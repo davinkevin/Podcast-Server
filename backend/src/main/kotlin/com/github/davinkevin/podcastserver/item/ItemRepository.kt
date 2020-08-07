@@ -106,7 +106,7 @@ class ItemRepository(private val query: DSLContext) {
                 .flatMap { findById(id) }
     }
 
-    fun search(q: String?, tags: List<String>, statuses: List<Status>, page: ItemPageRequest, podcastId: UUID?): Mono<PageItem> = Mono.defer {
+    fun search(q: String, tags: List<String>, statuses: List<Status>, page: ItemPageRequest, podcastId: UUID?): Mono<PageItem> = Mono.defer {
 
         Flux.from(
                 query

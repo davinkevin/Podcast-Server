@@ -50,7 +50,7 @@ class PodcastXmlHandler(
         val itemPageable = ItemPageRequest(0, limitNumber, ItemSort("DESC", "pubDate"))
 
         val items = itemService.search(
-                q = null,
+                q = "",
                 tags = listOf(),
                 statuses = listOf(),
                 page = itemPageable,

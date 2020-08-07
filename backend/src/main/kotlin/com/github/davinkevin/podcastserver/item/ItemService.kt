@@ -59,7 +59,7 @@ class ItemService(
             }
             .then()
 
-    fun search(q: String?, tags: List<String>, statuses: List<Status>, page: ItemPageRequest, podcastId: UUID? = null): Mono<PageItem> =
+    fun search(q: String, tags: List<String>, statuses: List<Status>, page: ItemPageRequest, podcastId: UUID? = null): Mono<PageItem> =
             repository.search(q = q, tags = tags, statuses = statuses, page = page, podcastId = podcastId)
 
     fun upload(podcastId: UUID, file: FilePart): Mono<Item> {

@@ -68,7 +68,7 @@ class ItemHandler(
                             .map { UriComponentsBuilder.fromUri(host)
                                     .pathSegment("data", it.podcast.title, it.fileName)
                                     .build().toUri() }
-                            .switchIfEmpty { URI(item.url).toMono() }
+                            .switchIfEmpty { URI(item.url!!).toMono() }
                 }
                 .doOnNext { log.debug("Redirect content playabe to {}", it)}
                 .flatMap { seeOther(it).build() }
@@ -102,25 +102,19 @@ class ItemHandler(
     }
 
     fun search(s: ServerRequest): Mono<ServerResponse> {
-        val q: String? = s.queryParam("q").filter { it.isNotEmpty() }.orElse(null)
-        val page = s.queryParam("page").map { it.toInt() }.orElse(0)
-        val size  = s.queryParam("size").map { it.toInt() }.orElse(12)
-        val sort  = s.queryParam("sort").orElse("pubDate,DESC")
-        val field = sort.split(",").first()
-        val direction = sort.split(",").last()
-
-        val itemPageable = ItemPageRequest(page, size, ItemSort(direction, field))
-
+        val q: String = s.queryParam("q").orElse("")
         val tags = s.queryParam("tags")
-                .filter { !it.isEmpty() }
+                .filter { it.isNotEmpty() }
                 .map { it.split(",") }
                 .orElse(listOf())
 
         val statuses = s.queryParam("status")
-                .filter { !it.isEmpty() }
+                .filter { it.isNotEmpty() }
                 .map { it.split(",") }
                 .orElse(listOf())
                 .map { Status.of(it) }
+
+        val itemPageable = s.toPageRequest()
 
         return itemService.search(
                 q = q,
@@ -135,13 +129,10 @@ class ItemHandler(
     }
 
     fun pocastItems(r: ServerRequest): Mono<ServerResponse> {
-        val q: String? = r.queryParam("q").filter { it.isNotEmpty() }.orElse(null)
-        val page = r.queryParam("page").map { it.toInt() }.orElse(0)
-        val size  = r.queryParam("size").map { it.toInt() }.orElse(12)
-        val (field, direction) = r.queryParam("sort").orElse("pubDate,DESC").split(",")
+        val q: String = r.queryParam("q").orElse("")
         val podcastId = UUID.fromString(r.pathVariable("idPodcast"))
 
-        val itemPageable = ItemPageRequest(page, size, ItemSort(direction, field))
+        val itemPageable = r.toPageRequest()
 
         val tags = r.queryParam("tags")
                 .filter { it.isNotEmpty() }
@@ -163,6 +154,14 @@ class ItemHandler(
         )
                 .map(::toPageItemHAL)
                 .flatMap { ok().bodyValue(it) }
+    }
+
+    fun ServerRequest.toPageRequest(): ItemPageRequest {
+        val page = queryParam("page").map { it.toInt() }.orElse(0)
+        val size  = queryParam("size").map { it.toInt() }.orElse(12)
+        val (field, direction) = queryParam("sort").orElse("pubDate,DESC").split(",")
+
+        return ItemPageRequest(page, size, ItemSort(direction, field))
     }
 
     fun upload(r: ServerRequest): Mono<ServerResponse> {

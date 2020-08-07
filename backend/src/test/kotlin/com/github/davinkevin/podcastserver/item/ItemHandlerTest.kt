@@ -36,7 +36,8 @@ import java.util.*
 @Import(ItemRoutingConfig::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
 class ItemHandlerTest(
-    @Autowired val rest: WebTestClient
+    @Autowired val rest: WebTestClient,
+    @Autowired val clock: Clock
 ) {
 
     @MockBean private lateinit var itemService: ItemService
@@ -404,6 +405,602 @@ class ItemHandlerTest(
                         } """)
                     }
         }
+    }
+
+    @Nested
+    @DisplayName("should search for item")
+    inner class ShouldSearchForItem {
+
+        @Nested
+        @DisplayName("on parameters")
+        inner class OnParameters {
+
+            val zeroResult = PageItem(
+                    content = listOf(),
+                    empty = true,
+                    first = true,
+                    last = true,
+                    number = 0,
+                    numberOfElements = 0,
+                    size = 0,
+                    totalElements = 0,
+                    totalPages = 0
+            )
+
+            @Test
+            fun `with default values`() {
+                /* Given */
+                val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+
+            @Test
+            fun `with query parameter`() {
+                /* Given */
+                val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
+                whenever(itemService.search("foo", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search?q=foo")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+
+            @Test
+            fun `with one tag`() {
+                /* Given */
+                val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
+                whenever(itemService.search("", listOf("foo"), emptyList(), request)).thenReturn(zeroResult.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search?tags=foo")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+
+            @Test
+            fun `with multiple tags`() {
+                /* Given */
+                val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
+                whenever(itemService.search("", listOf("foo", "bar"), emptyList(), request)).thenReturn(zeroResult.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search?tags=foo,bar")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+
+            @Test
+            fun `with one status`() {
+                /* Given */
+                val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
+                whenever(itemService.search("", emptyList(), listOf(Status.STARTED), request)).thenReturn(zeroResult.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search?status=STARTED")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+
+            @Test
+            fun `with multiple status`() {
+                /* Given */
+                val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
+                whenever(itemService.search("", emptyList(), listOf(Status.STARTED, Status.DELETED), request)).thenReturn(zeroResult.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search?status=STARTED,DELETED")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+
+            @Test
+            fun `with page parameter`() {
+                /* Given */
+                val request = ItemPageRequest(1, 12, ItemSort("DESC", "pubDate"))
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search?page=1")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+
+            @Test
+            fun `with size parameter`() {
+                /* Given */
+                val request = ItemPageRequest(0, 24, ItemSort("DESC", "pubDate"))
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search?size=24")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+
+            @Test
+            fun `with sort parameter`() {
+                /* Given */
+                val request = ItemPageRequest(0, 12, ItemSort("ASC", "downloadDate"))
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search?sort=downloadDate,ASC")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+
+
+        }
+
+        @Nested
+        @DisplayName("withSuccess")
+        inner class WithSuccess {
+
+            private val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
+
+            @Test
+            fun `with no items`() {
+                /* Given */
+                val result = PageItem(
+                        content = listOf(),
+                        empty = true,
+                        first = true,
+                        last = true,
+                        number = 0,
+                        numberOfElements = 0,
+                        size = 0,
+                        totalElements = 0,
+                        totalPages = 0
+                )
+
+                val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+            private val podcast = Item.Podcast(UUID.fromString("ef62c5c3-e79f-4474-8228-40b76abcdb57"), "podcast 1", "https/foo.bar.com/rss")
+
+            private val item1 = Item(
+                    id = UUID.fromString("6a287582-e181-48f9-a23d-c88d03879feb"),
+                    title = "item 1",
+                    url = "https://foo.bar.com/1.mp3",
+
+                    pubDate = now(clock),
+                    downloadDate = now(clock),
+                    creationDate = now(clock),
+
+                    description = "item 1 desc",
+                    mimeType = "audio/mp3",
+                    length = 1234,
+                    fileName = "1.mp3",
+                    status = Status.FINISH,
+
+                    podcast = podcast,
+                    cover = Item.Cover(UUID.fromString("337edcd5-97d3-4f78-9a5b-1c14c999883b"), URI("https://foo.bar.com/cover.png"), 100, 100)
+            )
+            private val item2 = Item(
+                    id = UUID.fromString("cb4cd9b9-957a-457e-a72a-519241c51aca"),
+                    title = "item 2",
+                    url = "https://foo.bar.com/2.mp3",
+
+                    pubDate = now(clock),
+                    downloadDate = now(clock),
+                    creationDate = now(clock),
+
+                    description = "item 2 desc",
+                    mimeType = "audio/mp3",
+                    length = 1234,
+                    fileName = "2.mp3",
+                    status = Status.FINISH,
+
+                    podcast = podcast,
+                    cover = Item.Cover(UUID.fromString("319072db-4411-4975-884e-f1cacbfb1471"), URI("https://foo.bar.com/2/cover.png"), 100, 100)
+            )
+            private val item3 = Item(
+                    id = UUID.fromString("ffbeb6b9-0e1f-4fb1-ab95-0f92effcc621"),
+                    title = "item 3",
+                    url = "https://foo.bar.com/3.mp3",
+
+                    pubDate = now(clock),
+                    downloadDate = now(clock),
+                    creationDate = now(clock),
+
+                    description = "item 3 desc",
+                    mimeType = "audio/mp3",
+                    length = 1234,
+                    fileName = "3.mp3",
+                    status = Status.FINISH,
+
+                    podcast = podcast,
+                    cover = Item.Cover(UUID.fromString("388d596e-858a-4746-bbe7-a1c027fa2fc4"), URI("https://foo.bar.com/3/cover.png"), 100, 100)
+            )
+
+            @Test
+            fun `with one items`() {
+                /* Given */
+                val result = PageItem.of(listOf(item1), 1, request)
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {
+                            isEqualTo("""{
+                               "content":[
+                                   {
+                                      "cover":{
+                                         "height":100,
+                                         "id":"337edcd5-97d3-4f78-9a5b-1c14c999883b",
+                                         "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/cover.png",
+                                         "width":100
+                                      },
+                                      "creationDate":"2019-03-04T05:06:07Z",
+                                      "description":"item 1 desc",
+                                      "downloadDate":"2019-03-04T05:06:07Z",
+                                      "fileName":"1.mp3",
+                                      "id":"6a287582-e181-48f9-a23d-c88d03879feb",
+                                      "isDownloaded":true,
+                                      "length":1234,
+                                      "mimeType":"audio/mp3",
+                                      "podcast":{
+                                         "id":"ef62c5c3-e79f-4474-8228-40b76abcdb57",
+                                         "title":"podcast 1",
+                                         "url":"https/foo.bar.com/rss"
+                                      },
+                                      "podcastId":"ef62c5c3-e79f-4474-8228-40b76abcdb57",
+                                      "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/item_1.mp3",
+                                      "pubDate":"2019-03-04T05:06:07Z",
+                                      "status":"FINISH",
+                                      "title":"item 1",
+                                      "url":"https://foo.bar.com/1.mp3"
+                                   }
+                                ],
+                               "empty":false,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":1,
+                               "size":12,
+                               "totalElements":1,
+                               "totalPages":1
+                            }""")
+                        }
+            }
+
+            @Test
+            fun `with two items`() {
+                /* Given */
+                val result = PageItem.of(listOf(item1, item2), 2, request)
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {
+                            isEqualTo("""{
+                               "content":[
+                               {
+                                  "cover":{
+                                     "height":100,
+                                     "id":"337edcd5-97d3-4f78-9a5b-1c14c999883b",
+                                     "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/cover.png",
+                                     "width":100
+                                  },
+                                  "creationDate":"2019-03-04T05:06:07Z",
+                                  "description":"item 1 desc",
+                                  "downloadDate":"2019-03-04T05:06:07Z",
+                                  "fileName":"1.mp3",
+                                  "id":"6a287582-e181-48f9-a23d-c88d03879feb",
+                                  "isDownloaded":true,
+                                  "length":1234,
+                                  "mimeType":"audio/mp3",
+                                  "podcast":{
+                                     "id":"ef62c5c3-e79f-4474-8228-40b76abcdb57",
+                                     "title":"podcast 1",
+                                     "url":"https/foo.bar.com/rss"
+                                  },
+                                  "podcastId":"ef62c5c3-e79f-4474-8228-40b76abcdb57",
+                                  "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/item_1.mp3",
+                                  "pubDate":"2019-03-04T05:06:07Z",
+                                  "status":"FINISH",
+                                  "title":"item 1",
+                                  "url":"https://foo.bar.com/1.mp3"
+                               },
+                               {
+                                  "cover":{
+                                     "height":100,
+                                     "id":"319072db-4411-4975-884e-f1cacbfb1471",
+                                     "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/cb4cd9b9-957a-457e-a72a-519241c51aca/cover.png",
+                                     "width":100
+                                  },
+                                  "creationDate":"2019-03-04T05:06:07Z",
+                                  "description":"item 2 desc",
+                                  "downloadDate":"2019-03-04T05:06:07Z",
+                                  "fileName":"2.mp3",
+                                  "id":"cb4cd9b9-957a-457e-a72a-519241c51aca",
+                                  "isDownloaded":true,
+                                  "length":1234,
+                                  "mimeType":"audio/mp3",
+                                  "podcast":{
+                                     "id":"ef62c5c3-e79f-4474-8228-40b76abcdb57",
+                                     "title":"podcast 1",
+                                     "url":"https/foo.bar.com/rss"
+                                  },
+                                  "podcastId":"ef62c5c3-e79f-4474-8228-40b76abcdb57",
+                                  "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/cb4cd9b9-957a-457e-a72a-519241c51aca/item_2.mp3",
+                                  "pubDate":"2019-03-04T05:06:07Z",
+                                  "status":"FINISH",
+                                  "title":"item 2",
+                                  "url":"https://foo.bar.com/2.mp3"
+                               }
+                            ],
+                               "empty":false,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":2,
+                               "size":12,
+                               "totalElements":2,
+                               "totalPages":1
+                            }""")
+                        }
+            }
+
+            @Test
+            fun `with three items`() {
+                /* Given */
+                val result = PageItem.of(listOf(item1, item2, item3), 3, request)
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {
+                            isEqualTo("""{
+                               "content":[
+                               {
+                                  "cover":{
+                                     "height":100,
+                                     "id":"337edcd5-97d3-4f78-9a5b-1c14c999883b",
+                                     "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/cover.png",
+                                     "width":100
+                                  },
+                                  "creationDate":"2019-03-04T05:06:07Z",
+                                  "description":"item 1 desc",
+                                  "downloadDate":"2019-03-04T05:06:07Z",
+                                  "fileName":"1.mp3",
+                                  "id":"6a287582-e181-48f9-a23d-c88d03879feb",
+                                  "isDownloaded":true,
+                                  "length":1234,
+                                  "mimeType":"audio/mp3",
+                                  "podcast":{ "id":"ef62c5c3-e79f-4474-8228-40b76abcdb57", "title":"podcast 1", "url":"https/foo.bar.com/rss" },
+                                  "podcastId":"ef62c5c3-e79f-4474-8228-40b76abcdb57",
+                                  "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/item_1.mp3",
+                                  "pubDate":"2019-03-04T05:06:07Z",
+                                  "status":"FINISH",
+                                  "title":"item 1",
+                                  "url":"https://foo.bar.com/1.mp3"
+                               },
+                               {
+                                  "cover":{
+                                     "height":100,
+                                     "id":"319072db-4411-4975-884e-f1cacbfb1471",
+                                     "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/cb4cd9b9-957a-457e-a72a-519241c51aca/cover.png",
+                                     "width":100
+                                  },
+                                  "creationDate":"2019-03-04T05:06:07Z",
+                                  "description":"item 2 desc",
+                                  "downloadDate":"2019-03-04T05:06:07Z",
+                                  "fileName":"2.mp3",
+                                  "id":"cb4cd9b9-957a-457e-a72a-519241c51aca",
+                                  "isDownloaded":true,
+                                  "length":1234,
+                                  "mimeType":"audio/mp3",
+                                  "podcast":{ "id":"ef62c5c3-e79f-4474-8228-40b76abcdb57", "title":"podcast 1", "url":"https/foo.bar.com/rss" },
+                                  "podcastId":"ef62c5c3-e79f-4474-8228-40b76abcdb57",
+                                  "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/cb4cd9b9-957a-457e-a72a-519241c51aca/item_2.mp3",
+                                  "pubDate":"2019-03-04T05:06:07Z",
+                                  "status":"FINISH",
+                                  "title":"item 2",
+                                  "url":"https://foo.bar.com/2.mp3"
+                               },
+                               {
+                                  "cover":{
+                                     "height":100,
+                                     "id":"388d596e-858a-4746-bbe7-a1c027fa2fc4",
+                                     "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/ffbeb6b9-0e1f-4fb1-ab95-0f92effcc621/cover.png",
+                                     "width":100
+                                  },
+                                  "creationDate":"2019-03-04T05:06:07Z",
+                                  "description":"item 3 desc",
+                                  "downloadDate":"2019-03-04T05:06:07Z",
+                                  "fileName":"3.mp3",
+                                  "id":"ffbeb6b9-0e1f-4fb1-ab95-0f92effcc621",
+                                  "isDownloaded":true,
+                                  "length":1234,
+                                  "mimeType":"audio/mp3",
+                                  "podcast":{ "id":"ef62c5c3-e79f-4474-8228-40b76abcdb57", "title":"podcast 1", "url":"https/foo.bar.com/rss" },
+                                  "podcastId":"ef62c5c3-e79f-4474-8228-40b76abcdb57",
+                                  "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/ffbeb6b9-0e1f-4fb1-ab95-0f92effcc621/item_3.mp3",
+                                  "pubDate":"2019-03-04T05:06:07Z",
+                                  "status":"FINISH",
+                                  "title":"item 3",
+                                  "url":"https://foo.bar.com/3.mp3"
+                               }
+                            ],
+                               "empty":false,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":3,
+                               "size":12,
+                               "totalElements":3,
+                               "totalPages":1
+                            }""")
+                        }
+            }
+
+
+        }
+
     }
 
     @Nested
