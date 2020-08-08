@@ -16,7 +16,16 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.core.io.ByteArrayResource
+import org.springframework.core.io.buffer.DataBuffer
+import org.springframework.core.io.buffer.DataBufferFactory
+import org.springframework.core.io.buffer.DataBufferUtils
+import org.springframework.core.io.buffer.DefaultDataBufferFactory
+import org.springframework.http.HttpHeaders
+import org.springframework.http.client.MultipartBodyBuilder
+import org.springframework.http.codec.multipart.FilePart
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.web.reactive.function.BodyInserters
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
@@ -162,7 +171,7 @@ class ItemHandlerTest(
 
     @Nested
     @DisplayName("should serve cover")
-    inner class ShouldServerCover {
+    inner class ShouldServeCover {
 
         @Test
         fun `by redirecting to local file server if cover exists locally`() {
@@ -1420,6 +1429,92 @@ class ItemHandlerTest(
                     /* Then */
                     .expectStatus().isOk
         }
+    }
+
+    @Nested
+    @DisplayName("should upload")
+    inner class ShouldUpload {
+
+        private val item1 = Item(
+                id = UUID.fromString("6a287582-e181-48f9-a23d-c88d03879feb"),
+                title = "item 1",
+                url = "https://foo.bar.com/1.mp3",
+
+                pubDate = now(clock),
+                downloadDate = now(clock),
+                creationDate = now(clock),
+
+                description = "item 1 desc",
+                mimeType = "audio/mp3",
+                length = 1234,
+                fileName = "1.mp3",
+                status = Status.FINISH,
+
+                podcast = Item.Podcast(UUID.fromString("ef62c5c3-e79f-4474-8228-40b76abcdb57"), "podcast 1", "https/foo.bar.com/rss"),
+                cover = Item.Cover(UUID.fromString("337edcd5-97d3-4f78-9a5b-1c14c999883b"), URI("https://foo.bar.com/cover.png"), 100, 100)
+        )
+
+
+        inner class TestFilePart: FilePart {
+            override fun content(): Flux<DataBuffer> = Flux.just(DefaultDataBufferFactory().wrap(("data".toByteArray())))
+            override fun headers(): HttpHeaders = TODO("Not yet implemented")
+            override fun filename(): String = "data.mp3"
+            override fun name(): String = TODO("Not yet implemented")
+            override fun transferTo(dest: Path): Mono<Void> = TODO("Not yet implemented")
+        }
+
+        @Test
+        fun `with success`() {
+            /* Given */
+            val filePart = TestFilePart()
+            val podcastId = UUID.fromString("7e90ebf0-bc4d-451a-82e1-e9ce3fb3fe73")
+            val body = MultipartBodyBuilder().apply { part("file", filePart) }.build()
+            whenever(itemService.upload(eq(podcastId), any())).thenReturn(item1.toMono())
+
+            /* When */
+            rest
+                    .post()
+                    .uri("/api/v1/podcasts/{idPodcast}/items/upload", podcastId)
+                    .header("X-Forwarded-Proto", "http")
+                    .header("host", "localhost")
+                    .header("X-Forwarded-Port", "8080")
+                    .body(BodyInserters.fromMultipartData(body))
+                    /* Then */
+                    .exchange()
+                    .expectStatus().isCreated
+                    .expectHeader()
+                    .valueEquals("Location", "http://localhost:8080/api/v1/items/6a287582-e181-48f9-a23d-c88d03879feb")
+                    .expectBody().assertThatJson {
+                        isEqualTo("""{
+                           "id":"6a287582-e181-48f9-a23d-c88d03879feb",
+                           "title":"item 1",
+                           "url":"https://foo.bar.com/1.mp3",
+                           "pubDate":"2019-03-04T05:06:07Z",
+                           "downloadDate":"2019-03-04T05:06:07Z",
+                           "creationDate":"2019-03-04T05:06:07Z",
+                           "description":"item 1 desc",
+                           "mimeType":"audio/mp3",
+                           "length":1234,
+                           "fileName":"1.mp3",
+                           "status":"FINISH",
+                           "podcast":{
+                              "id":"ef62c5c3-e79f-4474-8228-40b76abcdb57",
+                              "title":"podcast 1",
+                              "url":"https/foo.bar.com/rss"
+                           },
+                           "cover":{
+                              "id":"337edcd5-97d3-4f78-9a5b-1c14c999883b",
+                              "width":100,
+                              "height":100,
+                              "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/cover.png"
+                           },
+                           "podcastId":"ef62c5c3-e79f-4474-8228-40b76abcdb57",
+                           "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/item_1.mp3",
+                           "isDownloaded":true
+                        }""")
+                    }
+        }
+
     }
 
     @TestConfiguration

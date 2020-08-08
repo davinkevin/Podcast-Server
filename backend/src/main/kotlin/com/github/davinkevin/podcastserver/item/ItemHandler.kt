@@ -171,6 +171,7 @@ class ItemHandler(
                 .map { it["file"] as FilePart }
                 .doOnNext { log.info("upload of file ${it.filename()}") }
                 .flatMap { itemService.upload(podcastId, it) }
+                .map { it.toHAL() }
                 .flatMap { created(URI("${host}api/v1/items/${it.id}")).bodyValue(it) }
     }
 
@@ -190,7 +191,7 @@ class ItemHandler(
 
         return itemService
                 .deleteById(itemId)
-                .flatMap { ok().build() }
+                .then(ok().build())
 
     }
 }
