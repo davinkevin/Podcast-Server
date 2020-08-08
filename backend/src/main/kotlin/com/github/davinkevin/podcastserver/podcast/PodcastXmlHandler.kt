@@ -52,7 +52,7 @@ class PodcastXmlHandler(
         val items = itemService.search(
                 q = "",
                 tags = listOf(),
-                statuses = listOf(),
+                status = listOf(),
                 page = itemPageable,
                 podcastId = podcastId
         )

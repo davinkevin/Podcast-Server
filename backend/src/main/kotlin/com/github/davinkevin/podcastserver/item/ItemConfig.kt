@@ -21,7 +21,7 @@ class ItemRoutingConfig {
         }
 
         "/api/v1/podcasts/{idPodcast}".nest {
-            GET("/items", item::pocastItems )
+            GET("/items", item::podcastItems )
             POST("/items/upload", item::upload)
             "/items/{id}".nest {
                 GET("/", item::findById)

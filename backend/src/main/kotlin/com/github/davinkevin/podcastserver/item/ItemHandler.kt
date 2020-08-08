@@ -53,7 +53,7 @@ class ItemHandler(
         val id = UUID.fromString(s.pathVariable("id"))
 
         return itemService.reset(id)
-                .map(::toItemHAL)
+                .map { it.toHAL() }
                 .flatMap { ok().bodyValue(it) }
     }
 
@@ -63,14 +63,14 @@ class ItemHandler(
 
         return itemService.findById(id)
                 .flatMap { item -> item
-                            .toMono()
-                            .filter(Item::isDownloaded)
-                            .map { UriComponentsBuilder.fromUri(host)
-                                    .pathSegment("data", it.podcast.title, it.fileName)
-                                    .build().toUri() }
-                            .switchIfEmpty { URI(item.url!!).toMono() }
+                        .toMono()
+                        .filter { it.isDownloaded() }
+                        .map { UriComponentsBuilder.fromUri(host)
+                                .pathSegment("data", it.podcast.title, it.fileName)
+                                .build().toUri() }
+                        .switchIfEmpty { URI(item.url!!).toMono() }
                 }
-                .doOnNext { log.debug("Redirect content playabe to {}", it)}
+                .doOnNext { log.debug("Redirect content playable to {}", it)}
                 .flatMap { seeOther(it).build() }
                 .switchIfEmpty { ResponseStatusException(NOT_FOUND, "No item found for id $id").toMono() }
     }
@@ -84,8 +84,8 @@ class ItemHandler(
                         .toMono()
                         .flatMap { fileService.coverExists(it) }
                         .map { UriComponentsBuilder.fromUri(host)
-                                    .pathSegment("data", item.podcast.title, it)
-                                    .build().toUri()
+                                .pathSegment("data", item.podcast.title, it)
+                                .build().toUri()
                         }
                         .switchIfEmpty { item.cover.url.toMono() }
                 }
@@ -97,72 +97,69 @@ class ItemHandler(
         val id = UUID.fromString(s.pathVariable("id"))
 
         return itemService.findById(id)
-                .map(::toItemHAL)
+                .map { it.toHAL() }
                 .flatMap { ok().bodyValue(it) }
     }
 
-    fun search(s: ServerRequest): Mono<ServerResponse> {
-        val q: String = s.queryParam("q").orElse("")
-        val tags = s.queryParam("tags")
-                .filter { it.isNotEmpty() }
-                .map { it.split(",") }
-                .orElse(listOf())
-
-        val statuses = s.queryParam("status")
-                .filter { it.isNotEmpty() }
-                .map { it.split(",") }
-                .orElse(listOf())
-                .map { Status.of(it) }
-
-        val itemPageable = s.toPageRequest()
+    fun search(r: ServerRequest): Mono<ServerResponse> {
+        val q: String = r.extractQuery()
+        val tags = r.extractTags()
+        val status = r.extractStatus()
+        val itemPageable = r.toPageRequest()
 
         return itemService.search(
                 q = q,
                 tags = tags,
-                statuses = statuses,
+                status = status,
                 page = itemPageable,
                 podcastId = null
         )
-                .map(::toPageItemHAL)
+                .map { it.toHAL() }
                 .flatMap { ok().bodyValue(it) }
-
     }
 
-    fun pocastItems(r: ServerRequest): Mono<ServerResponse> {
-        val q: String = r.queryParam("q").orElse("")
+    fun podcastItems(r: ServerRequest): Mono<ServerResponse> {
         val podcastId = UUID.fromString(r.pathVariable("idPodcast"))
 
+        val q: String = r.extractQuery()
+        val tags = r.extractTags()
+        val status = r.extractStatus()
         val itemPageable = r.toPageRequest()
-
-        val tags = r.queryParam("tags")
-                .filter { it.isNotEmpty() }
-                .map { it.split(",") }
-                .orElse(listOf())
-
-        val statuses = r.queryParam("status")
-                .filter { it.isNotEmpty() }
-                .map { it.split(",") }
-                .orElse(listOf())
-                .map { Status.of(it) }
 
         return itemService.search(
                 q = q,
                 tags = tags,
-                statuses = statuses,
+                status = status,
                 page = itemPageable,
                 podcastId = podcastId
         )
-                .map(::toPageItemHAL)
+                .map { it.toHAL() }
                 .flatMap { ok().bodyValue(it) }
     }
 
-    fun ServerRequest.toPageRequest(): ItemPageRequest {
+    private fun ServerRequest.toPageRequest(): ItemPageRequest {
         val page = queryParam("page").map { it.toInt() }.orElse(0)
         val size  = queryParam("size").map { it.toInt() }.orElse(12)
         val (field, direction) = queryParam("sort").orElse("pubDate,DESC").split(",")
 
         return ItemPageRequest(page, size, ItemSort(direction, field))
     }
+
+    private fun ServerRequest.extractTags(): List<String> = queryParam("tags")
+            .filter { it.isNotEmpty() }
+            .map { it.split(",") }
+            .orElse(listOf())
+            .filter { it.isNotEmpty() }
+
+    private fun ServerRequest.extractStatus(): List<Status> = queryParam("status")
+            .filter { it.isNotEmpty() }
+            .map { it.split(",") }
+            .orElse(listOf())
+            .filter { it.isNotEmpty() }
+            .map { Status.of(it) }
+
+    private fun ServerRequest.extractQuery(): String = queryParam("q").orElse("")
+
 
     fun upload(r: ServerRequest): Mono<ServerResponse> {
         val podcastId = UUID.fromString(r.pathVariable("idPodcast"))
@@ -182,7 +179,7 @@ class ItemHandler(
 
         return itemService
                 .findPlaylistsContainingItem(itemId)
-                .map { PlaylistHAL(it.id, it.name) }
+                .map { PlaylistsHAL.PlaylistHAL(it.id, it.name) }
                 .collectList()
                 .map { PlaylistsHAL(it) }
                 .flatMap { ok().bodyValue(it) }
@@ -202,7 +199,7 @@ data class ItemHAL(
         val id: UUID, val title: String, val url: String?,
         val pubDate: OffsetDateTime?, val downloadDate: OffsetDateTime?, val creationDate: OffsetDateTime?,
         val description: String?, val mimeType: String, val length: Long?, val fileName: String?, val status: Status,
-        val podcast: PodcastHAL, val cover: CoverHAL
+        val podcast: Podcast, val cover: Cover
 ) {
     val podcastId = podcast.id
 
@@ -224,27 +221,28 @@ data class ItemHAL(
 
     @JsonProperty("isDownloaded")
     private val isDownloaded = Status.FINISH == status
+
+    data class Cover(val id: UUID, val width: Int, val height: Int, val url: URI)
+    data class Podcast(val id: UUID, val title: String, val url: String?)
 }
 
-data class CoverHAL(val id: UUID, val width: Int, val height: Int, val url: URI)
-data class PodcastHAL(val id: UUID, val title: String, val url: String?)
 
-fun toItemHAL(i: Item): ItemHAL {
+private fun Item.toHAL(): ItemHAL {
 
-    val extension = i.cover.url.extension()
+    val extension = cover.url.extension()
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
-            .pathSegment("api", "v1", "podcasts", i.podcast.id.toString(), "items", i.id.toString(), "cover.$extension")
+            .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), "cover.$extension")
             .build(true)
             .toUri()
 
     return ItemHAL(
-            id = i.id, title = i.title, url = i.url,
-            pubDate = i.pubDate, downloadDate = i.downloadDate, creationDate = i.creationDate,
-            description = i.description, mimeType = i.mimeType, length = i.length, fileName = i.fileName, status = i.status,
+            id = id, title = title, url = url,
+            pubDate = pubDate, downloadDate = downloadDate, creationDate = creationDate,
+            description = description, mimeType = mimeType, length = length, fileName = fileName, status = status,
 
-            podcast = PodcastHAL(i.podcast.id, i.podcast.title, i.podcast.url),
-            cover = CoverHAL(i.cover.id, i.cover.width, i.cover.height, coverUrl)
+            podcast = ItemHAL.Podcast(podcast.id, podcast.title, podcast.url),
+            cover = ItemHAL.Cover(cover.id, cover.width, cover.height, coverUrl)
     )
 }
 
@@ -260,17 +258,18 @@ data class PageItemHAL (
         val totalPages: Int
 )
 
-private fun toPageItemHAL(p: PageItem) = PageItemHAL(
-        content = p.content.map(::toItemHAL),
-        empty = p.empty,
-        first = p.first,
-        last = p.last,
-        number = p.number,
-        numberOfElements = p.numberOfElements,
-        size = p.size,
-        totalElements = p.totalElements,
-        totalPages = p.totalPages
+private fun PageItem.toHAL() = PageItemHAL(
+        content = content.map { it.toHAL() },
+        empty = empty,
+        first = first,
+        last = last,
+        number = number,
+        numberOfElements = numberOfElements,
+        size = size,
+        totalElements = totalElements,
+        totalPages = totalPages
 )
 
-data class PlaylistsHAL(val content: Collection<PlaylistHAL>)
-data class PlaylistHAL(val id: UUID, val name: String)
+data class PlaylistsHAL(val content: Collection<PlaylistHAL>) {
+    data class PlaylistHAL(val id: UUID, val name: String)
+}

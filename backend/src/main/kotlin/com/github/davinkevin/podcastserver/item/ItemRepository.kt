@@ -106,7 +106,7 @@ class ItemRepository(private val query: DSLContext) {
                 .flatMap { findById(id) }
     }
 
-    fun search(q: String, tags: List<String>, statuses: List<Status>, page: ItemPageRequest, podcastId: UUID?): Mono<PageItem> = Mono.defer {
+    fun search(q: String, tags: List<String>, status: List<Status>, page: ItemPageRequest, podcastId: UUID?): Mono<PageItem> = Mono.defer {
 
         Flux.from(
                 query
@@ -118,7 +118,7 @@ class ItemRepository(private val query: DSLContext) {
                 .collectList()
                 .flatMap { tagIds ->
 
-                    val statusesCondition = if (statuses.isEmpty()) noCondition() else ITEM.STATUS.`in`(statuses)
+                    val statusesCondition = if (status.isEmpty()) noCondition() else ITEM.STATUS.`in`(status)
                     val tagsCondition = if (tagIds.isEmpty()) noCondition() else {
                         tagIds
                                 .map {

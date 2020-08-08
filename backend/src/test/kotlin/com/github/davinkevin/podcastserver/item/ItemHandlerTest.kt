@@ -480,6 +480,32 @@ class ItemHandlerTest(
             }
 
             @Test
+            fun `with no tag`() {
+                /* Given */
+                val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("http://localhost:8080/api/v1/items/search?tags=")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+
+            @Test
             fun `with one tag`() {
                 /* Given */
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
@@ -532,6 +558,59 @@ class ItemHandlerTest(
             }
 
             @Test
+            fun `with some tags empty`() {
+                /* Given */
+                val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
+                whenever(itemService.search("", listOf("foo", "bar"), emptyList(), request)).thenReturn(zeroResult.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("http://localhost:8080/api/v1/items/search?tags=foo,bar,,,")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+
+
+            @Test
+            fun `with no status`() {
+                /* Given */
+                val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search?status=")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+
+            @Test
             fun `with one status`() {
                 /* Given */
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
@@ -566,6 +645,32 @@ class ItemHandlerTest(
                 rest
                         .get()
                         .uri("https://localhost:8080/api/v1/items/search?status=STARTED,DELETED")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody().assertThatJson {isEqualTo("""{
+                               "content":[],
+                               "empty":true,
+                               "first":true,
+                               "last":true,
+                               "number":0,
+                               "numberOfElements":0,
+                               "size":0,
+                               "totalElements":0,
+                               "totalPages":0
+                            }""")
+                        }
+            }
+
+            @Test
+            fun `with some status empty`() {
+                /* Given */
+                val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
+                whenever(itemService.search("", emptyList(), listOf(Status.STARTED, Status.DELETED), request)).thenReturn(zeroResult.toMono())
+                /* When */
+                rest
+                        .get()
+                        .uri("https://localhost:8080/api/v1/items/search?status=STARTED,DELETED,,,")
                         .exchange()
                         /* Then */
                         .expectStatus().isOk

@@ -59,8 +59,8 @@ class ItemService(
             }
             .then()
 
-    fun search(q: String, tags: List<String>, statuses: List<Status>, page: ItemPageRequest, podcastId: UUID? = null): Mono<PageItem> =
-            repository.search(q = q, tags = tags, statuses = statuses, page = page, podcastId = podcastId)
+    fun search(q: String, tags: List<String>, status: List<Status>, page: ItemPageRequest, podcastId: UUID? = null): Mono<PageItem> =
+            repository.search(q = q, tags = tags, status = status, page = page, podcastId = podcastId)
 
     fun upload(podcastId: UUID, file: FilePart): Mono<Item> {
         val filename = file.filename().replace("[^a-zA-Z0-9.-]".toRegex(), "_")
