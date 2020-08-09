@@ -41,7 +41,7 @@ class ItemRepository(private val query: DSLContext) {
                 )
                 .where(ITEM.ID.eq(id))
                 .toMono()
-                .map(::toItem)
+                .map { toItem(it) }
     }
 
     fun findAllToDelete(date: OffsetDateTime) = Flux.defer {
@@ -129,7 +129,7 @@ class ItemRepository(private val query: DSLContext) {
                                 }
                                 .reduce(DSL::and)
                     }
-                    val queryCondition = if (q.isNullOrEmpty()) noCondition()
+                    val queryCondition = if (q.isEmpty()) noCondition()
                     else or( ITEM.TITLE.containsIgnoreCase(q), ITEM.DESCRIPTION.containsIgnoreCase(q) )
 
                     val podcastCondition = if(podcastId == null) noCondition() else ITEM.PODCAST_ID.eq(podcastId)

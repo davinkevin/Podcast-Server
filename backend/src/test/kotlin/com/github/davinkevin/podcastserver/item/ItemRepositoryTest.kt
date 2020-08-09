@@ -300,7 +300,7 @@ class ItemRepositoryTest(
                             (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Appload $idx", "http://fakeurl.com/appload.$idx.mp3", "appload.$idx.mp3", fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), FINISH, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "audio/mp3") }
                             (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Geek Inc HD $idx", "http://fakeurl.com/geekinchd.$idx.mp3", "geekinchd.$idx.mp3", fromString("ccb75276-7a8c-4da9-b4fd-27ccec075c65"), FINISH, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("4b240b0a-516b-42e9-b9fc-e49b5f868045"), "desc", "video/mp4") }
                             (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Foo podcast $idx", "http://fakeurl.com/foo.$idx.mp3", "foo.$idx.mp3", fromString("cfb8c605-7e10-43b1-9b40-41ee8b5b13d3"), FINISH, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("a8eb1ea2-354c-4a8e-931a-dc0286a2a66e"), "desc", "unknown/unknown") }
-                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Other Podcast $idx", "http://fakeurl.com/other.$idx.mp3", "other.$idx.mp3", fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), NOT_DOWNLOADED, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "desc", "video/webm") }
+                            (1..max).forEach { val idx = max - it + 1; values(UUID.randomUUID(), "Other Podcast $idx", "http://fakeurl.com/other.$idx.mp3", "other.$idx.mp3", fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), NOT_DOWNLOADED, now().minusDays(it.toLong()).format(DB_DATE_FORMATTER), now().minusDays(it.toLong()+1).format(DB_DATE_FORMATTER), now().minusDays(15.toLong()+2).format(DB_DATE_FORMATTER), 0, fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "desc with content", "video/webm") }
                         }.build()!!,
                 insertInto("TAG")
                         .columns("ID", "NAME")
@@ -320,6 +320,154 @@ class ItemRepositoryTest(
 
         @BeforeEach
         fun prepare() = DbSetup(db, searchOperations).launch()
+
+        @Nested
+        @DisplayName("wth specific order")
+        inner class WithSpecificOrder {
+
+            @Test
+            fun `with downloadDate asc`() {
+                /* Given */
+                val page = ItemPageRequest(0, 12, ItemSort("asc", "downloadDate"))
+
+                /* When */
+                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.content.size).isEqualTo(12)
+                            assertThat(it.first).isTrue()
+                            assertThat(it.last).isFalse()
+                            assertThat(it.number).isEqualTo(0)
+                            assertThat(it.numberOfElements).isEqualTo(12)
+                            assertThat(it.totalElements).isEqualTo(200)
+                            assertThat(it.totalPages).isEqualTo(17)
+                            assertThat(it.content.map(Item::title)).contains(
+                                    "Appload 1", "Geek Inc HD 1", "Foo podcast 1", "Other Podcast 1",
+                                    "Appload 2", "Geek Inc HD 2", "Foo podcast 2", "Other Podcast 2",
+                                    "Appload 3", "Geek Inc HD 3", "Foo podcast 3", "Other Podcast 3"
+                            )
+                        }
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `with pubdate desc`() {
+                /* Given */
+                val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
+
+                /* When */
+                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.content.size).isEqualTo(12)
+                            assertThat(it.first).isTrue()
+                            assertThat(it.last).isFalse()
+                            assertThat(it.number).isEqualTo(0)
+                            assertThat(it.numberOfElements).isEqualTo(12)
+                            assertThat(it.totalElements).isEqualTo(200)
+                            assertThat(it.totalPages).isEqualTo(17)
+                            assertThat(it.content.map(Item::title)).contains(
+                                    "Appload 50", "Geek Inc HD 50", "Foo podcast 50", "Other Podcast 50",
+                                    "Appload 49", "Geek Inc HD 49", "Foo podcast 49", "Other Podcast 49",
+                                    "Appload 48", "Geek Inc HD 48", "Foo podcast 48", "Other Podcast 48"
+                            )
+                        }
+                        .verifyComplete()
+            }
+        }
+
+        @Nested
+        @DisplayName("on query parameter")
+        inner class OnQueryParameter {
+
+            @Test
+            fun empty() {
+                /* Given */
+                val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
+
+                /* When */
+                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.content.size).isEqualTo(12)
+                            assertThat(it.first).isTrue()
+                            assertThat(it.last).isFalse()
+                            assertThat(it.number).isEqualTo(0)
+                            assertThat(it.numberOfElements).isEqualTo(12)
+                            assertThat(it.totalElements).isEqualTo(200)
+                            assertThat(it.totalPages).isEqualTo(17)
+                            assertThat(it.content.map(Item::title)).contains(
+                                    "Appload 50", "Geek Inc HD 50", "Foo podcast 50", "Other Podcast 50",
+                                    "Appload 49", "Geek Inc HD 49", "Foo podcast 49", "Other Podcast 49",
+                                    "Appload 48", "Geek Inc HD 48", "Foo podcast 48", "Other Podcast 48"
+                            )
+                        }
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `with query matching item title`() {
+                /* Given */
+                val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
+
+                /* When */
+                StepVerifier.create(repository.search("podcast", listOf(), listOf(), page, null))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.content.size).isEqualTo(12)
+                            assertThat(it.first).isTrue()
+                            assertThat(it.last).isFalse()
+                            assertThat(it.number).isEqualTo(0)
+                            assertThat(it.numberOfElements).isEqualTo(12)
+                            assertThat(it.totalElements).isEqualTo(100)
+                            assertThat(it.totalPages).isEqualTo(9)
+                            assertThat(it.content.map(Item::title)).contains(
+                                    "Other Podcast 50", "Foo podcast 50",
+                                    "Other Podcast 49", "Foo podcast 49",
+                                    "Other Podcast 48", "Foo podcast 48",
+                                    "Other Podcast 47", "Foo podcast 47",
+                                    "Other Podcast 46", "Foo podcast 46",
+                                    "Other Podcast 45", "Foo podcast 45"
+                            )
+                        }
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `with query matching item description`() {
+                /* Given */
+                val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
+
+                /* When */
+                StepVerifier.create(repository.search("content", listOf(), listOf(), page, null))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.content.size).isEqualTo(12)
+                            assertThat(it.first).isTrue()
+                            assertThat(it.last).isFalse()
+                            assertThat(it.number).isEqualTo(0)
+                            assertThat(it.numberOfElements).isEqualTo(12)
+                            assertThat(it.totalElements).isEqualTo(50)
+                            assertThat(it.totalPages).isEqualTo(5)
+                            assertThat(it.content.map(Item::title)).contains(
+                                    "Other Podcast 50", "Other Podcast 49",
+                                    "Other Podcast 48", "Other Podcast 47",
+                                    "Other Podcast 46", "Other Podcast 45",
+                                    "Other Podcast 44", "Other Podcast 43",
+                                    "Other Podcast 42", "Other Podcast 41",
+                                    "Other Podcast 40", "Other Podcast 39"
+                            )
+                        }
+                        .verifyComplete()
+            }
+
+
+        }
 
         @Nested
         @DisplayName("with no tags and no specific statuses")
