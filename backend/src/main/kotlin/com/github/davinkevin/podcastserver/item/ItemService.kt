@@ -29,7 +29,8 @@ class ItemService(
         private val idm: ItemDownloadManager,
         private val p: PodcastServerParameters,
 
-        private val fileService: FileService
+        private val fileService: FileService,
+        private val clock: Clock
 ) {
 
     private val log = LoggerFactory.getLogger(ItemService::class.java)!!
@@ -84,8 +85,8 @@ class ItemService(
                             url = null,
 
                             pubDate = pubDate.toOffsetDateTime(),
-                            downloadDate = OffsetDateTime.now(),
-                            creationDate = OffsetDateTime.now(),
+                            downloadDate = OffsetDateTime.now(clock),
+                            creationDate = OffsetDateTime.now(clock),
 
                             description = podcast.description,
                             mimeType = mimeType,

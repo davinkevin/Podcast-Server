@@ -23,7 +23,7 @@ import java.util.*
 
 class PodcastRepository(private val query: DSLContext) {
 
-    fun findById(id: UUID) = Mono.zip(
+    fun findById(id: UUID): Mono<Podcast> = Mono.zip(
             Mono.defer { query
                     .select(
                             PODCAST.ID, PODCAST.TITLE, PODCAST.DESCRIPTION, PODCAST.SIGNATURE, PODCAST.URL,

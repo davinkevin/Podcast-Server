@@ -1,9 +1,12 @@
 package com.github.davinkevin.podcastserver.item
 
+import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.FINISH
 import com.github.davinkevin.podcastserver.entity.Status.NOT_DOWNLOADED
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
+import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.MimeTypeService
@@ -14,17 +17,22 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.io.TempDir
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.http.codec.multipart.FilePart
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
-import java.time.OffsetDateTime
+import java.nio.file.Path
+import java.time.*
 import java.util.*
 
 /**
@@ -34,7 +42,8 @@ import java.util.*
 @Import(ItemService::class)
 @Suppress("UnassignedFluxMonoInstance")
 class ItemServiceTest(
-        @Autowired val itemService: ItemService
+        @Autowired val itemService: ItemService,
+        @Autowired val clock: Clock
 ) {
 
     @MockBean private lateinit var repository: ItemRepository
@@ -85,7 +94,7 @@ class ItemServiceTest(
         val repoResponse = Flux.fromIterable(items)
         whenever(repository.findAllToDelete(limit)).thenReturn(repoResponse)
         whenever(fileService.
-                deleteItem(any())).thenReturn(Mono.empty())
+        deleteItem(any())).thenReturn(Mono.empty())
         whenever(repository.updateAsDeleted(any())).thenReturn(Mono.empty())
 
         /* When */
@@ -358,4 +367,92 @@ class ItemServiceTest(
             verify(fileService, times(1)).deleteItem(deleteItem)
         }
     }
+
+    @Nested
+    @DisplayName("should update file")
+    inner class ShouldUploadFile {
+
+        @Test
+        fun `with success`(@TempDir rootFolder: Path) {
+            /* Given */
+            val file: FilePart = mock()
+            val podcast = Podcast(
+                    id = UUID.fromString("2cdae1af-f93f-47f2-9a09-a316f2732fc1"),
+                    title = "podcast",
+                    description = "desc",
+                    signature = "sign",
+                    url = null,
+                    hasToBeDeleted = true,
+                    lastUpdate = OffsetDateTime.now(),
+                    type = "RSS",
+                    tags = emptyList(),
+                    cover = CoverForPodcast(
+                            id = UUID.fromString("e63f4c96-ce26-485a-bb8a-c3e799f843dd"),
+                            url = URI("17aaa117-afe7-4165-9468-fafb61d13bdb"),
+                            height = 100,
+                            width = 100
+                    )
+            )
+            val fileLocation = rootFolder.resolve("podcast").resolve("Podcast_Name_-_2020-01-02_-_title.mp3")
+            val itemToCreate = ItemForCreation(
+                    title = "title",
+                    url = null,
+
+                    pubDate = ZonedDateTime.of(LocalDateTime.of(2020, 1, 2, 0, 0), ZoneId.systemDefault())
+                            .toOffsetDateTime(),
+                    downloadDate = OffsetDateTime.now(clock),
+                    creationDate = OffsetDateTime.now(clock),
+
+                    description = podcast.description,
+                    mimeType = "audio/mp3",
+                    length = 1234L,
+                    fileName = "Podcast_Name_-_2020-01-02_-_title.mp3",
+                    status = FINISH,
+
+                    podcastId = podcast.id,
+                    cover = CoverForCreation(100, 100, podcast.cover.url)
+            )
+            val itemCreated = Item(
+                    id = UUID.fromString("a9f303e9-e53c-450c-97b6-7f16e8b2f541"),
+                    title = itemToCreate.title,
+                    url = null,
+                    pubDate = itemToCreate.pubDate,
+                    downloadDate = itemToCreate.downloadDate,
+                    creationDate = itemToCreate.creationDate,
+                    description = itemToCreate.description,
+                    mimeType = itemToCreate.mimeType,
+                    length = itemToCreate.length,
+                    status = FINISH,
+                    fileName = itemToCreate.fileName,
+                    podcast = Item.Podcast(podcast.id, podcast.title, podcast.url),
+                    cover = Item.Cover(
+                            id = UUID.fromString("f60ece68-d95b-4990-947d-bfe70ecb135c"),
+                            url = podcast.cover.url,
+                            width = podcast.cover.width,
+                            height = podcast.cover.height
+                    )
+            )
+            whenever(file.filename()).thenReturn("Podcast Name - 2020-01-02 - title.mp3")
+            whenever(p.rootfolder).thenReturn(rootFolder)
+            whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast.toMono())
+            whenever(fileService.upload(fileLocation, file)).thenReturn(Mono.empty())
+            whenever(fileService.size(fileLocation)).thenReturn(1234L.toMono())
+            whenever(fileService.probeContentType(fileLocation)).thenReturn("audio/mp3".toMono())
+            whenever(repository.create(itemToCreate)).thenReturn(itemCreated.toMono())
+            whenever(podcastRepository.updateLastUpdate(podcast.id)).thenReturn(Mono.empty())
+            /* When */
+            StepVerifier.create(itemService.upload(podcast.id, file))
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(itemCreated)
+                    .verifyComplete()
+        }
+    }
+
+    @TestConfiguration
+    class LocalTestConfiguration {
+        @Bean fun fixedClock(): Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
+    }
 }
+
+private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
