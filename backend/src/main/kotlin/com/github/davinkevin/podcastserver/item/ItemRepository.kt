@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.entity.Status.*
 import org.jooq.DSLContext
 import org.jooq.Field
 import org.jooq.Record18
+import org.jooq.SortField
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
 import org.slf4j.LoggerFactory
@@ -279,10 +280,7 @@ private fun toItem(it: Record18<UUID, String, String, OffsetDateTime, OffsetDate
     )
 }
 
-private fun <T> ItemSort.toOrderBy(downloadDate: Field<T>, defaultField: Field<T>) = when(field) {
-    "downloadDate" -> downloadDate
-    else -> defaultField
-}.let { when(direction.toUpperCase()) {
-    "ASC" -> it.asc()
-    else -> it.desc()
-} }
+private fun <T> ItemSort.toOrderBy(downloadDate: Field<T>, defaultField: Field<T>): SortField<T>? {
+    val field = if(field == "downloadDate" ) downloadDate else defaultField
+    return if (direction.toLowerCase() == "asc") field.asc() else field.desc()
+}
