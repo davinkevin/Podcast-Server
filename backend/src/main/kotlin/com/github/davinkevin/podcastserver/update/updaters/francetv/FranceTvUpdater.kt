@@ -149,19 +149,24 @@ private data class FranceTvItem(
         val ep = episode ?: ""
         val subTitle = sousTitre ?: ""
 
+        val seasonIsPresent     = season.isNotEmpty()
+        val episodeIsPresent    = ep.isNotEmpty()
+        val subTitleIsPresent   = subTitle.isNotEmpty()
+        /*
+         * Remove some comparison for purpose of code coverage analysis. Orders should be kept for logical purpose
+         * https://github.com/jacoco/jacoco/issues/921
+         */
         return when {
-            season.isNotEmpty() && ep.isNotEmpty() && subTitle.isNotEmpty() -> "$titre - S${season}E$episode - $subTitle"
+            seasonIsPresent    &&    !episodeIsPresent   &&    subTitleIsPresent    -> "$titre - S$season - $subTitle"
+            seasonIsPresent    &&    !episodeIsPresent /*&&    subTitleIsEmpty   */ -> "$titre - S$season"
+            seasonIsPresent    && /* !episodeIsEmpty     && */ subTitleIsPresent    -> "$titre - S${season}E$episode - $subTitle"
+            seasonIsPresent /* &&    !episodeIsEmpty     &&    subTitleIsEmpty   */ -> "$titre - S${season}E$ep"
 
-            season.isEmpty() && ep.isNotEmpty() && subTitle.isNotEmpty() -> "$titre - E$ep - $subTitle"
-            season.isEmpty() && ep.isNotEmpty() && subTitle.isEmpty() -> "$titre - E$ep"
-            season.isEmpty() && ep.isEmpty()    && subTitle.isNotEmpty() -> "$titre - $subTitle"
+            /*seasonIsEmpty    && */ episodeIsPresent    &&    subTitleIsPresent    -> "$titre - E$ep - $subTitle"
+            /*seasonIsEmpty    &&    episodeIsEmpty      && */ subTitleIsPresent    -> "$titre - $subTitle"
+            /*seasonIsEmpty    && */ episodeIsPresent /* &&    subTitleIsEmpty   */ -> "$titre - E$ep"
 
-            season.isNotEmpty() && ep.isEmpty() && subTitle.isNotEmpty() -> "$titre - S${season} - $subTitle"
-            season.isNotEmpty() && ep.isEmpty() && subTitle.isEmpty() -> "$titre - S${season}"
-
-            season.isNotEmpty() && ep.isNotEmpty() && subTitle.isEmpty() -> "$titre - S${season}E$ep"
-
-            else -> "$titre"
+            else -> titre
         }
     }
 

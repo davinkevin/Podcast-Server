@@ -220,7 +220,7 @@ class FranceTvUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/tools/getInfosOeuvre/v2/?idDiffusion=2d8cde13-4b9d-423f-95c8-b37151b989bc")
-                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific//2d8cde13-4b9d-423f-95c8-b37151b989bc-with-episode-subtitle.json"))))
+                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific/2d8cde13-4b9d-423f-95c8-b37151b989bc-with-episode-subtitle.json"))))
                 }
 
                 /* When */
@@ -238,7 +238,7 @@ class FranceTvUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/tools/getInfosOeuvre/v2/?idDiffusion=2d8cde13-4b9d-423f-95c8-b37151b989bc")
-                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific//2d8cde13-4b9d-423f-95c8-b37151b989bc-with-episode.json"))))
+                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific/2d8cde13-4b9d-423f-95c8-b37151b989bc-with-episode.json"))))
                 }
 
                 /* When */
@@ -257,7 +257,7 @@ class FranceTvUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/tools/getInfosOeuvre/v2/?idDiffusion=2d8cde13-4b9d-423f-95c8-b37151b989bc")
-                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific//2d8cde13-4b9d-423f-95c8-b37151b989bc-with-subtitle.json"))))
+                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific/2d8cde13-4b9d-423f-95c8-b37151b989bc-with-subtitle.json"))))
                 }
 
                 /* When */
@@ -275,7 +275,7 @@ class FranceTvUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/tools/getInfosOeuvre/v2/?idDiffusion=2d8cde13-4b9d-423f-95c8-b37151b989bc")
-                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific//2d8cde13-4b9d-423f-95c8-b37151b989bc-with-season-and-subtitle.json"))))
+                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific/2d8cde13-4b9d-423f-95c8-b37151b989bc-with-season-and-subtitle.json"))))
                 }
 
                 /* When */
@@ -293,7 +293,7 @@ class FranceTvUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/tools/getInfosOeuvre/v2/?idDiffusion=2d8cde13-4b9d-423f-95c8-b37151b989bc")
-                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific//2d8cde13-4b9d-423f-95c8-b37151b989bc-with-season.json"))))
+                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific/2d8cde13-4b9d-423f-95c8-b37151b989bc-with-season.json"))))
                 }
 
                 /* When */
@@ -311,7 +311,7 @@ class FranceTvUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/tools/getInfosOeuvre/v2/?idDiffusion=2d8cde13-4b9d-423f-95c8-b37151b989bc")
-                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific//2d8cde13-4b9d-423f-95c8-b37151b989bc-with-season-episode.json"))))
+                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific/2d8cde13-4b9d-423f-95c8-b37151b989bc-with-season-episode.json"))))
                 }
 
                 /* When */
@@ -329,7 +329,7 @@ class FranceTvUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/tools/getInfosOeuvre/v2/?idDiffusion=2d8cde13-4b9d-423f-95c8-b37151b989bc")
-                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific//2d8cde13-4b9d-423f-95c8-b37151b989bc-with-no-specific-fields.json"))))
+                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific/2d8cde13-4b9d-423f-95c8-b37151b989bc-with-no-specific-fields.json"))))
                 }
 
                 /* When */
