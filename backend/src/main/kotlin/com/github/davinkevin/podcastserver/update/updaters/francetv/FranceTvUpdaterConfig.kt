@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.web.reactive.function.client.WebClient
 import com.github.davinkevin.podcastserver.service.image.ImageService
+import java.time.Clock
 
 /**
  * Created by kevin on 18/02/2020
@@ -16,11 +17,16 @@ import com.github.davinkevin.podcastserver.service.image.ImageService
 class FranceTvUpdaterConfig {
 
     @Bean
-    fun franceTvUpdater(wcb: WebClient.Builder, image: ImageService, mapper: ObjectMapper): FranceTvUpdater {
+    fun franceTvUpdater(
+            wcb: WebClient.Builder,
+            image: ImageService,
+            mapper: ObjectMapper,
+            clock: Clock
+    ): FranceTvUpdater {
         val franceTvClient = wcb.clone().baseUrl("https://www.france.tv/").build()
         val franceTvApi = wcb.clone().baseUrl("https://sivideo.webservices.francetelevisions.fr").build()
 
-        return FranceTvUpdater(franceTvClient, franceTvApi, image, mapper)
+        return FranceTvUpdater(franceTvClient, franceTvApi, image, mapper, clock)
     }
 
 }

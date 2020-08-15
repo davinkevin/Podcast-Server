@@ -23,12 +23,14 @@ import java.time.ZonedDateTime
 import java.util.*
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.update.updaters.*
+import java.time.Clock
 
 class FranceTvUpdater(
         private val franceTvClient: WebClient,
         private val franceTvApi: WebClient,
         private val image: ImageService,
-        private val mapper: ObjectMapper
+        private val mapper: ObjectMapper,
+        private val clock: Clock
 ): Updater {
 
     private val log = LoggerFactory.getLogger(FranceTvUpdater::class.java)
@@ -81,7 +83,7 @@ class FranceTvUpdater(
                     ItemFromUpdate(
                             title = franceTvItem.title()!!,
                             description = franceTvItem.synopsis!!,
-                            pubDate = franceTvItem.pubDate(),
+                            pubDate = franceTvItem.pubDate(clock),
                             url = URI("https://www.france.tv$pathUrl"),
                             cover = cover.orNull(),
                             mimeType = "video/mp4"
@@ -140,7 +142,7 @@ private data class FranceTvItem(
         private val saison: String? = null,
         private val episode: String? = null,
         @field:JsonProperty("sous_titre") private val sousTitre: String? = null,
-        val diffusion: Diffusion = Diffusion(),
+        private val diffusion: Diffusion?,
         @field:JsonProperty("image_secure") val image: URI? = null
 ) {
 
@@ -170,13 +172,15 @@ private data class FranceTvItem(
         }
     }
 
-    fun pubDate(): ZonedDateTime {
-        return if (diffusion.timestamp == null) ZonedDateTime.now()
-        else ZonedDateTime.ofInstant(Instant.ofEpochSecond(diffusion.timestamp!!), ZONE_ID)
+    fun pubDate(clock: Clock): ZonedDateTime {
+        if (diffusion?.timestamp == null)
+            return ZonedDateTime.now(clock)
+
+        return ZonedDateTime.ofInstant(Instant.ofEpochSecond(diffusion.timestamp), ZONE_ID)
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
-    internal data class Diffusion(var timestamp: Long? = null)
+    internal data class Diffusion(val timestamp: Long?)
 }
 
 private val ZONE_ID = ZoneId.of("Europe/Paris")

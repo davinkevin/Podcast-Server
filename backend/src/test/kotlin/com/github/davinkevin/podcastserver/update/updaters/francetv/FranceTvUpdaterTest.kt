@@ -26,13 +26,15 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import reactor.test.StepVerifier
 import java.net.URI
-import java.time.ZoneId
-import java.time.ZonedDateTime
+import java.time.*
 import java.util.*
+
+private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
 @ExtendWith(SpringExtension::class)
 class FranceTvUpdaterTest(
-        @Autowired private val updater: FranceTvUpdater
+        @Autowired private val updater: FranceTvUpdater,
+        @Autowired private val clock: Clock
 ) {
 
     @TestConfiguration
@@ -40,6 +42,7 @@ class FranceTvUpdaterTest(
     class LocalTestConfiguration {
         @Bean fun remapFranceTvToMock() = remapToMockServer("www.france.tv")
         @Bean fun remapApiToMock() = remapToMockServer("sivideo.webservices.francetelevisions.fr")
+        @Bean fun fixedClock(): Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
     }
 
     private val podcast = PodcastToUpdate(
@@ -251,7 +254,6 @@ class FranceTvUpdaterTest(
                         .verifyComplete()
             }
 
-
             @Test
             fun `with subtitle field`(backend: WireMockServer) {
                 /* Given */
@@ -338,6 +340,42 @@ class FranceTvUpdaterTest(
                         .expectSubscription()
                         .assertNext {
                             assertThat(it.title).isEqualTo("Secrets d'histoire")
+                        }
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `with no diffusion`(backend: WireMockServer) {
+                /* Given */
+                backend.apply {
+                    stubFor(get("/tools/getInfosOeuvre/v2/?idDiffusion=2d8cde13-4b9d-423f-95c8-b37151b989bc")
+                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific/2d8cde13-4b9d-423f-95c8-b37151b989bc-without-diffusion.json"))))
+                }
+
+                /* When */
+                StepVerifier.create(updater.findItems(podcast))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.pubDate).isEqualTo(ZonedDateTime.now(clock))
+                        }
+                        .verifyComplete()
+            }
+
+            @Test
+            fun `with diffusion but with null timestamp`(backend: WireMockServer) {
+                /* Given */
+                backend.apply {
+                    stubFor(get("/tools/getInfosOeuvre/v2/?idDiffusion=2d8cde13-4b9d-423f-95c8-b37151b989bc")
+                            .willReturn(okJson(fileAsString("/remote/podcast/francetv/v3/items/specific/2d8cde13-4b9d-423f-95c8-b37151b989bc-with-diffusion-without-timestamp.json"))))
+                }
+
+                /* When */
+                StepVerifier.create(updater.findItems(podcast))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.pubDate).isEqualTo(ZonedDateTime.now(clock))
                         }
                         .verifyComplete()
             }
