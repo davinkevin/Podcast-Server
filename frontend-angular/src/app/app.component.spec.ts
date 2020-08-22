@@ -53,12 +53,12 @@ describe('AppComponent', () => {
     expect(component).toBeTruthy();
   }));
 
-  it('should have 4 elements in side nav', async(() => {
+  it('should have 5 elements in side nav', async(() => {
     /* Given */
     /* When  */
     const sideEls = el.queryAll(By.css('[mat-list-item]'));
     /* Then  */
-    expect(sideEls.length).toEqual(4);
+    expect(sideEls.length).toEqual(5);
   }));
 
   it('should have sidenav closed at boot', () => {
