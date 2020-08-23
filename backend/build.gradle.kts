@@ -1,17 +1,20 @@
 import com.gitlab.davinkevin.podcastserver.backend.build.DatabaseParameters
-import com.rohanprabhu.gradle.plugins.kdjooq.*
+import nu.studer.gradle.jooq.JooqEdition.OSS
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.internal.deprecation.DeprecatableConfiguration
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.jooq.meta.jaxb.ForcedType
+import org.jooq.meta.jaxb.Logging.INFO
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-	id("org.springframework.boot") version "2.3.1.RELEASE"
+	id("org.springframework.boot") version "2.3.3.RELEASE"
 	id("io.spring.dependency-management") version "1.0.9.RELEASE"
 	id("com.gorylenko.gradle-git-properties") version "2.2.2"
 	id("org.flywaydb.flyway") version "6.4.4"
-	id("com.rohanprabhu.kotlin-dsl-jooq") version "0.4.6"
+//	id("com.rohanprabhu.kotlin-dsl-jooq") version "0.4.6"
+	id("nu.studer.jooq") version "5.0.1"
 	id("com.google.cloud.tools.jib") version "2.4.0"
 	id("de.jansauer.printcoverage") version "2.0.0"
 
@@ -48,7 +51,7 @@ dependencies {
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.0.2.RELEASE")
 	implementation("javax.annotation:javax.annotation-api:1.3.2")
 	implementation("org.postgresql:postgresql:42.2.12")
-	jooqGeneratorRuntime("org.postgresql:postgresql:42.2.12")
+	jooqGenerator("org.postgresql:postgresql:42.2.14")
 
 	implementation("org.jdom:jdom2:2.0.6")
 	implementation("org.apache.tika:tika-core:1.24.1")
@@ -90,57 +93,101 @@ flyway {
 	locations = arrayOf("filesystem:${db.sqlFiles}")
 }
 
-jooqGenerator {
+jooq {
 
-	jooqVersion = "3.13.2"
+	version.set(dependencyManagement.importedProperties["jooq.version"])
+	edition.set(OSS)
 
-	configuration("primary", project.sourceSets.getByName("main")) {
-
-		databaseSources = listOf(db.sqlFiles)
-
-		configuration = jooqCodegenConfiguration {
-			jdbc {
-				url = db.url
-				username = db.user
-				password = db.password
-				driver = "org.postgresql.Driver"
-			}
-
-			generator {
-				database {
-					name = "org.jooq.meta.postgres.PostgresDatabase"
-					inputSchema = "public"
-					excludes = "Databasechangelog|Databasechangeloglock|flyway_schema_history"
-
-					forcedTypes {
-						forcedType {
-							userType = "com.github.davinkevin.podcastserver.entity.Status"
-							converter = "com.github.davinkevin.podcastserver.database.StatusConverter"
-							includeExpression = "ITEM\\.STATUS"
-						}
-					}
-
-					isIncludeTables = true
-					isIncludeRoutines = true
-					isIncludePackages = false
-					isIncludeUDTs = true
-					isIncludeSequences = true
-					isIncludePrimaryKeys = true
-					isIncludeUniqueKeys = true
-					isIncludeForeignKeys = true
+	configurations {
+		create("main") {
+			jooqConfiguration.apply {
+				logging = INFO
+				jdbc.apply {
+					driver = "org.postgresql.Driver"
+					url = db.url
+					user = db.user
+					password = db.password
 				}
 
-				target {
-					packageName = "com.github.davinkevin.podcastserver.database"
-					directory = "${project.buildDir}/generated/jooq/primary"
+				generator.apply {
+					name = "org.jooq.codegen.DefaultGenerator"
+					database.apply {
+						name = "org.jooq.meta.postgres.PostgresDatabase"
+						inputSchema = "public"
+						forcedTypes = listOf(
+								ForcedType()
+										.withUserType("com.github.davinkevin.podcastserver.entity.Status")
+										.withConverter("com.github.davinkevin.podcastserver.database.StatusConverter")
+										.withIncludeExpression("""ITEM\.STATUS""")
+						)
+						isIncludeTables = true
+						isIncludePackages = false
+						isIncludeUDTs = true
+						isIncludeSequences = true
+						isIncludePrimaryKeys = true
+						isIncludeUniqueKeys = true
+						isIncludeForeignKeys = true
+					}
+
+					target.apply {
+						packageName = "com.github.davinkevin.podcastserver.database"
+						directory = "${project.buildDir}/generated/jooq"
+					}
 				}
 			}
 		}
 	}
 }
 
+//jooqGenerator {
+//
+//	jooqVersion = "3.13.2"
+//
+//	configuration("primary", project.sourceSets.getByName("main")) {
+//
+//		databaseSources = listOf(db.sqlFiles)
+//
+//		configuration = jooqCodegenConfiguration {
+//			jdbc {
+//				url = db.url
+//				username = db.user
+//				password = db.password
+//				driver = "org.postgresql.Driver"
+//			}
+//
+//			generator {
+//				database {
+//					name = "org.jooq.meta.postgres.PostgresDatabase"
+//					inputSchema = "public"
+//					excludes = "Databasechangelog|Databasechangeloglock|flyway_schema_history"
+//
+//					forcedTypes {
+//						forcedType {
+//							userType = "com.github.davinkevin.podcastserver.entity.Status"
+//							converter = "com.github.davinkevin.podcastserver.database.StatusConverter"
+//							includeExpression = "ITEM\\.STATUS"
+//						}
+//					}
+//
+//					isIncludePackages = false
+//					isIncludeUDTs = true
+//					isIncludeSequences = true
+//					isIncludePrimaryKeys = true
+//					isIncludeUniqueKeys = true
+//					isIncludeForeignKeys = true
+//				}
+//
+//				target {
+//					packageName = "com.github.davinkevin.podcastserver.database"
+//					directory = "${project.buildDir}/generated/jooq/primary"
+//				}
+//			}
+//		}
+//	}
+//}
+
 project.tasks["flywayMigrate"].dependsOn("copyMigrations")
-project.tasks["jooq-codegen-primary"].dependsOn("flywayMigrate")
+project.tasks["generateJooq"].dependsOn("flywayMigrate")
 
 tasks.jacocoTestReport {
 	reports {

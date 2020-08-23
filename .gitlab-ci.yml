@@ -307,7 +307,7 @@ stages:
   image: openjdk:11-slim
   needs: [👷 backend, 👷 backend-base-image]
   script:
-    - ./backend/gradlew $GRADLE_OPTS -p backend/ jib -x jooq-codegen-primary
+    - ./backend/gradlew $GRADLE_OPTS -p backend/ jib -x generateJooq
   cache:
     key:
       files:
