@@ -5,9 +5,11 @@ import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Podcast
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
 import com.github.davinkevin.podcastserver.database.Tables.PODCAST
 import com.github.davinkevin.podcastserver.database.tables.Cover.COVER
+import com.github.davinkevin.podcastserver.tag.Tag
 import org.jooq.DSLContext
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.sql.Timestamp
@@ -16,9 +18,9 @@ import java.util.*
 
 class CoverRepository(private val query: DSLContext) {
 
-    fun save(cover: CoverForCreation): Mono<Cover> {
+    fun save(cover: CoverForCreation): Mono<Cover> = Mono.defer{
         val id = UUID.randomUUID()
-        return query.insertInto(COVER)
+        query.insertInto(COVER)
                 .set(COVER.ID, id)
                 .set(COVER.WIDTH, cover.width)
                 .set(COVER.HEIGHT, cover.height)
@@ -26,10 +28,11 @@ class CoverRepository(private val query: DSLContext) {
                 .toMono()
                 .map { Cover(id, cover.url, cover.height, cover.width) }
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
-    fun findCoverOlderThan(date: OffsetDateTime): Flux<DeleteCoverInformation> {
-        return Flux
-                .from(
+    fun findCoverOlderThan(date: OffsetDateTime): Flux<DeleteCoverInformation> = Flux.defer {
+        Flux.from(
                         query
                                 .select(
                                         PODCAST.ID, PODCAST.TITLE,
@@ -41,13 +44,16 @@ class CoverRepository(private val query: DSLContext) {
                                         .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
                                 )
                                 .where(ITEM.CREATION_DATE.lessOrEqual(date))
-                                .orderBy(COVER.ID.asc()))
-                .map {
+                                .orderBy(COVER.ID.asc())
+        )
+                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.parallel())
+                .map { (podcastId, podcastTitle, itemId, itemTitle, coverId, coverUrl) ->
                     DeleteCoverInformation(
-                            id = it[COVER.ID],
-                            extension = it[COVER.URL].substringAfterLast("."),
-                            item = Item(it[ITEM.ID], it[ITEM.TITLE]),
-                            podcast = Podcast(it[PODCAST.ID], it[PODCAST.TITLE])
+                            id = coverId,
+                            extension = coverUrl.substringAfterLast("."),
+                            item = Item(itemId, itemTitle),
+                            podcast = Podcast(podcastId, podcastTitle)
                     )
                 }
 

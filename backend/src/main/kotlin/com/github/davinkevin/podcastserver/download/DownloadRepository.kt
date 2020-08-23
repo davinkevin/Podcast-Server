@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem.Po
 import org.jooq.DSLContext
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.OffsetDateTime
@@ -35,6 +36,8 @@ class DownloadRepository(private val query: DSLContext) {
                         .and(ITEM.NUMBER_OF_FAIL.lt(withMaxNumberOfTry))
                         .orderBy(ITEM.PUB_DATE.asc())
         )
+                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.parallel())
                 .map { DownloadingItem(
                         it[ITEM.ID], it[ITEM.TITLE], it[ITEM.STATUS], URI(it[ITEM.URL]), it[ITEM.NUMBER_OF_FAIL], 0,
                         Podcast(it[PODCAST.ID], it[PODCAST.TITLE]),
@@ -56,6 +59,8 @@ class DownloadRepository(private val query: DSLContext) {
                 )
                 .where(ITEM.ID.eq(id))
                 .toMono()
+                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.parallel())
                 .map { DownloadingItem(
                         it[ITEM.ID], it[ITEM.TITLE], it[ITEM.STATUS], URI(it[ITEM.URL]), it[ITEM.NUMBER_OF_FAIL],0,
                         Podcast(it[PODCAST.ID], it[PODCAST.TITLE]),
@@ -70,6 +75,8 @@ class DownloadRepository(private val query: DSLContext) {
                 .where(ITEM.ID.eq(id))
                 .toMono()
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun updateDownloadItem(item: DownloadingItem): Mono<Int> = Mono.defer {
         query
@@ -79,6 +86,8 @@ class DownloadRepository(private val query: DSLContext) {
                 .where(ITEM.ID.eq(item.id))
                 .toMono()
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun finishDownload(id: UUID, length: Long, mimeType: String, fileName: String, downloadDate: OffsetDateTime): Mono<Int> = Mono.defer {
         query
@@ -91,4 +100,6 @@ class DownloadRepository(private val query: DSLContext) {
                 .where(ITEM.ID.eq(id))
                 .toMono()
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 }

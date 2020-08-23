@@ -52,6 +52,8 @@ class FileService(
                 .toMono()
                 .then()
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun deleteItem(item: DeleteItemInformation) = Mono.defer {
         val file = p.rootfolder.resolve(item.path)
@@ -60,17 +62,20 @@ class FileService(
                 .deleteIfExists(file)
                 .toMono()
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
-    fun deleteCover(cover: DeleteCoverInformation): Mono<Boolean> {
+    fun deleteCover(cover: DeleteCoverInformation): Mono<Boolean> = Mono.defer {
         val file = p.rootfolder
                 .resolve(cover.podcast.title)
                 .resolve(cover.item.id.toString() + "." + cover.extension)
 
         log.info("Deletion of file {}", file)
 
-        return Files.deleteIfExists(file)
-                .toMono()
+        Files.deleteIfExists(file).toMono()
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun coverExists(p: Podcast): Mono<String> = coverExists(p.title, p.id, p.cover.extension())
     fun coverExists(i: Item): Mono<String> = coverExists(i.podcast.title, i.id, i.cover.extension())
@@ -87,8 +92,9 @@ class FileService(
                 .filter { it }
                 .map { path }
                 .map { it.toString().substringAfterLast("/") }
-                .subscribeOn(Schedulers.elastic())
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun downloadPodcastCover(podcast: Podcast): Mono<Void> {
         return wcb.clone()
@@ -98,13 +104,16 @@ class FileService(
                 .accept(MediaType.APPLICATION_OCTET_STREAM)
                 .retrieve()
                 .bodyToMono(ByteArrayResource::class.java)
-                .map { val file = p.rootfolder
+                .flatMap { val file = p.rootfolder
                             .resolve(podcast.title)
                             .create()
                             .resolve("${podcast.id}.${podcast.cover.extension()}")
 
                     log.debug("Save file ${file.toAbsolutePath()}")
-                    Files.write(file, it.byteArray) }
+                    Mono.defer { Files.write(file, it.byteArray).toMono() }
+                            .subscribeOn(Schedulers.boundedElastic())
+                            .publishOn(Schedulers.parallel())
+                }
                 .then()
     }
 
@@ -116,13 +125,16 @@ class FileService(
                     .accept(MediaType.APPLICATION_OCTET_STREAM)
                     .retrieve()
                     .bodyToMono(ByteArrayResource::class.java)
-                    .map { val file = p.rootfolder
+                    .flatMap { val file = p.rootfolder
                             .resolve(item.podcast.title)
                             .create()
                             .resolve("${item.id}.${item.cover.extension()}")
 
                         log.debug("Save file ${file.toAbsolutePath()}")
-                        Files.write(file, it.byteArray) }
+                        Mono.defer { Files.write(file, it.byteArray).toMono() }
+                                .subscribeOn(Schedulers.boundedElastic())
+                                .publishOn(Schedulers.parallel())
+                    }
                     .then()
 
     fun movePodcast(details: MovePodcastDetails): Mono<Void> = Mono.defer {
@@ -131,20 +143,27 @@ class FileService(
 
         log.info("Move podcast from $oldLocation to $newLocation")
 
-        Files.move(oldLocation, newLocation)
-                .toMono()
-                .then()
+        Files.move(oldLocation, newLocation).toMono()
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
+            .then()
 
-    fun upload(destination: Path, file: FilePart): Mono<Void> {
+    fun upload(destination: Path, file: FilePart): Mono<Void> = Mono.defer {
         Files.deleteIfExists(destination)
         Files.createDirectories(destination.parent)
-        return file.transferTo(destination)
+        file.transferTo(destination).toMono()
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
-    fun size(file: Path): Mono<Long> = Files.size(file).toMono()
+    fun size(file: Path): Mono<Long> = Mono.defer { Files.size(file).toMono() }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
-    fun probeContentType(file: Path): Mono<String> = mimeTypeService.probeContentType(file).toMono()
+    fun probeContentType(file: Path): Mono<String> = Mono.defer { mimeTypeService.probeContentType(file).toMono() }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 }
 
 private fun Path.create() = if (Files.exists(this)) this else Files.createDirectory(this)

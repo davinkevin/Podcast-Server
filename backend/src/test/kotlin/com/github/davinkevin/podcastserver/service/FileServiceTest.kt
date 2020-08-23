@@ -338,8 +338,9 @@ class FileServiceTest(
             StepVerifier.create(fileService.deletePodcast(podcast))
                     /* Then */
                     .expectSubscription()
-                    .then { assertThat(folder).doesNotExist() }
                     .verifyComplete()
+
+            assertThat(folder).doesNotExist()
         }
 
     }
@@ -365,13 +366,12 @@ class FileServiceTest(
             StepVerifier.create(fileService.movePodcast(moveOperation))
             /* Then */
                     .expectSubscription()
-                    .then {
-                        assertThat(folder).doesNotExist()
-                        assertThat(newFolder).exists()
-                        assertThat(newFolder.resolve("file1.mp3")).exists()
-                        assertThat(newFolder.resolve("file2.mp3")).exists()
-                    }
                     .verifyComplete()
+
+            assertThat(folder).doesNotExist()
+            assertThat(newFolder).exists()
+            assertThat(newFolder.resolve("file1.mp3")).exists()
+            assertThat(newFolder.resolve("file2.mp3")).exists()
         }
     }
 }

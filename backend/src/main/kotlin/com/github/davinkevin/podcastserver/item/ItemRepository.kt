@@ -12,6 +12,7 @@ import org.jooq.impl.DSL.*
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
@@ -42,6 +43,8 @@ class ItemRepository(private val query: DSLContext) {
                 )
                 .where(ITEM.ID.eq(id))
                 .toMono()
+                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.parallel())
                 .map { toItem(it) }
     }
 
@@ -56,6 +59,8 @@ class ItemRepository(private val query: DSLContext) {
                 .fetch { DeleteItemInformation(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
                 .toFlux()
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun deleteById(id: UUID) = Mono.defer {
         val removeFromPlaylist = query
@@ -75,6 +80,8 @@ class ItemRepository(private val query: DSLContext) {
 
         removeFromPlaylist.then(delete)
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun updateAsDeleted(items: Collection<UUID>) = Mono.defer {
         query
@@ -85,6 +92,8 @@ class ItemRepository(private val query: DSLContext) {
                 .toMono()
                 .then()
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun hasToBeDeleted(id: UUID): Mono<Boolean> = Mono.defer {
         query
@@ -94,6 +103,8 @@ class ItemRepository(private val query: DSLContext) {
                 .toMono()
                 .map { it[PODCAST.HAS_TO_BE_DELETED] }
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun resetById(id: UUID): Mono<Item> = Mono.defer {
         query
@@ -106,9 +117,10 @@ class ItemRepository(private val query: DSLContext) {
                 .toMono()
                 .flatMap { findById(id) }
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun search(q: String, tags: List<String>, status: List<Status>, page: ItemPageRequest, podcastId: UUID?): Mono<PageItem> = Mono.defer {
-
         Flux.from(
                 query
                         .select(TAG.ID)
@@ -199,50 +211,56 @@ class ItemRepository(private val query: DSLContext) {
                     Mono.zip(content, totalElements)
                             .map { (content, totalElements) -> PageItem.of(content, totalElements, page) }
                 }
-
-
     }
 
-    fun create(item: ItemForCreation): Mono<Item> = query
-            .select(ITEM.ID)
-            .from(ITEM)
-            .where(ITEM.URL.eq(item.url))
-            .and(ITEM.PODCAST_ID.eq(item.podcastId))
-            .toMono()
-            .map { it[ITEM.ID] }
-            .hasElement()
-            .filter { it == false }
-            .flatMap {
-                val coverId = UUID.randomUUID()
-                val insertCover = query.insertInto(COVER)
-                        .set(COVER.ID, coverId)
-                        .set(COVER.HEIGHT, item.cover.height)
-                        .set(COVER.WIDTH, item.cover.width)
-                        .set(COVER.URL, item.cover.url.toASCIIString())
-                        .toMono()
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
-                val id = UUID.randomUUID()
-                val insertItem = query.insertInto(ITEM)
-                        .set(ITEM.ID, id)
-                        .set(ITEM.TITLE, item.title)
-                        .set(ITEM.URL, item.url)
-                        .set(ITEM.PUB_DATE, item.pubDate)
-                        .set(ITEM.DOWNLOAD_DATE, item.downloadDate)
-                        .set(ITEM.CREATION_DATE, item.creationDate)
-                        .set(ITEM.DESCRIPTION, item.description)
-                        .set(ITEM.MIME_TYPE, item.mimeType)
-                        .set(ITEM.LENGTH, item.length)
-                        .set(ITEM.FILE_NAME, item.fileName)
-                        .set(ITEM.STATUS, item.status)
-                        .set(ITEM.PODCAST_ID, item.podcastId)
-                        .set(ITEM.COVER_ID, coverId)
-                        .toMono()
+    fun create(item: ItemForCreation): Mono<Item> = Mono.defer {
+        query
+                .select(ITEM.ID)
+                .from(ITEM)
+                .where(ITEM.URL.eq(item.url))
+                .and(ITEM.PODCAST_ID.eq(item.podcastId))
+                .toMono()
+                .map { (id) -> id }
+                .hasElement()
+                .filter { it == false }
+                .flatMap {
+                    val coverId = UUID.randomUUID()
+                    val insertCover = query.insertInto(COVER)
+                            .set(COVER.ID, coverId)
+                            .set(COVER.HEIGHT, item.cover.height)
+                            .set(COVER.WIDTH, item.cover.width)
+                            .set(COVER.URL, item.cover.url.toASCIIString())
+                            .toMono()
+
+                    val id = UUID.randomUUID()
+                    val insertItem = query.insertInto(ITEM)
+                            .set(ITEM.ID, id)
+                            .set(ITEM.TITLE, item.title)
+                            .set(ITEM.URL, item.url)
+                            .set(ITEM.PUB_DATE, item.pubDate)
+                            .set(ITEM.DOWNLOAD_DATE, item.downloadDate)
+                            .set(ITEM.CREATION_DATE, item.creationDate)
+                            .set(ITEM.DESCRIPTION, item.description)
+                            .set(ITEM.MIME_TYPE, item.mimeType)
+                            .set(ITEM.LENGTH, item.length)
+                            .set(ITEM.FILE_NAME, item.fileName)
+                            .set(ITEM.STATUS, item.status)
+                            .set(ITEM.PODCAST_ID, item.podcastId)
+                            .set(ITEM.COVER_ID, coverId)
+                            .toMono()
 
 
-                insertCover
-                        .then(insertItem)
-                        .then(findById(id))
-            }
+                    insertCover
+                            .then(insertItem)
+                            .then(findById(id))
+                }
+    }
+
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun resetItemWithDownloadingState(): Mono<Void> = Mono.defer {
         query
@@ -253,6 +271,8 @@ class ItemRepository(private val query: DSLContext) {
                 .then()
                 .doOnTerminate { log.info("Reset of item with downloading state done") }
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun findPlaylistsContainingItem(itemId: UUID): Flux<ItemPlaylist> = Flux.defer {
         Flux.from(
@@ -265,7 +285,7 @@ class ItemRepository(private val query: DSLContext) {
                         .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(itemId))
                         .orderBy(WATCH_LIST.ID)
         )
-                .map { ItemPlaylist(it[WATCH_LIST.ID], it[WATCH_LIST.NAME]) }
+                .map { (id, name) -> ItemPlaylist(id, name) }
     }
 }
 

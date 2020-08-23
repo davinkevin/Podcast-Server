@@ -9,6 +9,7 @@ import org.jooq.TableField
 import org.jooq.impl.DSL
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
@@ -37,6 +38,8 @@ class PodcastRepository(private val query: DSLContext) {
             },
             findTagsByPodcastId(id)
     )
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
             .map { (p, tags) ->
                 val c = CoverForPodcast(p[COVER.ID], URI(p[COVER.URL]), p[COVER.WIDTH], p[COVER.HEIGHT])
 
@@ -52,7 +55,6 @@ class PodcastRepository(private val query: DSLContext) {
 
 
     private fun findTagsByPodcastId(id: UUID): Mono<List<Tag>> = Mono.defer {
-
         Flux.from(
                 query.select(TAG.ID, TAG.NAME)
                         .from(TAG.innerJoin(PODCAST_TAGS).on(TAG.ID.eq(PODCAST_TAGS.TAGS_ID)))
@@ -61,6 +63,8 @@ class PodcastRepository(private val query: DSLContext) {
                 .map { Tag(it[TAG.ID], it[TAG.NAME]) }
                 .collectList()
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun findAll(): Flux<Podcast> = Flux.defer {
         Flux.from(
@@ -81,6 +85,8 @@ class PodcastRepository(private val query: DSLContext) {
                                         .leftJoin(TAG).on(PODCAST_TAGS.TAGS_ID.eq(TAG.ID))
                         )
         )
+                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.parallel())
                 .groupBy { it[PODCAST.ID] }
                 .flatMap {
 
@@ -110,12 +116,12 @@ class PodcastRepository(private val query: DSLContext) {
     fun findStatByTypeAndPubDate(numberOfMonth: Int) = findStatByTypeAndField(numberOfMonth, ITEM.PUB_DATE)
     fun findStatByTypeAndDownloadDate(numberOfMonth: Int) = findStatByTypeAndField(numberOfMonth, ITEM.DOWNLOAD_DATE)
 
-    private fun findStatByTypeAndField(month: Int, field: TableField<ItemRecord, OffsetDateTime>): Flux<StatsPodcastType> {
+    private fun findStatByTypeAndField(month: Int, field: TableField<ItemRecord, OffsetDateTime>): Flux<StatsPodcastType> = Flux.defer {
         val date = DSL.trunc(field)
         val startDate = ZonedDateTime.now().minusMonths(month.toLong())
         val numberOfDays = Duration.between(startDate, ZonedDateTime.now()).toDays()
 
-        return query
+        query
                 .select(PODCAST.TYPE, DSL.count(), date)
                 .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
                 .where(field.isNotNull)
@@ -127,11 +133,12 @@ class PodcastRepository(private val query: DSLContext) {
                         type = it.key,
                         values = it.value
                                 .map { (_, number, date) -> NumberOfItemByDateWrapper(date.toLocalDate(), number) }
-                                .toSet()
-                )
+                                .toSet())
                 }
                 .toFlux()
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun findStatByPodcastIdAndPubDate(pid: UUID, month: Int) = findStatOfOnField(pid, month, ITEM.PUB_DATE)
     fun findStatByPodcastIdAndCreationDate(pid: UUID, month: Int) = findStatOfOnField(pid, month, ITEM.CREATION_DATE)
@@ -152,7 +159,9 @@ class PodcastRepository(private val query: DSLContext) {
                         .groupBy(date)
                         .orderBy(date.desc())
         )
-                .map { NumberOfItemByDateWrapper(it.component2().toLocalDate(), it.component1()) }
+                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.parallel())
+                .map { (count, date) -> NumberOfItemByDateWrapper(date.toLocalDate(), count) }
     }
 
     fun save(title: String, url: String?, hasToBeDeleted: Boolean, type: String, tags: Collection<Tag>, cover: Cover) = Mono.defer {
@@ -173,6 +182,8 @@ class PodcastRepository(private val query: DSLContext) {
                 .then(linkToTags)
                 .then(findById(id))
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
     fun update(id: UUID, title: String, url: String?, hasToBeDeleted: Boolean, tags: Collection<Tag>, cover: Cover): Mono<Podcast> = Mono.defer {
 
@@ -201,19 +212,29 @@ class PodcastRepository(private val query: DSLContext) {
                 .then(insertNewTags)
                 .then(findById(id))
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
-    fun updateSignature(podcastId: UUID, newSignature: String): Mono<Void> = query
-            .update(PODCAST)
-            .set(PODCAST.SIGNATURE, newSignature)
-            .where(PODCAST.ID.eq(podcastId))
-            .toMono()
+    fun updateSignature(podcastId: UUID, newSignature: String): Mono<Void> = Mono.defer {
+        query
+                .update(PODCAST)
+                .set(PODCAST.SIGNATURE, newSignature)
+                .where(PODCAST.ID.eq(podcastId))
+                .toMono()
+    }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
             .then()
 
-    fun findCover(id: UUID): Mono<CoverForPodcast> = query
-            .select(COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL)
-            .from(PODCAST.innerJoin(COVER).on(PODCAST.COVER_ID.eq(COVER.ID)))
-            .where(PODCAST.ID.eq(id))
-            .toMono()
+    fun findCover(id: UUID): Mono<CoverForPodcast> = Mono.defer {
+        query
+                .select(COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL)
+                .from(PODCAST.innerJoin(COVER).on(PODCAST.COVER_ID.eq(COVER.ID)))
+                .where(PODCAST.ID.eq(id))
+                .toMono()
+    }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
             .map { CoverForPodcast(
                     id = it[COVER.ID],
                     url = URI(it[COVER.URL]),
@@ -221,16 +242,19 @@ class PodcastRepository(private val query: DSLContext) {
                     width = it[COVER.WIDTH]
             ) }
 
-    fun updateLastUpdate(podcastId: UUID): Mono<Void> {
-        return query
+
+    fun updateLastUpdate(podcastId: UUID): Mono<Void> = Mono.defer {
+        query
                 .update(PODCAST)
                 .set(PODCAST.LAST_UPDATE, now())
                 .where(PODCAST.ID.eq(podcastId))
                 .toMono()
-                .then()
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
+            .then()
 
-    fun deleteById(id: UUID): Mono<DeletePodcastInformation> {
+    fun deleteById(id: UUID): Mono<DeletePodcastInformation> = Mono.defer {
         val removeItemFromPlaylist = query
                 .delete(WATCH_LIST_ITEMS)
                 .where(WATCH_LIST_ITEMS.ITEMS_ID.`in`(query
@@ -264,8 +288,10 @@ class PodcastRepository(private val query: DSLContext) {
                 .filter { it[PODCAST.HAS_TO_BE_DELETED] }
                 .map { DeletePodcastInformation(it[PODCAST.ID], it[PODCAST.TITLE]) }
 
-        return removeItemFromPlaylist
+        removeItemFromPlaylist
                 .then(Mono.zip(removePodcastTags, removeItems))
                 .then(deletePodcast)
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 }

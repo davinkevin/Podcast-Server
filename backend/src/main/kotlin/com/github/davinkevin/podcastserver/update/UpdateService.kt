@@ -56,6 +56,7 @@ class UpdateService(
                 .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
                 .sequential()
                 .collectList()
+                .subscribeOn(Schedulers.boundedElastic())
                 .subscribe {
                     liveUpdate.isUpdating(false)
                     log.info("End of the global update with ${it.size} found")

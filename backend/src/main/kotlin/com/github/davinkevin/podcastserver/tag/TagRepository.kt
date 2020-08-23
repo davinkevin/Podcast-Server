@@ -17,8 +17,10 @@ class TagRepository(val query: DSLContext) {
                 .from(TAG)
                 .where(TAG.ID.eq(id))
                 .toMono()
-                .map { Tag(it[TAG.ID], it[TAG.NAME]) }
+                .map { (id, name) -> Tag(id, name) }
     }
+                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.parallel())
 
     fun findByNameLike(name: String): Flux<Tag> {
         return Flux.from(
@@ -28,7 +30,9 @@ class TagRepository(val query: DSLContext) {
                         .where(TAG.NAME.containsIgnoreCase(name))
                         .orderBy(TAG.NAME.asc())
         )
-                .map { Tag(it[TAG.ID], it[TAG.NAME]) }
+                .map { (id, name) -> Tag(id, name) }
+                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.parallel())
     }
 
     fun save(name: String): Mono<Tag> = Mono.defer {
@@ -48,6 +52,7 @@ class TagRepository(val query: DSLContext) {
                             .map { Tag(id, name) }
                 }
     }
-            .subscribeOn(Schedulers.elastic())
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
 }
