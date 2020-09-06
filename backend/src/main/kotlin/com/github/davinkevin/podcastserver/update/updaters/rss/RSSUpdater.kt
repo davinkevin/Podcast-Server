@@ -39,7 +39,7 @@ class RSSUpdater(
                         .flatMap { imageService.fetchCoverInformation(it) }
                         .map { it.toCoverFromUpdate() }
                         .map { Optional.of(it) }
-                        .switchIfEmpty { Optional.empty<CoverFromUpdate>().toMono() }
+                        .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
                         .map {
                             val enclosure = elem.enclosure()
                             ItemFromUpdate(

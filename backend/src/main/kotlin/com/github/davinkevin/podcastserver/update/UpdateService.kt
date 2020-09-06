@@ -6,15 +6,14 @@ import com.github.davinkevin.podcastserver.item.ItemForCreation
 import com.github.davinkevin.podcastserver.item.ItemRepository
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
-import com.github.davinkevin.podcastserver.update.updaters.CoverFromUpdate
-import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
-import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
+import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.FileService
-import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
@@ -119,13 +118,13 @@ private fun ItemFromUpdate.toCreation(podcastId: UUID, coverCreation: CoverForCr
         cover = cover?.toCreation() ?: coverCreation
 )
 
-private fun CoverFromUpdate.toCreation() = CoverForCreation(width, height, url)
+private fun ItemFromUpdate.Cover.toCreation() = CoverForCreation(width, height, url)
 private fun CoverForPodcast.toCreation() = CoverForCreation(width, height, url)
 
-fun ImageService.fetchCoverUpdateInformationOrOption(url: URI?): Mono<Optional<CoverFromUpdate>> {
+fun ImageService.fetchCoverUpdateInformationOrOption(url: URI?): Mono<Optional<ItemFromUpdate.Cover>> {
     return Mono.justOrEmpty(url)
             .flatMap { fetchCoverInformation(url!!) }
-            .map { CoverFromUpdate(it.width, it.height, it.url) }
-            .map { Optional.of<CoverFromUpdate>(it) }
-            .switchIfEmpty { Optional.empty<CoverFromUpdate>().toMono() }
+            .map { ItemFromUpdate.Cover(it.width, it.height, it.url) }
+            .map { Optional.of<ItemFromUpdate.Cover>(it) }
+            .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
 }

@@ -12,8 +12,6 @@ import java.time.ZonedDateTime
 import java.util.*
 
 val log = LoggerFactory.getLogger(Updater::class.java)!!
-val defaultPodcast = PodcastToUpdate(id = UUID.randomUUID(), url = URI("https://localhost/"), signature = "")
-val NO_MODIFICATION = UpdatePodcastInformation(defaultPodcast, setOf(), "")
 
 interface Updater {
 
@@ -54,10 +52,12 @@ data class ItemFromUpdate(
         val mimeType: String,
         val url: URI,
         val description: String?,
-        val cover: CoverFromUpdate?
-)
-data class CoverFromUpdate(val width: Int, val height: Int, val url: URI)
-fun CoverInformation.toCoverFromUpdate() = CoverFromUpdate(
+        val cover: Cover?
+) {
+    data class Cover(val width: Int, val height: Int, val url: URI)
+}
+
+fun CoverInformation.toCoverFromUpdate() = ItemFromUpdate.Cover(
         height = this@toCoverFromUpdate.height,
         width = this@toCoverFromUpdate.width,
         url = this@toCoverFromUpdate.url

@@ -3,7 +3,6 @@ package com.github.davinkevin.podcastserver.update.updaters.youtube
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
-import com.github.davinkevin.podcastserver.update.updaters.CoverFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Updater
@@ -145,7 +144,7 @@ internal data class Snippet(val title: String, val resourceId: ResourceId, val d
     fun pubDate() = ZonedDateTime.parse(publishedAt, DateTimeFormatter.ISO_DATE_TIME)!!
     fun cover() = this.thumbnails
             .betterThumbnail()
-            .map { CoverFromUpdate(url = URI(it.url!!), width = it.width!!, height = it.height!!) }
+            .map { ItemFromUpdate.Cover(url = URI(it.url!!), width = it.width!!, height = it.height!!) }
             .orNull()
 }
 

@@ -186,10 +186,10 @@ private data class FranceTvItem(
 private val ZONE_ID = ZoneId.of("Europe/Paris")
 
 
-private fun ImageService.fetchCoverInformationOrOption(url: URI?): Mono<Optional<CoverFromUpdate>> {
+private fun ImageService.fetchCoverInformationOrOption(url: URI?): Mono<Optional<ItemFromUpdate.Cover>> {
     return Mono.justOrEmpty(url)
             .flatMap { fetchCoverInformation(url!!) }
-            .map { CoverFromUpdate(it.width, it.height, it.url) }
-            .map { Optional.of<CoverFromUpdate>(it) }
-            .switchIfEmpty { Optional.empty<CoverFromUpdate>().toMono() }
+            .map { ItemFromUpdate.Cover(it.width, it.height, it.url) }
+            .map { Optional.of<ItemFromUpdate.Cover>(it) }
+            .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
 }

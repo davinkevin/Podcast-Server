@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.update.updaters.youtube
 
-import com.github.davinkevin.podcastserver.update.updaters.CoverFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Updater
@@ -57,7 +56,7 @@ class YoutubeByXmlUpdater(
                 pubDate = ZonedDateTime.parse(e.getChildText("published", dn), DateTimeFormatter.ISO_DATE_TIME),
 
                 url = URI("https://www.youtube.com/watch?v=$idVideo"),
-                cover = CoverFromUpdate(
+                cover = ItemFromUpdate.Cover(
                         url = URI(thumbnail.getAttributeValue("url")),
                         width = thumbnail.getAttributeValue("width").toInt(),
                         height = thumbnail.getAttributeValue("height").toInt()

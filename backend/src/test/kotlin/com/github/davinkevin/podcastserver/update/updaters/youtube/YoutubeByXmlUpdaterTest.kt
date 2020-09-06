@@ -3,14 +3,13 @@ package com.github.davinkevin.podcastserver.update.updaters.youtube
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
-import com.github.davinkevin.podcastserver.update.updaters.CoverFromUpdate
-import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.remapToMockServer
+import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -102,7 +101,7 @@ class YoutubeByXmlUpdaterTest(
                         .expectSubscription()
                         .assertNext {
                             assertThat(it.url).isEqualTo(URI("https://www.youtube.com/watch?v=Xos2M-gTf6g"))
-                            assertThat(it.cover).isEqualTo(CoverFromUpdate(480, 360, URI("https://i1.ytimg.com/vi/Xos2M-gTf6g/hqdefault.jpg")))
+                            assertThat(it.cover).isEqualTo(ItemFromUpdate.Cover(480, 360, URI("https://i1.ytimg.com/vi/Xos2M-gTf6g/hqdefault.jpg")))
                             assertThat(it.title).isEqualTo("Joueur du grenier - Des jeux Color Dreams - NES")
                             assertThat(it.pubDate).isEqualTo(ZonedDateTime.of(2012, 10, 11, 16, 0, 9, 0, ZoneId.of("UTC")))
                             assertThat(it.description).isEqualTo("""Salut tout le monde ! Voici le 35ème test du grenier avec 2 jeux non licenciés édités par Color Dreams, Raid 2020 et Silent assault sur NES. j'espère que ca vous plaira, un test plus classique avec moins d'effets. Il en faut pour tout les goûts.""")
@@ -163,7 +162,7 @@ class YoutubeByXmlUpdaterTest(
                         .expectSubscription()
                         .assertNext {
                             assertThat(it.url).isEqualTo(URI("https://www.youtube.com/watch?v=Xos2M-gTf6g"))
-                            assertThat(it.cover).isEqualTo(CoverFromUpdate(480, 360, URI("https://i1.ytimg.com/vi/Xos2M-gTf6g/hqdefault.jpg")))
+                            assertThat(it.cover).isEqualTo(ItemFromUpdate.Cover(480, 360, URI("https://i1.ytimg.com/vi/Xos2M-gTf6g/hqdefault.jpg")))
                             assertThat(it.title).isEqualTo("Joueur du grenier - Des jeux Color Dreams - NES")
                             assertThat(it.pubDate).isEqualTo(ZonedDateTime.of(2012, 10, 11, 16, 0, 9, 0, ZoneId.of("UTC")))
                             assertThat(it.description).isEqualTo("""Salut tout le monde ! Voici le 35ème test du grenier avec 2 jeux non licenciés édités par Color Dreams, Raid 2020 et Silent assault sur NES. j'espère que ca vous plaira, un test plus classique avec moins d'effets. Il en faut pour tout les goûts.""")

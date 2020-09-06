@@ -3,18 +3,17 @@ package com.github.davinkevin.podcastserver.update.updaters.gulli
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
-import com.github.davinkevin.podcastserver.update.updaters.CoverFromUpdate
-import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.image.ImageService
+import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -87,7 +86,7 @@ class GulliUpdaterTest(
                     .expectSubscription()
                     .assertNext {
                         assertThat(it.url).isEqualTo(URI("https://replay.gulli.fr/dessins-animes/Pokemon7/VOD69210373530000"))
-                        assertThat(it.cover).isEqualTo(CoverFromUpdate(100, 200, URI("https://fake.url.com/img.png")))
+                        assertThat(it.cover).isEqualTo(ItemFromUpdate.Cover(100, 200, URI("https://fake.url.com/img.png")))
                         assertThat(it.title).isEqualTo("Une petite balle capricieuse")
                         assertThat(it.pubDate).isEqualTo(ZonedDateTime.of(2020, 3, 14, 19, 4, 44, 0, ZoneId.of("Europe/Paris")))
                         assertThat(it.description).isEqualTo("""Les élèves de l&#039;École Pokémon rencontrent une talentueuse golfeuse du nom de Kahili et son Bazoukan, &quot; Bazouki &quot;. Kahili traverse une mauvaise passe et le bruit court qu&#039;elle pourrait se retirer du circuit professionnel mais lorsque nos héros lui demandent de faire un parcours avec eux, elle leur donne gentiment de précieux conseils. Sur le terrain, ils sont rejoints par une figure familière, qui se prétend Maître Caddy et met Kahili au défi de viser un trou incroyablement difficile, ce qu&#039;elle fait... avec l&#039;aide de Bazouki ! Ces bons moments passés avec nos héros encouragent Kahili à continuer le Golf Pokémon et Bazouki en est ravi !""")
