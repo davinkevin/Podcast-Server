@@ -16,6 +16,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.ok
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.apache.commons.io.FilenameUtils
 import org.assertj.core.api.Assertions.assertThat
@@ -32,8 +33,10 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
+import org.springframework.http.codec.multipart.FilePart
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.FileSystemUtils
+import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 import java.nio.file.Files
@@ -433,6 +436,62 @@ class FileServiceTest(
                     .exists()
                     .hasDigest("MD5", "1cc21d3dce8bfedbda2d867a3238e8db")
         }
+
+    }
+
+    @Nested
+    @DisplayName("should upload file")
+    inner class ShouldUploadFile {
+
+        @Test
+        fun `with an already existing file`(@TempDir dir: Path) {
+            /* Given */
+            val filePart = mock<FilePart>()
+            val destination = dir.resolve("parent").resolve("item.mp3")
+            Files.createDirectories(destination.parent)
+            Files.createFile(destination)
+            whenever(filePart.transferTo(destination)).then { Files.createFile(destination).toMono().then() }
+            /* When */
+            StepVerifier.create(fileService.upload(destination, filePart))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            assertThat(destination).exists()
+        }
+
+        @Test
+        fun `with no file and no folder`(@TempDir dir: Path) {
+            /* Given */
+            val filePart = mock<FilePart>()
+            val destination = dir.resolve("parent").resolve("item.mp3")
+            whenever(filePart.transferTo(destination)).then { Files.createFile(destination).toMono().then() }
+            /* When */
+            StepVerifier.create(fileService.upload(destination, filePart))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            assertThat(destination).exists()
+        }
+
+        @Test
+        fun `with no file and but with folder`(@TempDir dir: Path) {
+            /* Given */
+            val filePart = mock<FilePart>()
+            val destination = dir.resolve("parent").resolve("item.mp3")
+            Files.createDirectories(destination.parent)
+            whenever(filePart.transferTo(destination)).then { Files.createFile(destination).toMono().then() }
+            /* When */
+            StepVerifier.create(fileService.upload(destination, filePart))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            assertThat(destination).exists()
+        }
+
+
 
     }
 }
