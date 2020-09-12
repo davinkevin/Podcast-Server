@@ -15,6 +15,7 @@ import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.stereotype.Service
 import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.core.scheduler.Schedulers
@@ -105,8 +106,7 @@ class FileService(
                 .retrieve()
                 .bodyToMono(ByteArrayResource::class.java)
                 .flatMap { val file = p.rootfolder
-                            .resolve(podcast.title)
-                            .create()
+                            .resolveOrCreate(podcast.title)
                             .resolve("${podcast.id}.${podcast.cover.extension()}")
 
                     log.debug("Save file ${file.toAbsolutePath()}")
@@ -124,10 +124,10 @@ class FileService(
                     .get()
                     .accept(MediaType.APPLICATION_OCTET_STREAM)
                     .retrieve()
-                    .bodyToMono(ByteArrayResource::class.java)
-                    .flatMap { val file = p.rootfolder
-                            .resolve(item.podcast.title)
-                            .create()
+                    .bodyToMono<ByteArrayResource>()
+                    .flatMap {
+                        val file = p.rootfolder
+                            .resolveOrCreate(item.podcast.title)
                             .resolve("${item.id}.${item.cover.extension()}")
 
                         log.debug("Save file ${file.toAbsolutePath()}")
@@ -166,7 +166,10 @@ class FileService(
             .publishOn(Schedulers.parallel())
 }
 
-private fun Path.create() = if (Files.exists(this)) this else Files.createDirectory(this)
+private fun Path.resolveOrCreate(title: String): Path {
+    val folder = this.resolve(title)
+    return if (Files.exists(folder)) folder else Files.createDirectory(folder)
+}
 private fun CoverForPodcast.extension(): String {
     val ext = FilenameUtils.getExtension(url.toASCIIString())
 

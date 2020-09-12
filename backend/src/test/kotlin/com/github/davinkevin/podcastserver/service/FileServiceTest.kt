@@ -1,8 +1,10 @@
 package com.github.davinkevin.podcastserver.service
 
+import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation
 import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.*
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.fileAsByteArray
 import com.github.davinkevin.podcastserver.item.DeleteItemInformation
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
@@ -11,6 +13,8 @@ import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.ok
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.nhaarman.mockitokotlin2.whenever
 import org.apache.commons.io.FilenameUtils
@@ -373,6 +377,63 @@ class FileServiceTest(
             assertThat(newFolder.resolve("file1.mp3")).exists()
             assertThat(newFolder.resolve("file2.mp3")).exists()
         }
+    }
+
+    @Nested
+    @DisplayName("should download item cover")
+    @ExtendWith(MockServer::class)
+    inner class ShouldDownloadItemCover {
+
+        val item = Item(
+                id = UUID.fromString("f47421c2-f7fd-480a-b266-635a97c301dd"),
+                title = "Item title",
+                url = "http://foo.bar.com/item.1.mp3",
+
+                pubDate = null,
+                downloadDate = null,
+                creationDate = null,
+
+                description = null,
+                mimeType = "audio/mp3",
+                length = null,
+                fileName = "item.1.mp3",
+                status = Status.NOT_DOWNLOADED,
+
+                podcast = Item.Podcast(
+                        id = UUID.fromString("096fc02f-e3d8-46a0-a523-6a479c573c73"),
+                        title = "podcast title",
+                        url = null
+                ),
+                cover = Item.Cover(
+                        id = UUID.fromString("054b45d2-4f7a-4161-98ba-7050630ee000"),
+                        url = URI("http://localhost:5555/item.1.png"),
+                        width = 100,
+                        height = 200
+                )
+        )
+
+        @Test
+        fun `and save it in podcast folder with specific name`(backend: WireMockServer, @TempDir dir: Path) {
+            /* Given */
+            whenever(p.rootfolder).thenReturn(dir)
+            backend.stubFor(get("/item.1.png")
+                    .willReturn(ok().withBody(fileAsByteArray("/__files/img/image.png")))
+            )
+            /* When */
+            StepVerifier.create(fileService.downloadItemCover(item))
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
+
+            val resultingFile = dir
+                    .resolve(item.podcast.title)
+                    .resolve("${item.id}.png")
+
+            assertThat(resultingFile)
+                    .exists()
+                    .hasDigest("MD5", "1cc21d3dce8bfedbda2d867a3238e8db")
+        }
+
     }
 }
 

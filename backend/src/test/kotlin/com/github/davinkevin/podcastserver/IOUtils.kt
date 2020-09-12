@@ -39,25 +39,12 @@ fun toPath(uri: String): Path {
     return Paths.get(file)
 }
 
-fun fileAsXml(uri: String): org.jdom2.Document? {
-    return SAXBuilder().build(toPath(uri).toFile())
-}
-
-fun fileAsHtml(uri: String, baseUri: String = ""): Document {
-    val file = toPath(uri).toFile()
-    return Jsoup.parse(file, "UTF-8", baseUri)
-}
-
 fun fileAsString(uri: String): String {
     return Files.newInputStream(toPath(uri))
             .bufferedReader()
             .use { it.readText() }
 }
 
-fun fileAsReader(file: String): BufferedReader {
-    return Files.newBufferedReader(toPath(file)) ?: error("File $file not found")
-}
-
-fun urlAsStream(url: String): InputStream {
-    return URL(url).openStream()
+fun fileAsByteArray(uri: String): ByteArray {
+    return Files.readAllBytes(toPath(uri))
 }
