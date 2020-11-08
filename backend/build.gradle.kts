@@ -225,7 +225,6 @@ jib {
 	val imageTags: Set<String>? by project.extra
 	val ciTags = imageTags?.toList() ?: emptyList()
 	val providedTag = project.findProperty("tag")?.toString()
-	val baseImageTag =  providedTag ?: "master"
 	val jibTags = when {
 		ciTags.isNotEmpty() -> ciTags
 		providedTag != null -> listOf(providedTag)
@@ -234,6 +233,7 @@ jib {
 
 	val (firstTag) = jibTags
 	val others = jibTags.drop(1)
+	val baseImageTag =  firstTag
 
 	from {
 		image = "podcastserver/backend-base-image:${baseImageTag}"
