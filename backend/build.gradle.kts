@@ -13,7 +13,6 @@ plugins {
 	id("io.spring.dependency-management") version "1.0.9.RELEASE"
 	id("com.gorylenko.gradle-git-properties") version "2.2.2"
 	id("org.flywaydb.flyway") version "6.4.4"
-//	id("com.rohanprabhu.kotlin-dsl-jooq") version "0.4.6"
 	id("nu.studer.jooq") version "5.0.1"
 	id("com.google.cloud.tools.jib") version "2.4.0"
 	id("de.jansauer.printcoverage") version "2.0.0"
@@ -138,53 +137,6 @@ jooq {
 		}
 	}
 }
-
-//jooqGenerator {
-//
-//	jooqVersion = "3.13.2"
-//
-//	configuration("primary", project.sourceSets.getByName("main")) {
-//
-//		databaseSources = listOf(db.sqlFiles)
-//
-//		configuration = jooqCodegenConfiguration {
-//			jdbc {
-//				url = db.url
-//				username = db.user
-//				password = db.password
-//				driver = "org.postgresql.Driver"
-//			}
-//
-//			generator {
-//				database {
-//					name = "org.jooq.meta.postgres.PostgresDatabase"
-//					inputSchema = "public"
-//					excludes = "Databasechangelog|Databasechangeloglock|flyway_schema_history"
-//
-//					forcedTypes {
-//						forcedType {
-//							userType = "com.github.davinkevin.podcastserver.entity.Status"
-//							converter = "com.github.davinkevin.podcastserver.database.StatusConverter"
-//							includeExpression = "ITEM\\.STATUS"
-//						}
-//					}
-//
-//					isIncludePackages = false
-//					isIncludeUDTs = true
-//					isIncludeSequences = true
-//					isIncludePrimaryKeys = true
-//					isIncludeUniqueKeys = true
-//					isIncludeForeignKeys = true
-//				}
-//
-//				target {
-//					packageName = "com.github.davinkevin.podcastserver.database"
-//					directory = "${project.buildDir}/generated/jooq/primary"
-//				}
-//			}
-//		}
-//	}
-//}
 
 project.tasks["flywayMigrate"].dependsOn("copyMigrations")
 project.tasks["generateJooq"].dependsOn("flywayMigrate")
