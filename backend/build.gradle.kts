@@ -17,8 +17,8 @@ plugins {
 	id("com.google.cloud.tools.jib") version "2.6.0"
 	id("de.jansauer.printcoverage") version "2.0.0"
 
-	kotlin("jvm") version "1.3.72"
-	kotlin("plugin.spring") version "1.3.72"
+	kotlin("jvm") version "1.4.21"
+	kotlin("plugin.spring") version "1.4.21"
 	jacoco
 }
 

@@ -14,8 +14,8 @@ class ExtractorSelector(val context: ApplicationContext, val extractors: Set<Ext
 
     @Suppress("UNCHECKED_CAST")
     fun of(url: URI): Extractor{
-        val e = extractors.minBy { it.compatibility(url) }
-        val eClass = (if (e is TargetClassAware) e.targetClass else e?.javaClass) as Class<Extractor>
+        val e = extractors.minByOrNull { it.compatibility(url) }!!
+        val eClass = (if (e is TargetClassAware) e.targetClass else e.javaClass) as Class<Extractor>
         return context.getBean(eClass)
     }
 }

@@ -73,7 +73,7 @@ class YoutubeDlServiceTest(
             /* When */
             assertThatThrownBy { youtube.extractName(url) }
                     /* Then */
-                    .hasCause(IllegalStateException("youtube.execute(request) must not be null"))
+                    .hasMessage("Error during creation of filename of $url")
         }
 
         fun response(name: String) = YoutubeDLResponse(null, null, null, 0, 0, name, null)

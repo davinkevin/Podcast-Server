@@ -9,6 +9,6 @@ import java.net.URI
  */
 class UpdaterSelector(val updaters: Set<Updater>) {
 
-    fun of(url: URI): Updater = updaters.minBy { updater -> updater.compatibility(url.toASCIIString()) }!!
+    fun of(url: URI): Updater = updaters.minByOrNull { updater: Updater -> updater.compatibility(url.toASCIIString()) }!!
     fun types(): Set<Type> = updaters.map { it.type() }.toSet()
 }

@@ -38,7 +38,7 @@ class ItunesFinderTest(
     @MockBean lateinit var rssFinder: RSSFinder
 
     @Test
-    fun `should be compatible with "podcasts dot apple dot com" url`() {
+    fun `should be compatible with podcasts dot apple dot com url`() {
         /* GIVEN */
         val url = "https://itunes.apple.com/fr/podcast/cauet-sl%C3%A2che/id1278255446?l=en&mt=2"
         /* WHEN  */
@@ -48,7 +48,7 @@ class ItunesFinderTest(
     }
 
     @Test
-    fun `should be compatible with "itunes dot apple dot com" url`() {
+    fun `should be compatible with itunes dot apple dot com url`() {
         /* GIVEN */
         val url = "https://podcasts.apple.com/fr/podcast/cauet-sl%C3%A2che/id1278255446?l=en&mt=2"
         /* WHEN  */

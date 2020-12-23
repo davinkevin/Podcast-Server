@@ -14,7 +14,7 @@ class FindService(val finders: Set<Finder>) {
     private val log = LoggerFactory.getLogger(FindService::class.java)
 
     fun find(url: URI): Mono<FindPodcastInformation> {
-        val finder = finders.minBy { it.compatibility(url.toASCIIString()) }!!
+        val finder = finders.minByOrNull { it.compatibility(url.toASCIIString()) }!!
 
         log.debug("finder selected is {}", finder.javaClass)
 

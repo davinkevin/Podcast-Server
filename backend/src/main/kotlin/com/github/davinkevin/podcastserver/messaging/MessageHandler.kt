@@ -76,7 +76,7 @@ private fun <T> convert(v: Message<T>): ServerSentEvent<out Any> {
 
 private fun <T> toServerSentEvent(event: String, body: T): ServerSentEvent<T> {
     return ServerSentEvent
-            .builder(body)
+            .builder(body!!)
             .event(event)
             .build()
 }
