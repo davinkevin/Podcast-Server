@@ -125,7 +125,7 @@ class TagRepositoryTest(
 
                         val tagRecord = query.selectFrom(TAG).where(TAG.NAME.eq(name)).fetchOne()
                         val numberOfTag = query.selectCount().from(TAG).fetchOne(count())
-                        assertThat(tagRecord.id).isEqualTo(it.id)
+                        assertThat(tagRecord?.id).isEqualTo(it.id)
                         assertThat(numberOfTag).isEqualTo(4)
                     }
                     .verifyComplete()
@@ -146,7 +146,7 @@ class TagRepositoryTest(
 
                         val tagRecord = query.selectFrom(TAG).where(TAG.NAME.eq(name)).fetchOne()
                         val numberOfTag = query.selectCount().from(TAG).fetchOne(count())
-                        assertThat(tagRecord.id).isEqualTo(it.id)
+                        assertThat(tagRecord?.id).isEqualTo(it.id)
                         assertThat(numberOfTag).isEqualTo(3)
                     }
                     .verifyComplete()

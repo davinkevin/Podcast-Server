@@ -83,11 +83,11 @@ class ItemRepository(private val query: DSLContext) {
             .subscribeOn(Schedulers.boundedElastic())
             .publishOn(Schedulers.parallel())
 
-    fun updateAsDeleted(items: Collection<UUID>) = Mono.defer {
+    fun updateAsDeleted(items: Collection<UUID>): Mono<Void> = Mono.defer {
         query
                 .update(ITEM)
                 .set(ITEM.STATUS, DELETED)
-                .set(ITEM.FILE_NAME, value<String>(null))
+                .set(ITEM.FILE_NAME, null as String?)
                 .where(ITEM.ID.`in`(items))
                 .toMono()
                 .then()
@@ -111,7 +111,7 @@ class ItemRepository(private val query: DSLContext) {
                 .update(ITEM)
                 .set(ITEM.STATUS, NOT_DOWNLOADED)
                 .set(ITEM.DOWNLOAD_DATE, null as OffsetDateTime?)
-                .set(ITEM.FILE_NAME, value<String>(null))
+                .set(ITEM.FILE_NAME, null as String?)
                 .set(ITEM.NUMBER_OF_FAIL, 0)
                 .where(ITEM.ID.eq(id))
                 .toMono()
@@ -176,10 +176,10 @@ class ItemRepository(private val query: DSLContext) {
                             )
                             .from(
                                     fi
-                                            .innerJoin(COVER).on(fi.field(ITEM.COVER_ID).eq(COVER.ID))
-                                            .innerJoin(PODCAST).on(fi.field(ITEM.PODCAST_ID).eq(PODCAST.ID))
+                                            .innerJoin(COVER).on(fi.field(ITEM.COVER_ID)?.eq(COVER.ID))
+                                            .innerJoin(PODCAST).on(fi.field(ITEM.PODCAST_ID)?.eq(PODCAST.ID))
                             )
-                            .orderBy(page.sort.toOrderBy(fi.field(ITEM.DOWNLOAD_DATE), fi.field(ITEM.PUB_DATE)), fi.field(ITEM.ID))
+                            .orderBy(page.sort.toOrderBy(fi.field(ITEM.DOWNLOAD_DATE)!!, fi.field(ITEM.PUB_DATE)!!), fi.field(ITEM.ID))
                     )
                             .map { (
                                            id, title, url,
@@ -300,7 +300,7 @@ private fun toItem(it: Record18<UUID, String, String, OffsetDateTime, OffsetDate
     )
 }
 
-private fun <T> ItemSort.toOrderBy(downloadDate: Field<T>, defaultField: Field<T>): SortField<T>? {
+private fun <T> ItemSort.toOrderBy(downloadDate: Field<T>, defaultField: Field<T>): SortField<T> {
     val field = if(field == "downloadDate" ) downloadDate else defaultField
     return if (direction.toLowerCase() == "asc") field.asc() else field.desc()
 }

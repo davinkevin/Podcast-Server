@@ -13,7 +13,7 @@ class CoverRoutingConfig {
     @Bean
     fun coverRouter(cover: CoverHandler) = router {
         "/api/v1/covers".nest {
-            DELETE("/", cover::deleteOldCovers)
+            DELETE("", cover::deleteOldCovers)
         }
     }
 }

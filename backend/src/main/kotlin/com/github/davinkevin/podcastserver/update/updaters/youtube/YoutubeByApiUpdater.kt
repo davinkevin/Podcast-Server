@@ -39,7 +39,7 @@ class YoutubeByApiUpdater(
         return findPlaylistId(podcast.url).flatMapMany { id ->
             Flux.range(1, MAX_PAGE)
                     .flatMap ({ pageNumber -> Mono
-                            .subscriberContext()
+                            .deferContextual { Mono.just(it) }
                             .flatMap { c -> Mono
                                     .justOrEmpty(c.getOrEmpty<List<String>>("pageTokens"))
                                     .filter { it.isNotEmpty() }
@@ -56,7 +56,7 @@ class YoutubeByApiUpdater(
                     .takeUntil { it.nextPageToken.isEmpty() }
                     .flatMapIterable { it.items }
                     .map { it.toItem() }
-                    .subscriberContext { c ->
+                    .contextWrite { c ->
                         log.debug("creation of cache")
                         c.put("pageTokens", CopyOnWriteArrayList<YoutubeApiResponse>())
                     }

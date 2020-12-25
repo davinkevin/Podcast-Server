@@ -1,17 +1,17 @@
 package com.github.davinkevin.podcastserver.messaging
 
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
-import reactor.core.publisher.DirectProcessor
+import reactor.core.publisher.Sinks
 
 /**
  * Created by kevin on 2018-11-25
  */
 class MessagingTemplate {
-    val messages: DirectProcessor<Message<out Any>> = DirectProcessor.create()
+    val messages: Sinks.Many<Message<out Any>> = Sinks.many().multicast().directBestEffort()
 
-    fun sendWaitingQueue(value: List<DownloadingItem>) = messages.onNext(WaitingQueueMessage(value))
-    fun sendItem(value: DownloadingItem) = messages.onNext(DownloadingItemMessage(value))
-    fun isUpdating(value: Boolean) = messages.onNext(UpdateMessage(value))
+    fun sendWaitingQueue(value: List<DownloadingItem>) = messages.tryEmitNext(WaitingQueueMessage(value))
+    fun sendItem(value: DownloadingItem) = messages.tryEmitNext(DownloadingItemMessage(value))
+    fun isUpdating(value: Boolean) = messages.tryEmitNext(UpdateMessage(value))
 }
 
 sealed class Message<T>(val topic: String, val value: T)

@@ -9,12 +9,12 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-	id("org.springframework.boot") version "2.3.3.RELEASE"
-	id("io.spring.dependency-management") version "1.0.9.RELEASE"
-	id("com.gorylenko.gradle-git-properties") version "2.2.2"
-	id("org.flywaydb.flyway") version "6.4.4"
-	id("nu.studer.jooq") version "5.0.1"
-	id("com.google.cloud.tools.jib") version "2.6.0"
+	id("org.springframework.boot") version "2.4.1"
+	id("io.spring.dependency-management") version "1.0.10.RELEASE"
+	id("com.gorylenko.gradle-git-properties") version "2.2.4"
+	id("org.flywaydb.flyway") version "7.3.2"
+	id("nu.studer.jooq") version "5.2"
+	id("com.google.cloud.tools.jib") version "2.7.0"
 	id("de.jansauer.printcoverage") version "2.0.0"
 
 	kotlin("jvm") version "1.4.21"
@@ -47,10 +47,10 @@ dependencies {
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions:1.0.2.RELEASE")
+	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 	implementation("javax.annotation:javax.annotation-api:1.3.2")
-	implementation("org.postgresql:postgresql:42.2.12")
-	jooqGenerator("org.postgresql:postgresql:42.2.14")
+	implementation("org.postgresql:postgresql:42.2.18")
+	jooqGenerator("org.postgresql:postgresql:42.2.18")
 
 	implementation("org.jdom:jdom2:2.0.6")
 	implementation("org.apache.tika:tika-core:1.24.1")
@@ -64,9 +64,7 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
 	testImplementation("io.projectreactor:reactor-test")
-	testImplementation("org.springframework.boot:spring-boot-starter-test") {
-		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
-	}
+	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:2.10.0")
 	testImplementation("com.github.tomakehurst:wiremock:2.25.1")

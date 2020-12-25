@@ -3,20 +3,18 @@ package com.github.davinkevin.podcastserver.messaging
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.fasterxml.jackson.databind.JsonNode
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.fasterxml.jackson.module.kotlin.treeToValue
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
-import org.slf4j.LoggerFactory
 import org.springframework.http.codec.ServerSentEvent
 import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.ok
-import reactor.core.publisher.DirectProcessor
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.publisher.Sinks
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
-import java.time.Duration.*
+import java.time.Duration.ofSeconds
 import java.util.*
 
 class MessageHandler(
@@ -24,27 +22,7 @@ class MessageHandler(
         private val mapper: ObjectMapper
 ) {
 
-    private val messageToForward: DirectProcessor<ServerSentEvent<out Any>> = DirectProcessor.create()
-
-    private val log = LoggerFactory.getLogger(MessageHandler::class.java)
-
-    fun sync(s: ServerRequest): Mono<ServerResponse> {
-
-        return s
-                .bodyToMono<JsonNode>()
-                .map {
-                    val (event, body) = when (val event = it["event"].textValue()) {
-                        "updating" -> "updating" to it["body"].asBoolean()
-                        "downloading" -> "downloading" to mapper.treeToValue<DownloadingItemHAL>(it["body"])!!
-                        "waiting" -> "waiting" to mapper.treeToValue<List<DownloadingItemHAL>>(it["body"])!!
-                        else -> throw error("message with event $event not supported")
-                    }
-
-                    toServerSentEvent(event, body)
-                }
-                .doOnNext { messageToForward.onNext(it) }
-                .flatMap { ok().build() }
-    }
+    private val messageToForward: Sinks.Many<Any> = Sinks.many().multicast().directBestEffort()
 
     fun sseMessages(@Suppress("UNUSED_PARAMETER") s: ServerRequest): Mono<ServerResponse> {
 
@@ -55,8 +33,8 @@ class MessageHandler(
                         .build()
                 }
 
-        val messages = mt.messages.map { convert(it) }.share()
-        val toForward = messageToForward.share()
+        val messages = mt.messages.asFlux().map { toSSE(it) }.share()
+        val toForward = messageToForward.asFlux().share()
 
         return ok()
                 .sse()
@@ -64,7 +42,7 @@ class MessageHandler(
     }
 }
 
-private fun <T> convert(v: Message<T>): ServerSentEvent<out Any> {
+private fun <T> toSSE(v: Message<T>): ServerSentEvent<out Any> {
     val body: Any = when(v) {
         is UpdateMessage -> v.value
         is WaitingQueueMessage -> v.value.map(::toDownloadingItemHAL)

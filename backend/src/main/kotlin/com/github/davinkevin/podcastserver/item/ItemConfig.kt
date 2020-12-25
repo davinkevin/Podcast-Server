@@ -17,19 +17,19 @@ class ItemRoutingConfig {
     fun itemRouter(item: ItemHandler) = router {
         "/api/v1/items".nest {
             GET("/search", item::search)
-            DELETE("/", item::clean)
+            DELETE("", item::clean)
         }
 
         "/api/v1/podcasts/{idPodcast}".nest {
             GET("/items", item::podcastItems )
             POST("/items/upload", item::upload)
             "/items/{id}".nest {
-                GET("/", item::findById)
+                GET("", item::findById)
                 GET("/cover.{ext}", item::cover)
                 GET("/playlists", item::playlists)
                 GET("/{file}", item::file)
                 POST("/reset", item::reset)
-                DELETE("/", item::delete)
+                DELETE("", item::delete)
             }
         }
     }

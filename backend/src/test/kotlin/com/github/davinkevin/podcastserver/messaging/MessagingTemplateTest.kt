@@ -65,7 +65,7 @@ class MessagingTemplateTest(
     fun `should send waiting queue`() {
         /* Given */
         /* When */
-        StepVerifier.create(messages.messages.take(4))
+        StepVerifier.create(messages.messages.asFlux().take(4))
                 /* Then */
                 .expectSubscription()
                 .then { messages.sendWaitingQueue(listOf(item1, item2, item3)) }
@@ -83,7 +83,7 @@ class MessagingTemplateTest(
     fun `should send downloading item`() {
         /* Given */
         /* When */
-        StepVerifier.create(messages.messages.take(4))
+        StepVerifier.create(messages.messages.asFlux().take(4))
                 /* Then */
                 .expectSubscription()
                 .then { messages.sendItem(item1) }
@@ -101,7 +101,7 @@ class MessagingTemplateTest(
     fun `should update`() {
         /* Given */
         /* When */
-        StepVerifier.create(messages.messages.take(3))
+        StepVerifier.create(messages.messages.asFlux().take(3))
                 /* Then */
                 .expectSubscription()
                 .then { messages.isUpdating(true) }
