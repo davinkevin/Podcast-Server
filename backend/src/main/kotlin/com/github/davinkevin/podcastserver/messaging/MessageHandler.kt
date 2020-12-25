@@ -14,31 +14,24 @@ import reactor.core.publisher.Mono
 import reactor.core.publisher.Sinks
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
+import java.time.Duration.ZERO
 import java.time.Duration.ofSeconds
 import java.util.*
 
-class MessageHandler(
-        private val mt: MessagingTemplate,
-        private val mapper: ObjectMapper
-) {
-
-    private val messageToForward: Sinks.Many<Any> = Sinks.many().multicast().directBestEffort()
+class MessageHandler(private val mt: MessagingTemplate) {
 
     fun sseMessages(@Suppress("UNUSED_PARAMETER") s: ServerRequest): Mono<ServerResponse> {
 
-        val heartBeat = Flux.interval(ofSeconds(5))
-                .mergeWith(0L.toMono())
-                .map { ServerSentEvent.builder(it as Any)
-                        .event("heartbeat")
-                        .build()
-                }
+        val heartBeat = Flux.interval(ZERO, ofSeconds(5))
+                .map { toHeartBeat(it) }
 
-        val messages = mt.messages.asFlux().map { toSSE(it) }.share()
-        val toForward = messageToForward.asFlux().share()
+        val messages = mt.messages.asFlux()
+                .map { toSSE(it) }
+                .share()
 
         return ok()
                 .sse()
-                .body(Flux.merge(messages, toForward, heartBeat))
+                .body(Flux.merge(messages, heartBeat))
     }
 }
 
@@ -51,6 +44,11 @@ private fun <T> toSSE(v: Message<T>): ServerSentEvent<out Any> {
 
     return toServerSentEvent(v.topic, body)
 }
+
+private fun toHeartBeat(v: Long): ServerSentEvent<out Any> = ServerSentEvent
+        .builder(v)
+        .event("heartbeat")
+        .build()
 
 private fun <T> toServerSentEvent(event: String, body: T): ServerSentEvent<T> {
     return ServerSentEvent
