@@ -29,4 +29,4 @@ echo "Creation of the frontend without automatic reload, to reload, launch in an
 ./mvnw -f frontend-angularjs/pom.xml frontend:gulp@skaffold
 
 echo "skaffold dev"
-skaffold dev
+skaffold dev --status-check=false

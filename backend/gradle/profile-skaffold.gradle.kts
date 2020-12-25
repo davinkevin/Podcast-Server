@@ -9,5 +9,7 @@ if (System.getenv("SKAFFOLD") != null || (skaffold?.toBoolean() == true)) {
             password = System.getenv("DATABASE_PASSWORD"),
             sqlFiles = "$buildDir/flyway/migrations/"
     ))
+
+    val imageTags by extra(setOf("master"))
 }
 
