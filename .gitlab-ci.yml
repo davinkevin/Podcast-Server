@@ -24,6 +24,8 @@ variables:
   }
 
 .container-scanning-with-trivy:
+  variables:
+    TRIVY_TIMEOUT: 10m
   image:
     name: aquasec/trivy
     entrypoint: [""]
