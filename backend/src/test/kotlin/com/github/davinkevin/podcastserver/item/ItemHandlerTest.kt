@@ -1457,7 +1457,7 @@ class ItemHandlerTest(
 
         inner class TestFilePart: FilePart {
             override fun content(): Flux<DataBuffer> = Flux.just(DefaultDataBufferFactory().wrap(("data".toByteArray())))
-            override fun headers(): HttpHeaders = TODO("Not yet implemented")
+            override fun headers(): HttpHeaders = HttpHeaders.EMPTY
             override fun filename(): String = "data.mp3"
             override fun name(): String = TODO("Not yet implemented")
             override fun transferTo(dest: Path): Mono<Void> = TODO("Not yet implemented")
@@ -1468,7 +1468,7 @@ class ItemHandlerTest(
             /* Given */
             val filePart = TestFilePart()
             val podcastId = UUID.fromString("7e90ebf0-bc4d-451a-82e1-e9ce3fb3fe73")
-            val body = MultipartBodyBuilder().apply { part("file", filePart) }.build()
+            val body = MultipartBodyBuilder().apply { part("file", filePart).filename(filePart.filename()) }.build()
             whenever(itemService.upload(eq(podcastId), any())).thenReturn(item1.toMono())
 
             /* When */

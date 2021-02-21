@@ -84,6 +84,7 @@ class PodcastRepository(private val query: DSLContext) {
                                         .leftJoin(PODCAST_TAGS).on(PODCAST_TAGS.PODCASTS_ID.eq(PODCAST.ID))
                                         .leftJoin(TAG).on(PODCAST_TAGS.TAGS_ID.eq(TAG.ID))
                         )
+                        .orderBy(PODCAST.ID, TAG.ID)
         )
                 .subscribeOn(Schedulers.boundedElastic())
                 .publishOn(Schedulers.parallel())

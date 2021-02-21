@@ -9,7 +9,7 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-	id("org.springframework.boot") version "2.4.1"
+	id("org.springframework.boot") version "2.4.3"
 	id("io.spring.dependency-management") version "1.0.10.RELEASE"
 	id("com.gorylenko.gradle-git-properties") version "2.2.4"
 	id("org.flywaydb.flyway") version "7.3.2"

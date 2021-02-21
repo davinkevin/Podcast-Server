@@ -147,6 +147,16 @@ class PodcastRepositoryTest(
                     /* Then */
                     .expectSubscription()
                     .assertNext {
+                        assertThat(it.id).isEqualTo(fromString("0311361c-cc97-48ab-b02a-0bd19eec8a45"))
+                        assertThat(it.title).isEqualTo("Without tags")
+                        assertThat(it.url).isEqualTo("http://fake.url.com/notags.rss")
+                        assertThat(it.hasToBeDeleted).isTrue()
+                        assertThat(it.type).isEqualTo("Youtube")
+                        assertThat(it.lastUpdate).isBetween(currentNow.minusDays(46).toOffsetDateTime(), currentNow.minusDays(44).toOffsetDateTime())
+                        assertThat(it.tags).hasSize(0)
+                        assertThat(it.cover).isEqualTo(CoverForPodcast(fromString("c46d93af-4461-4299-a42a-dd28d3f376e9"), URI("http://fake.url.com/notags/cover.png"), 100, 100))
+                    }
+                    .assertNext {
                         assertThat(it.id).isEqualTo(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"))
                         assertThat(it.title).isEqualTo("AppLoad")
                         assertThat(it.url).isEqualTo("http://fake.url.com/appload.rss")
@@ -165,18 +175,8 @@ class PodcastRepositoryTest(
                         assertThat(it.type).isEqualTo("Youtube")
                         assertThat(it.lastUpdate).isBetween(currentNow.minusDays(31).toOffsetDateTime(), currentNow.minusDays(29).toOffsetDateTime())
                         assertThat(it.tags).hasSize(2)
-                        assertThat(it.tags.map(Tag::name)).containsExactly("Geek", "Studio Renegade")
+                        assertThat(it.tags.map(Tag::name)).containsExactly("Studio Renegade", "Geek")
                         assertThat(it.cover).isEqualTo(CoverForPodcast(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), URI("http://fake.url.com/geekinc/cover.png"), 100, 100))
-                    }
-                    .assertNext {
-                        assertThat(it.id).isEqualTo(fromString("0311361c-cc97-48ab-b02a-0bd19eec8a45"))
-                        assertThat(it.title).isEqualTo("Without tags")
-                        assertThat(it.url).isEqualTo("http://fake.url.com/notags.rss")
-                        assertThat(it.hasToBeDeleted).isTrue()
-                        assertThat(it.type).isEqualTo("Youtube")
-                        assertThat(it.lastUpdate).isBetween(currentNow.minusDays(46).toOffsetDateTime(), currentNow.minusDays(44).toOffsetDateTime())
-                        assertThat(it.tags).hasSize(0)
-                        assertThat(it.cover).isEqualTo(CoverForPodcast(fromString("c46d93af-4461-4299-a42a-dd28d3f376e9"), URI("http://fake.url.com/notags/cover.png"), 100, 100))
                     }
                     .verifyComplete()
         }
