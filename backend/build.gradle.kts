@@ -68,7 +68,6 @@ dependencies {
 	testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:2.10.0")
 	testImplementation("com.github.tomakehurst:wiremock:2.25.1")
-	testImplementation("com.ninja-squad:DbSetup:1.6.0")
 	testImplementation("org.awaitility:awaitility:3.1.6")
 
 }

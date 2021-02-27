@@ -49,15 +49,15 @@ class ItemRepository(private val query: DSLContext) {
     }
 
     fun findAllToDelete(date: OffsetDateTime) = Flux.defer {
-        query
+        Flux.from(query
                 .select(ITEM.ID, ITEM.FILE_NAME, PODCAST.TITLE)
                 .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
                 .where(ITEM.DOWNLOAD_DATE.lessOrEqual(date))
                 .and(ITEM.STATUS.eq(FINISH))
                 .and(PODCAST.HAS_TO_BE_DELETED.isTrue)
                 .and(ITEM.ID.notIn(query.select(WATCH_LIST_ITEMS.ITEMS_ID).from(WATCH_LIST_ITEMS)))
-                .fetch { DeleteItemInformation(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
-                .toFlux()
+        )
+                .map { DeleteItemInformation(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
     }
             .subscribeOn(Schedulers.boundedElastic())
             .publishOn(Schedulers.parallel())
