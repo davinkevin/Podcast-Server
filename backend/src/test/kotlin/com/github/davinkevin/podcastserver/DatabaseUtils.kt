@@ -15,15 +15,6 @@ import java.util.*
 
 val DB_DATE_FORMATTER: DateTimeFormatter = DateTimeFormatterBuilder().append(DateTimeFormatter.ISO_LOCAL_DATE).appendLiteral(" ").append(DateTimeFormatter.ISO_LOCAL_TIME).toFormatter()
 
-val INSERT_TAG_DATA: Operation = sequenceOf(
-        Operations.insertInto("TAG")
-                .columns("ID", "NAME")
-                .values(UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "Foo")
-                .values(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr")
-                .values(UUID.fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar")
-                .build()
-)
-
 val INSERT_PODCAST_DATA: Operation = sequenceOf(
         Operations.insertInto("COVER")
                 .columns("ID", "URL", "WIDTH", "HEIGHT")

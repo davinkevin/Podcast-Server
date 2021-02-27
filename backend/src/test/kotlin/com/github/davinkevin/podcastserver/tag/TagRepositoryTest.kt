@@ -1,15 +1,9 @@
 package com.github.davinkevin.podcastserver.tag
 
-import com.github.davinkevin.podcastserver.INSERT_TAG_DATA
 import com.github.davinkevin.podcastserver.database.tables.Tag.TAG
-import com.ninja_squad.dbsetup.DbSetup
-import com.ninja_squad.dbsetup.DbSetupTracker
-import com.ninja_squad.dbsetup.destination.DataSourceDestination
-import com.ninja_squad.dbsetup.operation.CompositeOperation.sequenceOf
-import com.github.davinkevin.podcastserver.DELETE_ALL
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
-import org.jooq.impl.DSL.count
+import org.jooq.impl.DSL.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -18,8 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import reactor.test.StepVerifier
-import java.util.*
-import javax.sql.DataSource
+import java.util.UUID.fromString
 
 /**
  * Created by kevin on 2019-03-24
@@ -27,32 +20,30 @@ import javax.sql.DataSource
 @JooqTest
 @Import(TagRepository::class)
 class TagRepositoryTest(
-    @Autowired val query: DSLContext,
-    @Autowired val repository: TagRepository,
-    @Autowired val dataSource: DataSource
+        @Autowired val repository: TagRepository,
+        @Autowired val query: DSLContext
 ) {
-
-    private val dbSetupTracker = DbSetupTracker()
 
     @BeforeEach
     fun beforeEach() {
-        val operation = sequenceOf(DELETE_ALL, INSERT_TAG_DATA)
-        val dbSetup = DbSetup(DataSourceDestination(dataSource), operation)
-
-        dbSetupTracker.launchIfNecessary(dbSetup)
+        query.batch(
+                truncate(TAG).cascade(),
+                insertInto(TAG)
+                        .columns(TAG.ID, TAG.NAME)
+                        .values(fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "Foo")
+                        .values(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr")
+                        .values(fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar")
+        ).execute()
     }
 
     @Nested
     @DisplayName("Should find by id")
     inner class ShouldFindById {
 
-        @BeforeEach
-        fun beforeEach() = dbSetupTracker.skipNextLaunch()
-
         @Test
         fun `and return one matching element`() {
             /* Given */
-            val id = UUID.fromString("eb355a23-e030-4966-b75a-b70881a8bd08")
+            val id = fromString("eb355a23-e030-4966-b75a-b70881a8bd08")
 
             /* When */
             StepVerifier.create(repository.findById(id))
@@ -65,7 +56,7 @@ class TagRepositoryTest(
         @Test
         fun `and return empty mono if not find by id`() {
             /* Given */
-            val id = UUID.fromString("98b33370-a976-4e4d-9ab8-57d47241e693")
+            val id = fromString("98b33370-a976-4e4d-9ab8-57d47241e693")
 
             /* When */
             StepVerifier.create(repository.findById(id))
@@ -80,9 +71,6 @@ class TagRepositoryTest(
     @DisplayName("Should find by name")
     inner class ShouldFindByNameLike {
 
-        @BeforeEach
-        fun beforeEach() = dbSetupTracker.skipNextLaunch()
-
         @Test
         fun `with with insensitive case results`() {
             /* Given */
@@ -91,8 +79,8 @@ class TagRepositoryTest(
             StepVerifier.create(repository.findByNameLike("bar"))
                     /* Then */
                     .expectSubscription()
-                    .expectNext(Tag(UUID.fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar"))
-                    .expectNext(Tag(UUID.fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr"))
+                    .expectNext(Tag(fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar"))
+                    .expectNext(Tag(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr"))
                     .verifyComplete()
         }
 
