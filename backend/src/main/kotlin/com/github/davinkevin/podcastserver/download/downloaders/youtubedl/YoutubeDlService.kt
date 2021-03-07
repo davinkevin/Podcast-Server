@@ -43,7 +43,7 @@ class YoutubeDlService(private val youtube: YoutubeDL) {
             setOption("output", name)
 
             if(isFromVideoPlatform(url)) {
-                setOption("format", "bestvideo[ext=webm]+bestaudio[ext=webm]/best[ext=mp4]+bestaudio[ext=m4a]/best[ext=webm]/best[ext=mp4]")
+                setOption("format", "bestvideo[ext=webm]+bestaudio[ext=webm]/best[ext=mp4]+bestaudio[ext=m4a]/best[ext=webm]/best[ext=mp4]/mp4+m4a")
             }
         }
 

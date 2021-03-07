@@ -27,15 +27,12 @@ import java.nio.file.Paths
  * Created by kevin on 08/05/2020
  */
 @ExtendWith(SpringExtension::class)
+@Import(YoutubeDlService::class)
 class YoutubeDlServiceTest(
         @Autowired private val youtube: YoutubeDlService
 ) {
 
     @MockBean private lateinit var youtubeDl: YoutubeDL
-
-    @TestConfiguration
-    @Import(YoutubeDlService::class)
-    class LocalTestConfiguration
 
     @BeforeEach
     fun beforeEach() = Mockito.reset(youtubeDl)
@@ -123,7 +120,7 @@ class YoutubeDlServiceTest(
                         it.directory == "/tmp" &&
                         it.option["retries"] == "10" &&
                         it.option["output"] == "foo.mp3" &&
-                        it.option["format"] == "bestvideo[ext=webm]+bestaudio[ext=webm]/best[ext=mp4]+bestaudio[ext=m4a]/best[ext=webm]/best[ext=mp4]"
+                        it.option["format"] == "bestvideo[ext=webm]+bestaudio[ext=webm]/best[ext=mp4]+bestaudio[ext=m4a]/best[ext=webm]/best[ext=mp4]/mp4+m4a"
             }
             whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
 
