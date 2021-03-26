@@ -112,7 +112,6 @@ class FranceTvUpdater(
                 .map { it.attr("href") }
                 .sort()
                 .reduce { t, u -> """$t-$u""" }
-                .log()
                 .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
                 .switchIfEmpty("".toMono())
     }
