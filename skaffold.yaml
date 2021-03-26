@@ -1,18 +1,18 @@
-apiVersion: skaffold/v2beta3
+apiVersion: skaffold/v2beta10
 kind: Config
 build:
   artifacts:
-    - image: podcastserver/backend
-      context: backend
-      jib:
-        args:
-          - -Pskaffold=true
-    - image: podcastserver/ui-v1
-      context: frontend-angularjs/target/
-    - image: podcastserver/init-db
-      docker:
-        dockerfile: ./database/Dockerfile
+  - image: podcastserver/backend
+    context: backend
+    jib:
+      args:
+      - -Pskaffold=true
+  - image: podcastserver/ui-v1
+    context: frontend-angularjs/target/
+  - image: podcastserver/init-db
+    docker:
+      dockerfile: ./database/Dockerfile
 deploy:
   kustomize:
     paths:
-      - distribution/kubernetes/docker-for-desktop/
+    - distribution/kubernetes/docker-for-desktop/
