@@ -36,7 +36,7 @@ class UpdateService(
         private val idm: ItemDownloadManager
 ) {
 
-    val log = LoggerFactory.getLogger(UpdateService::class.java)!!
+    private val log = LoggerFactory.getLogger(UpdateService::class.java)!!
 
     fun updateAll(force: Boolean, download: Boolean): Mono<Void> {
 
@@ -92,7 +92,14 @@ class UpdateService(
                             .flatMap { podcastRepository.findCover(podcast.id).zipWith(it.toMono()) }
                             .map { (podcastCover, item) -> item.toCreation(podcast.id, podcastCover.toCreation()) }
                             .flatMap { itemRepository.create(it) }
-                            .flatMap { item -> fileService.downloadItemCover(item).then(item.toMono()) }
+                            .flatMap { item ->
+                                fileService.downloadItemCover(item)
+                                        .onErrorResume {
+                                            log.error("Error during download of cover for item $item", it)
+                                            Mono.empty()
+                                        }
+                                        .then(item.toMono())
+                            }
                             .sequential()
                             .collectList()
                             .delayUntil { if (it.isNotEmpty()) podcastRepository.updateLastUpdate(podcast.id) else Mono.empty<Void>() }
