@@ -194,6 +194,7 @@ class YoutubeByApiUpdaterTest(
 
             backend.apply {
                 stubFor(get("/user/joueurdugrenier")
+                        .withHeader("User-Agent", equalTo("curl/7.64.1"))
                         .willReturn(ok(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
                 stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
                         .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.json"))))
@@ -216,6 +217,7 @@ class YoutubeByApiUpdaterTest(
 
             backend.apply {
                 stubFor(get("/user/joueurdugrenier")
+                        .withHeader("User-Agent", equalTo("curl/7.64.1"))
                         .willReturn(ok(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
                 stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
                         .willReturn(notFound()))

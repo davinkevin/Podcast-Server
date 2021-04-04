@@ -29,6 +29,7 @@ class YoutubeUpdaterConfig {
         val builder = wcb
                 .clone()
                 .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
+                .defaultHeader("User-Agent", "curl/7.64.1")
 
         val youtubeClient = builder.clone()
                 .baseUrl("https://www.youtube.com")

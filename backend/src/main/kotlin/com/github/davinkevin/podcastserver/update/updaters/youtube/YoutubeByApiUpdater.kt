@@ -31,7 +31,7 @@ class YoutubeByApiUpdater(
         private val googleApiClient: WebClient
 ): Updater {
 
-    private val log = LoggerFactory.getLogger(this.javaClass.name)!!
+    private val log = LoggerFactory.getLogger(YoutubeByApiUpdater::class.java)
 
     override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
         log.debug("find items of {}", podcast.url)
@@ -105,7 +105,11 @@ class YoutubeByApiUpdater(
                 .retrieve()
                 .bodyToMono<String>()
                 .map { Jsoup.parse(it, "https://www.youtube.com") }
-                .flatMap { Mono.justOrEmpty(it.select("meta[itemprop=channelId]").firstOrNull()) }
+                .flatMap {
+                    val channels = it.select("meta[itemprop=channelId]")
+                    log.info("The channels list has the size ${channels.size}")
+                    Mono.justOrEmpty(channels.firstOrNull())
+                }
                 .map { it.attr("content") }
                 .map { transformChannelIdToPlaylistId(it) }
                 .switchIfEmpty { RuntimeException("channel id not found").toMono() }

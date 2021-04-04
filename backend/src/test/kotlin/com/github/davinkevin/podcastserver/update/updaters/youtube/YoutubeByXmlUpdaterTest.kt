@@ -7,6 +7,7 @@ import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.okJson
 import org.assertj.core.api.Assertions.assertThat
@@ -72,8 +73,10 @@ class YoutubeByXmlUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/user/joueurdugrenier")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
                     stubFor(get("/feeds/videos.xml?channel_id=UC_yP2DpIgs5Y1uWC0T03Chw")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.channel.with-0-item.xml"))))
                 }
 
@@ -90,8 +93,10 @@ class YoutubeByXmlUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/user/joueurdugrenier")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
                     stubFor(get("/feeds/videos.xml?channel_id=UC_yP2DpIgs5Y1uWC0T03Chw")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.channel.with-1-item.xml"))))
                 }
 
@@ -114,8 +119,10 @@ class YoutubeByXmlUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/user/joueurdugrenier")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
                     stubFor(get("/feeds/videos.xml?channel_id=UC_yP2DpIgs5Y1uWC0T03Chw")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.channel.xml"))))
                 }
 
@@ -137,6 +144,7 @@ class YoutubeByXmlUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/feeds/videos.xml?playlist_id=PLAD454F0807B6CB80")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.playlist.with-0-item.xml"))))
                 }
 
@@ -153,6 +161,7 @@ class YoutubeByXmlUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/feeds/videos.xml?playlist_id=PLAD454F0807B6CB80")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.playlist.with-1-item.xml"))))
                 }
 
@@ -175,6 +184,7 @@ class YoutubeByXmlUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/feeds/videos.xml?playlist_id=PLAD454F0807B6CB80")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.playlist.xml"))))
                 }
 
@@ -204,6 +214,7 @@ class YoutubeByXmlUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/feeds/videos.xml?playlist_id=PLAD454F0807B6CB80")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.playlist.with-0-item.xml"))))
                 }
 
@@ -220,6 +231,7 @@ class YoutubeByXmlUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/feeds/videos.xml?playlist_id=PLAD454F0807B6CB80")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.playlist.xml"))))
                 }
 
@@ -241,9 +253,11 @@ class YoutubeByXmlUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/user/joueurdugrenier")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
                     stubFor(get("/feeds/videos.xml?channel_id=UC_yP2DpIgs5Y1uWC0T03Chw")
-                        .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.channel.with-0-item.xml"))))
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
+                            .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.channel.with-0-item.xml"))))
                 }
 
                 /* When */
@@ -259,8 +273,10 @@ class YoutubeByXmlUpdaterTest(
                 /* Given */
                 backend.apply {
                     stubFor(get("/user/joueurdugrenier")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
                     stubFor(get("/feeds/videos.xml?channel_id=UC_yP2DpIgs5Y1uWC0T03Chw")
+                            .withHeader("User-Agent", WireMock.equalTo("curl/7.64.1"))
                             .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.channel.xml"))))
                 }
 

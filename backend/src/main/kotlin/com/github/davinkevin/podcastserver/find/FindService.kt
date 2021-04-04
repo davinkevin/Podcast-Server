@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.find
 
 import com.github.davinkevin.podcastserver.find.finders.Finder
 import org.slf4j.LoggerFactory
+import reactor.core.publisher.Hooks
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
@@ -16,7 +17,7 @@ class FindService(val finders: Set<Finder>) {
     fun find(url: URI): Mono<FindPodcastInformation> {
         val finder = finders.minByOrNull { it.compatibility(url.toASCIIString()) }!!
 
-        log.debug("finder selected is {}", finder.javaClass)
+        log.info("finder selected is {} for {}", finder.javaClass, url.toASCIIString())
 
         return finder
                 .findInformation(url.toASCIIString())

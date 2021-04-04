@@ -48,6 +48,7 @@ class YoutubeFinderTest(
                     .thenReturn(CoverInformation(100, 100, coverUrl).toMono())
 
             backend.stubFor(get("/user/joueurdugrenier")
+                    .withHeader("User-Agent", equalTo("curl/7.64.1"))
                     .willReturn(ok(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
 
             /* When */
@@ -75,6 +76,7 @@ class YoutubeFinderTest(
 
             backend.apply {
                 stubFor(get("/user/joueurdugrenier")
+                        .withHeader("User-Agent", equalTo("curl/7.64.1"))
                         .willReturn(permanentRedirect("http://localhost:5555/user/joueurdugrenier-after-redirect")))
 
                 stubFor(get("/user/joueurdugrenier-after-redirect")
@@ -113,6 +115,7 @@ class YoutubeFinderTest(
             /* Given */
             val url = "http://localhost:5555/user/joueurdugrenier"
             backend.stubFor(get("/user/joueurdugrenier")
+                    .withHeader("User-Agent", equalTo("curl/7.64.1"))
                     .willReturn(ok(fileAsString("/remote/podcast/youtube/joueurdugrenier.withoutDescAndCoverAndTitle.html"))))
 
             /* When */
