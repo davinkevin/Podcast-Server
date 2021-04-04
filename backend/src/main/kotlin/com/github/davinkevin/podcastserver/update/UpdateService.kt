@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.update
 
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemForCreation
 import com.github.davinkevin.podcastserver.item.ItemRepository
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
@@ -22,6 +23,7 @@ import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
+import reactor.util.function.Tuple2
 import java.net.URI
 import java.time.OffsetDateTime.now
 import java.util.*
@@ -51,7 +53,7 @@ class UpdateService(
                     val signature = if(force || it.signature == null) UUID.randomUUID().toString() else it.signature
                     PodcastToUpdate(it.id, URI(it.url!!), signature)
                 }
-                .flatMap {pu -> updaters.of(pu.url).update(pu) }
+                .flatMap({ pu -> updaters.of(pu.url).update(pu) }, false, parameters.maxUpdateParallels)
                 .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
                 .sequential()
                 .collectList()
@@ -80,30 +82,59 @@ class UpdateService(
         return Mono.empty()
     }
 
-    private fun saveSignatureAndCreateItems(podcast: PodcastToUpdate, items: Set<ItemFromUpdate>, signature: String) =
-            Mono.zip(
-                    Mono.defer {
-                        val realSignature = if (items.isEmpty()) "" else signature
-                        podcastRepository.updateSignature(podcast.id, realSignature).then(1.toMono())
-                    },
-                    items.toFlux()
-                            .parallel()
-                            .runOn(Schedulers.parallel())
-                            .flatMap { podcastRepository.findCover(podcast.id).zipWith(it.toMono()) }
-                            .map { (podcastCover, item) -> item.toCreation(podcast.id, podcastCover.toCreation()) }
-                            .flatMap { itemRepository.create(it) }
-                            .flatMap { item ->
-                                fileService.downloadItemCover(item)
-                                        .onErrorResume {
-                                            log.error("Error during download of cover for item $item", it)
-                                            Mono.empty()
-                                        }
-                                        .then(item.toMono())
-                            }
-                            .sequential()
-                            .collectList()
-                            .delayUntil { if (it.isNotEmpty()) podcastRepository.updateLastUpdate(podcast.id) else Mono.empty<Void>() }
-            )
+    private fun saveSignatureAndCreateItems(
+            podcast: PodcastToUpdate,
+            items: Set<ItemFromUpdate>,
+            signature: String,
+    ): Mono<Void> {
+        val realSignature = if (items.isEmpty()) "" else signature
+        val updateSignature = podcastRepository.updateSignature(podcast.id, realSignature)
+        val createItems = items.toFlux()
+                .parallel()
+                .runOn(Schedulers.parallel())
+                .flatMap { podcastRepository.findCover(podcast.id).zipWith(it.toMono()) }
+                .map { (podcastCover, item) -> item.toCreation(podcast.id, podcastCover.toCreation()) }
+                .flatMap { itemRepository.create(it) }
+                .flatMap { item -> fileService.downloadItemCover(item)
+                        .onErrorResume {
+                            log.error("Error during download of cover for item $item")
+                            log.error("downloading error", it)
+                            Mono.empty()
+                        }
+                        .then(item.toMono())
+                }
+                .sequential()
+                .collectList()
+                .delayUntil { if (it.isNotEmpty()) podcastRepository.updateLastUpdate(podcast.id) else Mono.empty<Void>() }
+
+        return Mono.zip(updateSignature, createItems).then()
+
+
+//        return Mono.zip(
+//                Mono.defer {
+//                    val realSignature = if (items.isEmpty()) "" else signature
+//                    podcastRepository.updateSignature(podcast.id, realSignature).then(1.toMono())
+//                },
+//                items.toFlux()
+//                        .parallel()
+//                        .runOn(Schedulers.parallel())
+//                        .flatMap { podcastRepository.findCover(podcast.id).zipWith(it.toMono()) }
+//                        .map { (podcastCover, item) -> item.toCreation(podcast.id, podcastCover.toCreation()) }
+//                        .flatMap { itemRepository.create(it) }
+//                        .flatMap { item ->
+//                            fileService.downloadItemCover(item)
+//                                    .onErrorResume {
+//                                        log.error("Error during download of cover for item $item")
+//                                        log.error("downloading error", it)
+//                                        Mono.empty()
+//                                    }
+//                                    .then(item.toMono())
+//                        }
+//                        .sequential()
+//                        .collectList()
+//                        .delayUntil { if (it.isNotEmpty()) podcastRepository.updateLastUpdate(podcast.id) else Mono.empty<Void>() }
+//        )
+    }
 }
 
 

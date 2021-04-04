@@ -31,7 +31,7 @@ interface Updater {
                             .doOnNext { log.debug("podcast {} has {} items found", podcast.url, it.size) }
                             .map { items -> UpdatePodcastInformation(podcast, items, sign) }
                 }
-                .doOnSuccess { log.info("podcast {} ends update with {} items found", podcast.url, it.items.size) }
+                .doOnSuccess { log.info("podcast {} ends update", podcast.url) }
                 .doOnError { log.error("podcast {} ends with error", podcast.url, it) }
                 .onErrorResume { Mono.empty() }
     }
