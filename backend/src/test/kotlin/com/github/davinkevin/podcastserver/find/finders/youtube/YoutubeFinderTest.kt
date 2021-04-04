@@ -42,7 +42,7 @@ class YoutubeFinderTest(
         fun `information about a youtube podcast with its url`(backend: WireMockServer) {
             /* Given */
             val url = "http://localhost:5555/user/joueurdugrenier"
-            val coverUrl = URI("https://yt3.ggpht.com/a/AATXAJzzJHBMXD4K4L5FX4X_TnfKO16Wy9M4pzlshph5=s900-c-k-c0xffffffff-no-rj-mo")
+            val coverUrl = URI("https://yt3.ggpht.com/ytc/AAUvwnhJmYkW42zA0rx8V37HS_MbK_IX09HKCwaIsuU-=s900-c-k-c0x00ffffff-no-rj")
 
             whenever(image.fetchCoverInformation(coverUrl))
                     .thenReturn(CoverInformation(100, 100, coverUrl).toMono())
@@ -69,7 +69,7 @@ class YoutubeFinderTest(
         fun `information about a youtube podcast with its url after redirect`(backend: WireMockServer) {
             /* Given */
             val url = "http://localhost:5555/user/joueurdugrenier"
-            val coverUrl = URI("https://yt3.ggpht.com/a/AATXAJzzJHBMXD4K4L5FX4X_TnfKO16Wy9M4pzlshph5=s900-c-k-c0xffffffff-no-rj-mo")
+            val coverUrl = URI("https://yt3.ggpht.com/ytc/AAUvwnhJmYkW42zA0rx8V37HS_MbK_IX09HKCwaIsuU-=s900-c-k-c0x00ffffff-no-rj")
 
             whenever(image.fetchCoverInformation(coverUrl))
                     .thenReturn(CoverInformation(100, 100, coverUrl).toMono())

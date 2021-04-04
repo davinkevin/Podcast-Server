@@ -39,14 +39,13 @@ class YoutubeFinder(
             .map { (cover, doc) -> FindPodcastInformation (
                     url = URI(url),
                     type = "Youtube",
-                    title = doc.meta("title"),
-                    description = doc.meta("description"),
+                    title = doc.meta("property=og:title"),
+                    description = doc.meta("name=description"),
                     cover = cover.orNull()
             ) }
 
     private fun findCover(page: Document): Mono<Optional<FindCoverInformation>> {
-        return page.select("meta[property=og:image]")
-                .attr("content")
+        return page.meta("property=og:image").also { println("image url is $it") }
                 .toMono()
                 .filter { it.isNotEmpty() }
                 .flatMap { imageService.fetchCoverInformationOrOption(URI(it)) }
@@ -56,4 +55,4 @@ class YoutubeFinder(
     override fun compatibility(url: String): Int = youtubeCompatibility(url)
 }
 
-private fun Document.meta(s: String) = this.select("meta[name=$s]").attr("content")
+private fun Document.meta(s: String) = this.select("meta[$s]").attr("content")
