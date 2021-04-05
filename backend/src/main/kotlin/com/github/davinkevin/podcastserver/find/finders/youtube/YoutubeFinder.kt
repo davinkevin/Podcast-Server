@@ -45,7 +45,7 @@ class YoutubeFinder(
             ) }
 
     private fun findCover(page: Document): Mono<Optional<FindCoverInformation>> {
-        return page.meta("property=og:image").also { println("image url is $it") }
+        return page.meta("property=og:image")
                 .toMono()
                 .filter { it.isNotEmpty() }
                 .flatMap { imageService.fetchCoverInformationOrOption(URI(it)) }
