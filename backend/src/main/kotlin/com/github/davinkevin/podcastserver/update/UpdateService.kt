@@ -88,7 +88,7 @@ class UpdateService(
             signature: String,
     ): Mono<Void> {
         val realSignature = if (items.isEmpty()) "" else signature
-        val updateSignature = podcastRepository.updateSignature(podcast.id, realSignature)
+        val updateSignature = podcastRepository.updateSignature(podcast.id, realSignature).then(1.toMono())
         val createItems = items.toFlux()
                 .parallel()
                 .runOn(Schedulers.parallel())
@@ -96,44 +96,17 @@ class UpdateService(
                 .map { (podcastCover, item) -> item.toCreation(podcast.id, podcastCover.toCreation()) }
                 .flatMap { itemRepository.create(it) }
                 .flatMap { item -> fileService.downloadItemCover(item)
-                        .onErrorResume {
-                            log.error("Error during download of cover for item $item")
-                            log.error("downloading error", it)
-                            Mono.empty()
-                        }
-                        .then(item.toMono())
+                            .onErrorResume {
+                                log.error("Error during download of cover ${item.cover.url}")
+                                Mono.empty()
+                            }
+                            .then(item.toMono())
                 }
                 .sequential()
                 .collectList()
                 .delayUntil { if (it.isNotEmpty()) podcastRepository.updateLastUpdate(podcast.id) else Mono.empty<Void>() }
 
         return Mono.zip(updateSignature, createItems).then()
-
-
-//        return Mono.zip(
-//                Mono.defer {
-//                    val realSignature = if (items.isEmpty()) "" else signature
-//                    podcastRepository.updateSignature(podcast.id, realSignature).then(1.toMono())
-//                },
-//                items.toFlux()
-//                        .parallel()
-//                        .runOn(Schedulers.parallel())
-//                        .flatMap { podcastRepository.findCover(podcast.id).zipWith(it.toMono()) }
-//                        .map { (podcastCover, item) -> item.toCreation(podcast.id, podcastCover.toCreation()) }
-//                        .flatMap { itemRepository.create(it) }
-//                        .flatMap { item ->
-//                            fileService.downloadItemCover(item)
-//                                    .onErrorResume {
-//                                        log.error("Error during download of cover for item $item")
-//                                        log.error("downloading error", it)
-//                                        Mono.empty()
-//                                    }
-//                                    .then(item.toMono())
-//                        }
-//                        .sequential()
-//                        .collectList()
-//                        .delayUntil { if (it.isNotEmpty()) podcastRepository.updateLastUpdate(podcast.id) else Mono.empty<Void>() }
-//        )
     }
 }
 
