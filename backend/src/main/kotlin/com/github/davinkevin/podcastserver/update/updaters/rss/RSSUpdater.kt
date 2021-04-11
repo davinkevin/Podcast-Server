@@ -1,6 +1,8 @@
 package com.github.davinkevin.podcastserver.update.updaters.rss
 
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
+import com.github.davinkevin.podcastserver.service.image.ImageService
+import com.github.davinkevin.podcastserver.update.updaters.*
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.jdom2.input.SAXBuilder
@@ -12,49 +14,63 @@ import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.switchIfEmpty
+import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import com.github.davinkevin.podcastserver.service.image.ImageService
-import com.github.davinkevin.podcastserver.update.updaters.*
 
 class RSSUpdater(
         private val imageService: ImageService,
         private val wcb: WebClient.Builder
 ) : Updater {
 
+    private val itunesNS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")!!
     private val log = LoggerFactory.getLogger(RSSUpdater::class.java)
 
     override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
         return fetchRss(podcast.url)
                 .map { SAXBuilder().build(it.inputStream) }
                 .flatMap { Mono.justOrEmpty(it.rootElement.getChild("channel")) }
-                .flatMapIterable { it.getChildren("item") }
-                .filter { hasEnclosure(it) }
-                .flatMap { elem -> Mono.justOrEmpty(elem.getChild("thumbnail", MEDIA))
-                        .map { it.getAttributeValue("url") ?: it.text }
-                        .map { URI(it) }
-                        .flatMap { imageService.fetchCoverInformation(it) }
-                        .map { it.toCoverFromUpdate() }
-                        .map { Optional.of(it) }
-                        .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
-                        .map {
-                            val enclosure = elem.enclosure()
-                            ItemFromUpdate(
-                                    title = elem.getChildText("title"),
-                                    pubDate = getPubDate(elem),
-                                    description = elem.getChildText("description"),
-                                    cover = it.orNull(),
-                                    url = urlOf(elem),
+                .flatMapMany { channel -> channel
+                        .getChildren("item")
+                        .toFlux()
+                        .filter { hasEnclosure(it) }
+                        .flatMap { elem -> Mono.justOrEmpty(elem.getChild("thumbnail", MEDIA))
+                                .map { URI(it.getAttributeValue("url") ?: it.text) }
+                                .flatMap {
+                                    imageService.fetchCoverInformation(it)
+                                            .map { cover -> Optional.of(cover.toCoverFromUpdate()) }
+                                }
+                                .switchIfEmpty { findPodcastCover(channel) }
+                                .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
+                                .map {
+                                    val enclosure = elem.enclosure()
+                                    ItemFromUpdate(
+                                            title = elem.getChildText("title"),
+                                            pubDate = getPubDate(elem),
+                                            description = elem.getChildText("description"),
+                                            cover = it.orNull(),
+                                            url = urlOf(elem),
 
-                                    length = enclosure.getAttributeValue("length")?.toLong(),
-                                    mimeType = mimeTypeOf(elem)
-                            )
+                                            length = enclosure.getAttributeValue("length")?.toLong(),
+                                            mimeType = mimeTypeOf(elem)
+                                    )
+                                }
+
                         }
-
                 }
+    }
+
+    private fun findPodcastCover(channelElement: Element): Mono<Optional<ItemFromUpdate.Cover>> {
+        val rss = channelElement.getChild("image")?.getChildText("url")
+        val itunes = channelElement.getChild("image", itunesNS)?.getAttributeValue("href")
+
+        val url = rss ?: itunes ?: return Optional.empty<ItemFromUpdate.Cover>().toMono()
+
+        return imageService.fetchCoverInformation(URI(url))
+                .map { Optional.of(ItemFromUpdate.Cover(it.width, it.height, it.url)) }
     }
 
     private fun hasEnclosure(item: Element) = item.enclosure() != null

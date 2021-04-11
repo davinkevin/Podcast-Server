@@ -29,6 +29,8 @@ import java.net.URI
 import java.time.ZoneOffset
 import java.util.*
 import com.github.davinkevin.podcastserver.service.image.ImageService
+import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
+import reactor.core.publisher.Mono
 import java.time.Duration
 import java.time.ZonedDateTime.now
 
@@ -70,8 +72,57 @@ class RSSUpdaterTest(
         }
 
         @Test
-        fun `with success with some cover null`(backend: WireMockServer) {
+        fun `with fallback cover to rss image`(backend: WireMockServer) {
             /* Given */
+            backend.stubFor(get("/rss.xml")
+                    .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.with-only-rss-cover.xml"))))
+
+            /* When */
+            StepVerifier.create(updater.findItems(podcast)
+                    .filter { it.cover?.url == URI("http://app-load.com/audio/rss/appload1400.jpg") }
+            )
+                    /* Then */
+                    .expectSubscription()
+                    .expectNextCount(215)
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `with fallback cover to itunes image`(backend: WireMockServer) {
+            /* Given */
+            backend.stubFor(get("/rss.xml")
+                    .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.with-only-itunes-cover.xml"))))
+
+            /* When */
+            StepVerifier.create(updater.findItems(podcast)
+                    .log()
+                    .filter { it.cover?.url == URI("http://app-load.com/audio/itunes/appload1400.jpg") }
+            )
+                    /* Then */
+                    .expectSubscription()
+                    .expectNextCount(215)
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `with success without any cover`(backend: WireMockServer) {
+            /* Given */
+            backend.stubFor(get("/rss.xml")
+                    .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.without-any-cover.xml"))))
+
+            /* When */
+            StepVerifier.create(updater.findItems(podcast).filter { it.cover == null })
+                    /* Then */
+                    .expectSubscription()
+                    .expectNextCount(215)
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `with success with podcast cover in error`(backend: WireMockServer) {
+            /* Given */
+            whenever(image.fetchCoverInformation(URI("http://app-load.com/audio/appload140.jpg")))
+                    .then { Mono.empty<CoverInformation>() }
             backend.stubFor(get("/rss.xml")
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
@@ -80,6 +131,24 @@ class RSSUpdaterTest(
                     /* Then */
                     .expectSubscription()
                     .expectNextCount(215)
+                    .verifyComplete()
+        }
+
+        @Test
+        fun `with success with item cover and podcast cover in error`(backend: WireMockServer) {
+            /* Given */
+            whenever(image.fetchCoverInformation(URI("http://app-load.com/audio/appload1400.jpg")))
+                    .then { Mono.empty<CoverInformation>() }
+            whenever(image.fetchCoverInformation(URI("http://app-load.com/audio/appload140.jpg")))
+                    .then { Mono.empty<CoverInformation>() }
+            backend.stubFor(get("/rss.xml")
+                    .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
+
+            /* When */
+            StepVerifier.create(updater.findItems(podcast).filter { it.cover == null })
+                    /* Then */
+                    .expectSubscription()
+                    .expectNextCount(217)
                     .verifyComplete()
         }
 
