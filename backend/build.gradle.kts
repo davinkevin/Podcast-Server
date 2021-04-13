@@ -42,13 +42,10 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
 	implementation("org.springframework.boot:spring-boot-starter-jooq")
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
-	implementation("org.springframework.boot:spring-boot-starter-validation")
 
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
-	implementation("javax.annotation:javax.annotation-api:1.3.2")
 	implementation("org.postgresql:postgresql:42.2.18")
 	jooqGenerator("org.postgresql:postgresql:42.2.18")
 
@@ -56,10 +53,10 @@ dependencies {
 	implementation("org.apache.tika:tika-core:1.24.1")
 	implementation("org.jsoup:jsoup:1.13.1")
 	implementation("com.github.pedroviniv:youtubedl-java:ef7110605d23eaaae4796312163bcf84c7099311")
-	implementation("com.jayway.jsonpath:json-path:2.4.0")
 	implementation("commons-io:commons-io:2.4")
 	implementation("net.bramp.ffmpeg:ffmpeg:0.6.1")
 
+	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
