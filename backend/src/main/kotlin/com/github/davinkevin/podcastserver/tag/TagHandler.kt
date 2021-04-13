@@ -1,5 +1,9 @@
 package com.github.davinkevin.podcastserver.tag
 
+import com.github.davinkevin.podcastserver.config.json.UUIDSerializer
+import kotlinx.serialization.Serializable
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.encodeToString
 import org.springframework.stereotype.Component
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -21,7 +25,7 @@ class TagHandler(private val tagService: TagService) {
         return tagService
                 .findById(id)
                 .map { TagHAL(it.id, it.name) }
-                .flatMap { ok().bodyValue(it) }
+                .flatMap { ok().bodyValue(Json.encodeToString(it)) }
                 .switchIfEmpty { notFound().build() }
     }
 
@@ -32,11 +36,16 @@ class TagHandler(private val tagService: TagService) {
                 .findByNameLike(name)
                 .map { TagHAL(it.id, it.name) }
                 .collectList()
-                .map { TagsResponse(it) }
-                .flatMap { ok().bodyValue(it) }
+                .map { TagsHAL(it) }
+                .flatMap { ok().bodyValue(Json.encodeToString(it)) }
     }
 }
 
-class TagHAL(val id: UUID, val name: String)
+@Serializable
+private class TagHAL(
+        @Serializable(with = UUIDSerializer::class) val id: UUID,
+        val name: String
+)
 
-private class TagsResponse(val content: Collection<TagHAL>)
+@Serializable
+private class TagsHAL(val content: Collection<TagHAL>)

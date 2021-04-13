@@ -17,8 +17,9 @@ plugins {
 	id("com.google.cloud.tools.jib") version "2.7.0"
 	id("de.jansauer.printcoverage") version "2.0.0"
 
-	kotlin("jvm") version "1.4.21"
+	kotlin("jvm") version "1.4.32"
 	kotlin("plugin.spring") version "1.4.21"
+	kotlin("plugin.serialization") version "1.4.32"
 	jacoco
 }
 
@@ -59,6 +60,7 @@ dependencies {
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
+	implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.1.0")
 
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
