@@ -4,6 +4,8 @@ import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Item
 import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Podcast
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.insertInto
@@ -180,67 +182,67 @@ class CoverRepositoryTest(
         }
 
         @Test
-        fun `99999 days and find nothing`() {
+        fun `99999 days and find nothing`(): Unit = runBlocking {
             /* Given */
             /* When */
-            StepVerifier.create(repository.findCoverOlderThan(now().minusDays(99999)))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            val foundCovers = repository.findCoverOlderThan(now().minusDays(99999)).toList()
+            /* Then */
+            assertThat(foundCovers).isEmpty()
         }
 
         @Test
-        fun `1 day and find everything`() {
+        fun `1 day and find everything`(): Unit = runBlocking {
             /* Given */
+            val date = now().minusDays(1)
+
             /* When */
-            StepVerifier.create(repository.findCoverOlderThan(now().minusDays(1)))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(
-                            DeleteCoverInformation(
-                                    id=fromString("1ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
-                                    extension="png",
-                                    item=Item(id= fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), title="Appload 1"),
-                                    podcast=Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
-                            ),
-                            DeleteCoverInformation(
-                                    id=fromString("1f050dc4-6a2e-46c3-8276-43098c011e68"),
-                                    extension="png",
-                                    item=Item(id= fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"), title="Geek INC 123"),
-                                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
-                            ),
-                            DeleteCoverInformation(
-                                    id=fromString("2ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
-                                    extension="png",
-                                    item=Item(id= fromString("817a4626-6fd2-457e-8d27-69ea5acdc828"), title="Appload 2"),
-                                    podcast=Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
-                            ),
-                            DeleteCoverInformation(
-                                    id=fromString("2f050dc4-6a2e-46c3-8276-43098c011e68"),
-                                    extension="png",
-                                    item=Item(id= fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), title="Geek INC 124"),
-                                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
-                            ),
-                            DeleteCoverInformation(
-                                    id=fromString("3ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
-                                    extension="png",
-                                    item=Item(id= fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), title="Appload 3"),
-                                    podcast=Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
-                            ),
-                            DeleteCoverInformation(
-                                    id=fromString("3f050dc4-6a2e-46c3-8276-43098c011e68"),
-                                    extension="png",
-                                    item=Item(id= fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"), title="Geek INC 122"),
-                                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
-                            ),
-                            DeleteCoverInformation(
-                                    id=fromString("4f050dc4-6a2e-46c3-8276-43098c011e68"),
-                                    extension="png",
-                                    item=Item(id= fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"), title="Geek INC 126"),
-                                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
-                            )
-                    )
-                    .verifyComplete()
+            val foundCovers = repository.findCoverOlderThan(date).toList()
+
+            /* Then */
+            assertThat(foundCovers).containsExactly(
+                DeleteCoverInformation(
+                    id=fromString("1ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
+                    extension="png",
+                    item=Item(id= fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), title="Appload 1"),
+                    podcast=Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
+                ),
+                DeleteCoverInformation(
+                    id=fromString("1f050dc4-6a2e-46c3-8276-43098c011e68"),
+                    extension="png",
+                    item=Item(id= fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"), title="Geek INC 123"),
+                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
+                ),
+                DeleteCoverInformation(
+                    id=fromString("2ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
+                    extension="png",
+                    item=Item(id= fromString("817a4626-6fd2-457e-8d27-69ea5acdc828"), title="Appload 2"),
+                    podcast=Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
+                ),
+                DeleteCoverInformation(
+                    id=fromString("2f050dc4-6a2e-46c3-8276-43098c011e68"),
+                    extension="png",
+                    item=Item(id= fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), title="Geek INC 124"),
+                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
+                ),
+                DeleteCoverInformation(
+                    id=fromString("3ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
+                    extension="png",
+                    item=Item(id= fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), title="Appload 3"),
+                    podcast=Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
+                ),
+                DeleteCoverInformation(
+                    id=fromString("3f050dc4-6a2e-46c3-8276-43098c011e68"),
+                    extension="png",
+                    item=Item(id= fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"), title="Geek INC 122"),
+                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
+                ),
+                DeleteCoverInformation(
+                    id=fromString("4f050dc4-6a2e-46c3-8276-43098c011e68"),
+                    extension="png",
+                    item=Item(id= fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"), title="Geek INC 126"),
+                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
+                )
+            )
         }
     }
 }

@@ -4,14 +4,14 @@ import com.github.davinkevin.podcastserver.config.ClockConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.web.reactive.function.server.router
+import org.springframework.web.reactive.function.server.coRouter
 
 @Configuration
 @Import(CoverHandler::class)
 class CoverRoutingConfig {
 
     @Bean
-    fun coverRouter(cover: CoverHandler) = router {
+    fun coverRouter(cover: CoverHandler) = coRouter {
         "/api/v1/covers".nest {
             DELETE("", cover::deleteOldCovers)
         }
