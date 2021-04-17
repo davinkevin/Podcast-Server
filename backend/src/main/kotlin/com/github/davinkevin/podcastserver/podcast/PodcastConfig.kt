@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.podcast.type.TypeConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
+import org.springframework.web.reactive.function.server.coRouter
 import org.springframework.web.reactive.function.server.router
 
 /**
@@ -18,14 +19,13 @@ class PodcastRoutingConfig {
         "/api/v1/podcasts".nest {
             val id = "{id:[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}}"
             GET("", podcast::findAll)
-            GET("opml", xml::opml)
             GET("${id}", podcast::findById)
             POST("", podcast::create)
             PUT("${id}", podcast::update)
 
             "{id}".nest {
                 GET("cover.{ext}", podcast::cover)
-                GET("rss", xml::rss)
+
 
                 DELETE("", podcast::delete)
 
@@ -45,14 +45,24 @@ class PodcastRoutingConfig {
 
         }
     }
+
+    @Bean
+    fun coPodcastRouter(xml: PodcastXmlHandler) = coRouter {
+        "/api/v1/podcasts".nest {
+            GET("opml", xml::opml)
+            "{id}".nest {
+                GET("rss", xml::rss)
+            }
+        }
+    }
 }
 
 @Configuration
 @Import(
-        TypeConfig::class,
+    TypeConfig::class,
 
-        PodcastRoutingConfig::class,
-        PodcastRepository::class,
-        PodcastService::class
+    PodcastRoutingConfig::class,
+    PodcastRepository::class,
+    PodcastService::class
 )
 class PodcastConfig
