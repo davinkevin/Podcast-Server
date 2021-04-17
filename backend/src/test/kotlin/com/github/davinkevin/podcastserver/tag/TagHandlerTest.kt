@@ -3,6 +3,8 @@ package com.github.davinkevin.podcastserver.tag
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -34,10 +36,10 @@ class TagHandlerTest(
     inner class ShouldFindById {
 
         @Test
-        fun `with existing tag`() {
+        fun `with existing tag`(): Unit = runBlocking {
             /* Given */
             val id = UUID.fromString("fdd3e040-5357-48c6-a31b-da3657ab7adf")
-            whenever(tagService.findById(id)).thenReturn(Tag(id, "foo").toMono())
+            whenever(tagService.findById(id)).thenReturn(Tag(id, "foo"))
 
             /* When */
             rest
@@ -56,10 +58,10 @@ class TagHandlerTest(
         }
 
         @Test
-        fun `with no result`() {
+        fun `with no result`(): Unit = runBlocking {
             /* Given */
             val id = UUID.fromString("fdd3e040-5357-48c6-a31b-da3657ab7adf")
-            whenever(tagService.findById(id)).thenReturn(Mono.empty())
+            whenever(tagService.findById(id)).thenReturn(null)
 
             /* When */
             rest
@@ -77,12 +79,12 @@ class TagHandlerTest(
     inner class ShouldFindByNameContaining {
 
         @Test
-        fun `foo which returns many elements`() {
+        fun `foo which returns many elements`(): Unit = runBlocking {
             /* Given */
             val t1 = Tag(UUID.randomUUID(), "foo")
             val t2 = Tag(UUID.randomUUID(), "foo2")
             val t3 = Tag(UUID.randomUUID(), "foo3")
-            whenever(tagService.findByNameLike("foo")).thenReturn(Flux.just(t1, t2, t3))
+            whenever(tagService.findByNameLike("foo")).thenReturn(flowOf(t1, t2, t3))
 
             /* When */
             rest
@@ -113,7 +115,7 @@ class TagHandlerTest(
         fun `bar which returns one element`() {
             /* Given */
             val t1 = Tag(UUID.randomUUID(), "bar")
-            whenever(tagService.findByNameLike("bar")).thenReturn(Flux.just(t1))
+            whenever(tagService.findByNameLike("bar")).thenReturn(flowOf(t1))
 
             /* When */
             rest
@@ -137,7 +139,7 @@ class TagHandlerTest(
         @Test
         fun `tech which returns no element`() {
             /* Given */
-            whenever(tagService.findByNameLike("tech")).thenReturn(Flux.empty())
+            whenever(tagService.findByNameLike("tech")).thenReturn(emptyFlow())
 
             /* When */
             rest
@@ -158,7 +160,7 @@ class TagHandlerTest(
             val t1 = Tag(UUID.randomUUID(), "foo")
             val t2 = Tag(UUID.randomUUID(), "foo2")
             val t3 = Tag(UUID.randomUUID(), "foo3")
-            whenever(tagService.findByNameLike("")).thenReturn(Flux.just(t1, t2, t3))
+            whenever(tagService.findByNameLike("")).thenReturn(flowOf(t1, t2, t3))
 
             /* When */
             rest

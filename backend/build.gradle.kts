@@ -58,6 +58,7 @@ dependencies {
 	implementation("net.bramp.ffmpeg:ffmpeg:0.6.1")
 
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
+	implementation("org.jetbrains.kotlinx:kotlinx-coroutines-reactor")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 

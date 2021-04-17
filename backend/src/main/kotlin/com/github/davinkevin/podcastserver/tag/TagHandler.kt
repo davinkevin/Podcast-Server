@@ -1,42 +1,43 @@
 package com.github.davinkevin.podcastserver.tag
 
-import org.springframework.stereotype.Component
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.notFound
 import org.springframework.web.reactive.function.server.ServerResponse.ok
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.switchIfEmpty
+import org.springframework.web.reactive.function.server.bodyValueAndAwait
+import org.springframework.web.reactive.function.server.buildAndAwait
 import java.util.*
 
 /**
  * Created by kevin on 2019-03-19
  */
-@Component
 class TagHandler(private val tagService: TagService) {
 
-    fun findById(s: ServerRequest): Mono<ServerResponse> {
+    suspend fun findById(s: ServerRequest): ServerResponse {
         val id = UUID.fromString(s.pathVariable("id"))
 
-        return tagService
-                .findById(id)
-                .map { TagHAL(it.id, it.name) }
-                .flatMap { ok().bodyValue(it) }
-                .switchIfEmpty { notFound().build() }
+        val tag = tagService.findById(id)
+            ?: return notFound().buildAndAwait()
+
+        return ok().bodyValueAndAwait(
+            TagHAL(tag.id, tag.name)
+        )
     }
 
-    fun findByNameLike(s: ServerRequest): Mono<ServerResponse> {
+    suspend fun findByNameLike(s: ServerRequest): ServerResponse {
         val name = s.queryParam("name").orElse("")
 
-        return tagService
-                .findByNameLike(name)
-                .map { TagHAL(it.id, it.name) }
-                .collectList()
-                .map { TagsResponse(it) }
-                .flatMap { ok().bodyValue(it) }
+        val tags = tagService.findByNameLike(name)
+            .map { TagHAL(it.id, it.name) }
+            .toList()
+
+        return ok().bodyValueAndAwait(TagsResponse(tags))
     }
 }
 
-class TagHAL(val id: UUID, val name: String)
-
+private class TagHAL(val id: UUID, val name: String)
 private class TagsResponse(val content: Collection<TagHAL>)
