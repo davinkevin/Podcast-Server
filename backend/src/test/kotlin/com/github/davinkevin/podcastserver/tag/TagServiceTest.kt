@@ -1,6 +1,11 @@
 package com.github.davinkevin.podcastserver.tag
 
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -31,30 +36,29 @@ class TagServiceTest (
     inner class ShouldFindById {
 
         @Test
-        fun `with existing tag`() {
+        fun `with existing tag`(): Unit = runBlocking {
             /* Given */
             val id = UUID.fromString("fdd3e040-5357-48c6-a31b-da3657ab7adf")
-            whenever(repo.findById(id)).thenReturn(Tag(id, "foo").toMono())
+            whenever(repo.findById(id)).thenReturn(Tag(id, "foo"))
 
             /* When */
-            StepVerifier.create(service.findById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(Tag(id, "foo"))
-                    .verifyComplete()
+            val foundTag = service.findById(id)
+
+            /* Then */
+            assertThat(foundTag).isEqualTo(Tag(id, "foo"))
         }
 
         @Test
-        fun `with no result`() {
+        fun `with no result`(): Unit = runBlocking {
             /* Given */
             val id = UUID.fromString("fdd3e040-5357-48c6-a31b-da3657ab7adf")
-            whenever(repo.findById(id)).thenReturn(Mono.empty())
+            whenever(repo.findById(id)).thenReturn(null)
 
             /* When */
-            StepVerifier.create(service.findById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            val foundTag = service.findById(id)
+
+            /* Then */
+            assertThat(foundTag).isNull()
         }
     }
 
@@ -63,29 +67,28 @@ class TagServiceTest (
     inner class ShouldFindByName {
 
         @Test
-        fun `with existing tags`() {
+        fun `with existing tags`(): Unit = runBlocking {
             /* Given */
             val tag = Tag(UUID.fromString("fdd3e040-5357-48c6-a31b-da3657ab7adf"), "foo")
-            whenever(repo.findByNameLike("foo")).thenReturn(Flux.just(tag))
+            whenever(repo.findByNameLike("foo")).thenReturn(flowOf(tag))
 
             /* When */
-            StepVerifier.create(service.findByNameLike("foo"))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(tag)
-                    .verifyComplete()
+            val foundTags = service.findByNameLike("foo").toList()
+
+            /* Then */
+            assertThat(foundTags).containsOnly(tag)
         }
 
         @Test
-        fun `with no result`() {
+        fun `with no result`(): Unit = runBlocking {
             /* Given */
-            whenever(repo.findByNameLike("foo")).thenReturn(Flux.empty())
+            whenever(repo.findByNameLike("foo")).thenReturn(emptyFlow())
 
             /* When */
-            StepVerifier.create(service.findByNameLike("foo"))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            val foundTags = service.findByNameLike("foo").toList()
+
+            /* Then */
+            assertThat(foundTags).isEmpty()
         }
 
     }
