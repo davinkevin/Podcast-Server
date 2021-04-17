@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.cover
 import com.nhaarman.mockitokotlin2.times
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -37,10 +38,9 @@ class CoverHandlerTest(
     inner class ShouldDeleteCover {
 
         @Test
-        fun `with number of days provided as query param`() {
+        fun `with number of days provided as query param`(): Unit = runBlocking {
             /* Given */
             val expectedDate = fixedDate.minusDays(2)
-            whenever(cover.deleteCoversInFileSystemOlderThan(expectedDate)).thenReturn(Mono.empty())
 
             /* When */
             rest
@@ -54,10 +54,9 @@ class CoverHandlerTest(
         }
 
         @Test
-        fun `with default number of days`() {
+        fun `with default number of days`(): Unit = runBlocking {
             /* Given */
             val expectedDate = fixedDate.minusDays(365)
-            whenever(cover.deleteCoversInFileSystemOlderThan(expectedDate)).thenReturn(Mono.empty())
 
             /* When */
             rest

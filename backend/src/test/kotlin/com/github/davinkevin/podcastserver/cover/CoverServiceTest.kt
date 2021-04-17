@@ -4,6 +4,9 @@ import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Item
 import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Podcast
 import com.github.davinkevin.podcastserver.service.FileService
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.flow.asFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -40,54 +43,49 @@ class CoverServiceTest (
         @AfterEach fun afterEach() = Mockito.reset(cover, file)
 
         @Test
-        fun `with no cover to delete`() {
+        fun `with no cover to delete`(): Unit = runBlocking {
             /* Given */
-            whenever(cover.findCoverOlderThan(date)).thenReturn(Flux.empty())
+            whenever(cover.findCoverOlderThan(date)).thenReturn(emptyFlow())
             /* When */
-            StepVerifier.create(service.deleteCoversInFileSystemOlderThan(date))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            service.deleteCoversInFileSystemOlderThan(date)
 
+            /* Then */
             verify(cover, times(1)).findCoverOlderThan(date)
             verify(file, never()).deleteCover(any())
         }
 
         @Test
-        fun `with covers existing`() {
+        fun `with covers existing`(): Unit = runBlocking {
             /* Given */
             val covers = listOf(
                     randomCover("item1", "podcast1"),
                     randomCover("item2", "podcast2"),
                     randomCover("item3", "podcast3")
             )
-            whenever(cover.findCoverOlderThan(date)).thenReturn(covers.toFlux())
+            whenever(cover.findCoverOlderThan(date)).thenReturn(covers.asFlow())
             whenever(file.coverExists(any(), any(), any())).thenReturn(Mono.just(""))
             whenever(file.deleteCover(any())).thenReturn(Mono.empty())
 
             /* When */
-            StepVerifier.create(service.deleteCoversInFileSystemOlderThan(date))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            service.deleteCoversInFileSystemOlderThan(date)
 
+            /* Then */
             verify(file, times(3)).deleteCover(any())
         }
 
         @Test
-        fun `with cover not existing`() {
+        fun `with cover not existing`(): Unit = runBlocking {
             /* Given */
             val covers = listOf(randomCover("item1", "podcast1"))
 
-            whenever(cover.findCoverOlderThan(date)).thenReturn(covers.toFlux())
+            whenever(cover.findCoverOlderThan(date)).thenReturn(covers.asFlow())
             whenever(file.coverExists(any(), any(), any())).thenReturn(Mono.empty())
 
             /* When */
-            StepVerifier.create(service.deleteCoversInFileSystemOlderThan(date))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            service.deleteCoversInFileSystemOlderThan(date)
 
+
+            /* Then */
             verify(file, never()).deleteCover(any())
         }
 
