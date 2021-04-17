@@ -9,16 +9,16 @@ import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
 
 plugins {
-	id("org.springframework.boot") version "2.4.3"
-	id("io.spring.dependency-management") version "1.0.10.RELEASE"
+	id("org.springframework.boot") version "2.4.5"
+	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 	id("com.gorylenko.gradle-git-properties") version "2.2.4"
 	id("org.flywaydb.flyway") version "7.3.2"
 	id("nu.studer.jooq") version "5.2"
 	id("com.google.cloud.tools.jib") version "2.7.0"
 	id("de.jansauer.printcoverage") version "2.0.0"
 
-	kotlin("jvm") version "1.4.21"
-	kotlin("plugin.spring") version "1.4.21"
+	kotlin("jvm") version "1.4.32"
+	kotlin("plugin.spring") version "1.4.32"
 	jacoco
 }
 
