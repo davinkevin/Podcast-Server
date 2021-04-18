@@ -10,6 +10,7 @@ import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeUpdate
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
+import org.springframework.web.reactive.function.server.coRouter
 import org.springframework.web.reactive.function.server.router
 
 /**
@@ -20,7 +21,7 @@ import org.springframework.web.reactive.function.server.router
 class UpdateRouterConfig {
 
     @Bean
-    fun updateRouter(update: UpdateHandler) = router {
+    fun updateRouter(update: UpdateHandler) = coRouter {
         "/api/v1/podcasts".nest {
             GET("/update", update::updateAll)
             GET("/{podcastId}/update", update::update)
