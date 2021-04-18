@@ -4,14 +4,13 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
-import org.apache.commons.io.FilenameUtils
-import org.springframework.web.reactive.function.server.ServerRequest
-import org.springframework.web.reactive.function.server.ServerResponse
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.reactive.asFlow
+import org.springframework.web.reactive.function.server.*
 import org.springframework.web.reactive.function.server.ServerResponse.noContent
 import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.reactive.function.server.bodyToMono
 import org.springframework.web.util.UriComponentsBuilder
-import reactor.core.publisher.Mono
 import java.net.URI
 import java.util.*
 
@@ -20,75 +19,82 @@ import java.util.*
  */
 class DownloadHandler(private val downloadService: ItemDownloadManager) {
 
-    fun download(r: ServerRequest): Mono<ServerResponse> {
+    suspend fun download(r: ServerRequest): ServerResponse {
         val id = UUID.fromString(r.pathVariable("id"))
+
         downloadService.addItemToQueue(id)
-        return noContent().build()
+
+        return noContent().buildAndAwait()
     }
 
-    fun downloading(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> =
-            downloadService
-                    .downloading
-                    .map { toDownloadingItem(it) }
-                    .collectList()
-                    .map { DownloadingItemsHAL(it) }
-                    .flatMap { ok().bodyValue(it) }
+    suspend fun downloading(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
+        val items = downloadService.downloading.asFlow()
+            .map { it.toDownloadingItem() }
+            .toList()
 
-    fun findLimit(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> =
-            ok().bodyValue(downloadService.limitParallelDownload)
+        return ok().bodyValueAndAwait(DownloadingItemsHAL(items))
+    }
 
-    fun updateLimit(r: ServerRequest): Mono<ServerResponse> =
-            r.bodyToMono<Int>()
-                    .delayUntil { downloadService.setLimitParallelDownload(it); Mono.empty<Void>() }
-                    .flatMap { ok().bodyValue(it) }
+    suspend fun findLimit(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
+        return ok().bodyValueAndAwait(downloadService.limitParallelDownload)
+    }
 
-    fun stopAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> {
+    suspend fun updateLimit(r: ServerRequest): ServerResponse {
+        val limit = r.awaitBody<Int>()
+
+        downloadService.setLimitParallelDownload(limit)
+
+        return ok().bodyValueAndAwait(limit)
+    }
+
+    suspend fun stopAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
         downloadService.stopAllDownload()
-        return noContent().build()
+        return noContent().buildAndAwait()
     }
 
-    fun pauseAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> {
+    suspend fun pauseAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
         downloadService.pauseAllDownload()
-        return noContent().build()
+        return noContent().buildAndAwait()
     }
 
-    fun restartAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> {
+    suspend fun restartAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
         downloadService.restartAllDownload()
-        return noContent().build()
+        return noContent().buildAndAwait()
     }
 
-    fun stopOne(r: ServerRequest): Mono<ServerResponse> {
+    suspend fun stopOne(r: ServerRequest): ServerResponse {
         val id = UUID.fromString(r.pathVariable("id"))
         downloadService.stopDownload(id)
-        return noContent().build()
+        return noContent().buildAndAwait()
     }
 
-    fun toggleOne(r: ServerRequest): Mono<ServerResponse> {
+    suspend fun toggleOne(r: ServerRequest): ServerResponse {
         val id = UUID.fromString(r.pathVariable("id"))
         downloadService.toggleDownload(id)
-        return noContent().build()
+        return noContent().buildAndAwait()
     }
 
-    fun queue(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> =
-            downloadService
-                    .queue
-                    .map { toDownloadingItem(it) }
-                    .collectList()
-                    .map { QueueItemsHAL(it) }
-                    .flatMap { ok().bodyValue(it) }
+    suspend fun queue(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
+        val items = downloadService.queue.asFlow()
+            .map { it.toDownloadingItem() }
+            .toList()
+
+        return ok().bodyValueAndAwait(QueueItemsHAL(items))
+    }
 
 
-    fun moveInQueue(r: ServerRequest): Mono<ServerResponse> =
-            r.bodyToMono<MovingItemInQueueForm>()
-                    .delayUntil { downloadService.moveItemInQueue(it.id, it.position); Mono.empty<Void>() }
-                    .flatMap { noContent().build() }
+    suspend fun moveInQueue(r: ServerRequest): ServerResponse {
+        val body = r.awaitBody<MovingItemInQueueForm>()
+        downloadService.moveItemInQueue(body.id, body.position)
+        return noContent().buildAndAwait()
+    }
 
-    fun removeFromQueue(r: ServerRequest): Mono<ServerResponse> {
+    suspend fun removeFromQueue(r: ServerRequest): ServerResponse {
         val id = UUID.fromString(r.pathVariable("id"))
         val stop = r.queryParam("stop").map { it!!.toBoolean() }.orElse(false)
 
         downloadService.removeItemFromQueue(id, stop)
-        return noContent().build()
+        return noContent().buildAndAwait()
     }
 }
 
@@ -107,28 +113,28 @@ private data class DownloadingItemHAL(
     data class Cover(val id: UUID, val url: URI)
 }
 
-private fun toDownloadingItem(item: DownloadingItem): DownloadingItemHAL {
-    val extension = item.cover.url.extension()
+private fun DownloadingItem.toDownloadingItem(): DownloadingItemHAL {
+    val extension = cover.url.extension()
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
-            .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$extension")
+            .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), "cover.$extension")
             .build(true)
             .toUri()
 
     return DownloadingItemHAL(
-            id = item.id,
-            title = item.title,
-            status = item.status,
-            progression = item.progression,
+            id = id,
+            title = title,
+            status = status,
+            progression = progression,
             podcast = DownloadingItemHAL.Podcast(
-                    id = item.podcast.id,
-                    title = item.podcast.title
+                    id = podcast.id,
+                    title = podcast.title
             ),
             cover = DownloadingItemHAL.Cover(
-                    id = item.cover.id,
+                    id = cover.id,
                     url = coverUrl
             )
     )
 }
 
-data class MovingItemInQueueForm(val id: UUID, val position: Int)
+internal data class MovingItemInQueueForm(val id: UUID, val position: Int)

@@ -5,7 +5,6 @@ import com.sapher.youtubedl.YoutubeDL
 import com.sapher.youtubedl.YoutubeDLRequest
 import com.sapher.youtubedl.YoutubeDLResponse
 import org.slf4j.LoggerFactory
-import java.lang.RuntimeException
 import java.nio.file.Path
 
 /**

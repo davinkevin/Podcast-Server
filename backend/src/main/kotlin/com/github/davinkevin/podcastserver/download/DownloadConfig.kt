@@ -4,7 +4,7 @@ import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.web.reactive.function.server.router
+import org.springframework.web.reactive.function.server.coRouter
 
 /**
  * Created by kevin on 17/09/2019
@@ -14,7 +14,7 @@ import org.springframework.web.reactive.function.server.router
 class DownloadRouterConfig {
 
     @Bean
-    fun downloadRouter(d: DownloadHandler) = router {
+    fun downloadRouter(d: DownloadHandler) = coRouter {
         POST("/api/v1/podcasts/{idPodcast}/items/{id}/download", d::download)
 
         "/api/v1/downloads".nest {
