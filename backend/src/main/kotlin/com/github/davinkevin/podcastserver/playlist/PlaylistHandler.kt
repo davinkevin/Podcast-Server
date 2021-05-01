@@ -2,6 +2,11 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.apache.commons.io.FilenameUtils
 import org.jdom2.Document
 import org.jdom2.Element
@@ -10,11 +15,8 @@ import org.jdom2.Text
 import org.jdom2.output.Format
 import org.jdom2.output.XMLOutputter
 import org.springframework.http.MediaType
-import org.springframework.web.reactive.function.server.ServerRequest
-import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.ServerResponse.noContent
-import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.reactive.function.server.bodyToMono
+import org.springframework.web.reactive.function.server.*
+import org.springframework.web.reactive.function.server.ServerResponse.*
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import java.net.URI
@@ -25,89 +27,69 @@ class PlaylistHandler(
         private val playlistService: PlaylistService
 ) {
 
-    fun save(r: ServerRequest): Mono<ServerResponse> {
-        return r
-                .bodyToMono<SavePlaylist>()
-                .flatMap { playlistService.save(it.name) }
-                .map { PlaylistWithItemsHAL(
-                        id = it.id,
-                        name = it.name,
-                        items = it.items.map(PlaylistWithItems.Item::toHAL)
-                ) }
-                .flatMap { ok().bodyValue(it) }
+    suspend fun findAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
+        val playlists = playlistService
+            .findAll()
+            .map { PlaylistHAL(it.id, it.name) }
+            .toList()
 
+        return ok().bodyValueAndAwait(FindAllPlaylistHAL(playlists))
     }
 
-    fun findAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> =
-            playlistService
-                    .findAll()
-                    .map { PlaylistHAL(it.id, it.name) }
-                    .collectList()
-                    .map { FindAllPlaylistHAL(it) }
-                    .flatMap { ok().bodyValue(it) }
+    suspend fun save(r: ServerRequest): ServerResponse {
+        val body = r.awaitBody<SavePlaylist>()
 
-    fun findById(r: ServerRequest): Mono<ServerResponse> {
+        val savedPlaylist = playlistService.save(body.name)
+
+        return ok().bodyValueAndAwait(savedPlaylist.toHAL())
+    }
+
+    suspend fun findById(r: ServerRequest): ServerResponse {
         val id = UUID.fromString(r.pathVariable("id"))
 
-        return playlistService
-                .findById(id)
-                .map { PlaylistWithItemsHAL(
-                        id = it.id,
-                        name = it.name,
-                        items = it.items.map(PlaylistWithItems.Item::toHAL)
-                ) }
-                .flatMap { ok().bodyValue(it) }
+        val playlist = playlistService.findById(id)
+            ?: return notFound().buildAndAwait()
+
+        return ok().bodyValueAndAwait(playlist.toHAL())
     }
 
-    fun deleteById(r: ServerRequest): Mono<ServerResponse> {
+    suspend fun deleteById(r: ServerRequest): ServerResponse {
         val id = UUID.fromString(r.pathVariable("id"))
 
-        return playlistService
-                .deleteById(id)
-                .then(noContent().build())
+        playlistService.deleteById(id)
+
+        return noContent().buildAndAwait()
     }
 
-    fun rss(r: ServerRequest): Mono<ServerResponse> {
+    suspend fun rss(r: ServerRequest): ServerResponse {
         val host = r.extractHost()
         val id = UUID.fromString(r.pathVariable("id"))
 
-        return playlistService
-                .findById(id)
-                .map { it.toRss(host) }
-                .map { XMLOutputter(Format.getPrettyFormat()).outputString(Document(it)) }
-                .flatMap { ok()
-                        .contentType(MediaType.APPLICATION_XML)
-                        .bodyValue(it)
-                }
+        val playlist = playlistService.findById(id)
+            ?: return notFound().buildAndAwait()
 
+        val rss = playlist.toRss(host)
+            .let { XMLOutputter(Format.getPrettyFormat()).outputString(Document(it)) }
+
+        return ok().contentType(MediaType.APPLICATION_XML).bodyValueAndAwait(rss)
     }
 
-    fun addToPlaylist(r: ServerRequest): Mono<ServerResponse> {
+    suspend fun addToPlaylist(r: ServerRequest): ServerResponse {
         val playlistId = UUID.fromString(r.pathVariable("id"))
         val itemId = UUID.fromString(r.pathVariable("itemId"))
 
-        return playlistService
-                .addToPlaylist(playlistId, itemId)
-                .map { PlaylistWithItemsHAL(
-                        id = it.id,
-                        name = it.name,
-                        items = it.items.map(PlaylistWithItems.Item::toHAL)
-                ) }
-                .flatMap { ok().bodyValue(it) }
+        val playlist = playlistService.addToPlaylist(playlistId, itemId)
+
+        return ok().bodyValueAndAwait(playlist.toHAL())
     }
 
-    fun removeFromPlaylist(r: ServerRequest): Mono<ServerResponse> {
+    suspend fun removeFromPlaylist(r: ServerRequest): ServerResponse {
         val playlistId = UUID.fromString(r.pathVariable("id"))
         val itemId = UUID.fromString(r.pathVariable("itemId"))
 
-        return playlistService
-                .removeFromPlaylist(playlistId, itemId)
-                .map { PlaylistWithItemsHAL(
-                        id = it.id,
-                        name = it.name,
-                        items = it.items.map(PlaylistWithItems.Item::toHAL)
-                ) }
-                .flatMap { ok().bodyValue(it) }
+        val playlist = playlistService.removeFromPlaylist(playlistId, itemId)
+
+        return ok().bodyValueAndAwait(playlist.toHAL())
     }
 
 }
@@ -116,6 +98,12 @@ private class SavePlaylist(val name: String)
 
 private class FindAllPlaylistHAL(val content: Collection<PlaylistHAL>)
 private class PlaylistHAL(val id: UUID, val name: String)
+
+private fun PlaylistWithItems.toHAL() = PlaylistWithItemsHAL(
+    id = this.id,
+    name = this.name,
+    items = this.items.map(PlaylistWithItems.Item::toHAL)
+)
 
 private class PlaylistWithItemsHAL(val id: UUID, val name: String, val items: Collection<Item>) {
     data class Item(

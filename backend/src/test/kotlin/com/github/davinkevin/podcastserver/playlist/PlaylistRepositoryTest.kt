@@ -2,6 +2,8 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.runBlocking
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
@@ -89,16 +91,16 @@ class PlaylistRepositoryTest(
     @DisplayName("should find all")
     inner class ShouldFindAll {
         @Test
-        fun `with watch lists in results`() {
+        fun `with watch lists in results`(): Unit = runBlocking {
             /* Given */
             /* When */
-            StepVerifier.create(repository.findAll())
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(Playlist(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"))
-                    .expectNext(Playlist(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist"))
-                    .expectNext(Playlist(fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), "empty playlist"))
-                    .verifyComplete()
+            val playlists = repository.findAll().toList()
+            /* Then */
+            assertThat(playlists).containsExactly(
+                    Playlist(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
+                    Playlist(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist"),
+                    Playlist(fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), "empty playlist"),
+            )
         }
     }
 
@@ -107,106 +109,104 @@ class PlaylistRepositoryTest(
     inner class ShouldFindById {
 
         @Test
-        fun `with no item`() {
+        fun `with no playlist`(): Unit = runBlocking {
+            /* Given */
+            val id = fromString("9706ba78-2df2-4b37-a573-04367dc6f0ef")
+            /* When */
+            val playlist = repository.findById(id)
+            /* Then */
+            assertThat(playlist).isNull()
+        }
+
+        @Test
+        fun `with no item`(): Unit = runBlocking {
             /* Given */
             val id = fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
             /* When */
-            StepVerifier.create(repository.findById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.name).isEqualTo("empty playlist")
-                        assertThat(it.id).isEqualTo(id)
-                        assertThat(it.items).isEmpty()
-                    }
-                    .verifyComplete()
+            val playlist = repository.findById(id)!!
+            /* Then */
+            assertThat(playlist.name).isEqualTo("empty playlist")
+            assertThat(playlist.id).isEqualTo(id)
+            assertThat(playlist.items).isEmpty()
         }
 
         @Test
-        fun `with 1 item`() {
+        fun `with 1 item`(): Unit = runBlocking {
             /* Given */
             val id = fromString("24248480-bd04-11e5-a837-0800200c9a66")
             /* When */
-            StepVerifier.create(repository.findById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.name).isEqualTo("Conférence Rewind")
-                        assertThat(it.id).isEqualTo(id)
-                        assertThat(it.items).hasSize(1).containsOnly(
-                                PlaylistWithItems. Item(
-                                        id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
-                                        title = "Geek INC 124",
-                                        fileName = "geekinc.124.mp3",
-                                        description = "desc",
-                                        mimeType = "video/mp4",
-                                        length = null,
-                                        pubDate = fixedDate.minusDays(15),
-                                        podcast = PlaylistWithItems.Item.Podcast(
-                                                id = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
-                                                title = "Geek Inc HD"
-                                        ),
-                                        cover = PlaylistWithItems.Item.Cover(
-                                                id = fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"),
-                                                width = 100,
-                                                height = 100,
-                                                url = URI("http://fake.url.com/geekinc/cover.png")))
-                        )
-                    }
-                    .verifyComplete()
+            val playlist = repository.findById(id)!!
+            /* Then */
+            assertThat(playlist.name).isEqualTo("Conférence Rewind")
+            assertThat(playlist.id).isEqualTo(id)
+            assertThat(playlist.items).hasSize(1).containsOnly(
+                PlaylistWithItems. Item(
+                    id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
+                    title = "Geek INC 124",
+                    fileName = "geekinc.124.mp3",
+                    description = "desc",
+                    mimeType = "video/mp4",
+                    length = null,
+                    pubDate = fixedDate.minusDays(15),
+                    podcast = PlaylistWithItems.Item.Podcast(
+                        id = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                        title = "Geek Inc HD"
+                    ),
+                    cover = PlaylistWithItems.Item.Cover(
+                        id = fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"),
+                        width = 100,
+                        height = 100,
+                        url = URI("http://fake.url.com/geekinc/cover.png")))
+            )
         }
 
         @Test
-        fun `with 2 items`() {
+        fun `with 2 items`(): Unit = runBlocking {
             /* Given */
             val id = fromString("dc024a30-bd02-11e5-a837-0800200c9a66")
             /* When */
-            StepVerifier.create(repository.findById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.name).isEqualTo("Humour Playlist")
-                        assertThat(it.id).isEqualTo(id)
-                        assertThat(it.items).hasSize(2).containsOnly(
-                                PlaylistWithItems.Item(
-                                        id = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"),
-                                        title = "Appload 3",
-                                        fileName = "appload.3.mp3",
-                                        description = "desc",
-                                        mimeType = "audio/mp3",
-                                        length = null,
-                                        pubDate = fixedDate,
-                                        podcast = PlaylistWithItems.Item.Podcast(
-                                                id = fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"),
-                                                title = "AppLoad"
-                                        ),
-                                        cover = PlaylistWithItems.Item.Cover(
-                                                id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
-                                                width = 100,
-                                                height = 100,
-                                                url = URI("http://fake.url.com/appload/cover.png")
-                                        )
-                                ),
-                                PlaylistWithItems. Item(
-                                        id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
-                                        title = "Geek INC 124",
-                                        fileName = "geekinc.124.mp3",
-                                        description = "desc",
-                                        mimeType = "video/mp4",
-                                        length = null,
-                                        pubDate = fixedDate.minusDays(15),
-                                        podcast = PlaylistWithItems.Item.Podcast(
-                                                id = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
-                                                title = "Geek Inc HD"
-                                        ),
-                                        cover = PlaylistWithItems.Item.Cover(
-                                                id = fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"),
-                                                width = 100,
-                                                height = 100,
-                                                url = URI("http://fake.url.com/geekinc/cover.png")))
-                        )
-                    }
-                    .verifyComplete()
+            val playlist = repository.findById(id)!!
+            /* Then */
+            assertThat(playlist.name).isEqualTo("Humour Playlist")
+            assertThat(playlist.id).isEqualTo(id)
+            assertThat(playlist.items).hasSize(2).containsOnly(
+                PlaylistWithItems.Item(
+                    id = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"),
+                    title = "Appload 3",
+                    fileName = "appload.3.mp3",
+                    description = "desc",
+                    mimeType = "audio/mp3",
+                    length = null,
+                    pubDate = fixedDate,
+                    podcast = PlaylistWithItems.Item.Podcast(
+                        id = fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"),
+                        title = "AppLoad"
+                    ),
+                    cover = PlaylistWithItems.Item.Cover(
+                        id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
+                        width = 100,
+                        height = 100,
+                        url = URI("http://fake.url.com/appload/cover.png")
+                    )
+                ),
+                PlaylistWithItems. Item(
+                    id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
+                    title = "Geek INC 124",
+                    fileName = "geekinc.124.mp3",
+                    description = "desc",
+                    mimeType = "video/mp4",
+                    length = null,
+                    pubDate = fixedDate.minusDays(15),
+                    podcast = PlaylistWithItems.Item.Podcast(
+                        id = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                        title = "Geek Inc HD"
+                    ),
+                    cover = PlaylistWithItems.Item.Cover(
+                        id = fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"),
+                        width = 100,
+                        height = 100,
+                        url = URI("http://fake.url.com/geekinc/cover.png")))
+            )
         }
     }
 
@@ -215,36 +215,30 @@ class PlaylistRepositoryTest(
     inner class ShouldSave {
 
         @Test
-        fun `with a name`() {
+        fun `with a name`(): Unit = runBlocking {
             /* Given */
             /* When */
-            StepVerifier.create(repository.save("foo"))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.id).isNotNull()
-                        assertThat(it.name).isEqualTo("foo")
-                        assertThat(it.items).isEmpty()
-                    }
-                    .verifyComplete()
+            val playlist = repository.save("foo")
+
+            /* Then */
+            assertThat(playlist.id).isNotNull()
+            assertThat(playlist.name).isEqualTo("foo")
+            assertThat(playlist.items).isEmpty()
 
             val numberOfPlaylist = query.selectCount().from(WATCH_LIST).fetchOne(count())
             assertThat(numberOfPlaylist).isEqualTo(4)
         }
 
         @Test
-        fun `with an already existing name`() {
+        fun `with an already existing name`(): Unit = runBlocking {
             /* Given */
             /* When */
-            StepVerifier.create(repository.save("Humour Playlist"))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.id).isNotNull()
-                        assertThat(it.name).isEqualTo("Humour Playlist")
-                        assertThat(it.items).hasSize(2)
-                    }
-                    .verifyComplete()
+            val playlist = repository.save("Humour Playlist")
+
+            /* Then */
+            assertThat(playlist.id).isNotNull()
+            assertThat(playlist.name).isEqualTo("Humour Playlist")
+            assertThat(playlist.items).hasSize(2)
 
             val numberOfPlaylist = query.selectCount().from(WATCH_LIST).fetchOne(count())
             assertThat(numberOfPlaylist).isEqualTo(3)
@@ -255,27 +249,23 @@ class PlaylistRepositoryTest(
     @DisplayName("should delete")
     inner class ShouldDelete {
         @Test
-        fun `by id with no items`() {
+        fun `by id with no items`(): Unit = runBlocking {
             /* Given */
             /* When */
-            StepVerifier.create(repository.deleteById(fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            repository.deleteById(fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"))
 
+            /* Then */
             assertThat(query.selectCount().from(WATCH_LIST).fetchOne(count())).isEqualTo(2)
             assertThat(query.selectCount().from(WATCH_LIST_ITEMS).fetchOne(count())).isEqualTo(3)
         }
 
         @Test
-        fun `by id with items`() {
+        fun `by id with items`(): Unit = runBlocking {
             /* Given */
             /* When */
-            StepVerifier.create(repository.deleteById(fromString("dc024a30-bd02-11e5-a837-0800200c9a66")))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            repository.deleteById(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"))
 
+            /* Then */
             assertThat(query.selectCount().from(WATCH_LIST).fetchOne(count())).isEqualTo(2)
             assertThat(query.selectCount().from(WATCH_LIST_ITEMS).fetchOne(count())).isEqualTo(1)
         }
@@ -286,51 +276,45 @@ class PlaylistRepositoryTest(
     inner class ShouldAdd {
 
         @Test
-        fun `item to playlist`() {
+        fun `item to playlist`(): Unit = runBlocking {
             /* Given */
             val playlistId = fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
             val itemId = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
             /* When */
-            StepVerifier.create(repository.addToPlaylist(playlistId, itemId))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.items).hasSize(1).containsOnly(
-                                PlaylistWithItems. Item(
-                                        id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"),
-                                        title = "Geek INC 126",
-                                        fileName = "geekinc.126.mp3",
-                                        description = "desc",
-                                        mimeType = "video/mp4",
-                                        length = null,
-                                        pubDate = fixedDate.minusDays(1),
-                                        podcast = PlaylistWithItems.Item.Podcast(
-                                                id = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
-                                                title = "Geek Inc HD"
-                                        ),
-                                        cover = PlaylistWithItems.Item.Cover(
-                                                id = fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"),
-                                                width = 100,
-                                                height = 100,
-                                                url = URI("http://fake.url.com/geekinc/cover.png")))
-                        )
-                    }
-                    .verifyComplete()
+            val playlist = repository.addToPlaylist(playlistId, itemId)
+            /* Then */
+            assertThat(playlist.items).hasSize(1).containsOnly(
+                PlaylistWithItems. Item(
+                    id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"),
+                    title = "Geek INC 126",
+                    fileName = "geekinc.126.mp3",
+                    description = "desc",
+                    mimeType = "video/mp4",
+                    length = null,
+                    pubDate = fixedDate.minusDays(1),
+                    podcast = PlaylistWithItems.Item.Podcast(
+                        id = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                        title = "Geek Inc HD"
+                    ),
+                    cover = PlaylistWithItems.Item.Cover(
+                        id = fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"),
+                        width = 100,
+                        height = 100,
+                        url = URI("http://fake.url.com/geekinc/cover.png")))
+            )
+
         }
 
         @Test
-        fun `item to playlist which already exist`() {
+        fun `item to playlist which already exist`(): Unit = runBlocking {
             /* Given */
             val playlistId = fromString("dc024a30-bd02-11e5-a837-0800200c9a66")
             val itemId = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
             /* When */
-            StepVerifier.create(repository.addToPlaylist(playlistId, itemId))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.items).hasSize(2)
-                    }
-                    .verifyComplete()
+            val playlist = repository.addToPlaylist(playlistId, itemId)
+            /* Then */
+            assertThat(playlist.items).hasSize(2)
+
         }
     }
 
@@ -339,33 +323,25 @@ class PlaylistRepositoryTest(
     inner class ShouldRemove {
 
         @Test
-        fun `item from playlist`() {
+        fun `item from playlist`(): Unit = runBlocking {
             /* Given */
             val playlistId = fromString("dc024a30-bd02-11e5-a837-0800200c9a66")
             val itemId = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
             /* When */
-            StepVerifier.create(repository.removeFromPlaylist(playlistId, itemId))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.items).hasSize(1)
-                    }
-                    .verifyComplete()
+            val playlist = repository.removeFromPlaylist(playlistId, itemId)
+            /* Then */
+            assertThat(playlist.items).hasSize(1)
         }
 
         @Test
-        fun `item from playlist which wasn't linked`() {
+        fun `item from playlist which wasn't linked`(): Unit = runBlocking {
             /* Given */
             val playlistId = fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
             val itemId = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
             /* When */
-            StepVerifier.create(repository.removeFromPlaylist(playlistId, itemId))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.items).hasSize(0)
-                    }
-                    .verifyComplete()
+            val playlist = repository.removeFromPlaylist(playlistId, itemId)
+            /* Then */
+            assertThat(playlist.items).hasSize(0)
         }
 
     }

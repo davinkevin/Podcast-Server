@@ -2,7 +2,12 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.times
+import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -42,10 +47,10 @@ class PlaylistHandlerTest (
     inner class ShouldSave {
 
         @Test
-        fun `with a name`() {
+        fun `with a name`(): Unit = runBlocking {
             /* Given */
             val playlist = PlaylistWithItems(id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), name = "foo", items = emptyList())
-            whenever(service.save("foo")).thenReturn(playlist.toMono())
+            whenever(service.save("foo")).thenReturn(playlist)
             /* When */
             rest
                     .post()
@@ -71,9 +76,9 @@ class PlaylistHandlerTest (
     inner class ShouldFindAll {
 
         @Test
-        fun `with no watch list`() {
+        fun `with no watch list`(): Unit = runBlocking {
             /* Given */
-            whenever(service.findAll()).thenReturn(Flux.empty())
+            whenever(service.findAll()).thenReturn(emptyFlow())
             /* When */
             rest
                     .get()
@@ -88,13 +93,14 @@ class PlaylistHandlerTest (
         }
 
         @Test
-        fun `with watch lists in results`() {
+        fun `with watch lists in results`(): Unit = runBlocking {
             /* Given */
-            whenever(service.findAll()).thenReturn(Flux.just(
+            whenever(service.findAll()).thenReturn(flowOf(
                     Playlist(UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"), "first"),
                     Playlist(UUID.fromString("6e15b195-7a1f-43e8-bc06-bf88b7f865f8"), "second"),
                     Playlist(UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"), "third")
-            ))
+            )
+            )
 
             /* When */
             rest
@@ -126,10 +132,10 @@ class PlaylistHandlerTest (
         inner class AsJson {
 
             @Test
-            fun `with no items`() {
+            fun `with no items`(): Unit = runBlocking {
                 /* Given */
                 val playlist = PlaylistWithItems(id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), name = "foo", items = emptyList())
-                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
+                whenever(service.findById(playlist.id)).thenReturn(playlist)
                 /* When */
                 rest
                         .get()
@@ -148,7 +154,7 @@ class PlaylistHandlerTest (
             }
 
             @Test
-            fun `with 1 item`() {
+            fun `with 1 item`(): Unit = runBlocking {
                 /* Given */
                 val playlist = PlaylistWithItems(
                         id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
@@ -175,7 +181,7 @@ class PlaylistHandlerTest (
                                 )
                         )
                 )
-                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
+                whenever(service.findById(playlist.id)).thenReturn(playlist)
                 /* When */
                 rest
                         .get()
@@ -212,7 +218,7 @@ class PlaylistHandlerTest (
             }
 
             @Test
-            fun `with 2 item`() {
+            fun `with 2 item`(): Unit = runBlocking {
                 /* Given */
                 val playlist = PlaylistWithItems(
                         id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
@@ -258,7 +264,7 @@ class PlaylistHandlerTest (
                                 )
                         )
                 )
-                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
+                whenever(service.findById(playlist.id)).thenReturn(playlist)
                 /* When */
                 rest
                         .get()
@@ -317,7 +323,7 @@ class PlaylistHandlerTest (
         inner class AsRss {
 
             @Test
-            fun `with 1 item`() {
+            fun `with 1 item`(): Unit = runBlocking {
                 /* Given */
                 val item = PlaylistWithItems.Item(
                         id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
@@ -343,7 +349,7 @@ class PlaylistHandlerTest (
                         name = "foo",
                         items = listOf(item)
                 )
-                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
+                whenever(service.findById(playlist.id)).thenReturn(playlist)
 
                 /* When */
                 rest
@@ -388,10 +394,9 @@ class PlaylistHandlerTest (
     inner class ShouldDelete {
 
         @Test
-        fun `by id`() {
+        fun `by id`(): Unit = runBlocking {
             /* Given */
             val id = UUID.randomUUID()
-            whenever(service.deleteById(id)).thenReturn(Mono.empty())
             /* When */
             rest
                     .delete()
@@ -399,6 +404,8 @@ class PlaylistHandlerTest (
                     .exchange()
                     /* Then */
                     .expectStatus().isNoContent
+
+            verify(service, times(1)).deleteById(id)
         }
     }
 
@@ -407,7 +414,7 @@ class PlaylistHandlerTest (
     inner class ShouldAdd {
 
         @Test
-        fun `to playlist`() {
+        fun `to playlist`(): Unit = runBlocking {
             /* Given */
             val item = PlaylistWithItems.Item(
                     id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
@@ -433,7 +440,7 @@ class PlaylistHandlerTest (
                     name = "foo",
                     items = listOf(item)
             )
-            whenever(service.addToPlaylist(playlist.id, item.id)).thenReturn(playlist.toMono())
+            whenever(service.addToPlaylist(playlist.id, item.id)).thenReturn(playlist)
 
             /* When */
             rest
@@ -476,11 +483,11 @@ class PlaylistHandlerTest (
     inner class ShouldRemove {
 
         @Test
-        fun `from playlist`() {
+        fun `from playlist`(): Unit = runBlocking {
             /* Given */
             val playlist = PlaylistWithItems(id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), name = "foo", items = emptyList())
             val itemId = UUID.randomUUID()
-            whenever(service.addToPlaylist(playlist.id, itemId)).thenReturn(playlist.toMono())
+            whenever(service.addToPlaylist(playlist.id, itemId)).thenReturn(playlist)
 
             /* When */
             rest
