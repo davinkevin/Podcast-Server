@@ -16,11 +16,9 @@ import java.net.URI
 /**
  * Created by kevin on 09/03/2016 for Podcast Server
  */
-@ExtendWith(SpringExtension::class)
-@Import(NoopConfig::class)
-class NoOpFinderTest(
-        @Autowired val finder: NoOpFinder
-) {
+class NoOpFinderTest {
+
+    private val finder = NoOpFinder()
 
     @Test
     fun `should find default information`() {

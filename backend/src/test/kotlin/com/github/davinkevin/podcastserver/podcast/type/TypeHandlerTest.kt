@@ -3,6 +3,8 @@ package com.github.davinkevin.podcastserver.podcast.type
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.update.updaters.Type
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -11,7 +13,9 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 
@@ -22,21 +26,28 @@ import org.springframework.test.web.reactive.server.WebTestClient
 @Import(TypeRoutingConfig::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
 class TypeHandlerTest(
-    @Autowired val rest: WebTestClient
+    @Autowired private val rest: WebTestClient
 ) {
 
-    @MockBean private lateinit var updaterSelector: UpdaterSelector
+    @TestConfiguration
+    class TestLocalConfiguration {
 
-    private val dailymotion = Type("Dailymotion", "Dailymotion")
-    private val franceTv = Type("FranceTv", "France•tv")
-    private val gulli = Type("Gulli", "Gulli")
-    private val jeuxVideoCom = Type("JeuxVideoCom", "JeuxVideo.com")
-    private val myCanal = Type("MyCanal", "MyCanal")
-    private val rss = Type("RSS", "RSS")
-    private val sixPlay = Type("SixPlay", "6Play")
-    private val tf1Replay = Type("TF1Replay", "TF1 Replay")
-    private val upload = Type("upload", "Upload")
-    private val youtube = Type("Youtube", "Youtube")
+        private val dailymotion = Type("Dailymotion", "Dailymotion")
+        private val franceTv = Type("FranceTv", "France•tv")
+        private val gulli = Type("Gulli", "Gulli")
+        private val jeuxVideoCom = Type("JeuxVideoCom", "JeuxVideo.com")
+        private val myCanal = Type("MyCanal", "MyCanal")
+        private val rss = Type("RSS", "RSS")
+        private val sixPlay = Type("SixPlay", "6Play")
+        private val tf1Replay = Type("TF1Replay", "TF1 Replay")
+        private val upload = Type("upload", "Upload")
+        private val youtube = Type("Youtube", "Youtube")
+
+        @Bean
+        fun updaterSelector() = mock<UpdaterSelector>() {
+            on { types() } doReturn setOf(dailymotion, franceTv, gulli, jeuxVideoCom, myCanal, rss, sixPlay, tf1Replay, upload, youtube)
+        }
+    }
 
     @Nested
     @DisplayName("should find all")
@@ -45,9 +56,6 @@ class TypeHandlerTest(
         @Test
         fun `and return all element inside a wrapper`() {
             /* Given */
-            val types = setOf(dailymotion, franceTv, gulli, jeuxVideoCom, myCanal, rss, sixPlay, tf1Replay, upload, youtube)
-            whenever(updaterSelector.types()).thenReturn(types)
-
             /* When */
             rest
                     .get()

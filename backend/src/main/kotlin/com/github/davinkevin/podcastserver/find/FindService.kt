@@ -1,6 +1,9 @@
 package com.github.davinkevin.podcastserver.find
 
 import com.github.davinkevin.podcastserver.find.finders.Finder
+import com.github.davinkevin.podcastserver.find.finders.noop.NoOpFinder
+import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Hooks
 import reactor.core.publisher.Mono
@@ -14,19 +17,14 @@ class FindService(val finders: Set<Finder>) {
 
     private val log = LoggerFactory.getLogger(FindService::class.java)
 
-    fun find(url: URI): Mono<FindPodcastInformation> {
-        val finder = finders.minByOrNull { it.compatibility(url.toASCIIString()) }!!
+    suspend fun find(url: URI): FindPodcastInformation {
+        val finder = finders.minByOrNull { it.compatibility(url.toASCIIString()) }
+            ?: NoOpFinder()
 
         log.info("finder selected is {} for {}", finder.javaClass, url.toASCIIString())
 
-        return finder
-                .findInformation(url.toASCIIString())
-                .onErrorResume {
-                    log.error("error during execution of finder", it)
-
-                    FindPodcastInformation(title = "", url = url, type = "RSS", cover = null, description = "")
-                            .toMono()
-                }
+        return runCatching { finder.findInformation(url.toASCIIString()).awaitFirst() }
+            .getOrDefault(FindPodcastInformation(title = "", url = url, type = "RSS", cover = null, description = ""))
     }
 
 }

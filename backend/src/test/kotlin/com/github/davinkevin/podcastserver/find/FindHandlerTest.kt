@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.runBlocking
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -23,15 +24,14 @@ class FindHandlerTest(
     @Autowired val rest: WebTestClient
 ) {
 
-    @MockBean
-    private lateinit var finder: FindService
+    @MockBean private lateinit var finder: FindService
 
     @Nested
     @DisplayName("should find")
     inner class ShouldFind {
 
         @Test
-        fun `with success`() {
+        fun `with success`(): Unit = runBlocking {
             /* Given */
             val url = URI("http://foo.bar.com/")
             val podcast = FindPodcastInformation(
@@ -41,7 +41,7 @@ class FindHandlerTest(
                     type = "aType",
                     cover = FindCoverInformation(100, 100, URI("http://foo.bar.com/img.png"))
             )
-            whenever(finder.find(url)).thenReturn(podcast.toMono())
+            whenever(finder.find(url)).thenReturn(podcast)
 
             /* When */
             rest
