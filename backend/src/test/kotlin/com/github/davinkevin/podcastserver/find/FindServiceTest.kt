@@ -2,6 +2,9 @@ package com.github.davinkevin.podcastserver.find
 
 import com.github.davinkevin.podcastserver.find.finders.Finder
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions
+import org.assertj.core.api.Assertions.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -21,34 +24,52 @@ class FindServiceTest(
     @MockBean(name = "firstFinder") private lateinit var firstFinder: Finder
     @MockBean(name = "secondFinder") private lateinit var secondFinder: Finder
 
+    private val url = "https://foo.bar.com"
+
     @Test
-    fun `should find most compatible finder and delegate to it the find operation`() {
+    fun `should find most compatible finder and delegate to it the find operation`(): Unit = runBlocking {
         /* Given */
-        val url = "https://foo.bar.com"
         val p = FindPodcastInformation(title = "", url = URI(url), type = "first", cover = null, description = "")
         whenever(firstFinder.compatibility(url)).thenReturn(2)
         whenever(firstFinder.findInformation(url)).thenReturn(p.toMono())
         whenever(secondFinder.compatibility(url)).thenReturn(3)
         /* When */
-        StepVerifier.create(service.find(URI(url)))
-                /* Then */
-                .expectSubscription()
-                .expectNext(p)
-                .verifyComplete()
+        val foundInfo = service.find(URI(url))
+        /* Then */
+        assertThat(foundInfo).isEqualTo(p)
     }
 
     @Test
-    fun `should fallback on default response if the selected finder crash during find operation`() {
+    fun `should fallback on the noop finder if none are found`(): Unit = runBlocking {
         /* Given */
-        val url = "https://foo.bar.com"
+        val finders = FindService(emptySet())
+        /* When */
+        val foundInfo = finders.find(URI(url))
+        /* Then */
+        assertThat(foundInfo).isEqualTo(FindPodcastInformation(
+            title = "",
+            url = URI(url),
+            description = "",
+            type = "noop",
+            cover = null
+        ))
+    }
+
+    @Test
+    fun `should fallback on default response if the selected finder crash during find operation`(): Unit = runBlocking {
+        /* Given */
         whenever(firstFinder.compatibility(url)).thenReturn(2)
         whenever(firstFinder.findInformation(url)).thenReturn(RuntimeException("error !").toMono())
         whenever(secondFinder.compatibility(url)).thenReturn(3)
         /* When */
-        StepVerifier.create(service.find(URI(url)))
-                /* Then */
-                .expectSubscription()
-                .expectNext(FindPodcastInformation(title = "", url = URI(url), type = "RSS", cover = null, description = ""))
-                .verifyComplete()
+        val foundInfo = service.find(URI(url))
+        /* Then */
+        assertThat(foundInfo).isEqualTo(FindPodcastInformation(
+            title = "",
+            url = URI(url),
+            type = "RSS",
+            cover = null,
+            description = ""
+        ))
     }
 }
