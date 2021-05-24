@@ -134,7 +134,7 @@ spec:
         spec:
           containers:
             - name: podcast-server-update-and-download
-              image: tutum/curl
+              image: curlimages/curl
               args:
                 - /bin/sh
                 - -c
@@ -154,7 +154,7 @@ spec:
         spec:
           containers:
             - name: podcast-server-delete-old-covers
-              image: tutum/curl
+              image: curlimages/curl
               args:
                 - /bin/sh
                 - -c
@@ -174,7 +174,7 @@ spec:
         spec:
           containers:
             - name: podcast-server-delete-old-items
-              image: tutum/curl
+              image: curlimages/curl
               imagePullPolicy: IfNotPresent
               args:
                 - /bin/sh
