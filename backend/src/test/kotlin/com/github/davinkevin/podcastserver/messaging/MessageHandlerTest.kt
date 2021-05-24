@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -30,6 +31,7 @@ import java.util.*
 /**
  * Created by kevin on 02/05/2020
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 @WebFluxTest(controllers = [MessageHandler::class])
 @Import(MessagingRoutingConfig::class)
 @AutoConfigureWebTestClient(timeout = "PT15S")
@@ -95,7 +97,7 @@ class MessageHandlerTest(
             fun `should receive items`() {
                 /* Given */
                 val messages = Sinks.many().multicast().directBestEffort<Message<out Any>>()
-                whenever(messageTemplate.messages).thenReturn(messages)
+//                whenever(messageTemplate.messages).thenReturn(messages)
 
                 /* When */
                 StepVerifier.create(rest
@@ -156,7 +158,7 @@ class MessageHandlerTest(
             fun `should receive updates`() {
                 /* Given */
                 val messages = Sinks.many().multicast().directBestEffort<Message<out Any>>()
-                whenever(messageTemplate.messages).thenReturn(messages)
+//                whenever(messageTemplate.messages).thenReturn(messages)
 
                 /* When */
                 StepVerifier.create(rest
@@ -198,7 +200,7 @@ class MessageHandlerTest(
             fun `should receive new waiting list`() {
                 /* Given */
                 val messages = Sinks.many().multicast().directBestEffort<Message<out Any>>()
-                whenever(messageTemplate.messages).thenReturn(messages)
+//                whenever(messageTemplate.messages).thenReturn(messages)
 
                 /* When */
                 StepVerifier.create(rest
@@ -252,8 +254,8 @@ class MessageHandlerTest(
         @Test
         fun `should receive heartbeat`() {
             /* Given */
-            whenever(messageTemplate.messages)
-                    .thenReturn(Sinks.many().multicast().directBestEffort())
+//            whenever(messageTemplate.messages)
+//                    .thenReturn(Sinks.many().multicast().directBestEffort())
 
             /* When */
             StepVerifier.create(rest

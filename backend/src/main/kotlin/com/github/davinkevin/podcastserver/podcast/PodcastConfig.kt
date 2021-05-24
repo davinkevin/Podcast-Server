@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.podcast.type.TypeConfig
+import kotlinx.coroutines.FlowPreview
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -10,6 +11,7 @@ import org.springframework.web.reactive.function.server.router
 /**
  * Created by kevin on 2019-02-15
  */
+@OptIn(FlowPreview::class)
 @Configuration
 @Import(PodcastHandler::class, PodcastXmlHandler::class)
 class PodcastRoutingConfig {

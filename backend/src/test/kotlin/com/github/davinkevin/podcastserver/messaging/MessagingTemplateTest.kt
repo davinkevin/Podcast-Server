@@ -2,7 +2,14 @@ package com.github.davinkevin.podcastserver.messaging
 
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.take
+import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.Timeout
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
@@ -62,54 +69,66 @@ class MessagingTemplateTest(
     )
 
     @Test
-    fun `should send waiting queue`() {
+    @Timeout(5)
+    fun `should send waiting queue`(): Unit = runBlocking {
         /* Given */
         /* When */
-        StepVerifier.create(messages.messages.asFlux().take(4))
-                /* Then */
-                .expectSubscription()
-                .then { messages.sendWaitingQueue(listOf(item1, item2, item3)) }
-                .expectNextMatches { it is WaitingQueueMessage && it.value.containsAll(listOf(item1, item2, item3)) }
-                .then { messages.sendWaitingQueue(listOf(item1, item3, item4)) }
-                .expectNextMatches { it is WaitingQueueMessage && it.value.containsAll(listOf(item1, item3, item4)) }
-                .then { messages.sendWaitingQueue(listOf(item1, item2)) }
-                .expectNextMatches { it is WaitingQueueMessage && it.value.containsAll(listOf(item1, item2)) }
-                .then { messages.sendWaitingQueue(listOf(item4)) }
-                .expectNextMatches { it is WaitingQueueMessage && it.value.containsAll(listOf(item4)) }
-                .verifyComplete()
-    }
+        val job = launch {
+            println("here")
+            val m = messages.messages.take(1).toList()
+            assertThat(m).isEmpty()
+        }
+        /* Then */
+        job.start()
+        delay(4000)
+        messages.sendWaitingQueue(listOf(item1, item2, item3))
+        println("after send")
 
-    @Test
-    fun `should send downloading item`() {
-        /* Given */
-        /* When */
-        StepVerifier.create(messages.messages.asFlux().take(4))
-                /* Then */
-                .expectSubscription()
-                .then { messages.sendItem(item1) }
-                .expectNextMatches { it is DownloadingItemMessage && it.value == item1 }
-                .then { messages.sendItem(item2) }
-                .expectNextMatches { it is DownloadingItemMessage && it.value == item2 }
-                .then { messages.sendItem(item3) }
-                .expectNextMatches { it is DownloadingItemMessage && it.value == item3 }
-                .then { messages.sendItem(item4) }
-                .expectNextMatches { it is DownloadingItemMessage && it.value == item4 }
-                .verifyComplete()
-    }
 
-    @Test
-    fun `should update`() {
-        /* Given */
-        /* When */
-        StepVerifier.create(messages.messages.asFlux().take(3))
-                /* Then */
-                .expectSubscription()
-                .then { messages.isUpdating(true) }
-                .expectNextMatches { it is UpdateMessage && it.value }
-                .then { messages.isUpdating(false) }
-                .expectNextMatches { it is UpdateMessage && !it.value }
-                .then { messages.isUpdating(true) }
-                .expectNextMatches { it is UpdateMessage && it.value }
-                .verifyComplete()
+//        StepVerifier.create(messages.messages.asFlux().take(4))
+//                .expectSubscription()
+//                .then { messages.sendWaitingQueue(listOf(item1, item2, item3)) }
+//                .expectNextMatches { it is WaitingQueueMessage && it.value.containsAll(listOf(item1, item2, item3)) }
+//                .then { messages.sendWaitingQueue(listOf(item1, item3, item4)) }
+//                .expectNextMatches { it is WaitingQueueMessage && it.value.containsAll(listOf(item1, item3, item4)) }
+//                .then { messages.sendWaitingQueue(listOf(item1, item2)) }
+//                .expectNextMatches { it is WaitingQueueMessage && it.value.containsAll(listOf(item1, item2)) }
+//                .then { messages.sendWaitingQueue(listOf(item4)) }
+//                .expectNextMatches { it is WaitingQueueMessage && it.value.containsAll(listOf(item4)) }
+//                .verifyComplete()
     }
+//
+//    @Test
+//    fun `should send downloading item`() {
+//        /* Given */
+//        /* When */
+//        StepVerifier.create(messages.messages.asFlux().take(4))
+//                /* Then */
+//                .expectSubscription()
+//                .then { messages.sendItem(item1) }
+//                .expectNextMatches { it is DownloadingItemMessage && it.value == item1 }
+//                .then { messages.sendItem(item2) }
+//                .expectNextMatches { it is DownloadingItemMessage && it.value == item2 }
+//                .then { messages.sendItem(item3) }
+//                .expectNextMatches { it is DownloadingItemMessage && it.value == item3 }
+//                .then { messages.sendItem(item4) }
+//                .expectNextMatches { it is DownloadingItemMessage && it.value == item4 }
+//                .verifyComplete()
+//    }
+//
+//    @Test
+//    fun `should update`() {
+//        /* Given */
+//        /* When */
+//        StepVerifier.create(messages.messages.asFlux().take(3))
+//                /* Then */
+//                .expectSubscription()
+//                .then { messages.isUpdating(true) }
+//                .expectNextMatches { it is UpdateMessage && it.value }
+//                .then { messages.isUpdating(false) }
+//                .expectNextMatches { it is UpdateMessage && !it.value }
+//                .then { messages.isUpdating(true) }
+//                .expectNextMatches { it is UpdateMessage && it.value }
+//                .verifyComplete()
+//    }
 }

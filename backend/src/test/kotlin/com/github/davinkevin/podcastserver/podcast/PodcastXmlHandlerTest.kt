@@ -9,6 +9,7 @@ import com.nhaarman.mockitokotlin2.anyOrNull
 import com.nhaarman.mockitokotlin2.eq
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.FlowPreview
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -30,6 +31,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 
+@OptIn(FlowPreview::class)
 @WebFluxTest(controllers = [PodcastXmlHandler::class])
 @Import(PodcastRoutingConfig::class, PodcastHandler::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)

@@ -66,12 +66,11 @@ class YoutubeDlDownloader(
 
         if(savedPath != t) {
             val realExtension = getExtension(savedPath.toString())
-            val fileNameWithoutAnyExtension = removeExtension(removeExtension(t.fileName.toString()));
+            val fileNameWithoutAnyExtension = removeExtension(removeExtension(t.fileName.toString()))
 
             target = t.resolveSibling("$fileNameWithoutAnyExtension.$realExtension$temporaryExtension")
             Result.runCatching { Files.move(savedPath, target!!) }
         }
-
         super.finishDownload()
     }
 

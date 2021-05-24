@@ -1,17 +1,21 @@
 package com.github.davinkevin.podcastserver.messaging
 
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.reactive.asFlow
 import reactor.core.publisher.Sinks
 
 /**
  * Created by kevin on 2018-11-25
  */
 class MessagingTemplate {
-    val messages: Sinks.Many<Message<out Any>> = Sinks.many().multicast().directBestEffort()
+    val messages = MutableSharedFlow<Message<out Any>>()
 
-    fun sendWaitingQueue(value: List<DownloadingItem>) = messages.tryEmitNext(WaitingQueueMessage(value))
-    fun sendItem(value: DownloadingItem) = messages.tryEmitNext(DownloadingItemMessage(value))
-    fun isUpdating(value: Boolean) = messages.tryEmitNext(UpdateMessage(value))
+    fun sendWaitingQueue(value: List<DownloadingItem>) = messages.tryEmit(WaitingQueueMessage(value)).also { println("inside fun") }
+    fun sendItem(value: DownloadingItem) = messages.tryEmit(DownloadingItemMessage(value))
+    fun isUpdating(value: Boolean) = messages.tryEmit(UpdateMessage(value))
 }
 
 sealed class Message<T>(val topic: String, val value: T)

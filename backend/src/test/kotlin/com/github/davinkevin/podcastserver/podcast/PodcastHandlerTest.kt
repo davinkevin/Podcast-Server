@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.tag.Tag
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
+import kotlinx.coroutines.FlowPreview
 import org.apache.commons.io.FilenameUtils
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -36,6 +37,7 @@ import java.util.*
 /**
  * Created by kevin on 2019-02-16
  */
+@OptIn(FlowPreview::class)
 @WebFluxTest(controllers = [PodcastHandler::class])
 @Import(PodcastRoutingConfig::class, PodcastXmlHandler::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)

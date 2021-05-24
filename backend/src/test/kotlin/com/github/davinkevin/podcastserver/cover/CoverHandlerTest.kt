@@ -56,8 +56,6 @@ class CoverHandlerTest(
         @Test
         fun `with default number of days`(): Unit = runBlocking {
             /* Given */
-            val expectedDate = fixedDate.minusDays(365)
-
             /* When */
             rest
                     .delete()
