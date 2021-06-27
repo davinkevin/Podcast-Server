@@ -52,5 +52,9 @@ class BeanConfigScan {
 
     @Bean
     @ConfigurationPropertiesBinding
-    fun pathConverter() = Converter<String, Path> { source -> Paths.get(source) }
+    fun pathConverter() = PathConvert()
+}
+
+class PathConvert: Converter<String, Path> {
+    override fun convert(source: String): Path = Paths.get(source)
 }
