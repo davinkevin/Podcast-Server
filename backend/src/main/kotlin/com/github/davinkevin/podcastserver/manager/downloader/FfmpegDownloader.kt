@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Clock
+import java.util.*
 
 @Scope(SCOPE_PROTOTYPE)
 @Component
@@ -144,6 +145,6 @@ class FfmpegDownloader(
     }
 
     override fun compatibility(downloadingInformation: DownloadingInformation) =
-            if (downloadingInformation.urls.map { it.toLowerCase() }.all { "m3u8" in it || "mp4" in it }) 10
+            if (downloadingInformation.urls.map { it.lowercase(Locale.getDefault()) }.all { "m3u8" in it || "mp4" in it }) 10
             else Integer.MAX_VALUE
 }

@@ -47,8 +47,8 @@ dependencies {
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-	implementation("org.postgresql:postgresql:42.2.18")
-	jooqGenerator("org.postgresql:postgresql:42.2.18")
+	implementation("org.postgresql:postgresql")
+	jooqGenerator("org.postgresql:postgresql:" + dependencyManagement.importedProperties["postgresql.version"])
 
 	implementation("org.jdom:jdom2:2.0.6")
 	implementation("org.apache.tika:tika-core:1.24.1")
@@ -113,10 +113,10 @@ jooq {
 						name = "org.jooq.meta.postgres.PostgresDatabase"
 						inputSchema = "public"
 						forcedTypes = listOf(
-								ForcedType()
-										.withUserType("com.github.davinkevin.podcastserver.entity.Status")
-										.withConverter("com.github.davinkevin.podcastserver.database.StatusConverter")
-										.withIncludeExpression("""ITEM\.STATUS""")
+							ForcedType()
+								.withUserType("com.github.davinkevin.podcastserver.entity.Status")
+								.withConverter("com.github.davinkevin.podcastserver.database.StatusConverter")
+								.withIncludeExpression("""ITEM\.STATUS""")
 						)
 						isIncludeTables = true
 						isIncludePackages = false
@@ -142,8 +142,8 @@ project.tasks["generateJooq"].dependsOn("flywayMigrate")
 
 tasks.jacocoTestReport {
 	reports {
-		xml.isEnabled = true
-		html.isEnabled = true
+		html.required.value(true)
+		xml.required.value(true)
 	}
 	executionData(File("$buildDir/jacoco/test.exec"))
 	finalizedBy(tasks.printCoverage)
@@ -165,8 +165,8 @@ tasks.withType<Test> {
 tasks.withType<KotlinCompile> {
 	kotlinOptions {
 		freeCompilerArgs = listOf(
-				"-Xjsr305=strict",
-				"-Xallow-result-return-type"
+			"-Xjsr305=strict",
+			"-Xallow-result-return-type",
 		)
 		jvmTarget = "11"
 	}
@@ -206,14 +206,14 @@ tasks.register("downloadDependencies") {
 	}
 	doLast {
 		val buildDeps = buildscript
-				.configurations
-				.map { it.resolve().size }
-				.sum()
+			.configurations
+			.map { it.resolve().size }
+			.sum()
 
 		val allDeps = configurations
-				.filter { it.isCanBeResolved && !it.isDeprecated() }
-				.map { it.resolve().size }
-				.sum()
+			.filter { it.isCanBeResolved && !it.isDeprecated() }
+			.map { it.resolve().size }
+			.sum()
 
 		println("Downloaded all dependencies: ${allDeps + buildDeps}")
 	}

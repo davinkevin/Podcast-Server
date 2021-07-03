@@ -302,5 +302,5 @@ private fun toItem(it: Record18<UUID, String, String, OffsetDateTime, OffsetDate
 
 private fun <T> ItemSort.toOrderBy(downloadDate: Field<T>, defaultField: Field<T>): SortField<T> {
     val field = if(field == "downloadDate" ) downloadDate else defaultField
-    return if (direction.toLowerCase() == "asc") field.asc() else field.desc()
+    return if (direction.lowercase(Locale.getDefault()) == "asc") field.asc() else field.desc()
 }

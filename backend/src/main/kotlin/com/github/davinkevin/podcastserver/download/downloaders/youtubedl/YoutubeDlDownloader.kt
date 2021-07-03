@@ -13,6 +13,7 @@ import org.apache.commons.io.FilenameUtils.removeExtension
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.time.Clock
+import java.util.*
 import kotlin.math.roundToInt
 import kotlin.streams.asSequence
 
@@ -75,7 +76,7 @@ class YoutubeDlDownloader(
     }
 
     override fun compatibility(downloadingInformation: DownloadingInformation): Int {
-        val url = downloadingInformation.urls.first().toLowerCase()
+        val url = downloadingInformation.urls.first().lowercase(Locale.getDefault())
 
         return when {
             downloadingInformation.urls.size > 1 -> Int.MAX_VALUE

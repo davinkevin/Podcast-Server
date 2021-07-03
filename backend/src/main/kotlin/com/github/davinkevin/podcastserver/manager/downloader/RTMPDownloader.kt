@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 import java.io.File
 import java.time.Clock
+import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
 
@@ -43,9 +44,15 @@ class RTMPDownloader(
             log.debug("out file : {}", target!!.toAbsolutePath().toString())
 
             val processToExecute = processService
-                    .newProcessBuilder(externalTools.rtmpdump, "-r", downloadingInformation.url(), "-o", target!!.toAbsolutePath().toString())
-                    .directory(File("/tmp"))
-                    .redirectErrorStream(true)
+                .newProcessBuilder(
+                    externalTools.rtmpdump,
+                    "-r",
+                    downloadingInformation.url(),
+                    "-o",
+                    target!!.toAbsolutePath().toString()
+                )
+                .directory(File("/tmp"))
+                .redirectErrorStream(true)
 
             p = processService.start(processToExecute)
             pid = processService.pidOf(p!!)
@@ -54,7 +61,9 @@ class RTMPDownloader(
 
             p!!.waitFor()
             pid = 0
-        } catch (e: Exception) { throw RuntimeException(e) }
+        } catch (e: Exception) {
+            throw RuntimeException(e)
+        }
 
         return downloadingInformation.item
     }
@@ -63,21 +72,21 @@ class RTMPDownloader(
         log.debug("Reading output of RTMPDump")
 
         process.inputStream
-                .bufferedReader()
-                .lines()
-                .forEach {
-                    val (isProgression, progression) = isProgressionLine(it)
-                    if (isProgression) {
-                        broadcastProgression(downloadingInformation.item, progression)
-                        return@forEach
-                    }
-
-                    if (isDownloadComplete(it)) {
-                        log.info("End of download")
-                        finishDownload()
-                        return@forEach
-                    }
+            .bufferedReader()
+            .lines()
+            .forEach {
+                val (isProgression, progression) = isProgressionLine(it)
+                if (isProgression) {
+                    broadcastProgression(downloadingInformation.item, progression)
+                    return@forEach
                 }
+
+                if (isDownloadComplete(it)) {
+                    log.info("End of download")
+                    finishDownload()
+                    return@forEach
+                }
+            }
 
         if (downloadingInformation.item.status != Status.FINISH && !stopDownloading.get()) {
             throw RuntimeException("Unexpected ending, failed download")
@@ -102,16 +111,16 @@ class RTMPDownloader(
     }
 
     override fun restartDownload() =
-            try {
-                val restart = processService.newProcessBuilder("kill", "-SIGCONT", "" + pid.toString())
-                processService.start(restart)
-                downloadingInformation = downloadingInformation.status(Status.STARTED)
-                saveStateOfItem(downloadingInformation.item)
-                broadcast(downloadingInformation.item)
-            } catch (e: Exception) {
-                log.error("Error during restart of process :", e)
-                failDownload()
-            }
+        try {
+            val restart = processService.newProcessBuilder("kill", "-SIGCONT", "" + pid.toString())
+            processService.start(restart)
+            downloadingInformation = downloadingInformation.status(Status.STARTED)
+            saveStateOfItem(downloadingInformation.item)
+            broadcast(downloadingInformation.item)
+        } catch (e: Exception) {
+            log.error("Error during restart of process :", e)
+            failDownload()
+        }
 
     override fun stopDownload() {
         stopDownloading.set(true)
@@ -130,8 +139,8 @@ class RTMPDownloader(
     }
 
     override fun compatibility(downloadingInformation: DownloadingInformation) =
-            if (downloadingInformation.urls.size == 1 && downloadingInformation.urls.first().startsWith("rtmp://")) 1
-            else Integer.MAX_VALUE
+        if (downloadingInformation.urls.size == 1 && downloadingInformation.urls.first().startsWith("rtmp://")) 1
+        else Integer.MAX_VALUE
 
     private fun broadcastProgression(item: DownloadingItem, progression: Int) {
         if (item.progression != progression)
@@ -141,11 +150,11 @@ class RTMPDownloader(
     private fun isProgressionLine(line: String): Pair<Boolean, Int> {
         val m = RTMP_DUMP_PROGRESSION.matcher(line)
         val isMatch = m.matches()
-        return if(isMatch) true to m.group(1).toInt()
+        return if (isMatch) true to m.group(1).toInt()
         else false to -1
     }
 
-    private fun isDownloadComplete(line: String) = line.toLowerCase().contains(DOWNLOAD_COMPLETE)
+    private fun isDownloadComplete(line: String) = line.lowercase(Locale.getDefault()).contains(DOWNLOAD_COMPLETE)
 
     companion object {
         private const val DOWNLOAD_COMPLETE = "download complete"
