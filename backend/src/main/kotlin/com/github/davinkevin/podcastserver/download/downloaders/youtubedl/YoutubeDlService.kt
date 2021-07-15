@@ -5,7 +5,6 @@ import com.sapher.youtubedl.YoutubeDL
 import com.sapher.youtubedl.YoutubeDLRequest
 import com.sapher.youtubedl.YoutubeDLResponse
 import org.slf4j.LoggerFactory
-import java.lang.RuntimeException
 import java.nio.file.Path
 
 /**
@@ -43,7 +42,7 @@ class YoutubeDlService(private val youtube: YoutubeDL) {
             setOption("output", name)
 
             if(isFromVideoPlatform(url)) {
-                setOption("format", "bestvideo[ext=webm]+bestaudio[ext=webm]/best[ext=mp4]+bestaudio[ext=m4a]/best[ext=webm]/best[ext=mp4]/mp4+m4a")
+                setOption("format", "bestvideo[ext=webm]+bestaudio[ext=webm]/best[ext=mp4]+bestaudio[ext=m4a]/best[ext=webm]/best[ext=mp4]/mp4+m4a/best")
             }
         }
 
