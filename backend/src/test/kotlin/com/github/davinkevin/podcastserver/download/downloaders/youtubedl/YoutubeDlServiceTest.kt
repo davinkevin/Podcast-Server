@@ -17,7 +17,6 @@ import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -120,7 +119,7 @@ class YoutubeDlServiceTest(
                         it.directory == "/tmp" &&
                         it.option["retries"] == "10" &&
                         it.option["output"] == "foo.mp3" &&
-                        it.option["format"] == "bestvideo[ext=webm]+bestaudio[ext=webm]/best[ext=mp4]+bestaudio[ext=m4a]/best[ext=webm]/best[ext=mp4]/mp4+m4a"
+                        it.option["format"] == "bestvideo[ext=webm]+bestaudio[ext=webm]/best[ext=mp4]+bestaudio[ext=m4a]/best[ext=webm]/best[ext=mp4]/mp4+m4a/best"
             }
             whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
 
