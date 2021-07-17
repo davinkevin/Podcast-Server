@@ -19,6 +19,7 @@ import org.junit.jupiter.api.io.TempDir
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.util.FileSystemUtils
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
 import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
@@ -94,7 +95,7 @@ class DownloaderTest {
             /* Then */
             assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.STOPPED)
             verify(template, atLeast(1)).sendItem(any())
-            assertThat(downloader.target).isEqualTo(ROOT_TEST_PATH.resolve("baz").resolve("filename.mp4$TEMPORARY_EXTENSION"))
+            assertThat(downloader.target).isEqualTo(ROOT_TEST_PATH.resolve("baz").resolve("filename-${item.id}.mp4$TEMPORARY_EXTENSION"))
         }
 
         @Test
@@ -128,32 +129,6 @@ class DownloaderTest {
             /* Then */
             assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.PAUSED)
             verify(template, atLeast(1)).sendItem(any())
-        }
-
-        @Test
-        fun `should save with same file already existing`() {
-            /* Given */
-            downloader
-                    .with(DownloadingInformation(item,  listOf(), "file.mp4", null), itemDownloadManager)
-
-            whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
-            whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
-            whenever(downloadRepository.finishDownload(
-                    id = item.id,
-                    length = 0,
-                    mimeType = "video/mp4",
-                    fileName = "file.mp4",
-                    downloadDate = fixedDate
-            )).thenReturn(Mono.empty())
-
-            /* When */
-            downloader.run()
-            downloader.finishDownload()
-
-            /* Then */
-            assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FINISH)
-            assertThat(downloader.target).isEqualTo(ROOT_TEST_PATH.resolve("baz").resolve("file.mp4"))
         }
 
         @Test
@@ -193,23 +168,6 @@ class DownloaderTest {
         }
 
         @Test
-        fun `should handle duplicate on file name`() {
-            /* Given */
-            val information = DownloadingInformation(item, listOf(), "file.mp4", null)
-            downloader.with(information, itemDownloadManager)
-            whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-
-            Files.createDirectory(ROOT_TEST_PATH.resolve(item.podcast.title))
-            Files.createFile(ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file.mp4$TEMPORARY_EXTENSION"))
-
-            /* When */
-            val targetFile = downloader.computeTargetFile(information)
-
-            /* Then */
-            assertThat(targetFile).isNotEqualTo(ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file.mp4$TEMPORARY_EXTENSION"))
-        }
-
-        @Test
         @Disabled
         fun `should handle error during creation of temp file`(@TempDir dir: Path) {
             /* Given */
@@ -224,6 +182,7 @@ class DownloaderTest {
             downloader.with(information, itemDownloadManager)
 
             whenever(podcastServerParameters.rootfolder).thenReturn(subDir)
+            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(1.toMono())
 
             /* When */
             assertThatThrownBy { downloader.computeTargetFile(information) }
@@ -231,7 +190,7 @@ class DownloaderTest {
                     .hasMessage("Error during creation of target file")
 
             /* Then */
-            assertThat(item.status).isEqualTo(Status.FAILED)
+            assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FAILED)
         }
 
         @Test

@@ -123,7 +123,7 @@ class YoutubeDlDownloaderTest(
             downloader.download()
 
             /* Then */
-            assertThat(rootFolder.resolve(item.podcast.title).resolve(dItem.filename))
+            assertThat(rootFolder.resolve(item.podcast.title).resolve("one-${dItem.item.id}.mp3"))
                     .exists()
         }
 
@@ -148,7 +148,7 @@ class YoutubeDlDownloaderTest(
             downloader.download()
 
             /* Then */
-            assertThat(rootFolder.resolve(item.podcast.title).resolve(dItem.filename))
+            assertThat(rootFolder.resolve(item.podcast.title).resolve("one-${dItem.item.id}.mp3"))
                     .exists()
         }
 

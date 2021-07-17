@@ -129,44 +129,32 @@ public abstract class AbstractDownloader(
         broadcast(downloadingInformation.item)
     }
 
-    internal fun computeTargetFile(info: DownloadingInformation): Path {
+    internal fun computeTargetFile(info: DownloadingInformation): Path = runCatching {
         val t = target
         if (t != null) return t
 
         val finalFile = computeDestinationFile(info)
         log.debug("Creation of file : {}", finalFile.toFile().absolutePath)
 
-        try {
-            if (!Files.exists(finalFile.parent)) {
-                Files.createDirectories(finalFile.parent) // # Should explode !
-            }
-
-            val fileWithTemporaryExtension = finalFile.resolveSibling(finalFile.fileName.toString() + temporaryExtension)
-            if (!Files.exists(finalFile) && !Files.exists(fileWithTemporaryExtension)) {
-                return fileWithTemporaryExtension
-            }
-
-            log.info("Doublon sur le fichier en lien avec {} - {}, {}", info.item.podcast.title, info.item.id, info.item.title)
-            return generateTempFileNextTo(finalFile)
-        } catch (e: Exception) {
-            failDownload()
-            throw RuntimeException("Error during creation of target file", e)
+        if (!Files.exists(finalFile.parent)) {
+            Files.createDirectories(finalFile.parent)
         }
-    }
 
-    /* Change visibility after kotlin Migration */
-    fun generateTempFileNextTo(finalFile: Path): Path {
-        val fileName = finalFile.fileName.toString()
-        val name = FilenameUtils.getBaseName(fileName)
-        val extension = FilenameUtils.getExtension(fileName)
-        return Files.createTempFile(finalFile.parent, "$name-", ".$extension$temporaryExtension")
+        return finalFile.resolveSibling(finalFile.fileName.toString() + temporaryExtension)
+    }.getOrElse {
+        failDownload()
+        throw RuntimeException("Error during creation of target file", it)
     }
 
     private fun computeDestinationFile(info: DownloadingInformation): Path {
-        val filename = info.filename
+        val simplifiedFilename = info.filename
                 .replace("\n".toRegex(), "")
                 .replace("[^a-zA-Z0-9.-]".toRegex(), "_")
-        return podcastServerParameters.rootfolder.resolve(info.item.podcast.title).resolve(filename)
+
+        val name = FilenameUtils.getBaseName(simplifiedFilename) + "-${downloadingInformation.item.id}"
+        val extension = FilenameUtils.getExtension(simplifiedFilename)
+
+        return podcastServerParameters.rootfolder.resolve(info.item.podcast.title).resolve("$name.$extension")
     }
 
     internal fun saveStateOfItem(item: DownloadingItem) {

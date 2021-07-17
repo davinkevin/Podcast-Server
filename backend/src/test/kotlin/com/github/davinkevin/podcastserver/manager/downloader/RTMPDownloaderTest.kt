@@ -152,8 +152,8 @@ class RTMPDownloaderTest {
         @Nested
         @DisplayName("should download")
         inner class ShouldDownload {
-//
-            private val destination = ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file.mp4$TEMPORARY_EXTENSION")
+
+            private val destination = ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file-${item.id}.mp4$TEMPORARY_EXTENSION")
             private val pb = mock<ProcessBuilder>()
             private val p = mock<Process>()
             private val parameters = arrayOf("/usr/local/bin/rtmpdump","-r", item.url.toASCIIString(), "-o", destination.toAbsolutePath().toString())
@@ -181,7 +181,7 @@ class RTMPDownloaderTest {
                         id = item.id,
                         length = 0,
                         mimeType = "video/mp4",
-                        fileName = "file.mp4",
+                        fileName = "file-${item.id}.mp4",
                         downloadDate = fixedDate
                 )).thenReturn(Mono.empty())
 
@@ -190,7 +190,7 @@ class RTMPDownloaderTest {
 
                 /* Then */
                 assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FINISH)
-                assertThat(ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file.mp4")).exists()
+                assertThat(ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file-${item.id}.mp4")).exists()
             }
 
             @Nested
@@ -225,7 +225,7 @@ class RTMPDownloaderTest {
                                 id = item.id,
                                 length = 0,
                                 mimeType = "video/mp4",
-                                fileName = "file.mp4",
+                                fileName = "file-${item.id}.mp4",
                                 downloadDate = fixedDate
                         )).thenReturn(Mono.empty())
 
@@ -247,7 +247,7 @@ class RTMPDownloaderTest {
                                 id = item.id,
                                 length = 0,
                                 mimeType = "video/mp4",
-                                fileName = "file.mp4",
+                                fileName = "file-${item.id}.mp4",
                                 downloadDate = fixedDate
                         )).thenReturn(Mono.empty())
                         doAnswer { throw RuntimeException("Error during -STOP operation on process") }
@@ -284,7 +284,7 @@ class RTMPDownloaderTest {
                                     id = item.id,
                                     length = 0,
                                     mimeType = "video/mp4",
-                                    fileName = "file.mp4",
+                                    fileName = "file-${item.id}.mp4",
                                     downloadDate = fixedDate
                             )).thenReturn(Mono.empty())
                             /* WHEN  */
@@ -306,7 +306,7 @@ class RTMPDownloaderTest {
                                     id = item.id,
                                     length = 0,
                                     mimeType = "video/mp4",
-                                    fileName = "file.mp4",
+                                    fileName = "file-${item.id}.mp4",
                                     downloadDate = fixedDate
                             )).thenReturn(Mono.empty())
                             doAnswer { throw RuntimeException("Error during -SIGCONT operation on process") }
@@ -333,7 +333,7 @@ class RTMPDownloaderTest {
                             id = item.id,
                             length = 0,
                             mimeType = "video/mp4",
-                            fileName = "file.mp4",
+                            fileName = "file-${item.id}.mp4",
                             downloadDate = fixedDate
                     )).thenReturn(Mono.empty())
 

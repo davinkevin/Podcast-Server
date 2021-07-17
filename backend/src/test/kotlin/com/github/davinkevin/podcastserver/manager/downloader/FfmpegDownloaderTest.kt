@@ -125,7 +125,7 @@ class FfmpegDownloaderTest {
                         id = item.id,
                         length = 0,
                         mimeType = "video/mp4",
-                        fileName = "file.mp4",
+                        fileName = "file-${item.id}.mp4",
                         downloadDate = fixedDate
                 )).thenReturn(Mono.empty())
 
@@ -134,7 +134,7 @@ class FfmpegDownloaderTest {
                 downloader.run()
 
                 /* Then */
-                assertThat(ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file.mp4")).exists()
+                assertThat(ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file-${item.id}.mp4")).exists()
                 assertThat(downloader.downloadingInformation.item.status).isEqualTo(FINISH)
                 assertThat(downloader.downloadingInformation.item.progression).isEqualTo(100)
                 assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(item.podcast.title)))
