@@ -14,6 +14,7 @@ import org.springframework.web.reactive.function.BodyExtractors
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.*
+import org.springframework.web.reactive.function.server.buildAndAwait
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
@@ -36,17 +37,16 @@ class ItemHandler(
 
     private var log = LoggerFactory.getLogger(ItemHandler::class.java)
 
-    fun clean(r: ServerRequest): Mono<ServerResponse> {
+    suspend fun clean(r: ServerRequest): ServerResponse {
         val retentionNumberOfDays = r.queryParam("days")
                 .map { it.toLong() }
                 .orElse(30L)
 
-        val date = OffsetDateTime.now(clock)
-                .minusDays(retentionNumberOfDays)
+        val date = OffsetDateTime.now(clock).minusDays(retentionNumberOfDays)
 
-        return itemService
-                .deleteItemOlderThan(date)
-                .then(ok().build())
+        itemService.deleteItemOlderThan(date)
+
+        return ok().buildAndAwait()
     }
 
     fun reset(s: ServerRequest): Mono<ServerResponse> {

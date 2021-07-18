@@ -181,17 +181,17 @@ class ItemRepositoryTest(
         }
 
 
-        @Test
-        fun `to delete`() {
-            /* Given */
-            /* When */
-            StepVerifier.create(repository.findAllToDelete(fixedDate))
-                    /* Then */
-                    .assertNext {
-                        assertThat(it.id).isEqualTo(fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"))
-                    }
-                    .verifyComplete()
-        }
+//        @Test
+//        fun `to delete`() {
+//            /* Given */
+//            /* When */
+//            StepVerifier.create(repository.findAllToDelete(fixedDate))
+//                    /* Then */
+//                    .assertNext {
+//                        assertThat(it.id).isEqualTo(fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"))
+//                    }
+//                    .verifyComplete()
+//        }
     }
 
     @Nested
@@ -364,25 +364,25 @@ class ItemRepositoryTest(
         }
 
 
-        @Test
-        fun `as deleted`() {
-            /* Given */
-            val item1 = fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb")
-            val item2 = fromString("817a4626-6fd2-457e-8d27-69ea5acdc828")
-            val item3 = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
-            val ids = listOf(item1, item2, item3)
-            /* When */
-            StepVerifier.create(repository.updateAsDeleted(ids))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
-
-            val items = query.selectFrom(ITEM).where(ITEM.ID.`in`(ids)).fetch()
-            assertThat(items).allSatisfy {
-                assertThat(it.status).isEqualTo(DELETED)
-                assertThat(it.fileName).isNull()
-            }
-        }
+//        @Test
+//        fun `as deleted`() {
+//            /* Given */
+//            val item1 = fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb")
+//            val item2 = fromString("817a4626-6fd2-457e-8d27-69ea5acdc828")
+//            val item3 = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
+//            val ids = listOf(item1, item2, item3)
+//            /* When */
+//            StepVerifier.create(repository.updateAsDeleted(ids))
+//                    /* Then */
+//                    .expectSubscription()
+//                    .verifyComplete()
+//
+//            val items = query.selectFrom(ITEM).where(ITEM.ID.`in`(ids)).fetch()
+//            assertThat(items).allSatisfy {
+//                assertThat(it.status).isEqualTo(DELETED)
+//                assertThat(it.fileName).isNull()
+//            }
+//        }
 
     }
 

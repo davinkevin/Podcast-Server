@@ -3,6 +3,10 @@ package com.github.davinkevin.podcastserver.item
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.reactive.asFlow
+import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.jooq.DSLContext
 import org.jooq.Field
 import org.jooq.Record18
@@ -48,19 +52,20 @@ class ItemRepository(private val query: DSLContext) {
                 .map { toItem(it) }
     }
 
-    fun findAllToDelete(date: OffsetDateTime) = Flux.defer {
+    fun findAllToDelete(date: OffsetDateTime): Flow<DeleteItemInformation> = Flux.defer {
         Flux.from(query
-                .select(ITEM.ID, ITEM.FILE_NAME, PODCAST.TITLE)
-                .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
-                .where(ITEM.DOWNLOAD_DATE.lessOrEqual(date))
-                .and(ITEM.STATUS.eq(FINISH))
-                .and(PODCAST.HAS_TO_BE_DELETED.isTrue)
-                .and(ITEM.ID.notIn(query.select(WATCH_LIST_ITEMS.ITEMS_ID).from(WATCH_LIST_ITEMS)))
+            .select(ITEM.ID, ITEM.FILE_NAME, PODCAST.TITLE)
+            .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
+            .where(ITEM.DOWNLOAD_DATE.lessOrEqual(date))
+            .and(ITEM.STATUS.eq(FINISH))
+            .and(PODCAST.HAS_TO_BE_DELETED.isTrue)
+            .and(ITEM.ID.notIn(query.select(WATCH_LIST_ITEMS.ITEMS_ID).from(WATCH_LIST_ITEMS)))
         )
-                .map { DeleteItemInformation(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
+            .map { DeleteItemInformation(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
     }
-            .subscribeOn(Schedulers.boundedElastic())
-            .publishOn(Schedulers.parallel())
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
+        .asFlow()
 
     fun deleteById(id: UUID) = Mono.defer {
         val removeFromPlaylist = query
@@ -83,7 +88,7 @@ class ItemRepository(private val query: DSLContext) {
             .subscribeOn(Schedulers.boundedElastic())
             .publishOn(Schedulers.parallel())
 
-    fun updateAsDeleted(items: Collection<UUID>): Mono<Void> = Mono.defer {
+    suspend fun updateAsDeleted(items: Collection<UUID>): Void? = Mono.defer {
         query
                 .update(ITEM)
                 .set(ITEM.STATUS, DELETED)
@@ -92,8 +97,9 @@ class ItemRepository(private val query: DSLContext) {
                 .toMono()
                 .then()
     }
-            .subscribeOn(Schedulers.boundedElastic())
-            .publishOn(Schedulers.parallel())
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
+        .awaitFirst()
 
     fun hasToBeDeleted(id: UUID): Mono<Boolean> = Mono.defer {
         query

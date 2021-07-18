@@ -7,6 +7,9 @@ import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.reactive.awaitFirst
+import kotlinx.coroutines.reactive.awaitFirstOrNull
 import org.slf4j.LoggerFactory
 import org.springframework.http.codec.multipart.FilePart
 import reactor.core.publisher.Flux
@@ -35,13 +38,17 @@ class ItemService(
 
     private val log = LoggerFactory.getLogger(ItemService::class.java)!!
 
-    fun deleteItemOlderThan(date: OffsetDateTime) = repository.
-            findAllToDelete(date)
-            .doOnSubscribe { log.info("Deletion of items older than {}", date) }
-            .delayUntil { fileService.deleteItem(it) }
+    suspend fun deleteItemOlderThan(date: OffsetDateTime) {
+
+        log.info("Deletion of items older than {}", date)
+
+        val items = repository.findAllToDelete(date)
+            .onEach { fileService.deleteItem(it).awaitFirstOrNull() }
             .map { v -> v.id }
-            .collectList()
-            .flatMap { repository.updateAsDeleted(it) }
+            .toList()
+
+        repository.updateAsDeleted(items)
+    }
 
     fun findById(id: UUID) = repository.findById(id)
 

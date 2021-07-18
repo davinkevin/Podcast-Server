@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.service.FileService
 import com.nhaarman.mockitokotlin2.*
+import kotlinx.coroutines.runBlocking
 import org.apache.commons.io.FilenameUtils
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -85,29 +86,29 @@ class ItemHandlerTest(
     inner class ShouldDelete {
 
         @Test
-        fun `with the default number of days to keep because no parameters`() {
+        fun `with the default number of days to keep because no parameters`(): Unit = runBlocking {
             /* Given */
-            whenever(itemService.deleteItemOlderThan(fixedDate.minusDays(30))).thenReturn(Mono.empty())
-
             /* When */
             rest.delete()
                     .uri("/api/v1/items")
                     .exchange()
                     /* Then */
                     .expectStatus().isOk
+
+            verify(itemService, times(1)).deleteItemOlderThan(fixedDate.minusDays(30))
         }
 
         @Test
-        fun `with number of days to keep on the url query params`() {
+        fun `with number of days to keep on the url query params`(): Unit = runBlocking {
             /* Given */
-            whenever(itemService.deleteItemOlderThan(fixedDate.minusDays(60))).thenReturn(Mono.empty())
-
             /* When */
             rest.delete()
                     .uri("/api/v1/items?days=60")
                     .exchange()
                     /* Then */
                     .expectStatus().isOk
+
+            verify(itemService, times(1)).deleteItemOlderThan(fixedDate.minusDays(60))
         }
     }
 

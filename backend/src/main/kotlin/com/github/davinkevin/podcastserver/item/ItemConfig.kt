@@ -4,6 +4,7 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
+import org.springframework.web.reactive.function.server.coRouter
 import org.springframework.web.reactive.function.server.router
 
 /**
@@ -17,7 +18,7 @@ class ItemRoutingConfig {
     fun itemRouter(item: ItemHandler) = router {
         "/api/v1/items".nest {
             GET("/search", item::search)
-            DELETE("", item::clean)
+//            DELETE("", item::clean)
         }
 
         "/api/v1/podcasts/{idPodcast}".nest {
@@ -32,6 +33,27 @@ class ItemRoutingConfig {
                 DELETE("", item::delete)
             }
         }
+    }
+
+    @Bean
+    fun coItemRouter(item: ItemHandler) = coRouter {
+        "/api/v1/items".nest {
+//            GET("/search", item::search)
+            DELETE("", item::clean)
+        }
+
+//        "/api/v1/podcasts/{idPodcast}".nest {
+//            GET("/items", item::podcastItems )
+//            POST("/items/upload", item::upload)
+//            "/items/{id}".nest {
+//                GET("", item::findById)
+//                GET("/cover.{ext}", item::cover)
+//                GET("/playlists", item::playlists)
+//                GET("/{file}", item::file)
+//                POST("/reset", item::reset)
+//                DELETE("", item::delete)
+//            }
+//        }
     }
 }
 
