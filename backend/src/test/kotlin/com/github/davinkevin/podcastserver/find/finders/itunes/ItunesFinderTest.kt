@@ -11,6 +11,7 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.nhaarman.mockitokotlin2.whenever
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
@@ -68,6 +69,7 @@ class ItunesFinderTest(
     }
 
     @Test
+    @Disabled
     fun `should find url`(backend: WireMockServer) {
         /* GIVEN */
         val url = "https://podcasts.apple.com/fr/podcast/positron/id662892474"

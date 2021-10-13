@@ -7,15 +7,17 @@ import org.jooq.meta.jaxb.ForcedType
 import org.jooq.meta.jaxb.Logging.INFO
 import java.time.OffsetDateTime
 import java.time.format.DateTimeFormatter
+import nu.studer.gradle.jooq.JooqGenerate
+import org.flywaydb.gradle.task.FlywayMigrateTask
 
 plugins {
 	id("org.springframework.boot") version "2.5.2"
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 
-	id("com.gorylenko.gradle-git-properties") version "2.2.4"
+	id("com.gorylenko.gradle-git-properties") version "2.3.1"
 	id("org.flywaydb.flyway") version "7.3.2"
-	id("nu.studer.jooq") version "5.2"
-	id("com.google.cloud.tools.jib") version "3.1.1"
+	id("nu.studer.jooq") version "6.0.1"
+	id("com.google.cloud.tools.jib") version "3.1.4"
 	id("de.jansauer.printcoverage") version "2.0.0"
 
 	kotlin("jvm") version "1.5.20"
@@ -70,18 +72,24 @@ dependencies {
 
 }
 
-jacoco {
-	toolVersion = "0.8.7"
-}
-
-gitProperties {
-	dotGitDirectory = "${project.rootDir}/../.git"
+configure<com.gorylenko.GitPropertiesPluginExtension> {
+	(dotGitDirectory as DirectoryProperty).set(projectDir)
+    customProperty("git.build.host", "none")
+    customProperty("git.build.user.email", "none")
+    customProperty("git.build.user.name", "none")
 }
 
 tasks.register<Copy>("copyMigrations") {
 	from("${project.rootDir}/../database/migrations/")
 	include("*.sql")
 	into(db.sqlFiles)
+    outputs.cacheIf { true }
+}
+
+normalization {
+    runtimeClasspath {
+        ignore("git.properties")
+    }
 }
 
 flyway {
@@ -91,8 +99,27 @@ flyway {
 	locations = arrayOf("filesystem:${db.sqlFiles}")
 }
 
-jooq {
+tasks.register<FlywayMigrateTask>("flywayMigrateForJOOQ") {
+    dependsOn("copyMigrations")
+    inputs.dir(file("../database/migrations"))
+        .withPropertyName("migrations")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
 
+    outputs.dir(file("$buildDir/flyway-executed/migrations/"))
+        .withPropertyName("migrations")
+
+    outputs.cacheIf { true }
+
+    doLast {
+        copy {
+            from(db.sqlFiles)
+            include("*.sql")
+            into("$buildDir/flyway-executed/migrations/")
+        }
+    }
+}
+
+jooq {
 	version.set(dependencyManagement.importedProperties["jooq.version"])
 	edition.set(OSS)
 
@@ -137,39 +164,66 @@ jooq {
 	}
 }
 
-project.tasks["flywayMigrate"].dependsOn("copyMigrations")
-project.tasks["generateJooq"].dependsOn("flywayMigrate")
+tasks.named<JooqGenerate>("generateJooq") {
+    inputs.dir(file("../database/migrations"))
+        .withPropertyName("migrations")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
+
+    allInputsDeclared.set(true)
+    outputs.cacheIf { true }
+
+    dependsOn("flywayMigrateForJOOQ")
+}
+
+tasks.withType<KotlinCompile> {
+    kotlinOptions {
+        freeCompilerArgs = listOf(
+            "-Xjsr305=strict",
+            "-Xallow-result-return-type",
+        )
+        jvmTarget = "11"
+    }
+}
+
+jacoco {
+    toolVersion = "0.8.7"
+}
+
+tasks.register<FlywayMigrateTask>("flywaySetupDbForTests") { dependsOn("copyMigrations") }
+tasks.test {
+    useJUnitPlatform()
+    systemProperty("user.timezone", "UTC")
+    systemProperty("spring.datasource.url", db.url)
+    systemProperty("spring.datasource.username", db.user)
+    systemProperty("spring.datasource.password", db.password)
+
+    dependsOn(tasks.named("flywaySetupDbForTests"))
+    finalizedBy(tasks.jacocoTestReport)
+    testLogging {
+        exceptionFormat = TestExceptionFormat.FULL
+    }
+}
 
 tasks.jacocoTestReport {
 	reports {
 		html.required.value(true)
 		xml.required.value(true)
 	}
-	executionData(File("$buildDir/jacoco/test.exec"))
+	executionData(layout.buildDirectory.file("jacoco/test.exec"))
+
+    dependsOn(tasks.test)
 	finalizedBy(tasks.printCoverage)
 }
 
-tasks.withType<Test> {
-	useJUnitPlatform()
-	systemProperty("user.timezone", "UTC")
-	systemProperty("spring.datasource.url", db.url)
-	systemProperty("spring.datasource.username", db.user)
-	systemProperty("spring.datasource.password", db.password)
+tasks.printCoverage {
+    dependsOn(tasks.jacocoTestReport)
 
-	finalizedBy(tasks.jacocoTestReport)
-	testLogging {
-		exceptionFormat = TestExceptionFormat.FULL
-	}
-}
+    outputs.upToDateWhen { true }
+    outputs.cacheIf { !System.getenv("CI_JOB_STAGE").contains("test") }
 
-tasks.withType<KotlinCompile> {
-	kotlinOptions {
-		freeCompilerArgs = listOf(
-			"-Xjsr305=strict",
-			"-Xallow-result-return-type",
-		)
-		jvmTarget = "11"
-	}
+    inputs.dir(file(layout.buildDirectory.dir("reports")))
+        .withPropertyName("reports")
+        .withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 jib {
@@ -206,15 +260,18 @@ tasks.register("downloadDependencies") {
 	}
 	doLast {
 		val buildDeps = buildscript
-			.configurations
-			.map { it.resolve().size }
-			.sum()
+            .configurations
+            .sumOf { it.resolve().size }
 
-		val allDeps = configurations
-			.filter { it.isCanBeResolved && !it.isDeprecated() }
-			.map { it.resolve().size }
-			.sum()
+        val allDeps = configurations
+            .filter { it.isCanBeResolved && !it.isDeprecated() }
+            .sumOf { it.resolve().size }
 
-		println("Downloaded all dependencies: ${allDeps + buildDeps}")
+        println("Downloaded all dependencies: ${allDeps + buildDeps}")
 	}
 }
+
+dependencyManagement {
+    applyMavenExclusions(false)
+}
+
