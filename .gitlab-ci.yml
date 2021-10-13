@@ -4,7 +4,7 @@ workflow:
     - if: $CI_COMMIT_BRANCH
 
 variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.jvmargs=-Xmx16024m -Dorg.gradle.caching=true"
   GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle
   MAVEN_OPTS: "-Dhttps.protocols=TLSv1.2 -Dmaven.repo.local=$CI_PROJECT_DIR/.m2/repository -Dorg.slf4j.simpleLogger.log.org.apache.maven.cli.transfer.Slf4jMavenTransferListener=WARN -Dorg.slf4j.simpleLogger.showDateTime=true -Djava.awt.headless=true"
   MAVEN_CLI_OPTS: "--batch-mode --errors --fail-at-end --show-version -DinstallAtEnd=true -DdeployAtEnd=true"
@@ -124,7 +124,7 @@ stages:
   extends: [ .only-on-backend-changes ]
   image: openjdk:11-slim
   script:
-    - ./backend/gradlew $GRADLE_OPTS -p backend/ downloadDependencies
+    - ./backend/gradlew $GRADLE_OPTS -p backend/ downloadDependencies -Dscan.tag.exp4-gitlabci
   cache:
     key:
       files:
@@ -132,6 +132,7 @@ stages:
       prefix: "backend"
     paths:
       - .gradle/
+      - backend/build
 
 ⬇ ui-v1:
   stage: ⬇ download
@@ -174,11 +175,11 @@ stages:
   services:
     - postgres:12.3-alpine
   variables:
-    POSTGRES_USER: test-user
+    POSTGRES_USER: pg-user
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
-    POSTGRES_DB: test-db
+    POSTGRES_DB: podcast-server-db
   script:
-    - ./backend/gradlew $GRADLE_OPTS -p backend/ test
+    - ./backend/gradlew $GRADLE_OPTS -p backend/ test -Dscan.tag.exp4-gitlabci
     - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
   artifacts:
     paths:
@@ -194,6 +195,7 @@ stages:
     policy: pull
     paths:
       - .gradle/
+      - backend/build
   retry: 2
 
 🧪 ui-v2:
@@ -230,15 +232,15 @@ stages:
   stage: 👷‍ build
   extends: [ .only-on-backend-changes ]
   image: openjdk:11-slim
-  needs: [⬇ backend]
+  needs: [🧪 backend]
   services:
     - postgres:12.3-alpine
   variables:
-    POSTGRES_USER: build-user
-    POSTGRES_PASSWORD: zSR87g1xj5TyJRZwDpyhPqkLO472QHSf
-    POSTGRES_DB: build-db
+      POSTGRES_USER: pg-user
+      POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
+      POSTGRES_DB: podcast-server-db
   script:
-    - ./backend/gradlew $GRADLE_OPTS -p backend/ compileJava compileKotlin
+    - ./backend/gradlew $GRADLE_OPTS -p backend/ build -Dscan.tag.exp4-gitlabci
   artifacts:
     paths:
       - backend/build
@@ -249,6 +251,7 @@ stages:
       prefix: "backend"
     paths:
       - .gradle/
+      - backend/build
   retry: 2
 
 👷 ui-v1:
@@ -309,7 +312,7 @@ stages:
   image: openjdk:11-slim
   needs: [👷 backend, 👷 backend-base-image]
   script:
-    - ./backend/gradlew $GRADLE_OPTS -p backend/ jib -x generateJooq
+    - ./backend/gradlew $GRADLE_OPTS -p backend/ jib -Dscan.tag.exp4-gitlabci
   cache:
     key:
       files:
@@ -318,6 +321,7 @@ stages:
     policy: pull
     paths:
       - .gradle/
+      - backend/build
   environment:
     name: backend/$CI_COMMIT_REF_SLUG
     url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/backend/tags
