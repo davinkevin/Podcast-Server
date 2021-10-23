@@ -154,16 +154,17 @@ stages:
 ⬇ ui-v2:
   stage: ⬇ download
   extends: [ .only-on-frontend-changes ]
-  image: node:11
+  image: openjdk:11-slim
   script:
-    - yarn --cwd frontend-angular
+    - ./gradlew $GRADLE_OPTS -p frontend-angular downloadDependencies
   cache:
     key:
       files:
         - frontend-angular/yarn.lock
       prefix: "ui-v2"
     paths:
-      - .yarn
+      - .gradle
+      - frontend-angular/.gradle
       - frontend-angular/node_modules/
 
 🧪 backend:
@@ -199,10 +200,10 @@ stages:
 🧪 ui-v2:
   stage: 🧪 test
   extends: [ .only-on-frontend-changes ]
-  image: node:11
+  image: openjdk:11-slim
   needs: [⬇ ui-v2]
   script:
-    - yarn --cwd frontend-angular test
+    - ./gradlew $GRADLE_OPTS -p frontend-angular yarn_test
   cache:
     key:
       files:
@@ -210,7 +211,8 @@ stages:
       prefix: "ui-v2"
     policy: pull
     paths:
-      - .yarn
+      - .gradle
+      - frontend-angular/.gradle
       - frontend-angular/node_modules/
 
 👷 backend-base-image:
@@ -276,10 +278,10 @@ stages:
 👷 ui-v2:
   stage: 👷‍ build
   extends: [ .only-on-frontend-changes ]
-  image: node:11
+  image: openjdk:11-slim
   needs: [⬇ ui-v2]
   script:
-    - yarn --cwd frontend-angular build
+    - ./gradlew $GRADLE_OPTS -p frontend-angular yarn_build
   artifacts:
     paths:
       - frontend-angular/dist/
@@ -290,7 +292,8 @@ stages:
       prefix: "ui-v2"
     policy: pull
     paths:
-      - .yarn
+      - .gradle
+      - frontend-angular/.gradle
       - frontend-angular/node_modules/
 
 👷 documentation:
