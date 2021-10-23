@@ -25,8 +25,9 @@ docker run --rm -d \
 
 trap cleanup EXIT
 
-echo "Creation of the frontend without automatic reload, to reload, launch in another term \"./mvn -f frontend-angularjs/pom.xml frontend:gulp@skaffold-watch\""
-./mvnw -f frontend-angularjs/pom.xml frontend:gulp@skaffold
+echo "Creation of the frontend without automatic reloading."
+echo "To reload on code change, run in another term \"./gradlew -p frontend-angularjs skaffold_watch\""
+./gradlew -p frontend-angularjs skaffold_build
 
 echo "skaffold dev"
 skaffold dev --status-check=false

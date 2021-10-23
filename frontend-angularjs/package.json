@@ -53,12 +53,12 @@
       "angular-hotkeys": "github:chieffancypants/angular-hotkeys@1.6.0",
       "angular-loading-bar": "github:chieffancypants/angular-loading-bar@^0.8.0",
       "angular-mocks": "github:angular/bower-angular-mocks@^1.5.0",
-      "angular-notification": "github:neoziro/angular-notification@^1.1.1",
+      "angular-notification": "github:gregberge/angular-notification@^1.1.1",
       "angular-route": "github:angular/bower-angular-route@^1.5.0",
       "angular-sanitize": "github:angular/bower-angular-sanitize@^1.5.0",
       "angular-touch": "github:angular/bower-angular-touch@^1.5.0",
       "angular-truncate": "github:sparkalow/angular-truncate@master",
-      "animate.css": "github:daneden/animate.css@^3.4.0",
+      "animate.css": "github:animate-css/animate.css@^3.4.0",
       "bootstrap-less": "github:distros/bootstrap-less@^3.3.9",
       "clipboard": "github:zenorocha/clipboard.js@^1.5.5",
       "font-awesome": "github:components/font-awesome@4.5.0",
@@ -84,8 +84,8 @@
       "core-js": "npm:core-js@^1.1.4",
       "css": "github:systemjs/plugin-css@^0.1.19",
       "text": "github:systemjs/plugin-text@^0.0.2",
-      "traceur": "github:jmcriffey/bower-traceur@0.0.93",
-      "traceur-runtime": "github:jmcriffey/bower-traceur-runtime@0.0.93"
+      "traceur": "github:jeffrifwald/bower-traceur@0.0.93",
+      "traceur-runtime": "github:jeffrifwald/bower-traceur-runtime@0.0.93"
     },
     "overrides": {
       "github:highcharts/highcharts-dist@4.2.3": {
@@ -110,11 +110,14 @@
   "scripts": {
     "prebuild": "npm install",
     "jspminstall": "jspm install && gulp less",
+    "jspm": "jspm",
     "build": "gulp build",
+    "build-app": "gulp less && gulp build",
     "release": "gulp release --type $(type)",
     "serve": "gulp serve",
     "serve:dev": "gulp serve:dev",
-    "skaffold": "gulp skaffold"
+    "skaffold-watch": "gulp skaffold",
+    "skaffold-build": "gulp skaffold:build"
   },
   "config": {
     "unsafe-perm": true

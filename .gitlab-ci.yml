@@ -138,7 +138,7 @@ stages:
   extends: [ .only-on-frontend-changes ]
   image: openjdk:8
   script:
-    - ./mvnw $MAVEN_CLI_OPTS -f frontend-angularjs/pom.xml frontend:install-node-and-npm frontend:npm@npm-install frontend:jspm@jspm-config frontend:jspm@jspm-install -Djspm_token=$JSPM_GITHUB_AUTH_TOKEN
+    - ./gradlew $GRADLE_OPTS -p frontend-angularjs downloadDependencies
   cache:
     key:
       files:
@@ -146,10 +146,11 @@ stages:
         - frontend-angularjs/www/config.js
       prefix: "ui-v1"
     paths:
+      - .gradle
+      - frontend-angularjs/.gradle
       - frontend-angularjs/node_modules/
       - frontend-angularjs/www/jspm_packages/
       - frontend-angularjs/target/
-      - .m2/
 
 ⬇ ui-v2:
   stage: ⬇ download
@@ -256,10 +257,10 @@ stages:
 👷 ui-v1:
   stage: 👷‍ build
   extends: [ .only-on-frontend-changes ]
-  image: openjdk:8
+  image: openjdk:11
   needs: [⬇ ui-v1]
   script:
-    - ./mvnw $MAVEN_CLI_OPTS -f frontend-angularjs/pom.xml frontend:gulp@build-less frontend:gulp@build-app
+    - ./gradlew $GRADLE_OPTS -p frontend-angularjs build_app
   artifacts:
     paths:
       - frontend-angularjs/target/dist/
@@ -271,6 +272,8 @@ stages:
       prefix: "ui-v1"
     policy: pull
     paths:
+      - .gradle
+      - frontend-angularjs/.gradle
       - frontend-angularjs/node_modules/
       - frontend-angularjs/www/jspm_packages/
       - frontend-angularjs/target/
