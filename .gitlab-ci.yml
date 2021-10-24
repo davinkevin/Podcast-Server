@@ -260,7 +260,7 @@ stages:
   image: openjdk:11
   needs: [⬇ ui-v1]
   script:
-    - ./gradlew $GRADLE_OPTS -p frontend-angularjs build_app
+    - ./gradlew $GRADLE_OPTS -p frontend-angularjs build
   artifacts:
     paths:
       - frontend-angularjs/target/dist/
@@ -284,7 +284,7 @@ stages:
   image: openjdk:11-slim
   needs: [⬇ ui-v2]
   script:
-    - ./gradlew $GRADLE_OPTS -p frontend-angular yarn_build
+    - ./gradlew $GRADLE_OPTS -p frontend-angular build
   artifacts:
     paths:
       - frontend-angular/dist/

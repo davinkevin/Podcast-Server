@@ -32,6 +32,10 @@ tasks.named<YarnTask>("yarn_build") {
   dependsOn("yarn")
 }
 
+tasks.named("build") {
+  dependsOn("yarn_build")
+}
+
 tasks.named<Delete>("clean") {
   delete.add("node_modules")
   delete.add("dist")

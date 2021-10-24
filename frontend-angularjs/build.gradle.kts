@@ -49,6 +49,10 @@ tasks.register<NpmTask>("build_app") {
   dependsOn("downloadDependencies")
 }
 
+tasks.named("build") {
+  dependsOn("build_app")
+}
+
 tasks.register<NpmTask>("skaffold_build") {
   args.addAll("run", "skaffold-build")
 
