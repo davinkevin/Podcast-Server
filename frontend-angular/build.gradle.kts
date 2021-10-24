@@ -21,6 +21,10 @@ tasks.register("downloadDependencies") {
   dependsOn("nodeSetup", "yarnSetup", "yarn")
 }
 
+tasks.named<YarnTask>("yarn") {
+  args.addAll("--network-timeout", "100000")
+}
+
 tasks.named<YarnTask>("yarn_build") {
   inputs.dir(file("src"))
     .withPropertyName("source")
