@@ -135,7 +135,7 @@ stages:
 ⬇ ui-v1:
   stage: ⬇ download
   extends: [ .only-on-frontend-changes ]
-  image: openjdk:8
+  image: openjdk:11
   script:
     - ./gradlew $GRADLE_OPTS -p frontend-angularjs downloadDependencies
   cache:
