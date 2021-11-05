@@ -21,7 +21,8 @@ tasks.register("downloadDependencies") {
 }
 
 tasks.register<NpmTask>("jspm_config") {
-  args.addAll("run", "jspm", "config", "registries.github.auth", System.getenv("JSPM_GITHUB_AUTH_TOKEN"))
+  args.addAll("run", "--silent", "jspm", "config", "registries.github.auth", System.getenv("JSPM_GITHUB_AUTH_TOKEN"))
+  onlyIf { System.getenv("JSPM_GITHUB_AUTH_TOKEN") != null }
   dependsOn("npmInstall")
 }
 
