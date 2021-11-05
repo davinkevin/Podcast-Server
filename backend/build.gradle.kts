@@ -101,22 +101,6 @@ flyway {
 
 tasks.register<FlywayMigrateTask>("flywayMigrateForJOOQ") {
     dependsOn("copyMigrations")
-    inputs.dir(file("../database/migrations"))
-        .withPropertyName("migrations")
-        .withPathSensitivity(PathSensitivity.RELATIVE)
-
-    outputs.dir(file("$buildDir/flyway-executed/migrations/"))
-        .withPropertyName("migrations")
-
-    outputs.cacheIf { true }
-
-    doLast {
-        copy {
-            from(db.sqlFiles)
-            include("*.sql")
-            into("$buildDir/flyway-executed/migrations/")
-        }
-    }
 }
 
 jooq {

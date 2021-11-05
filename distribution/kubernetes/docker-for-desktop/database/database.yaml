@@ -8,13 +8,19 @@ spec:
       containers:
         - name: database
           volumeMounts:
-            - name: database
+            - name: data
               mountPath: /var/lib/postgresql/data
+            - name: init
+              mountPath: /docker-entrypoint-initdb.d
       volumes:
-        - name: database
+        - name: data
           hostPath:
-            path: /tmp/podcast-server/database/
-            type: Directory
+            path: /tmp/podcast-server/database/data
+            type: DirectoryOrCreate
+        - name: init
+          hostPath:
+              path: /tmp/podcast-server/database/init
+              type: DirectoryOrCreate
 ---
 apiVersion: batch/v1beta1
 kind: CronJob
@@ -34,4 +40,4 @@ spec:
             - name: backup
               hostPath:
                 path: /tmp/podcast-server/database/backup/
-                type: Directory
+                type: DirectoryOrCreate

@@ -7,8 +7,12 @@ function cleanup {
 }
 
 echo "Creation of folders mounted inside the container, for file storage"
-mkdir -p /tmp/podcast-server/files/ /tmp/podcast-server/database/ /tmp/podcast-server/database/backup/ /tmp/podcast-server/files/
+mkdir -p    /tmp/podcast-server/files/ \
+            /tmp/podcast-server/database/backup/ \
+            /tmp/podcast-server/database/init/ \
+            /tmp/podcast-server/database/data/
 
+export SKAFFOLD=true
 export DATABASE_PASSWORD=nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
 export DATABASE_USERNAME=podcast-server-user
 export DATABASE_NAME=podcast-server-code-generation

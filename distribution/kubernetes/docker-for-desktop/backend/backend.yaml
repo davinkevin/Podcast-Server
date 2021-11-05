@@ -14,4 +14,4 @@ spec:
         - name: podcasts-files
           hostPath:
             path: /tmp/podcast-server/files/
-            type: Directory
+            type: DirectoryOrCreate
