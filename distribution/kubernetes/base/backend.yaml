@@ -116,9 +116,13 @@ spec:
             - name: http-port
               containerPort: 8080
               protocol: TCP
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
           readinessProbe:
             httpGet:
-              path: /actuator/health
+              path: /actuator/health/readiness
               port: 8080
 ---
 apiVersion: batch/v1beta1
