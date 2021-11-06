@@ -59,12 +59,14 @@ spec:
                   - -c
                   - su - postgres -c "pg_ctl stop -m fast"
           livenessProbe:
+            timeoutSeconds: 5
             exec:
               command:
                 - /bin/sh
                 - -c
                 - exec pg_isready -U $POSTGRES_USER -d $POSTGRES_DB -h 127.1 -p 5432
           readinessProbe:
+            timeoutSeconds: 5
             exec:
               command:
                 - /bin/sh
