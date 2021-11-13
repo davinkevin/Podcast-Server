@@ -47,7 +47,7 @@ class UpdateService(
         podcastRepository
                 .findAll()
                 .parallel(parameters.maxUpdateParallels)
-                .runOn(Schedulers.parallel())
+                .runOn(Schedulers.boundedElastic())
                 .filter { it.url != null }
                 .map {
                     val signature = if(force || it.signature == null) UUID.randomUUID().toString() else it.signature
