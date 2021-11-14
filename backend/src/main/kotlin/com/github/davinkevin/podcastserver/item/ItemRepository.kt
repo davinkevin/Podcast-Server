@@ -136,9 +136,9 @@ class ItemRepository(private val query: DSLContext) {
                         tagIds
                                 .map {
                                     value(it).`in`(query
-                                        .select(PODCAST_TAGS.TAGS_ID)
-                                        .from(PODCAST_TAGS)
-                                        .where(ITEM.PODCAST_ID.eq(PODCAST_TAGS.PODCASTS_ID)))
+                                            .select(PODCAST_TAGS.TAGS_ID)
+                                            .from(PODCAST_TAGS)
+                                            .where(ITEM.PODCAST_ID.eq(PODCAST_TAGS.PODCASTS_ID)))
                                 }
                                 .reduce(DSL::and)
                     }
@@ -157,10 +157,10 @@ class ItemRepository(private val query: DSLContext) {
 
                                     ITEM.PODCAST_ID, ITEM.COVER_ID
                             )
-                            .from(ITEM)
-                            .where(filterConditions)
-                            .orderBy(page.sort.toOrderBy(ITEM.DOWNLOAD_DATE, ITEM.PUB_DATE), ITEM.ID.asc())
-                            .limit((page.size * page.page), page.size)
+                                    .from(ITEM)
+                                    .where(filterConditions)
+                                    .orderBy(page.sort.toOrderBy(ITEM.DOWNLOAD_DATE, ITEM.PUB_DATE), ITEM.ID.asc())
+                                    .limit((page.size * page.page), page.size)
                     )
 
                     val content: Mono<List<Item>> = Flux.from(query
@@ -190,13 +190,13 @@ class ItemRepository(private val query: DSLContext) {
                                            podcastId, podcastTitle, podcastUrl,
                                            coverId, coverUrl, coverWidth, coverHeight
                                    ) -> Item(
-                                        id, title, url,
-                                        pubDate, downloadDate, creationDate,
-                                        description, mimeType, length, fileName, status,
+                                    id, title, url,
+                                    pubDate, downloadDate, creationDate,
+                                    description, mimeType, length, fileName, status,
 
-                                        Item.Podcast(podcastId, podcastTitle, podcastUrl),
-                                        Item.Cover(coverId, URI(coverUrl), coverWidth, coverHeight)
-                                )
+                                    Item.Podcast(podcastId, podcastTitle, podcastUrl),
+                                    Item.Cover(coverId, URI(coverUrl), coverWidth, coverHeight)
+                            )
                             }
                             .collectList()
 
@@ -217,46 +217,38 @@ class ItemRepository(private val query: DSLContext) {
             .publishOn(Schedulers.parallel())
 
     fun create(item: ItemForCreation): Mono<Item> = Mono.defer {
-        query
-                .select(ITEM.ID)
-                .from(ITEM)
-                .where(ITEM.URL.eq(item.url))
-                .and(ITEM.PODCAST_ID.eq(item.podcastId))
+        val coverId = UUID.randomUUID()
+        val insertCover = query
+                .insertInto(COVER, COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL).select(
+                select(value(coverId), value(item.cover.height), value(item.cover.height), value(item.cover.url.toASCIIString()))
+                        .where(notExists(
+                                selectFrom(ITEM)
+                                        .where(ITEM.URL.eq(item.url))
+                                        .and(ITEM.PODCAST_ID.eq(item.podcastId)))
+                        )
+        ).toMono()
+
+        val id = UUID.randomUUID()
+        val insertItem = query.insertInto(ITEM)
+                .set(ITEM.ID, id)
+                .set(ITEM.TITLE, item.title)
+                .set(ITEM.URL, item.url)
+                .set(ITEM.PUB_DATE, item.pubDate)
+                .set(ITEM.DOWNLOAD_DATE, item.downloadDate)
+                .set(ITEM.CREATION_DATE, item.creationDate)
+                .set(ITEM.DESCRIPTION, item.description)
+                .set(ITEM.MIME_TYPE, item.mimeType)
+                .set(ITEM.LENGTH, item.length)
+                .set(ITEM.FILE_NAME, item.fileName)
+                .set(ITEM.STATUS, item.status)
+                .set(ITEM.PODCAST_ID, item.podcastId)
+                .set(ITEM.COVER_ID, coverId)
+                .onConflictDoNothing()
                 .toMono()
-                .map { (id) -> id }
-                .hasElement()
-                .filter { it == false }
-                .flatMap {
-                    val coverId = UUID.randomUUID()
-                    val insertCover = query.insertInto(COVER)
-                            .set(COVER.ID, coverId)
-                            .set(COVER.HEIGHT, item.cover.height)
-                            .set(COVER.WIDTH, item.cover.width)
-                            .set(COVER.URL, item.cover.url.toASCIIString())
-                            .toMono()
 
-                    val id = UUID.randomUUID()
-                    val insertItem = query.insertInto(ITEM)
-                            .set(ITEM.ID, id)
-                            .set(ITEM.TITLE, item.title)
-                            .set(ITEM.URL, item.url)
-                            .set(ITEM.PUB_DATE, item.pubDate)
-                            .set(ITEM.DOWNLOAD_DATE, item.downloadDate)
-                            .set(ITEM.CREATION_DATE, item.creationDate)
-                            .set(ITEM.DESCRIPTION, item.description)
-                            .set(ITEM.MIME_TYPE, item.mimeType)
-                            .set(ITEM.LENGTH, item.length)
-                            .set(ITEM.FILE_NAME, item.fileName)
-                            .set(ITEM.STATUS, item.status)
-                            .set(ITEM.PODCAST_ID, item.podcastId)
-                            .set(ITEM.COVER_ID, coverId)
-                            .toMono()
-
-
-                    insertCover
-                            .then(insertItem)
-                            .then(findById(id))
-                }
+        insertCover
+            .then(insertItem)
+            .then(findById(id))
     }
 
             .subscribeOn(Schedulers.boundedElastic())
