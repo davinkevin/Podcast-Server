@@ -2,7 +2,6 @@ package com.github.davinkevin.podcastserver.update
 
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemForCreation
 import com.github.davinkevin.podcastserver.item.ItemRepository
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
@@ -19,11 +18,7 @@ import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import reactor.kotlin.core.publisher.switchIfEmpty
-import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
-import reactor.util.function.Tuple2
 import java.net.URI
 import java.time.OffsetDateTime.now
 import java.util.*
@@ -90,9 +85,8 @@ class UpdateService(
         val realSignature = if (items.isEmpty()) "" else signature
         val updateSignature = podcastRepository.updateSignature(podcast.id, realSignature).then(1.toMono())
         val createItems = podcastRepository.findCover(podcast.id)
-                .map { it.toCreation() }
-                .flatMapIterable { items.map { item -> item.toCreation(podcast.id, it) } }
-                .flatMap({ itemRepository.create(it) }, 1)
+                .map { items.map { item -> item.toCreation(podcast.id, it.toCreation()) } }
+                .flatMapMany { itemRepository.create(it) }
                 .flatMap { item -> fileService.downloadItemCover(item)
                             .onErrorResume {
                                 log.error("Error during download of cover ${item.cover.url}")

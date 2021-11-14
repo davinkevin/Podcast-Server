@@ -13,7 +13,6 @@ import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
-import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
@@ -28,8 +27,10 @@ class ItemRepository(private val query: DSLContext) {
 
     private val log = LoggerFactory.getLogger(ItemRepository::class.java)
 
-    fun findById(id: UUID) = Mono.defer {
-        query
+    fun findById(id: UUID) = Mono.defer { findById(listOf(id)).toMono() }
+
+    fun findById(ids: List<UUID>) = Flux.defer {
+        Flux.from(query
                 .select(ITEM.ID, ITEM.TITLE, ITEM.URL,
                         ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
                         ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.FILE_NAME, ITEM.STATUS,
@@ -41,12 +42,13 @@ class ItemRepository(private val query: DSLContext) {
                         ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
                                 .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
                 )
-                .where(ITEM.ID.eq(id))
-                .toMono()
+                .where(ITEM.ID.`in`(ids))
+        )
                 .subscribeOn(Schedulers.boundedElastic())
                 .publishOn(Schedulers.parallel())
                 .map { toItem(it) }
     }
+
 
     fun findAllToDelete(date: OffsetDateTime) = Flux.defer {
         Flux.from(query
@@ -217,38 +219,59 @@ class ItemRepository(private val query: DSLContext) {
             .publishOn(Schedulers.parallel())
 
     fun create(item: ItemForCreation): Mono<Item> = Mono.defer {
-        val coverId = UUID.randomUUID()
-        val insertCover = query
-                .insertInto(COVER, COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL).select(
-                select(value(coverId), value(item.cover.height), value(item.cover.height), value(item.cover.url.toASCIIString()))
-                        .where(notExists(
-                                selectFrom(ITEM)
-                                        .where(ITEM.URL.eq(item.url))
-                                        .and(ITEM.PODCAST_ID.eq(item.podcastId)))
-                        )
-        ).toMono()
+        create(listOf(item)).toMono()
+    }
 
-        val id = UUID.randomUUID()
-        val insertItem = query.insertInto(ITEM)
-                .set(ITEM.ID, id)
-                .set(ITEM.TITLE, item.title)
-                .set(ITEM.URL, item.url)
-                .set(ITEM.PUB_DATE, item.pubDate)
-                .set(ITEM.DOWNLOAD_DATE, item.downloadDate)
-                .set(ITEM.CREATION_DATE, item.creationDate)
-                .set(ITEM.DESCRIPTION, item.description)
-                .set(ITEM.MIME_TYPE, item.mimeType)
-                .set(ITEM.LENGTH, item.length)
-                .set(ITEM.FILE_NAME, item.fileName)
-                .set(ITEM.STATUS, item.status)
-                .set(ITEM.PODCAST_ID, item.podcastId)
-                .set(ITEM.COVER_ID, coverId)
-                .onConflictDoNothing()
-                .toMono()
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
-        insertCover
-            .then(insertItem)
-            .then(findById(id))
+    fun create(items: List<ItemForCreation>): Flux<Item> = Flux.defer {
+        val itemsWithIds = items.map { ItemForCreationWithId(itemForCreation = it) }
+
+        val queries = itemsWithIds.flatMap { (id, item) ->
+            val coverId = UUID.randomUUID()
+            val insertCover = query.insertInto(COVER, COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL).select(
+                    select(
+                            value(coverId),
+                            value(item.cover.height),
+                            value(item.cover.height),
+                            value(item.cover.url.toASCIIString())
+                    )
+                            .where(notExists(
+                                    selectFrom(ITEM)
+                                            .where(ITEM.URL.eq(item.url))
+                                            .and(ITEM.PODCAST_ID.eq(item.podcastId)))
+                            )
+            )
+
+            val insertItem = query.insertInto(ITEM)
+                    .set(ITEM.ID, id)
+                    .set(ITEM.TITLE, item.title)
+                    .set(ITEM.URL, item.url)
+                    .set(ITEM.PUB_DATE, item.pubDate)
+                    .set(ITEM.DOWNLOAD_DATE, item.downloadDate)
+                    .set(ITEM.CREATION_DATE, item.creationDate)
+                    .set(ITEM.DESCRIPTION, item.description)
+                    .set(ITEM.MIME_TYPE, item.mimeType)
+                    .set(ITEM.LENGTH, item.length)
+                    .set(ITEM.FILE_NAME, item.fileName)
+                    .set(ITEM.STATUS, item.status)
+                    .set(ITEM.PODCAST_ID, item.podcastId)
+                    .set(ITEM.COVER_ID, coverId)
+                    .onConflictDoNothing()
+
+            listOf(insertCover, insertItem)
+        }
+
+
+        val r = query.batch(queries)
+                .execute()
+                .toList()
+                .filterIndexed { idx, _ -> idx % 2 != 0}
+                .mapIndexed { idx, v ->  if (v > 0) itemsWithIds[idx].id else null}
+                .filterNotNull()
+
+        findById(r)
     }
 
             .subscribeOn(Schedulers.boundedElastic())
@@ -296,3 +319,8 @@ private fun <T> ItemSort.toOrderBy(downloadDate: Field<T>, defaultField: Field<T
     val field = if(field == "downloadDate" ) downloadDate else defaultField
     return if (direction.lowercase(Locale.getDefault()) == "asc") field.asc() else field.desc()
 }
+
+private data class ItemForCreationWithId(
+        val id: UUID = UUID.randomUUID(),
+        val itemForCreation: ItemForCreation
+)

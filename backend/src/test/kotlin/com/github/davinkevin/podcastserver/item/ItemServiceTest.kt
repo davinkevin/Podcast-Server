@@ -114,7 +114,7 @@ class ItemServiceTest(
     @Test
     fun `should find by id`() {
         /* Given */
-        whenever(repository.findById(any())).thenReturn(item.toMono())
+        whenever(repository.findById(any<UUID>())).thenReturn(item.toMono())
         /* When */
         StepVerifier.create(itemService.findById(item.id))
                 /* Then */
@@ -144,7 +144,7 @@ class ItemServiceTest(
                     .verifyComplete()
 
             verify(repository, never()).hasToBeDeleted(any())
-            verify(repository, never()).findById(any())
+            verify(repository, never()).findById(any<UUID>())
             verify(fileService, never()).deleteItem(any())
         }
 
@@ -162,7 +162,7 @@ class ItemServiceTest(
                     .expectNext(item)
                     .verifyComplete()
 
-            verify(repository, never()).findById(any())
+            verify(repository, never()).findById(any<UUID>())
             verify(fileService, never()).deleteItem(any())
         }
 
