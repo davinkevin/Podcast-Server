@@ -7,7 +7,7 @@ import com.github.davinkevin.podcastserver.service.FileService
 import com.github.davinkevin.podcastserver.service.MovePodcastDetails
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.davinkevin.podcastserver.tag.TagRepository
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith

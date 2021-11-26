@@ -8,8 +8,8 @@ import com.github.davinkevin.podcastserver.update.updaters.gulli.GulliUpdater
 import com.github.davinkevin.podcastserver.update.updaters.mytf1.MyTf1Updater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByApiUpdater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByXmlUpdater
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName

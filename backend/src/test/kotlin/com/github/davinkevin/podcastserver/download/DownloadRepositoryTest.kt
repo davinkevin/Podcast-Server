@@ -817,7 +817,7 @@ class DownloadRepositoryTest(
             assertThat(item[i.LENGTH]).isEqualTo(100L)
             assertThat(item[i.MIME_TYPE]).isEqualTo("video/avi")
             assertThat(item[i.FILE_NAME]).isEqualTo("filename.mp4")
-            assertThat(item[i.DOWNLOAD_DATE]).isEqualTo(now)
+            assertThat(item[i.DOWNLOAD_DATE]).isEqualToIgnoringNanos(now)
         }
 
         @Test

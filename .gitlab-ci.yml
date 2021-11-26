@@ -120,7 +120,7 @@ stages:
 ⬇ backend:
   stage: ⬇ download
   extends: [ .only-on-backend-changes ]
-  image: openjdk:11-slim
+  image: openjdk:17-slim
   script:
     - ./gradlew $GRADLE_OPTS :backend:downloadDependencies
   cache:
@@ -135,7 +135,7 @@ stages:
 ⬇ ui-v1:
   stage: ⬇ download
   extends: [ .only-on-frontend-changes ]
-  image: openjdk:11
+  image: openjdk:17-bullseye
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angularjs:downloadDependencies
   cache:
@@ -154,7 +154,7 @@ stages:
 ⬇ ui-v2:
   stage: ⬇ download
   extends: [ .only-on-frontend-changes ]
-  image: openjdk:11-slim
+  image: openjdk:17-slim
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angular:downloadDependencies
   cache:
@@ -171,7 +171,7 @@ stages:
 🧪 backend:
   stage: 🧪 test
   extends: [ .only-on-backend-changes ]
-  image: openjdk:11
+  image: openjdk:17-bullseye
   needs: [⬇ backend]
   services:
     - postgres:12.3-alpine
@@ -202,7 +202,7 @@ stages:
 🧪 ui-v2:
   stage: 🧪 test
   extends: [ .only-on-frontend-changes ]
-  image: openjdk:11-slim
+  image: openjdk:17-slim
   needs: [⬇ ui-v2]
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angular:yarn_test
@@ -234,7 +234,7 @@ stages:
 👷 ui-v1:
   stage: 👷‍ build
   extends: [ .only-on-frontend-changes ]
-  image: openjdk:11
+  image: openjdk:17-bullseye
   needs: [⬇ ui-v1]
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angularjs:build
@@ -258,7 +258,7 @@ stages:
 👷 ui-v2:
   stage: 👷‍ build
   extends: [ .only-on-frontend-changes ]
-  image: openjdk:11-slim
+  image: openjdk:17-slim
   needs: [⬇ ui-v2]
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angular:build
@@ -290,7 +290,7 @@ stages:
 🐳 backend:
   stage: 🐳 packaging
   extends: [ .only-on-backend-changes ]
-  image: openjdk:11-slim
+  image: openjdk:17-slim
   needs: [🧪 backend, 👷 backend-base-image]
   services:
     - postgres:12.3-alpine

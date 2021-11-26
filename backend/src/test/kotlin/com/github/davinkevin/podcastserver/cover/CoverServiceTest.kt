@@ -3,7 +3,7 @@ package com.github.davinkevin.podcastserver.cover
 import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Item
 import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Podcast
 import com.github.davinkevin.podcastserver.service.FileService
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested

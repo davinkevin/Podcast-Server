@@ -2,9 +2,9 @@ package com.github.davinkevin.podcastserver.service
 
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.ProcessListener
-import com.nhaarman.mockitokotlin2.any
-import com.nhaarman.mockitokotlin2.mock
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import net.bramp.ffmpeg.FFmpegExecutor
 import net.bramp.ffmpeg.FFprobe
 import net.bramp.ffmpeg.builder.FFmpegBuilder

@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import com.sapher.youtubedl.DownloadProgressCallback
 import com.sapher.youtubedl.YoutubeDL
 import com.sapher.youtubedl.YoutubeDLRequest

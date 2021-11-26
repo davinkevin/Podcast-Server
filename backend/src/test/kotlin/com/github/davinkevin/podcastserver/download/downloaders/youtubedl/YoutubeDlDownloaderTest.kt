@@ -9,7 +9,7 @@ import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import com.sapher.youtubedl.DownloadProgressCallback
 import com.sapher.youtubedl.YoutubeDLResponse
 import org.assertj.core.api.Assertions.assertThat

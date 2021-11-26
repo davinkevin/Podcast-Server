@@ -1550,9 +1550,9 @@ class ItemRepositoryTest(
                     .assertNext {
                         assertThat(it.title).isEqualTo("an item")
                         assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
-                        assertThat(it.pubDate).isEqualTo(now)
+                        assertThat(it.pubDate).isEqualToIgnoringNanos(now)
                         assertThat(it.downloadDate).isNull()
-                        assertThat(it.creationDate).isEqualTo(now)
+                        assertThat(it.creationDate).isEqualToIgnoringNanos(now)
                         assertThat(it.description).isEqualTo("a description")
                         assertThat(it.mimeType).isEqualTo("audio/mp3")
                         assertThat(it.length).isEqualTo(1234)

@@ -19,7 +19,7 @@ plugins {
 	id("com.google.cloud.tools.jib") version "3.1.4"
 	id("de.jansauer.printcoverage") version "2.0.0"
 
-	kotlin("jvm") version "1.5.20"
+	kotlin("jvm") version "1.6.0"
 	kotlin("plugin.spring") version "1.5.20"
 	jacoco
 }
@@ -65,7 +65,7 @@ dependencies {
 
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0")
+	testImplementation("org.mockito.kotlin:mockito-kotlin:2.2.11")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:2.10.0")
 	testImplementation("com.github.tomakehurst:wiremock:2.25.1")
 	testImplementation("org.awaitility:awaitility:3.1.6")
@@ -80,7 +80,7 @@ configure<com.gorylenko.GitPropertiesPluginExtension> {
 }
 
 tasks.register<Copy>("copyMigrations") {
-	from("${project.rootDir}/../database/migrations/")
+	from("${project.rootDir}/database/migrations/")
 	include("*.sql")
 	into(db["sqlFiles"]!!)
     outputs.cacheIf { true }
@@ -154,7 +154,6 @@ tasks.named<JooqGenerate>("generateJooq") {
         .withPathSensitivity(PathSensitivity.RELATIVE)
 
     allInputsDeclared.set(true)
-    outputs.cacheIf { true }
 
     dependsOn("flywayMigrateForJOOQ")
 }
@@ -180,7 +179,7 @@ tasks.test {
     systemProperty("spring.datasource.url", db["url"]!!)
     systemProperty("spring.datasource.username", db["user"]!!)
     systemProperty("spring.datasource.password", db["password"]!!)
-
+	jvmArgs = listOf("--add-opens", "java.base/java.time=ALL-UNNAMED")
     dependsOn(tasks.named("flywaySetupDbForTests"))
     finalizedBy(tasks.jacocoTestReport)
     testLogging {

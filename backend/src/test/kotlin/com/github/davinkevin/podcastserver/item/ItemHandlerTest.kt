@@ -3,7 +3,7 @@ package com.github.davinkevin.podcastserver.item
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.service.FileService
-import com.nhaarman.mockitokotlin2.*
+import org.mockito.kotlin.*
 import org.apache.commons.io.FilenameUtils
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested

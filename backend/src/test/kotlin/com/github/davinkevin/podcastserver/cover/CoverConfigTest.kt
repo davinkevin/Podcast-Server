@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.cover
 
 import com.github.davinkevin.podcastserver.service.FileService
-import com.nhaarman.mockitokotlin2.mock
+import org.mockito.kotlin.mock
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.Test

@@ -1,4 +1,4 @@
-FROM debian:10 AS downloader
+FROM debian:11 AS downloader
 
 WORKDIR /opt
 
@@ -15,7 +15,7 @@ RUN mkdir /opt/youtube-dl && \
     ## Final check
     tree /opt/
 
-FROM openjdk:11-slim as base-image
+FROM openjdk:17-slim as base-image
 RUN apt-get update && apt-get install python3 rtmpdump procps -y --no-install-recommends && \
       rm -rf /var/lib/apt/lists/* && \
       apt-get autoremove && \

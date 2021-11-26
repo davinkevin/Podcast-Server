@@ -9,7 +9,7 @@ import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
 import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test

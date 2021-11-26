@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.find
 
 import com.github.davinkevin.podcastserver.find.finders.Finder
-import com.nhaarman.mockitokotlin2.whenever
+import org.mockito.kotlin.whenever
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
