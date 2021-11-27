@@ -122,7 +122,7 @@ stages:
   extends: [ .only-on-backend-changes ]
   image: openjdk:11-slim
   script:
-    - ./gradlew $GRADLE_OPTS -p backend/ downloadDependencies
+    - ./gradlew $GRADLE_OPTS :backend:downloadDependencies
   cache:
     key:
       files:
@@ -137,7 +137,7 @@ stages:
   extends: [ .only-on-frontend-changes ]
   image: openjdk:11
   script:
-    - ./gradlew $GRADLE_OPTS -p frontend-angularjs downloadDependencies
+    - ./gradlew $GRADLE_OPTS :frontend-angularjs:downloadDependencies
   cache:
     key:
       files:
@@ -156,7 +156,7 @@ stages:
   extends: [ .only-on-frontend-changes ]
   image: openjdk:11-slim
   script:
-    - ./gradlew $GRADLE_OPTS -p frontend-angular downloadDependencies
+    - ./gradlew $GRADLE_OPTS :frontend-angular:downloadDependencies
   cache:
     key:
       files:
@@ -180,7 +180,7 @@ stages:
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
     POSTGRES_DB: podcast-server-db
   script:
-    - ./gradlew $GRADLE_OPTS -p backend/ test
+    - ./gradlew $GRADLE_OPTS :backend:test
     - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
   artifacts:
     paths:
@@ -205,7 +205,7 @@ stages:
   image: openjdk:11-slim
   needs: [⬇ ui-v2]
   script:
-    - ./gradlew $GRADLE_OPTS -p frontend-angular yarn_test
+    - ./gradlew $GRADLE_OPTS :frontend-angular:yarn_test
   cache:
     key:
       files:
@@ -237,7 +237,7 @@ stages:
   image: openjdk:11
   needs: [⬇ ui-v1]
   script:
-    - ./gradlew $GRADLE_OPTS -p frontend-angularjs build
+    - ./gradlew $GRADLE_OPTS :frontend-angularjs:build
   artifacts:
     paths:
       - frontend-angularjs/target/dist/
@@ -261,7 +261,7 @@ stages:
   image: openjdk:11-slim
   needs: [⬇ ui-v2]
   script:
-    - ./gradlew $GRADLE_OPTS -p frontend-angular build
+    - ./gradlew $GRADLE_OPTS :frontend-angular:build
   artifacts:
     paths:
       - frontend-angular/dist/
@@ -299,7 +299,7 @@ stages:
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
     POSTGRES_DB: podcast-server-db
   script:
-    - ./gradlew $GRADLE_OPTS -p backend/ jib
+    - ./gradlew $GRADLE_OPTS :backend:jib
   cache:
     key:
       files:

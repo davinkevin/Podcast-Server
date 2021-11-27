@@ -1,4 +1,3 @@
-import com.gitlab.davinkevin.podcastserver.backend.build.DatabaseParameters
 import nu.studer.gradle.jooq.JooqEdition.OSS
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.internal.deprecation.DeprecatableConfiguration
@@ -33,7 +32,8 @@ apply(from = "gradle/profile-default.gradle.kts")
 apply(from = "gradle/profile-ci.gradle.kts")
 apply(from = "gradle/profile-skaffold.gradle.kts")
 
-val db = project.extra["databaseParameters"] as DatabaseParameters
+@Suppress("UNCHECKED_CAST")
+val db: Map<String, String> = project.extra["databaseParameters"] as Map<String, String>
 
 repositories {
 	mavenCentral()
@@ -82,7 +82,7 @@ configure<com.gorylenko.GitPropertiesPluginExtension> {
 tasks.register<Copy>("copyMigrations") {
 	from("${project.rootDir}/../database/migrations/")
 	include("*.sql")
-	into(db.sqlFiles)
+	into(db["sqlFiles"]!!)
     outputs.cacheIf { true }
 }
 
@@ -93,10 +93,10 @@ normalization {
 }
 
 flyway {
-	url = db.url
-	user = db.user
-	password = db.password
-	locations = arrayOf("filesystem:${db.sqlFiles}")
+	url = db["url"]
+	user = db["user"]
+	password = db["password"]
+	locations = arrayOf("filesystem:${db["sqlFiles"]}")
 }
 
 tasks.register<FlywayMigrateTask>("flywayMigrateForJOOQ") {
@@ -113,9 +113,9 @@ jooq {
 				logging = INFO
 				jdbc.apply {
 					driver = "org.postgresql.Driver"
-					url = db.url
-					user = db.user
-					password = db.password
+					url = db["url"]
+					user = db["user"]
+					password = db["password"]
 				}
 
 				generator.apply {
@@ -177,9 +177,9 @@ tasks.register<FlywayMigrateTask>("flywaySetupDbForTests") { dependsOn("copyMigr
 tasks.test {
     useJUnitPlatform()
     systemProperty("user.timezone", "UTC")
-    systemProperty("spring.datasource.url", db.url)
-    systemProperty("spring.datasource.username", db.user)
-    systemProperty("spring.datasource.password", db.password)
+    systemProperty("spring.datasource.url", db["url"]!!)
+    systemProperty("spring.datasource.username", db["user"]!!)
+    systemProperty("spring.datasource.password", db["password"]!!)
 
     dependsOn(tasks.named("flywaySetupDbForTests"))
     finalizedBy(tasks.jacocoTestReport)

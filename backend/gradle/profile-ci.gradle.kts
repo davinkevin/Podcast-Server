@@ -1,5 +1,3 @@
-import com.gitlab.davinkevin.podcastserver.backend.build.*
-
 val env: Map<String, String> = System.getenv()!!
 
 if (env.containsKey("CI")) {
@@ -7,11 +5,11 @@ if (env.containsKey("CI")) {
 }
 
 if (env.containsKey("POSTGRES_DB") && env.containsKey("POSTGRES_USER") && env.containsKey("POSTGRES_PASSWORD")) {
-    val databaseParameters by extra(DatabaseParameters(
-            url = "jdbc:postgresql://postgres:5432/${env["POSTGRES_DB"]}",
-            user = env["POSTGRES_USER"]!!,
-            password = env["POSTGRES_PASSWORD"]!!,
-            sqlFiles = "$buildDir/flyway/migrations/"
+    val databaseParameters by extra(mapOf(
+            "url" to "jdbc:postgresql://postgres:5432/${env["POSTGRES_DB"]}",
+            "user" to env["POSTGRES_USER"]!!,
+            "password" to env["POSTGRES_PASSWORD"]!!,
+            "sqlFiles" to "$buildDir/flyway/migrations/"
     ))
 }
 
