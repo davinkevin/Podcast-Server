@@ -102,7 +102,6 @@ class YoutubeDlServiceTest(
             assertThat(download).isSameAs(response)
         }
 
-
         @ParameterizedTest(name = "url {0}")
         @ValueSource(strings = [
             "https://youtube.com/file.mp3",
@@ -119,7 +118,7 @@ class YoutubeDlServiceTest(
                         it.directory == "/tmp" &&
                         it.option["retries"] == "10" &&
                         it.option["output"] == "foo.mp3" &&
-                        it.option["format"] == "bestvideo[ext=webm]+bestaudio[ext=webm]/best[ext=mp4]+bestaudio[ext=m4a]/best[ext=webm]/best[ext=mp4]/mp4+m4a/best"
+                        it.option["format"] == "bestvideo[ext=webm]+bestaudio[ext=webm]/best[ext=mp4]+bestaudio[ext=m4a]/best[ext=webm]/best[ext=mp4]/mp4+m4a/best/bv*+ba"
             }
             whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
 
