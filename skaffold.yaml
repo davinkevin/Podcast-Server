@@ -3,10 +3,15 @@ kind: Config
 build:
   artifacts:
   - image: podcastserver/backend
-    context: backend
     jib:
+      project: backend
       args:
       - -Pskaffold=true
+    requires:
+      - image: podcastserver/backend-base-image
+  - image: podcastserver/backend-base-image
+    docker:
+      dockerfile: backend/src/main/base-image/Dockerfile
   - image: podcastserver/ui-v1
     context: frontend-angularjs/target/
   - image: podcastserver/init-db
