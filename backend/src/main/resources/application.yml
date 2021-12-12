@@ -12,7 +12,7 @@ server:
 management:
   endpoint:
     health.show-details: always
-  endpoints.web.exposure.include: ['health', 'info', 'env', 'configprops']
+  endpoints.web.exposure.include: ['health', 'info', 'env', 'configprops', 'prometheus', 'metrics']
 
 
 ##############################
