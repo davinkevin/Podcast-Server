@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
 import com.github.davinkevin.podcastserver.entity.Status
+import org.apache.commons.io.FilenameUtils
 import java.net.URI
 import java.util.*
 
@@ -26,7 +27,16 @@ data class DownloadingInformation(val item: DownloadingItem, val urls: List<Stri
     }
 
     fun fileName(filename: String): DownloadingInformation {
-        return this.copy(filename = filename)
+        val extension = FilenameUtils.getExtension(filename)
+        val base = FilenameUtils.getBaseName(filename)
+
+        val safeFilename = base
+            .replace("\n".toRegex(), "")
+            .replace("[^a-zA-Z0-9.-]".toRegex(), "_")
+            .take(100)
+            .plus(".$extension")
+
+        return this.copy(filename = safeFilename)
     }
 }
 
