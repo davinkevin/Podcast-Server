@@ -3,11 +3,10 @@ package com.github.davinkevin.podcastserver.podcast
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.item.*
-import com.github.davinkevin.podcastserver.service.FileService
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.tag.Tag
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -17,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
@@ -37,7 +34,7 @@ class PodcastXmlHandlerTest(
     @Autowired val rest: WebTestClient
 ) {
 
-    @MockBean private lateinit var fileService: FileService
+    @MockBean private lateinit var fileService: FileStorageService
     @MockBean private lateinit var itemService: ItemService
     @MockBean private lateinit var podcastService: PodcastService
 

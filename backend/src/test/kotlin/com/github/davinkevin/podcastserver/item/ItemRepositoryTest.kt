@@ -260,7 +260,7 @@ class ItemRepositoryTest(
                 StepVerifier.create(repository.deleteById(id))
                         /* Then */
                         .expectSubscription()
-                        .expectNext(DeleteItemInformation(fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), "geekinc.124.mp3", "Geek Inc HD"))
+                        .expectNext(DeleteItemRequest(fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), "geekinc.124.mp3", "Geek Inc HD"))
                         .verifyComplete()
             }
 

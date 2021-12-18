@@ -2,11 +2,10 @@ package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.item.ItemService
-import com.github.davinkevin.podcastserver.service.FileService
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.tag.Tag
 import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.apache.commons.io.FilenameUtils
 import org.junit.jupiter.api.DisplayName
@@ -16,9 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -46,7 +43,7 @@ class PodcastHandlerTest(
     @MockBean private lateinit var itemService: ItemService
     @MockBean private lateinit var podcastService: PodcastService
     @MockBean private lateinit var parameters: PodcastServerParameters
-    @MockBean private lateinit var fileService: FileService
+    @MockBean private lateinit var fileService: FileStorageService
 
     val podcast = Podcast(
             id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
@@ -545,7 +542,6 @@ class PodcastHandlerTest(
             whenever(fileService.coverExists(any<Podcast>())).then {
                 FilenameUtils.getName(it.getArgument<Podcast>(0).cover.url.toASCIIString()).toMono()
             }
-            whenever(parameters.coverDefaultName).thenReturn("cover")
             /* When */
             rest
                     .get()

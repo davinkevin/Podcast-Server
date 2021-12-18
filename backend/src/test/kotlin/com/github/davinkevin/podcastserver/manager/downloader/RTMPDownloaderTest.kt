@@ -1,11 +1,11 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
-import com.github.davinkevin.podcastserver.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.MimeTypeService
+import com.github.davinkevin.podcastserver.service.FileMetaData
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
@@ -16,12 +16,12 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.io.TempDir
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
-import org.springframework.util.FileSystemUtils
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
+import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.net.URI
@@ -67,9 +67,8 @@ class RTMPDownloaderTest {
 
         @Mock lateinit var downloadRepository: DownloadRepository
         @Mock lateinit var itemDownloadManager: ItemDownloadManager
-        @Mock lateinit var podcastServerParameters: PodcastServerParameters
         @Mock lateinit var template: MessagingTemplate
-        @Mock lateinit var mimeTypeService: MimeTypeService
+        @Mock lateinit var file: FileStorageService
         @Mock lateinit var externalTools: ExternalTools
         @Mock lateinit var processService: ProcessService
         val clock: Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
@@ -91,15 +90,12 @@ class RTMPDownloaderTest {
                     .inputStream()
 
             whenever(externalTools.rtmpdump).thenReturn("/usr/local/bin/rtmpdump")
-            downloader = RTMPDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock, processService, externalTools)
+            downloader = RTMPDownloader(downloadRepository, template, clock, file, processService, externalTools)
 
             downloader.with(
                     DownloadingInformation(item,  listOf(), "file.mp4", null),
                     itemDownloadManager
             )
-
-            FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(item.podcast.title).toFile())
-            Files.createDirectories(ROOT_TEST_PATH)
         }
 
         @Nested
@@ -107,7 +103,7 @@ class RTMPDownloaderTest {
         inner class ShouldFailed {
             //
             @Test
-            fun immediatly_when_process_start() {
+            fun immediately_when_process_start() {
                 /* Given */
                 val pb = mock<ProcessBuilder>()
                 whenever(pb.directory(File("/tmp"))).then { pb }
@@ -121,7 +117,6 @@ class RTMPDownloaderTest {
 
                 /* Then */
                 assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FAILED)
-                assertThat(ROOT_TEST_PATH.resolve(item.podcast.title)).doesNotExist()
             }
             //
             @Test
@@ -141,7 +136,6 @@ class RTMPDownloaderTest {
 
                 /* Then */
                 assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FAILED)
-                assertThat(ROOT_TEST_PATH.resolve(item.podcast.title)).doesNotExist()
                 verify(p).destroy()
             }
         }
@@ -176,14 +170,16 @@ class RTMPDownloaderTest {
             }
 
             @Test
-            fun `and save file to disk`(@TempDir rootFolder: Path) {
+            fun `and save file to disk`() {
                 /* Given */
-                whenever(podcastServerParameters.rootfolder).thenReturn(rootFolder)
+                whenever(file.upload(eq(item.podcast.title), any()))
+                    .thenReturn(PutObjectResponse.builder().build().toMono())
+                whenever(file.metadata(eq(item.podcast.title), any()))
+                    .thenReturn(FileMetaData("video/mp4", 123L).toMono())
                 whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
-                whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
                 whenever(downloadRepository.finishDownload(
                         id = item.id,
-                        length = 0,
+                        length = 123L,
                         mimeType = "video/mp4",
                         fileName = "file-${item.id}.mp4",
                         downloadDate = fixedDate
@@ -194,7 +190,6 @@ class RTMPDownloaderTest {
 
                 /* Then */
                 assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FINISH)
-                assertThat(rootFolder.resolve(item.podcast.title).resolve("file-${item.id}.mp4")).exists()
             }
 
             @Nested
@@ -210,13 +205,15 @@ class RTMPDownloaderTest {
                 }
 
                 @Test
-                fun stop(@TempDir rootFolder: Path) {
+                fun stop() {
                     /* GIVEN */
-                    whenever(podcastServerParameters.rootfolder).thenReturn(rootFolder)
-                    whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
+                    whenever(file.upload(eq(item.podcast.title), any()))
+                        .thenReturn(PutObjectResponse.builder().build().toMono())
+                    whenever(file.metadata(eq(item.podcast.title), any()))
+                        .thenReturn(FileMetaData("video/mp4", 123L).toMono())
                     whenever(downloadRepository.finishDownload(
                             id = item.id,
-                            length = 0,
+                            length = 123L,
                             mimeType = "video/mp4",
                             fileName = "file-${item.id}.mp4",
                             downloadDate = fixedDate
@@ -265,7 +262,7 @@ class RTMPDownloaderTest {
         @Mock lateinit var itemDownloadManager: ItemDownloadManager
         @Mock lateinit var podcastServerParameters: PodcastServerParameters
         @Mock lateinit var template: MessagingTemplate
-        @Mock lateinit var mimeTypeService: MimeTypeService
+        @Mock lateinit var file: FileStorageService
         @Mock lateinit var externalTools: ExternalTools
         @Mock lateinit var processService: ProcessService
         val clock: Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
@@ -273,7 +270,14 @@ class RTMPDownloaderTest {
 
         @BeforeEach
         fun beforeEach() {
-            downloader = RTMPDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock, processService, externalTools)
+            downloader = RTMPDownloader(
+                downloadRepository,
+                template,
+                clock,
+                file,
+                processService,
+                externalTools
+            )
         }
 
         @Test

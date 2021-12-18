@@ -54,7 +54,6 @@ dependencies {
 	jooqGenerator("org.postgresql:postgresql:" + dependencyManagement.importedProperties["postgresql.version"])
 
 	implementation("org.jdom:jdom2:2.0.6")
-	implementation("org.apache.tika:tika-core:1.24.1")
 	implementation("org.jsoup:jsoup:1.13.1")
 	implementation("com.github.pedroviniv:youtubedl-java:ef7110605d23eaaae4796312163bcf84c7099311")
 	implementation("commons-io:commons-io:2.4")
@@ -64,11 +63,16 @@ dependencies {
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
+	implementation(platform("software.amazon.awssdk:bom:2.17.100"))
+	implementation("software.amazon.awssdk:s3")
+	implementation("software.amazon.awssdk:netty-nio-client")
+
+
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.mockito.kotlin:mockito-kotlin:2.2.11")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:2.10.0")
-	testImplementation("com.github.tomakehurst:wiremock:2.25.1")
+	testImplementation("com.github.tomakehurst:wiremock-jre8:2.32.0")
 	testImplementation("org.awaitility:awaitility:3.1.6")
 
 }

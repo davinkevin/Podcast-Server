@@ -48,9 +48,6 @@ class ItemDownloadManager (
     val limitParallelDownload: Int
         get() = downloadExecutor.corePoolSize
 
-    val downloadingItems: Set<DownloadingItem>
-        get() = this.downloadingQueue.keys
-
     fun setLimitParallelDownload(limitParallelDownload: Int) {
         downloadExecutor.corePoolSize = limitParallelDownload
         manageDownload()

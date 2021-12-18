@@ -11,7 +11,7 @@ import kotlin.math.ceil
 /**
  * Created by kevin on 2019-02-09
  */
-data class DeleteItemInformation(val id: UUID, val fileName: String, val podcastTitle: String) {
+data class DeleteItemRequest(val id: UUID, val fileName: String, val podcastTitle: String) {
     val path = Paths.get(podcastTitle, fileName)!!
 }
 

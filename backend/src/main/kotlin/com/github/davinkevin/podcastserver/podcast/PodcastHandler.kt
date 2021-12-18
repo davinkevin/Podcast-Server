@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
-import com.github.davinkevin.podcastserver.service.FileService
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -23,7 +23,7 @@ import java.util.*
  */
 class PodcastHandler(
         private val podcastService: PodcastService,
-        private val fileService: FileService
+        private val fileService: FileStorageService
 ) {
 
     private var log = LoggerFactory.getLogger(PodcastHandler::class.java)

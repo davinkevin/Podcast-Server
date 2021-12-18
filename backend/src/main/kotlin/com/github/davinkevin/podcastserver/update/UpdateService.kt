@@ -9,7 +9,7 @@ import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
-import com.github.davinkevin.podcastserver.service.FileService
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
@@ -24,13 +24,13 @@ import java.time.OffsetDateTime.now
 import java.util.*
 
 class UpdateService(
-        private val podcastRepository: PodcastRepository,
-        private val itemRepository: ItemRepository,
-        private val updaters: UpdaterSelector,
-        private val liveUpdate: MessagingTemplate,
-        private val fileService: FileService,
-        private val parameters: PodcastServerParameters,
-        private val idm: ItemDownloadManager
+    private val podcastRepository: PodcastRepository,
+    private val itemRepository: ItemRepository,
+    private val updaters: UpdaterSelector,
+    private val liveUpdate: MessagingTemplate,
+    private val fileService: FileStorageService,
+    private val parameters: PodcastServerParameters,
+    private val idm: ItemDownloadManager
 ) {
 
     private val log = LoggerFactory.getLogger(UpdateService::class.java)!!

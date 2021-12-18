@@ -1,8 +1,8 @@
 package com.github.davinkevin.podcastserver.cover
 
-import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Item
-import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Podcast
-import com.github.davinkevin.podcastserver.service.FileService
+import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Item
+import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Podcast
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import org.mockito.kotlin.*
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
@@ -31,7 +31,7 @@ class CoverServiceTest (
     private val date = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
     @MockBean private lateinit var cover: CoverRepository
-    @MockBean private lateinit var file: FileService
+    @MockBean private lateinit var file: FileStorageService
 
     @Nested
     @DisplayName("should delete old covers")
@@ -96,4 +96,4 @@ class CoverServiceTest (
 }
 
 private fun randomCover(itemTitle: String, podcastTitle: String) =
-        DeleteCoverInformation(randomUUID(), "png", Item(randomUUID(), itemTitle), Podcast(randomUUID(), podcastTitle))
+        DeleteCoverRequest(randomUUID(), "png", Item(randomUUID(), itemTitle), Podcast(randomUUID(), podcastTitle))

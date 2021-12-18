@@ -45,18 +45,18 @@ spec:
             - name: FLYWAY_URL
               valueFrom:
                 configMapKeyRef:
-                  name: podcast-server
-                  key: database.url
+                  name: database
+                  key: url
             - name: FLYWAY_USER
               valueFrom:
                 configMapKeyRef:
-                  name: podcast-server
-                  key: database.username
+                  name: database
+                  key: username
             - name: FLYWAY_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: podcast-server
-                  key: database.password
+                  name: database
+                  key: password
       containers:
         - name: app
           image: podcastserver/backend
@@ -64,30 +64,24 @@ spec:
             - name: SPRING_DATASOURCE_URL
               valueFrom:
                 configMapKeyRef:
-                  name: podcast-server
-                  key: database.url
+                  name: database
+                  key: url
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 configMapKeyRef:
-                  name: podcast-server
-                  key: database.username
+                  name: database
+                  key: username
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: podcast-server
-                  key: database.password
+                  name: database
+                  key: password
             - name: PODCASTSERVER_API_YOUTUBE
               valueFrom:
                 secretKeyRef:
                   optional: true
                   name: podcast-server
                   key: api.youtube
-            - name: PODCASTSERVER_ROOTFOLDER
-              valueFrom:
-                configMapKeyRef:
-                  optional: true
-                  name: podcast-server
-                  key: root-folder
             - name: PODCASTSERVER_CONCURRENT_DOWNLOAD
               valueFrom:
                 configMapKeyRef:
@@ -112,6 +106,23 @@ spec:
                   optional: true
                   name: podcast-server
                   key: number-of-day-to-save-cover
+            - name: PODCASTSERVER_STORAGE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: storage
+                  key: username
+            - name: PODCASTSERVER_STORAGE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: storage
+                  key: password
+            - name: PODCASTSERVER_STORAGE_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: storage
+                  key: bucket
+            - name: PODCASTSERVER_STORAGE_URL
+              value: http://storage:9000/
           ports:
             - name: http-port
               containerPort: 8080

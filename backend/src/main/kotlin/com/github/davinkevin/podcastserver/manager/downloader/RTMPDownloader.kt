@@ -4,7 +4,7 @@ package com.github.davinkevin.podcastserver.manager.downloader
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.MimeTypeService
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
@@ -21,14 +21,13 @@ import java.util.regex.Pattern
 @Component
 @Scope(SCOPE_PROTOTYPE)
 class RTMPDownloader(
-        downloadRepository: DownloadRepository,
-        podcastServerParameters: PodcastServerParameters,
-        template: MessagingTemplate,
-        mimeTypeService: MimeTypeService,
-        clock: Clock,
-        val processService: ProcessService,
-        val externalTools: ExternalTools
-) : AbstractDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock) {
+    downloadRepository: DownloadRepository,
+    template: MessagingTemplate,
+    clock: Clock,
+    file: FileStorageService,
+    val processService: ProcessService,
+    val externalTools: ExternalTools
+) : AbstractDownloader(downloadRepository, template, clock, file) {
 
     private val log = LoggerFactory.getLogger(RTMPDownloader::class.java)
 

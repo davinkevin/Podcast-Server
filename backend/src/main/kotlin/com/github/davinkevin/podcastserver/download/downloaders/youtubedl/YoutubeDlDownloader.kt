@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.manager.downloader.AbstractDownloader
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.MimeTypeService
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.sapher.youtubedl.DownloadProgressCallback
 import org.slf4j.LoggerFactory
@@ -20,19 +20,16 @@ import kotlin.streams.asSequence
  * Created by kevin on 2019-07-21
  */
 class YoutubeDlDownloader(
-        downloadRepository: DownloadRepository,
-        podcastServerParameters: PodcastServerParameters,
-        template: MessagingTemplate,
-        mimeTypeService: MimeTypeService,
-        clock: Clock,
-        private val youtubeDl: YoutubeDlService
-) : AbstractDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock) {
+    downloadRepository: DownloadRepository,
+    template: MessagingTemplate,
+    clock: Clock,
+    file: FileStorageService,
+    private val youtubeDl: YoutubeDlService
+) : AbstractDownloader(downloadRepository, template, clock, file) {
 
     private val log = LoggerFactory.getLogger(YoutubeDlDownloader::class.java)
 
     override fun download(): DownloadingItem {
-        log.info("Starting download of ${downloadingInformation.item.url}")
-
         val url = downloadingInformation.url()
         downloadingInformation = downloadingInformation.fileName(youtubeDl.extractName(url))
 

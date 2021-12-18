@@ -9,20 +9,31 @@ resources:
   - ingress/ingress.yaml
 
 patchesStrategicMerge:
-  - backend/backend.yaml
-  - database/database.yaml
-  - files-system/fs.yaml
+  - database/volume.yaml
+  - storage/volume.yaml
   - ingress/ingress.yaml
 
 secretGenerator:
-  - name: podcast-server-tls
+  - name: podcast-k8s-local
     files:
-      - ingress/tls.crt
-      - ingress/tls.key
+      - ingress/podcast.k8s.local/tls.crt
+      - ingress/podcast.k8s.local/tls.key
     type: kubernetes.io/tls
+  - name: minio-podcast-k8s-local
+    files:
+      - ingress/minio.podcast.k8s.local/tls.crt
+      - ingress/minio.podcast.k8s.local/tls.key
+    type: kubernetes.io/tls
+  - name: database
+    behavior: merge
+    literals:
+      - password=nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
   - name: podcast-server
     behavior: merge
     literals:
-      - database.password=nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
-      - api.youtube=AN_API_KEY
+      - api.youtube=TO_BE_DEFINED
     type: Opaque
+  - name: storage
+    behavior: merge
+    literals:
+      - password=Mns1G6RgPtLgy68H

@@ -52,10 +52,10 @@ variables:
     - backend/**/*
     - database/**/*
 
-.files_system_files:
-  - &changes_files_system_files
+.storage_files:
+  - &changes_storage_files
     changes:
-    - files-system/**/*
+    - storage/**/*
 
 .frontend_files:
   - &changes_frontend_files
@@ -78,9 +78,9 @@ variables:
   rules:
     - *changes_backend_files
 
-.only-on-files-system-changes:
+.only-on-storage-changes:
   rules:
-    - *changes_files_system_files
+    - *changes_storage_files
 
 .only-on-frontend-changes:
   rules:
@@ -93,7 +93,7 @@ variables:
 .only-on-code-change:
   rules:
     - *changes_frontend_files
-    - *changes_files_system_files
+    - *changes_storage_files
     - *changes_backend_files
 
 stages:
@@ -366,9 +366,9 @@ stages:
     name: init-db/$CI_COMMIT_REF_SLUG
     action: stop
 
-🐳 file-system:
+🐳 storage:
   stage: 🐳 packaging
-  extends: [ .only-on-files-system-changes ]
+  extends: [ .only-on-storage-changes ]
   needs: []
   image:
     name: gcr.io/kaniko-project/executor:debug
@@ -377,29 +377,28 @@ stages:
     - *cicd_utils
     - kaniko_auth_docker_hub
   script:
-    - sh ./files-system/compile.sh
     - export VERSION="${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}"
-    - export PROJECT_DIR=$CI_PROJECT_DIR/files-system/target/docker/
-    - /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/file-system:${VERSION}
-    - if [ "$VERSION" == "master" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/file-system:latest ; fi
+    - export PROJECT_DIR=$CI_PROJECT_DIR/storage
+    - /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/storage:${VERSION}
+    - if [ "$VERSION" == "master" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/storage:latest ; fi
   environment:
-    name: file-system/$CI_COMMIT_REF_SLUG
-    url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/file-system/tags
-    on_stop: 🗑 file-system
+    name: storage/$CI_COMMIT_REF_SLUG
+    url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/storage/tags
+    on_stop: 🗑 storage
 
-🗑 file-system:
+🗑 storage:
   stage: 🐳 packaging
   extends: [ .delete-docker-image ]
   variables:
     GIT_STRATEGY: none
-    COMPONENT: file-system
+    COMPONENT: storage
   rules:
     - *rule-not-on-master
-    - <<: *changes_files_system_files
+    - <<: *changes_storage_files
       when: manual
       allow_failure: true
   environment:
-    name: file-system/$CI_COMMIT_REF_SLUG
+    name: storage/$CI_COMMIT_REF_SLUG
     action: stop
 
 🐳 ui:
@@ -453,13 +452,13 @@ stages:
     - trivy --exit-code 0 --no-progress --cache-dir .trivy/ --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
     - trivy --exit-code 0 --no-progress --cache-dir .trivy/ podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
 
-🔎 file-system:
+🔎 storage:
   stage: 🔎 Security Analysis
-  extends: [.container-scanning-with-trivy, .only-on-files-system-changes]
-  needs: [⬇ container analysis db, 🐳 file-system]
+  extends: [.container-scanning-with-trivy, .only-on-storage-changes]
+  needs: [⬇ container analysis db, 🐳 storage]
   script:
-    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json podcastserver/file-system:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
-    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ podcastserver/file-system:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json podcastserver/storage:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --exit-code 0 --no-progress --cache-dir .trivy/ podcastserver/storage:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
 
 🔎 ui:
   stage: 🔎 Security Analysis

@@ -1,25 +1,26 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
-import com.github.davinkevin.podcastserver.TEMPORARY_EXTENSION
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.MimeTypeService
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import org.mockito.kotlin.*
+import com.github.davinkevin.podcastserver.service.FileMetaData
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.sapher.youtubedl.DownloadProgressCallback
 import com.sapher.youtubedl.YoutubeDLResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
+import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -27,7 +28,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.core.publisher.Mono
-import java.lang.RuntimeException
+import reactor.kotlin.core.publisher.toMono
+import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
@@ -46,7 +48,6 @@ private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC
 class YoutubeDlDownloaderTest(
         @Autowired private val downloader: YoutubeDlDownloader,
         @Autowired private val idm: ItemDownloadManager,
-        @Autowired private val parameters: PodcastServerParameters
 ) {
 
     private val item: DownloadingItem = DownloadingItem (
@@ -68,7 +69,7 @@ class YoutubeDlDownloaderTest(
 
     @MockBean private lateinit var downloadRepository: DownloadRepository
     @MockBean private lateinit var template: MessagingTemplate
-    @MockBean private lateinit var mimeTypeService: MimeTypeService
+    @MockBean private lateinit var file: FileStorageService
     @MockBean private lateinit var youtube: YoutubeDlService
 
     @TestConfiguration
@@ -76,9 +77,6 @@ class YoutubeDlDownloaderTest(
     class LocalTestConfiguration {
         @Bean fun clock(): Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
         @Bean fun idm(): ItemDownloadManager = mock()
-        @Bean fun parameters() = mock<PodcastServerParameters>().apply {
-            whenever(downloadExtension).thenReturn(TEMPORARY_EXTENSION)
-        }
     }
 
     @Nested
@@ -96,22 +94,25 @@ class YoutubeDlDownloaderTest(
         fun beforeEach() {
             Mockito.reset(template, youtube, idm)
             downloader.itemDownloadManager = idm
+
+            whenever(file.upload(eq(dItem.item.podcast.title), any()))
+                .thenReturn(PutObjectResponse.builder().build().toMono())
+            whenever(file.metadata(eq(dItem.item.podcast.title), any())).thenReturn(FileMetaData("foo/bar", 123L).toMono())
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
             whenever(downloadRepository.finishDownload(any(), any(), anyOrNull(), any(), any()))
                     .thenReturn(Mono.empty())
         }
 
         @Test
-        fun `with a simple url`(@TempDir rootFolder: Path) {
+        fun `with a simple url`() {
             /* Given */
             val url = "https://foo.bar.com/one.mp3"
+            var finalFile: Path = Files.createTempFile("not-used-for-now", ".mp3")
             downloader.downloadingInformation = dItem.copy(urls = listOf(url))
-
-            whenever(parameters.rootfolder).thenReturn(rootFolder)
             whenever(youtube.extractName(url)).thenReturn("one.mp3")
             whenever(youtube.download(eq(url), any(), any())).then {
                 val fileToCreate = it.getArgument<Path>(1)
-                Files.createFile(fileToCreate)
+                finalFile = Files.createFile(fileToCreate)
                 mock<YoutubeDLResponse>()
             }
 
@@ -119,8 +120,8 @@ class YoutubeDlDownloaderTest(
             downloader.download()
 
             /* Then */
-            assertThat(rootFolder.resolve(item.podcast.title).resolve("one-${dItem.item.id}.mp3"))
-                    .exists()
+            verify(file, times(1)).upload(dItem.item.podcast.title, finalFile)
+            verify(file, times(1)).metadata(dItem.item.podcast.title, finalFile)
         }
 
         @Nested
@@ -134,11 +135,10 @@ class YoutubeDlDownloaderTest(
             inner class DuringDownload {
 
                 @Test
-                fun `with youtube-dl`(@TempDir rootFolder: Path) {
+                fun `with youtube-dl`() {
                     /* Given */
                     downloader.downloadingInformation = dItem.copy(urls = listOf(url))
 
-                    whenever(parameters.rootfolder).thenReturn(rootFolder)
                     whenever(youtube.extractName(url)).thenReturn("one.mp3")
                     doThrow(RuntimeException("fake error"))
                             .whenever(youtube).download(eq(url), any(), any())
@@ -156,10 +156,9 @@ class YoutubeDlDownloaderTest(
             inner class DuringFinishOfDownload {
 
                 @BeforeEach
-                fun beforeEach(@TempDir rootFolder: Path) {
+                fun beforeEach() {
                     downloader.downloadingInformation = dItem.copy(urls = listOf(url))
 
-                    whenever(parameters.rootfolder).thenReturn(rootFolder)
                     whenever(youtube.extractName(url)).thenReturn("one.mp3")
                 }
 
@@ -184,11 +183,10 @@ class YoutubeDlDownloaderTest(
             private val captor = argumentCaptor<DownloadProgressCallback>()
 
             @BeforeEach
-            fun beforeEach(@TempDir rootFolder: Path) {
+            fun beforeEach() {
                 Mockito.reset(template, youtube)
                 val url = "https://foo.bar.com/one.mp3"
                 downloader.downloadingInformation = dItem.copy(urls = listOf(url))
-                whenever(parameters.rootfolder).thenReturn(rootFolder)
                 whenever(youtube.extractName(url)).thenReturn("one.mp3")
                 whenever(youtube.download(eq(url), any(), any())).then {
                     Files.createFile(it.getArgument(1))

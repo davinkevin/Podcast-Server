@@ -4,16 +4,24 @@ kind: Kustomization
 resources:
   - backend.yaml
   - database.yaml
-  - fs.yaml
+  - storage.yaml
   - ui.yaml
 
 
 configMapGenerator:
   - name: podcast-server
+  - name: database
     literals:
-      - database.username=podcast-server-user
-      - database.url=jdbc:postgresql://database:5432/podcast-server
-      - root-folder=/podcasts
+      - username=podcast-server-user
+      - name=podcast-server
+      - url=jdbc:postgresql://database:5432/podcast-server
+  - name: storage
+    literals:
+      - username=podcast-server-user
+      - bucket=data
+      - url=http://storage:9000/
 
 secretGenerator:
   - name: podcast-server
+  - name: database
+  - name: storage

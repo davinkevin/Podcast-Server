@@ -16,3 +16,8 @@ logging:
     org.springframework: "off"
     org.eclipse.jetty: "off"
     org.jooq.Constants: "off"
+
+podcastserver:
+  storage:
+    username: foo
+    password: password
