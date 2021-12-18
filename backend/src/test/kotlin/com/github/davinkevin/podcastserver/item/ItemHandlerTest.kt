@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
-import com.github.davinkevin.podcastserver.service.FileService
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import org.mockito.kotlin.*
 import org.apache.commons.io.FilenameUtils
 import org.junit.jupiter.api.DisplayName
@@ -16,10 +16,7 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
-import org.springframework.core.io.ByteArrayResource
 import org.springframework.core.io.buffer.DataBuffer
-import org.springframework.core.io.buffer.DataBufferFactory
-import org.springframework.core.io.buffer.DataBufferUtils
 import org.springframework.core.io.buffer.DefaultDataBufferFactory
 import org.springframework.http.HttpHeaders
 import org.springframework.http.client.MultipartBodyBuilder
@@ -50,7 +47,7 @@ class ItemHandlerTest(
 ) {
 
     @MockBean private lateinit var itemService: ItemService
-    @MockBean private lateinit var fileService: FileService
+    @MockBean private lateinit var fileService: FileStorageService
 
     val item = Item(
             id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),

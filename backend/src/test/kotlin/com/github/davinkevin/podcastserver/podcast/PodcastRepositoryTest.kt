@@ -685,7 +685,7 @@ class PodcastRepositoryTest(
             StepVerifier.create(repository.deleteById(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d")))
                     /* Then */
                     .expectSubscription()
-                    .expectNext(DeletePodcastInformation(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD"))
+                    .expectNext(DeletePodcastRequest(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD"))
                     .verifyComplete()
         }
 

@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
-import com.github.davinkevin.podcastserver.service.FileService
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.slf4j.LoggerFactory
 import org.springframework.http.codec.multipart.FilePart
@@ -14,7 +14,7 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
-import reactor.kotlin.core.util.function.component3
+import java.nio.file.Paths
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
@@ -23,96 +23,98 @@ import java.util.*
  * Created by kevin on 2019-02-09
  */
 class ItemService(
-        private val repository: ItemRepository,
-        private val podcastRepository: PodcastRepository,
+    private val repository: ItemRepository,
+    private val podcastRepository: PodcastRepository,
 
-        private val idm: ItemDownloadManager,
-        private val p: PodcastServerParameters,
+    private val idm: ItemDownloadManager,
+    private val p: PodcastServerParameters,
 
-        private val fileService: FileService,
-        private val clock: Clock
+    private val file: FileStorageService,
+    private val clock: Clock
 ) {
 
     private val log = LoggerFactory.getLogger(ItemService::class.java)!!
 
     fun deleteItemOlderThan(date: OffsetDateTime) = repository.
-            findAllToDelete(date)
-            .doOnSubscribe { log.info("Deletion of items older than {}", date) }
-            .delayUntil { fileService.deleteItem(it) }
-            .map { v -> v.id }
-            .collectList()
-            .flatMap { repository.updateAsDeleted(it) }
+    findAllToDelete(date)
+        .doOnSubscribe { log.info("Deletion of items older than {}", date) }
+        .delayUntil { file.deleteItem(it) }
+        .map { v -> v.id }
+        .collectList()
+        .flatMap { repository.updateAsDeleted(it) }
 
     fun findById(id: UUID) = repository.findById(id)
 
     fun reset(id: UUID): Mono<Item> = deleteItemFiles(id)
-            .then(repository.resetById(id))
+        .then(repository.resetById(id))
 
     private fun deleteItemFiles(id: UUID): Mono<Void> = id.toMono()
-            .filter { !idm.isInDownloadingQueueById(it) }
-            .filterWhen { repository.hasToBeDeleted(it) }
-            .flatMap { repository.findById(it) }
-            .delayUntil { item -> item.toMono()
-                    .filter { it.isDownloaded() }
-                    .filter { !it.fileName.isNullOrEmpty() }
-                    .map { DeleteItemInformation(it.id, it.fileName!!, it.podcast.title) }
-                    .flatMap { fileService.deleteItem(it) }
-            }
-            .then()
+        .filter { !idm.isInDownloadingQueueById(it) }
+        .filterWhen { repository.hasToBeDeleted(it) }
+        .flatMap { repository.findById(it) }
+        .delayUntil { item -> item.toMono()
+            .filter { it.isDownloaded() }
+            .filter { !it.fileName.isNullOrEmpty() }
+            .map { DeleteItemRequest(it.id, it.fileName!!, it.podcast.title) }
+            .flatMap { file.deleteItem(it) }
+        }
+        .then()
 
     fun search(q: String, tags: List<String>, status: List<Status>, page: ItemPageRequest, podcastId: UUID? = null): Mono<PageItem> =
-            repository.search(q = q, tags = tags, status = status, page = page, podcastId = podcastId)
+        repository.search(q = q, tags = tags, status = status, page = page, podcastId = podcastId)
 
-    fun upload(podcastId: UUID, file: FilePart): Mono<Item> {
-        val filename = file.filename().replace("[^a-zA-Z0-9.-]".toRegex(), "_")
-        return podcastRepository
-                .findById(podcastId)
-                .delayUntil { fileService.upload(p.rootfolder.resolve(it.title).resolve(filename), file) }
-                .flatMap { podcast -> Mono.zip(
-                        fileService.size(p.rootfolder.resolve(podcast.title).resolve(filename)),
-                        fileService.probeContentType(p.rootfolder.resolve(podcast.title).resolve(filename)),
-                        podcast.toMono()
-                ) }
-                .map { (length, mimeType, podcast) ->
-                    val (_, p2, p3) = file.filename().split(" - ")
-                    val title = p3.substringBeforeLast(".")
-                    val date = LocalDate.parse(p2, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                    val time = LocalTime.of(0, 0)
-                    val pubDate = ZonedDateTime.of(date, time, ZoneId.systemDefault())
+    fun upload(podcastId: UUID, filePart: FilePart): Mono<Item> {
+        val filename = Paths.get(filePart.filename().replace("[^a-zA-Z0-9.-]".toRegex(), "_"))
 
-                    ItemForCreation(
-                            title = title,
-                            url = null,
+        return Mono.zip(
+            file.cache(filePart, filename),
+            podcastRepository.findById(podcastId)
+        )
+            .flatMap { (cacheFile, podcast) -> file.upload(podcast.title, cacheFile).thenReturn(podcast) }
+            .flatMap { Mono.zip(
+                file.metadata(it.title, filename),
+                it.toMono()
+            ) }
+            .map { (metadata, podcast) ->
+                val (_, p2, p3) = filePart.filename().split(" - ")
+                val title = p3.substringBeforeLast(".")
+                val date = LocalDate.parse(p2, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+                val time = LocalTime.of(0, 0)
+                val pubDate = ZonedDateTime.of(date, time, ZoneId.systemDefault())
 
-                            pubDate = pubDate.toOffsetDateTime(),
-                            downloadDate = OffsetDateTime.now(clock),
-                            creationDate = OffsetDateTime.now(clock),
+                ItemForCreation(
+                    title = title,
+                    url = null,
 
-                            description = podcast.description,
-                            mimeType = mimeType,
-                            length = length,
-                            fileName = filename,
-                            status = Status.FINISH,
+                    pubDate = pubDate.toOffsetDateTime(),
+                    downloadDate = OffsetDateTime.now(clock),
+                    creationDate = OffsetDateTime.now(clock),
 
-                            podcastId = podcast.id,
-                            cover = podcast.cover.toCoverForCreation()
-                    )
-                }
-                .flatMap { repository.create(it) }
-                .delayUntil { podcastRepository.updateLastUpdate(podcastId) }
+                    description = podcast.description,
+                    mimeType = metadata.contentType,
+                    length = metadata.size,
+                    fileName = filename.fileName.toString(),
+                    status = Status.FINISH,
+
+                    podcastId = podcast.id,
+                    cover = podcast.cover.toCoverForCreation()
+                )
+            }
+            .flatMap { repository.create(it) }
+            .delayUntil { podcastRepository.updateLastUpdate(podcastId) }
     }
 
     fun findPlaylistsContainingItem(itemId: UUID): Flux<ItemPlaylist> =
-            repository.findPlaylistsContainingItem(itemId)
+        repository.findPlaylistsContainingItem(itemId)
 
     fun deleteById(itemId: UUID): Mono<Void> {
 
         idm.removeItemFromQueueAndDownload(itemId)
 
         return repository
-                .deleteById(itemId)
-                .delayUntil { fileService.deleteItem(it) }
-                .then()
+            .deleteById(itemId)
+            .delayUntil { file.deleteItem(it) }
+            .then()
     }
 }
 

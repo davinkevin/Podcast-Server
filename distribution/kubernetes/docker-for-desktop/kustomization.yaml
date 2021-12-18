@@ -15,14 +15,46 @@ patchesStrategicMerge:
   - ingress/ingress.yaml
 
 secretGenerator:
-  - name: podcast-server-tls
+  - name: podcast-k8s-local
     files:
-      - ingress/tls.crt
-      - ingress/tls.key
+      - ingress/podcast.k8s.local/tls.crt
+      - ingress/podcast.k8s.local/tls.key
     type: kubernetes.io/tls
+  - name: minio-podcast-k8s-local
+    files:
+      - ingress/minio.podcast.k8s.local/tls.crt
+      - ingress/minio.podcast.k8s.local/tls.key
+    type: kubernetes.io/tls
+  - name: database
+    literals:
+      - password=nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
   - name: podcast-server
     behavior: merge
     literals:
-      - database.password=nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
-      - api.youtube=AN_API_KEY
+      - api.youtube=TO_BE_DEFINED
     type: Opaque
+  - name: storage
+    literals:
+      - password=Mns1G6RgPtLgy68H
+
+replacements:
+  - source:
+      kind: Ingress
+      name: podcast-server
+      fieldPath: spec.rules.0.host
+    targets:
+      - select:
+          kind: Deployment
+          name: fs
+        fieldPaths:
+          - spec.template.spec.containers.[name=minio].env.[name=MINIO_DOMAIN].value
+  - source:
+      kind: Ingress
+      name: minio-console
+      fieldPath: spec.rules.0.host
+    targets:
+      - select:
+          kind: Deployment
+          name: fs
+        fieldPaths:
+          - spec.template.spec.containers.[name=minio].env.[name=MINIO_DOMAIN].value

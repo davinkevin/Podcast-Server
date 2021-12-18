@@ -42,52 +42,58 @@ spec:
         - name: init-db
           image: podcastserver/init-db
           env:
-            - name: FLYWAY_URL
+            - name: DATABASE_SERVICE_NAME
+              value: DATABASE_SERVICE_NAME
+            - name: DATABASE_SERVICE_PORT
+              value: "5432"
+            - name: DATABASE_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: podcast-server
-                  key: database.url
+                  name: database
+                  key: name
+            - name: FLYWAY_URL
+              value: jdbc:postgresql://$(DATABASE_SERVICE_NAME):$(DATABASE_SERVICE_PORT)/$(DATABASE_NAME)
             - name: FLYWAY_USER
               valueFrom:
                 configMapKeyRef:
-                  name: podcast-server
-                  key: database.username
+                  name: database
+                  key: username
             - name: FLYWAY_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: podcast-server
-                  key: database.password
+                  name: database
+                  key: password
       containers:
         - name: app
           image: podcastserver/backend
           env:
-            - name: SPRING_DATASOURCE_URL
+            - name: DATABASE_SERVICE_NAME
+              value: DATABASE_SERVICE_NAME
+            - name: DATABASE_SERVICE_PORT
+              value: "5432"
+            - name: DATABASE_NAME
               valueFrom:
                 configMapKeyRef:
-                  name: podcast-server
-                  key: database.url
+                  name: database
+                  key: name
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://$(DATABASE_SERVICE_NAME):$(DATABASE_SERVICE_PORT)/$(DATABASE_NAME)
             - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 configMapKeyRef:
-                  name: podcast-server
-                  key: database.username
+                  name: database
+                  key: username
             - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: podcast-server
-                  key: database.password
+                  name: database
+                  key: password
             - name: PODCASTSERVER_API_YOUTUBE
               valueFrom:
                 secretKeyRef:
                   optional: true
                   name: podcast-server
                   key: api.youtube
-            - name: PODCASTSERVER_ROOTFOLDER
-              valueFrom:
-                configMapKeyRef:
-                  optional: true
-                  name: podcast-server
-                  key: root-folder
             - name: PODCASTSERVER_CONCURRENT_DOWNLOAD
               valueFrom:
                 configMapKeyRef:
@@ -112,6 +118,27 @@ spec:
                   optional: true
                   name: podcast-server
                   key: number-of-day-to-save-cover
+            - name: PODCASTSERVER_STORAGE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: storage
+                  key: username
+            - name: PODCASTSERVER_STORAGE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: storage
+                  key: password
+            - name: PODCASTSERVER_STORAGE_BUCKET
+              valueFrom:
+                configMapKeyRef:
+                  name: storage
+                  key: bucket
+            - name: PODCASTSERVER_STORAGE_SERVICE_NAME
+              value: PODCASTSERVER_STORAGE_SERVICE_NAME
+            - name: PODCASTSERVER_STORAGE_SERVICE_PORT
+              value: "9000"
+            - name: PODCASTSERVER_STORAGE_URL
+              value: http://$(PODCASTSERVER_STORAGE_SERVICE_NAME):$(PODCASTSERVER_STORAGE_SERVICE_PORT)/
           ports:
             - name: http-port
               containerPort: 8080

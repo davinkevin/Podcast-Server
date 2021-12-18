@@ -1,17 +1,17 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: fs
+  name: storage
 spec:
   template:
     spec:
       containers:
-        - name: fs
+        - name: minio
           volumeMounts:
-            - name: podcasts-files
-              mountPath: /var/www/podcast-server-files/data
+            - name: data
+              mountPath: "/data"
       volumes:
-        - name: podcasts-files
+        - name: data
           hostPath:
             path: /tmp/podcast-server/files/
             type: DirectoryOrCreate

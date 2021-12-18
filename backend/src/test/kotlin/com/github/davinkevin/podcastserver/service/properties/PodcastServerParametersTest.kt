@@ -1,9 +1,7 @@
 package com.github.davinkevin.podcastserver.service.properties
 
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import java.nio.file.Paths
 import java.time.ZonedDateTime.now
 
 /**
@@ -15,9 +13,6 @@ class PodcastServerParametersTest {
     fun should_have_default_value() {
         val parameters = PodcastServerParameters()
 
-        assertThat(parameters.rootfolder).isEqualTo(Paths.get("/tmp/"))
-        assertThat(parameters.coverDefaultName).isEqualTo("cover")
-        assertThat(parameters.downloadExtension).isEqualTo(".psdownload")
         assertThat(parameters.concurrentDownload).isEqualTo(3)
         assertThat(parameters.numberOfTry).isEqualTo(10)
         assertThat(parameters.rssDefaultNumberItem).isEqualTo(50L)
@@ -31,11 +26,7 @@ class PodcastServerParametersTest {
     @Test
     fun should_have_modified_values() {
         /* Given */
-        val rootFolder = Paths.get("/tmp/bar")
         val parameters = PodcastServerParameters(
-            rootfolder = rootFolder,
-            coverDefaultName = "default",
-            downloadExtension = ".bardownload",
             maxUpdateParallels = 5,
             concurrentDownload = 5,
             numberOfTry = 20,
@@ -47,9 +38,6 @@ class PodcastServerParametersTest {
         /* When */
 
         /* Then */
-        assertThat(parameters.downloadExtension).isEqualTo(".bardownload")
-        assertThat(parameters.rootfolder).isEqualTo(rootFolder)
-        assertThat(parameters.coverDefaultName).isEqualTo("default")
         assertThat(parameters.concurrentDownload).isEqualTo(5)
         assertThat(parameters.numberOfTry).isEqualTo(20)
         assertThat(parameters.rssDefaultNumberItem).isEqualTo(25L)

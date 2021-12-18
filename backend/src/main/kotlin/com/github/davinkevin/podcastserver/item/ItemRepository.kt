@@ -59,7 +59,7 @@ class ItemRepository(private val query: DSLContext) {
                 .and(PODCAST.HAS_TO_BE_DELETED.isTrue)
                 .and(ITEM.ID.notIn(query.select(WATCH_LIST_ITEMS.ITEMS_ID).from(WATCH_LIST_ITEMS)))
         )
-                .map { DeleteItemInformation(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
+                .map { DeleteItemRequest(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
     }
             .subscribeOn(Schedulers.boundedElastic())
             .publishOn(Schedulers.parallel())
@@ -78,7 +78,7 @@ class ItemRepository(private val query: DSLContext) {
                 .delayUntil { query.delete(ITEM).where(ITEM.ID.eq(id)).toMono() }
                 .filter { it[PODCAST.HAS_TO_BE_DELETED] }
                 .filter { it[ITEM.STATUS] == FINISH }
-                .map { DeleteItemInformation(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
+                .map { DeleteItemRequest(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
 
         removeFromPlaylist.then(delete)
     }

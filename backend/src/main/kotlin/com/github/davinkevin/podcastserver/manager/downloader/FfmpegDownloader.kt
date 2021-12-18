@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.FfmpegService
-import com.github.davinkevin.podcastserver.service.MimeTypeService
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import net.bramp.ffmpeg.builder.FFmpegBuilder
@@ -22,14 +22,13 @@ import java.util.*
 @Scope(SCOPE_PROTOTYPE)
 @Component
 class FfmpegDownloader(
-        downloadRepository: DownloadRepository,
-        podcastServerParameters: PodcastServerParameters,
-        template: MessagingTemplate,
-        mimeTypeService: MimeTypeService,
-        clock: Clock,
-        val ffmpegService: FfmpegService,
-        val processService: ProcessService
-) : AbstractDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock) {
+    downloadRepository: DownloadRepository,
+    template: MessagingTemplate,
+    clock: Clock,
+    file: FileStorageService,
+    val ffmpegService: FfmpegService,
+    val processService: ProcessService
+) : AbstractDownloader(downloadRepository, template, clock, file) {
 
     private val log = LoggerFactory.getLogger(FfmpegDownloader::class.java)
 

@@ -4,16 +4,43 @@ kind: Kustomization
 resources:
   - backend.yaml
   - database.yaml
-  - fs.yaml
+  - storage.yaml
   - ui.yaml
 
 
 configMapGenerator:
   - name: podcast-server
+  - name: database
     literals:
-      - database.username=podcast-server-user
-      - database.url=jdbc:postgresql://database:5432/podcast-server
-      - root-folder=/podcasts
+      - username=podcast-server-user
+      - name=podcast-server
+  - name: storage
+    literals:
+      - username=podcast-server-user
+      - bucket=data
 
 secretGenerator:
   - name: podcast-server
+  - name: database
+  - name: storage
+
+replacements:
+  - source:
+      kind: Service
+      name: database
+    targets:
+      - select:
+          kind: Deployment
+          name: backend
+        fieldPaths:
+          - spec.template.spec.containers.[name=app].env.[name=DATABASE_SERVICE_NAME].value
+          - spec.template.spec.initContainers.[name=init-db].env.[name=DATABASE_SERVICE_NAME].value
+  - source:
+      kind: Service
+      name: storage
+    targets:
+      - select:
+          kind: Deployment
+          name: backend
+        fieldPaths:
+          - spec.template.spec.containers.[name=app].env.[name=PODCASTSERVER_STORAGE_SERVICE_NAME].value

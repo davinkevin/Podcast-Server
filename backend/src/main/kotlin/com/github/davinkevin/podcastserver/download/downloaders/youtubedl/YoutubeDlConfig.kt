@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.MimeTypeService
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.sapher.youtubedl.YoutubeDL
@@ -23,19 +23,18 @@ class YoutubeDlConfig {
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
     fun youtubeDlDownloader(
-            downloadRepository: DownloadRepository,
-            parameters: PodcastServerParameters,
-            template: MessagingTemplate,
-            mimeType: MimeTypeService,
-            clock: Clock,
-            youtubeDlService: YoutubeDlService
+        downloadRepository: DownloadRepository,
+        parameters: PodcastServerParameters,
+        template: MessagingTemplate,
+        clock: Clock,
+        file: FileStorageService,
+        youtubeDlService: YoutubeDlService
     ): YoutubeDlDownloader = YoutubeDlDownloader(
-            downloadRepository = downloadRepository,
-            podcastServerParameters = parameters,
-            template = template,
-            mimeTypeService = mimeType,
-            clock = clock,
-            youtubeDl = youtubeDlService
+        downloadRepository = downloadRepository,
+        template = template,
+        clock = clock,
+        file = file,
+        youtubeDl = youtubeDlService
     )
 
     @Bean

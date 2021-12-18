@@ -8,17 +8,16 @@ import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
-import com.github.davinkevin.podcastserver.service.FileService
-import com.github.davinkevin.podcastserver.service.MimeTypeService
+import com.github.davinkevin.podcastserver.service.FileMetaData
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import org.mockito.kotlin.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.io.TempDir
 import org.mockito.Mockito
+import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
@@ -31,7 +30,7 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
-import java.nio.file.Path
+import java.nio.file.Paths
 import java.time.*
 import java.util.*
 
@@ -48,10 +47,9 @@ class ItemServiceTest(
 
     @MockBean private lateinit var repository: ItemRepository
     @MockBean private lateinit var p: PodcastServerParameters
-    @MockBean private lateinit var fileService: FileService
+    @MockBean private lateinit var fileService: FileStorageService
     @MockBean private lateinit var idm: ItemDownloadManager
     @MockBean private lateinit var podcastRepository: PodcastRepository
-    @MockBean private lateinit var mimeTypeService: MimeTypeService
 
     val item = Item(
             id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
@@ -87,9 +85,9 @@ class ItemServiceTest(
         /* Given */
         val limit = OffsetDateTime.now().minusDays(30)
         val items = listOf(
-                DeleteItemInformation(UUID.fromString("2e7d6cc7-c3ed-47d1-866f-7f797624124d"), "foo", "bar"),
-                DeleteItemInformation(UUID.fromString("dca41d0b-a59c-43fa-8d2d-2129fb637546"), "num1", "num2"),
-                DeleteItemInformation(UUID.fromString("40430ce3-b421-4c82-b34d-2deb4c46b1cd"), "itemT", "podcastT")
+                DeleteItemRequest(UUID.fromString("2e7d6cc7-c3ed-47d1-866f-7f797624124d"), "foo", "bar"),
+                DeleteItemRequest(UUID.fromString("dca41d0b-a59c-43fa-8d2d-2129fb637546"), "num1", "num2"),
+                DeleteItemRequest(UUID.fromString("40430ce3-b421-4c82-b34d-2deb4c46b1cd"), "itemT", "podcastT")
         )
         val repoResponse = Flux.fromIterable(items)
         whenever(repository.findAllToDelete(limit)).thenReturn(repoResponse)
@@ -226,7 +224,7 @@ class ItemServiceTest(
         fun `and delete files`() {
             /* Given */
             val currentItem = item.copy(status = FINISH, fileName = "foo.mp4")
-            val deleteItemInformation = DeleteItemInformation(currentItem.id, currentItem.fileName!!, currentItem.podcast.title)
+            val deleteItemInformation = DeleteItemRequest(currentItem.id, currentItem.fileName!!, currentItem.podcast.title)
             whenever(repository.resetById(item.id)).thenReturn(item.toMono())
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
@@ -354,7 +352,7 @@ class ItemServiceTest(
         fun `an item which should be deleted from disk`() {
             /* Given */
             val id = UUID.randomUUID()
-            val deleteItem = DeleteItemInformation(id, "foo", "bar")
+            val deleteItem = DeleteItemRequest(id, "foo", "bar")
             whenever(repository.deleteById(id)).thenReturn(Mono.just(deleteItem))
             whenever(fileService.deleteItem(deleteItem)).thenReturn(Mono.empty())
 
@@ -373,7 +371,7 @@ class ItemServiceTest(
     inner class ShouldUploadFile {
 
         @Test
-        fun `with success`(@TempDir rootFolder: Path) {
+        fun `with success`() {
             /* Given */
             val file: FilePart = mock()
             val podcast = Podcast(
@@ -393,7 +391,7 @@ class ItemServiceTest(
                             width = 100
                     )
             )
-            val fileLocation = rootFolder.resolve("podcast").resolve("Podcast_Name_-_2020-01-02_-_title.mp3")
+
             val itemToCreate = ItemForCreation(
                     title = "title",
                     url = null,
@@ -432,14 +430,18 @@ class ItemServiceTest(
                             height = podcast.cover.height
                     )
             )
-            whenever(file.filename()).thenReturn("Podcast Name - 2020-01-02 - title.mp3")
-            whenever(p.rootfolder).thenReturn(rootFolder)
+            val fileName = "Podcast Name - 2020-01-02 - title.mp3"
+            val normalizedFileName = Paths.get(fileName.replace("[^a-zA-Z0-9.-]".toRegex(), "_"))
+            whenever(file.filename()).thenReturn(fileName)
             whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast.toMono())
-            whenever(fileService.upload(fileLocation, file)).thenReturn(Mono.empty())
-            whenever(fileService.size(fileLocation)).thenReturn(1234L.toMono())
-            whenever(fileService.probeContentType(fileLocation)).thenReturn("audio/mp3".toMono())
+            whenever(fileService.cache(file, normalizedFileName)).thenReturn(normalizedFileName.toMono())
+            whenever(fileService.upload(podcast.title, normalizedFileName)).thenReturn(Mono.empty())
+            whenever(fileService.metadata(podcast.title, normalizedFileName)).thenReturn(
+                FileMetaData("audio/mp3", 1234L).toMono()
+            )
             whenever(repository.create(itemToCreate)).thenReturn(itemCreated.toMono())
             whenever(podcastRepository.updateLastUpdate(podcast.id)).thenReturn(Mono.empty())
+
             /* When */
             StepVerifier.create(itemService.upload(podcast.id, file))
                     /* Then */

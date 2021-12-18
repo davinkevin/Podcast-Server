@@ -12,9 +12,6 @@ import java.time.ZonedDateTime.now
 @ConstructorBinding
 @ConfigurationProperties(value = "podcastserver")
 data class PodcastServerParameters(
-        val rootfolder: Path = Paths.get("/tmp"),
-        val coverDefaultName: String = "cover",
-        val downloadExtension: String = ".psdownload",
         val maxUpdateParallels: Int = 256,
         val concurrentDownload: Int = 3,
         val numberOfTry: Int = 10,

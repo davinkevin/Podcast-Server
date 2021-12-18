@@ -4,7 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
-import com.github.davinkevin.podcastserver.service.FileService
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -29,9 +29,9 @@ import java.util.*
  */
 @Component
 class ItemHandler(
-        private val itemService: ItemService,
-        private val fileService: FileService,
-        private val clock: Clock
+    private val itemService: ItemService,
+    private val fileService: FileStorageService,
+    private val clock: Clock
 ) {
 
     private var log = LoggerFactory.getLogger(ItemHandler::class.java)
@@ -165,6 +165,7 @@ class ItemHandler(
         val podcastId = UUID.fromString(r.pathVariable("idPodcast"))
         val host = r.extractHost()
         log.debug("uploading to podcast {}", podcastId)
+
 
         return r.body(BodyExtractors.toMultipartData())
                 .map { it.toSingleValueMap() }

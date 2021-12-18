@@ -5,30 +5,34 @@ import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.MimeTypeService
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
+import reactor.core.publisher.Hooks
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.util.function.component1
+import reactor.kotlin.core.util.function.component2
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.attribute.PosixFilePermission.*
 import java.time.Clock
+import java.time.Duration
 import java.time.OffsetDateTime
 import kotlin.io.path.absolutePathString
 
 abstract class AbstractDownloader(
     private val downloadRepository: DownloadRepository,
-    private val podcastServerParameters: PodcastServerParameters,
     private val template: MessagingTemplate,
-    private val mimeTypeService: MimeTypeService,
-    private val clock: Clock
+    private val clock: Clock,
+    private val file: FileStorageService,
 ) : Runnable, Downloader {
 
     private val log = LoggerFactory.getLogger(AbstractDownloader::class.java)
 
     override lateinit var downloadingInformation: DownloadingInformation
     internal lateinit var itemDownloadManager: ItemDownloadManager
-    internal lateinit var target: Path
+    var target: Path = Files.createTempFile("default-init-file", ".ext")
 
     override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager) {
         this.downloadingInformation = information
@@ -36,7 +40,7 @@ abstract class AbstractDownloader(
     }
 
     override fun run() {
-        log.debug("Run")
+        log.info("Starting download of ${downloadingInformation.item.url}")
         startDownload()
     }
 
@@ -56,7 +60,7 @@ abstract class AbstractDownloader(
         saveStateOfItem(downloadingInformation.item)
         itemDownloadManager.removeACurrentDownload(downloadingInformation.item.id)
 
-        if (this::target.isInitialized) Files.deleteIfExists(target)
+        Files.deleteIfExists(target)
 
         broadcast(downloadingInformation.item)
     }
@@ -68,7 +72,7 @@ abstract class AbstractDownloader(
         saveStateOfItem(downloadingInformation.item)
         itemDownloadManager.removeACurrentDownload(downloadingInformation.item.id)
 
-        if (this::target.isInitialized) Files.deleteIfExists(target)
+        Files.deleteIfExists(target)
 
         broadcast(downloadingInformation.item)
     }
@@ -76,40 +80,26 @@ abstract class AbstractDownloader(
     override fun finishDownload() {
         itemDownloadManager.removeACurrentDownload(downloadingInformation.item.id)
 
-        try {
-            val parentLocation = podcastServerParameters.rootfolder
-                .resolve(downloadingInformation.item.podcast.title)
-                .also(Files::createDirectories)
-
-            val newLocation = parentLocation.resolve(target.fileName)
-                .also(Files::deleteIfExists)
-
-            Files.move(target, newLocation)
-
-            target = newLocation ?: error("Error when returning target without extension")
-        } catch (e:Exception) {
-            failDownload()
-            throw RuntimeException("Error during move of file", e)
-        }
-
-        try {
-            log.debug("Modification of read/write access")
-            Files.setPosixFilePermissions(target, setOf(OWNER_READ, OWNER_WRITE, GROUP_READ, OTHERS_READ))
-        } catch (e: Exception) {
-            log.warn("Modification of read/write access not made")
-        }
-
-        downloadRepository.finishDownload(
-            id = downloadingInformation.item.id,
-            length = Files.size(target),
-            mimeType = mimeTypeService.probeContentType(target),
-            fileName = FilenameUtils.getName(target.fileName.toString()),
-            downloadDate = OffsetDateTime.now(clock)
-        )
+        file.upload(downloadingInformation.item.podcast.title, target)
+            .then(file.metadata(downloadingInformation.item.podcast.title, target))
+            .flatMap { (mimeType, size) ->
+                downloadRepository.finishDownload(
+                    id = downloadingInformation.item.id,
+                    length = size,
+                    mimeType = mimeType,
+                    fileName = target.fileName.toString(),
+                    downloadDate = OffsetDateTime.now(clock)
+                ) }
+            .doOnSuccess {
+                downloadingInformation = downloadingInformation.status(Status.FINISH)
+                broadcast(downloadingInformation.item)
+                log.info("End of download for ${downloadingInformation.item.url}")
+            }
+            .doOnError {
+                log.error("Error during download of ${downloadingInformation.item.url}", it)
+                failDownload()
+            }
             .subscribe()
-
-        downloadingInformation = downloadingInformation.status(Status.FINISH)
-        broadcast(downloadingInformation.item)
     }
 
     internal fun computeTargetFile(info: DownloadingInformation): Path {

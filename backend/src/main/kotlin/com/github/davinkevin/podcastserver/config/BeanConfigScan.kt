@@ -6,13 +6,11 @@ import com.github.davinkevin.podcastserver.find.FindConfig
 import com.github.davinkevin.podcastserver.item.ItemConfig
 import com.github.davinkevin.podcastserver.playlist.PlaylistConfig
 import com.github.davinkevin.podcastserver.podcast.PodcastConfig
-import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.tag.TagConfig
 import com.github.davinkevin.podcastserver.update.UpdateConfig
-import org.apache.tika.Tika
 import org.springframework.boot.context.properties.ConfigurationPropertiesBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -38,18 +36,6 @@ import java.nio.file.Paths
         DownloadConfig::class
 )
 class BeanConfigScan {
-
-    @Bean
-    fun mimeTypeService(): MimeTypeService = MimeTypeService(
-            tika = Tika(),
-            mimeMap = mapOf(
-                    "mp4" to "video/mp4",
-                    "mp3" to "audio/mp3",
-                    "flv" to "video/flv",
-                    "webm" to "video/webm"
-            )
-    )
-
     @Bean
     @ConfigurationPropertiesBinding
     fun pathConverter() = PathConvert()

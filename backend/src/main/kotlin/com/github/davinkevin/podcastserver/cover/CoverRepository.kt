@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.cover
 
-import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Item
-import com.github.davinkevin.podcastserver.cover.DeleteCoverInformation.Podcast
+import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Item
+import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Podcast
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
 import com.github.davinkevin.podcastserver.database.Tables.PODCAST
 import com.github.davinkevin.podcastserver.database.tables.Cover.COVER
@@ -29,7 +29,7 @@ class CoverRepository(private val query: DSLContext) {
             .subscribeOn(Schedulers.boundedElastic())
             .publishOn(Schedulers.parallel())
 
-    fun findCoverOlderThan(date: OffsetDateTime): Flux<DeleteCoverInformation> = Flux.defer {
+    fun findCoverOlderThan(date: OffsetDateTime): Flux<DeleteCoverRequest> = Flux.defer {
         Flux.from(
                         query
                                 .select(
@@ -47,7 +47,7 @@ class CoverRepository(private val query: DSLContext) {
                 .subscribeOn(Schedulers.boundedElastic())
                 .publishOn(Schedulers.parallel())
                 .map { (podcastId, podcastTitle, itemId, itemTitle, coverId, coverUrl) ->
-                    DeleteCoverInformation(
+                    DeleteCoverRequest(
                             id = coverId,
                             extension = coverUrl.substringAfterLast("."),
                             item = Item(itemId, itemTitle),
@@ -59,7 +59,7 @@ class CoverRepository(private val query: DSLContext) {
 }
 
 data class CoverForCreation(val width: Int, val height: Int, val url: URI)
-data class DeleteCoverInformation(val id: UUID, val extension: String, val item: Item, val podcast: Podcast) {
+data class DeleteCoverRequest(val id: UUID, val extension: String, val item: Item, val podcast: Podcast) {
     data class Item(val id: UUID, val title: String)
     data class Podcast(val id: UUID, val title: String)
 }

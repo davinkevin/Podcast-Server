@@ -1,6 +1,5 @@
 
 podcastserver:
-  rootfolder: /podcasts
   concurrent-download: 40
   max-update-parallels: 256
   number-of-day-to-download: 30

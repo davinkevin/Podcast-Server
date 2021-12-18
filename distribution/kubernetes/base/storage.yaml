@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: storage
+spec:
+  selector:
+    matchLabels:
+      app: storage
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        app: storage
+    spec:
+      containers:
+        - name: minio
+          image: podcastserver/storage
+          args:
+            - server
+            - --console-address
+            - :9001
+            - /data
+          env:
+            - name: MINIO_ROOT_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: storage
+                  key: username
+            - name: MINIO_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: storage
+                  key: password
+            - name: MINIO_DOMAIN
+              value: MINIO_DOMAIN
+          ports:
+            - containerPort: 9000
+            - containerPort: 9001
+          readinessProbe:
+            httpGet:
+              path: /minio/health/ready
+              port: 9000
+            initialDelaySeconds: 10
+            periodSeconds: 20
+          livenessProbe:
+            httpGet:
+              path: /minio/health/live
+              port: 9000
+            initialDelaySeconds: 20
+            periodSeconds: 20
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: storage
+spec:
+  ports:
+    - port: 9000
+      protocol: TCP
+      targetPort: 9000
+      name: http-standard
+    - port: 9001
+      protocol: TCP
+      targetPort: 9001
+      name: http-console
+  selector:
+    app: storage

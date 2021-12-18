@@ -255,7 +255,7 @@ class PodcastRepository(private val query: DSLContext) {
             .publishOn(Schedulers.parallel())
             .then()
 
-    fun deleteById(id: UUID): Mono<DeletePodcastInformation> = Mono.defer {
+    fun deleteById(id: UUID): Mono<DeletePodcastRequest> = Mono.defer {
         val removeItemFromPlaylist = query
                 .delete(WATCH_LIST_ITEMS)
                 .where(WATCH_LIST_ITEMS.ITEMS_ID.`in`(query
@@ -287,7 +287,7 @@ class PodcastRepository(private val query: DSLContext) {
                     deletePodcast.then(deleteCover)
                 }
                 .filter { it[PODCAST.HAS_TO_BE_DELETED] }
-                .map { DeletePodcastInformation(it[PODCAST.ID], it[PODCAST.TITLE]) }
+                .map { DeletePodcastRequest(it[PODCAST.ID], it[PODCAST.TITLE]) }
 
         removeItemFromPlaylist
                 .then(Mono.zip(removePodcastTags, removeItems))

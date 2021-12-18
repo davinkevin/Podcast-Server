@@ -1,38 +1,32 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
-import com.github.davinkevin.podcastserver.ROOT_TEST_PATH
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.MimeTypeService
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
-import org.springframework.util.FileSystemUtils
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
 import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
-import java.nio.file.Paths
 import java.time.Clock
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.*
+import kotlin.io.path.writeText
 
 private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
 /**
  * Created by kevin on 09/02/2016 for Podcast Server
  */
-@ExtendWith(MockitoExtension::class)
 class DownloaderTest {
 
     private val clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
@@ -58,20 +52,14 @@ class DownloaderTest {
     inner class SimpleDownloaderTest {
 
         var downloadRepository: DownloadRepository = mock()
-        var podcastServerParameters: PodcastServerParameters = mock()
         var template: MessagingTemplate = mock()
-        var mimeTypeService: MimeTypeService = mock()
+        var file: FileStorageService = mock()
         var itemDownloadManager: ItemDownloadManager = mock()
         internal lateinit var downloader: SimpleDownloader
 
         @BeforeEach
         fun beforeEach() {
-            whenever(podcastServerParameters.downloadExtension).thenReturn(TEMPORARY_EXTENSION)
-
-            downloader = SimpleDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock)
-
-            FileSystemUtils.deleteRecursively(ROOT_TEST_PATH.resolve(item.podcast.title).toFile())
-            Files.createDirectories(ROOT_TEST_PATH)
+            downloader = SimpleDownloader(downloadRepository, template, clock, file)
         }
 
         @Test
@@ -80,7 +68,6 @@ class DownloaderTest {
             downloader
                     .with(DownloadingInformation(item,  listOf(), "filename.mp4", null), itemDownloadManager)
 
-            whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
 
             /* When */
@@ -91,26 +78,6 @@ class DownloaderTest {
             assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.STOPPED)
             verify(template, atLeast(1)).sendItem(any())
             assertThat(downloader.target.fileName.toString()).isEqualTo("filename-${item.id}.mp4")
-        }
-
-        @Test
-        fun `should failed if error during move`() {
-            /* Given */
-            downloader
-                    .with(DownloadingInformation(item,  listOf(), "file.mp4", null), itemDownloadManager)
-
-            whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
-
-            /* When */
-            downloader.run()
-            downloader.target = Paths.get("/tmp", item.podcast.title, "fake_file$TEMPORARY_EXTENSION")
-            assertThatThrownBy { downloader.finishDownload() }
-                    .isInstanceOf(RuntimeException::class.java)
-                    .hasMessage("Error during move of file")
-
-            /* Then */
-            assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FAILED)
         }
 
         @Test
@@ -127,22 +94,44 @@ class DownloaderTest {
             /* Then */
             verify(downloadRepository, times(1)).updateDownloadItem(information.item)
         }
+
+        @Test
+        @Suppress("UnassignedFluxMonoInstance")
+        fun `should failed if error occurs during finish method`() {
+            /* Given */
+            val information = DownloadingInformation(item, listOf(), "file.mp4", null)
+            downloader.with(information, itemDownloadManager)
+            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
+            whenever(file.upload(any(), any())).thenReturn(RuntimeException("not expected error").toMono())
+            whenever(file.metadata(any(), any())).thenReturn(RuntimeException("not expected error").toMono())
+
+            /* When */
+            downloader.apply {
+                startDownload()
+                assertThat(target).exists()
+                finishDownload()
+            }
+
+            /* Then */
+            assertThat(downloader.target).doesNotExist()
+        }
+
+
     }
 
     @Nested
     inner class AlwaysFailingDownloaderTest {
 
         var downloadRepository: DownloadRepository = mock()
-        var podcastServerParameters: PodcastServerParameters = mock()
         var template: MessagingTemplate = mock()
-        var mimeTypeService: MimeTypeService = mock()
+        var file: FileStorageService = mock()
         var itemDownloadManager: ItemDownloadManager = mock()
         internal lateinit var downloader: SimpleDownloader
 
         @Test
         fun `should trigger fail if download fail`() {
             /* Given */
-            val d = AlwaysFailingDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock)
+            val d = AlwaysFailingDownloader(downloadRepository, template, clock, file)
             d.with(DownloadingInformation(item,  listOf(), "filename.mp4", null), itemDownloadManager)
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
 
@@ -152,28 +141,21 @@ class DownloaderTest {
             /* Then */
             assertThat(d.downloadingInformation.item.status).isEqualTo(Status.FAILED)
         }
-
-    }
-
-    companion object {
-        const val TEMPORARY_EXTENSION = ".psdownload"
     }
 }
 
 internal class SimpleDownloader(
-        downloadRepository: DownloadRepository,
-        podcastServerParameters: PodcastServerParameters,
-        template: MessagingTemplate,
-        mimeTypeService: MimeTypeService,
-        clock: Clock
-) : AbstractDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock) {
+    downloadRepository: DownloadRepository,
+    template: MessagingTemplate,
+    clock: Clock,
+    file: FileStorageService,
+) : AbstractDownloader(downloadRepository, template, clock, file) {
 
     override fun download(): DownloadingItem {
         try {
             target = computeTargetFile(downloadingInformation)
             downloadingInformation = downloadingInformation.status(Status.FINISH)
-            val item = downloadingInformation.item
-            Files.createTempDirectory(item.podcast.title).resolve("file.mp4")
+            Files.createFile(target).apply { writeText("the file is here") }
         } catch (e: IOException) {
             e.printStackTrace()
         }
@@ -185,12 +167,11 @@ internal class SimpleDownloader(
 }
 
 internal class AlwaysFailingDownloader(
-        downloadRepository: DownloadRepository,
-        podcastServerParameters: PodcastServerParameters,
-        template: MessagingTemplate,
-        mimeTypeService: MimeTypeService,
-        clock: Clock
-) : AbstractDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock) {
+    downloadRepository: DownloadRepository,
+    template: MessagingTemplate,
+    clock: Clock,
+    file: FileStorageService
+) : AbstractDownloader(downloadRepository, template, clock, file) {
 
     override fun download(): DownloadingItem = throw RuntimeException("I'm failing !")
     override fun compatibility(downloadingInformation: DownloadingInformation) = 1

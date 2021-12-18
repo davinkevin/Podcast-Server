@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
-import com.github.davinkevin.podcastserver.service.FileService
+import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
@@ -15,7 +15,6 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.context.annotation.UserConfigurations
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.context.annotation.Bean
-import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Primary
 import reactor.core.publisher.Mono
 import java.time.Clock
@@ -57,7 +56,7 @@ class MockForResetAtStartupConfig {
 class ItemDependencyMockConfig {
     @Bean @Primary fun mockJOOQ(): DSLContext = mock()
     @Bean @Primary fun mockItemService(): ItemService = mock()
-    @Bean @Primary fun mockFileService(): FileService = mock()
+    @Bean @Primary fun mockFileService(): FileStorageService = mock()
     @Bean @Primary fun mockPodcastRepository(): PodcastRepository = mock()
     @Bean @Primary fun mockIDM(): ItemDownloadManager = mock()
     @Bean @Primary fun mockPodcastProps(): PodcastServerParameters = mock()

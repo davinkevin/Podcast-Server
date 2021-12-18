@@ -3,8 +3,8 @@ package com.github.davinkevin.podcastserver.podcast
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.cover.CoverRepository
-import com.github.davinkevin.podcastserver.service.FileService
-import com.github.davinkevin.podcastserver.service.MovePodcastDetails
+import com.github.davinkevin.podcastserver.service.FileStorageService
+import com.github.davinkevin.podcastserver.service.MovePodcastRequest
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.davinkevin.podcastserver.tag.TagRepository
 import org.mockito.kotlin.*
@@ -39,7 +39,7 @@ class PodcastServiceTest(
     @MockBean private lateinit var coverRepository: CoverRepository
     @MockBean private lateinit var tagRepository: TagRepository
     @MockBean private lateinit var repository: PodcastRepository
-    @MockBean private lateinit var fileService: FileService
+    @MockBean private lateinit var fileService: FileStorageService
 
     val podcast = Podcast(
             id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
@@ -701,7 +701,7 @@ class PodcastServiceTest(
                         tags = any(),
                         cover = any()
                 )).thenReturn(pAfterUpdate.toMono())
-                val moveOperation = MovePodcastDetails(
+                val moveOperation = MovePodcastRequest(
                         id = p.id,
                         from = p.title,
                         to = pToUpdate.title
@@ -735,7 +735,7 @@ class PodcastServiceTest(
         fun `a podcast which has to be deleted`() {
             /* Given */
             val id = UUID.randomUUID()
-            val information = DeletePodcastInformation(id, "foo")
+            val information = DeletePodcastRequest(id, "foo")
             whenever(repository.deleteById(id)).thenReturn(information.toMono())
             whenever(fileService.deletePodcast(information)).thenReturn(Mono.empty())
 

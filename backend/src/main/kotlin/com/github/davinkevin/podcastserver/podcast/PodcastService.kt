@@ -2,8 +2,8 @@ package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverRepository
-import com.github.davinkevin.podcastserver.service.FileService
-import com.github.davinkevin.podcastserver.service.MovePodcastDetails
+import com.github.davinkevin.podcastserver.service.FileStorageService
+import com.github.davinkevin.podcastserver.service.MovePodcastRequest
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.davinkevin.podcastserver.tag.TagRepository
 import reactor.core.publisher.Flux
@@ -18,7 +18,7 @@ class PodcastService(
         private val repository: PodcastRepository,
         private val coverRepository: CoverRepository,
         private val tagRepository: TagRepository,
-        private val fileService: FileService
+        private val fileService: FileStorageService
 ) {
 
     fun findAll(): Flux<Podcast> = repository.findAll()
@@ -69,7 +69,7 @@ class PodcastService(
 
         val title =
                 if (p.title != updatePodcast.title) {
-                    val movePodcastDetails = MovePodcastDetails(
+                    val movePodcastDetails = MovePodcastRequest(
                             id = updatePodcast.id,
                             from = p.title,
                             to = updatePodcast.title
