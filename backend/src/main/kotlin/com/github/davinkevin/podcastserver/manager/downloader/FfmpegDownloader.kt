@@ -55,7 +55,7 @@ class FfmpegDownloader(
             }
 
             ffmpegService.concat(
-                    target!!,
+                target,
                     *multiDownloads.map { it.getOrNull()!! }.toTypedArray()
             )
         }

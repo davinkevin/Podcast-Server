@@ -41,7 +41,7 @@ class RTMPDownloader(
 
         try {
             target = computeTargetFile(downloadingInformation)
-            log.debug("out file : {}", target!!.toAbsolutePath().toString())
+            log.debug("out file : {}", target.toAbsolutePath().toString())
 
             val processToExecute = processService
                 .newProcessBuilder(
@@ -49,7 +49,7 @@ class RTMPDownloader(
                     "-r",
                     downloadingInformation.url(),
                     "-o",
-                    target!!.toAbsolutePath().toString()
+                    target.toAbsolutePath().toString()
                 )
                 .directory(File("/tmp"))
                 .redirectErrorStream(true)

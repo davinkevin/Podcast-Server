@@ -18,6 +18,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.io.TempDir
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.springframework.util.FileSystemUtils
@@ -27,6 +28,7 @@ import java.io.File
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 import java.time.Clock
 import java.time.OffsetDateTime
 import java.time.ZoneId
@@ -89,10 +91,7 @@ class RTMPDownloaderTest {
                     .toByteArray()
                     .inputStream()
 
-            whenever(podcastServerParameters.downloadExtension).thenReturn(TEMPORARY_EXTENSION)
             whenever(externalTools.rtmpdump).thenReturn("/usr/local/bin/rtmpdump")
-            whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-
             downloader = RTMPDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock, processService, externalTools)
 
             downloader.with(
@@ -123,8 +122,7 @@ class RTMPDownloaderTest {
 
                 /* Then */
                 assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FAILED)
-                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(item.podcast.title)))
-                        .isEqualTo(0)
+                assertThat(ROOT_TEST_PATH.resolve(item.podcast.title)).doesNotExist()
             }
             //
             @Test
@@ -144,7 +142,7 @@ class RTMPDownloaderTest {
 
                 /* Then */
                 assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FAILED)
-                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(item.podcast.title))).isEqualTo(0)
+                assertThat(ROOT_TEST_PATH.resolve(item.podcast.title)).doesNotExist()
                 verify(p).destroy()
             }
         }
@@ -153,19 +151,25 @@ class RTMPDownloaderTest {
         @DisplayName("should download")
         inner class ShouldDownload {
 
-            private val destination = ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file-${item.id}.mp4$TEMPORARY_EXTENSION")
             private val pb = mock<ProcessBuilder>()
             private val p = mock<Process>()
-            private val parameters = arrayOf("/usr/local/bin/rtmpdump","-r", item.url.toASCIIString(), "-o", destination.toAbsolutePath().toString())
             private val pid = 1234L
 
             @BeforeEach
             fun beforeEach() {
+                var fileToCreate = ""
                 whenever(pb.directory(File("/tmp"))).then { pb }
                 whenever(pb.redirectErrorStream(true)).then { pb }
-                whenever(processService.newProcessBuilder(*parameters)).then { pb }
+                whenever(processService.newProcessBuilder(anyVararg())).then {
+                    assertThat(it.arguments[0]).isEqualTo("/usr/local/bin/rtmpdump")
+                    assertThat(it.arguments[1]).isEqualTo("-r")
+                    assertThat(it.arguments[2]).isEqualTo(item.url.toASCIIString())
+                    assertThat(it.arguments[3]).isEqualTo("-o")
+                    fileToCreate = it.arguments[4]!! as String
+                    pb
+                }
                 whenever(processService.start(pb)).then {
-                    Files.createFile(destination)
+                    Files.createFile(Paths.get(fileToCreate))
                     p
                 }
                 whenever(processService.pidOf(any())).thenReturn(pid)
@@ -173,8 +177,9 @@ class RTMPDownloaderTest {
             }
 
             @Test
-            fun `and save file to disk`() {
+            fun `and save file to disk`(@TempDir rootFolder: Path) {
                 /* Given */
+                whenever(podcastServerParameters.rootfolder).thenReturn(rootFolder)
                 whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
                 whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
                 whenever(downloadRepository.finishDownload(
@@ -190,7 +195,7 @@ class RTMPDownloaderTest {
 
                 /* Then */
                 assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FINISH)
-                assertThat(ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file-${item.id}.mp4")).exists()
+                assertThat(rootFolder.resolve(item.podcast.title).resolve("file-${item.id}.mp4")).exists()
             }
 
             @Nested
@@ -218,8 +223,9 @@ class RTMPDownloaderTest {
                     }
 
                     @Test
-                    fun download() {
+                    fun download(@TempDir rootFolder: Path) {
                         /* GIVEN */
+                        whenever(podcastServerParameters.rootfolder).thenReturn(rootFolder)
                         whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
                         whenever(downloadRepository.finishDownload(
                                 id = item.id,
@@ -240,8 +246,9 @@ class RTMPDownloaderTest {
                     }
 
                     @Test
-                    fun `but fail`() {
+                    fun `but fail`(@TempDir rootFolder: Path) {
                         /* GIVEN */
+                        whenever(podcastServerParameters.rootfolder).thenReturn(rootFolder)
                         whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
                         whenever(downloadRepository.finishDownload(
                                 id = item.id,
@@ -277,8 +284,9 @@ class RTMPDownloaderTest {
                         }
 
                         @Test
-                        fun download() {
+                        fun download(@TempDir rootFolder: Path) {
                             /* GIVEN */
+                            whenever(podcastServerParameters.rootfolder).thenReturn(rootFolder)
                             whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
                             whenever(downloadRepository.finishDownload(
                                     id = item.id,
@@ -299,8 +307,9 @@ class RTMPDownloaderTest {
                         }
 
                         @Test
-                        fun `but fail`() {
+                        fun `but fail`(@TempDir rootFolder: Path) {
                             /* GIVEN */
+                            whenever(podcastServerParameters.rootfolder).thenReturn(rootFolder)
                             whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
                             whenever(downloadRepository.finishDownload(
                                     id = item.id,
@@ -326,8 +335,9 @@ class RTMPDownloaderTest {
                 }
 
                 @Test
-                fun stop() {
+                fun stop(@TempDir rootFolder: Path) {
                     /* GIVEN */
+                    whenever(podcastServerParameters.rootfolder).thenReturn(rootFolder)
                     whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
                     whenever(downloadRepository.finishDownload(
                             id = item.id,
@@ -357,7 +367,7 @@ class RTMPDownloaderTest {
                 Progression : (1%)
                 Progression : (2%)
                 Progression : (3%)
-            """
+                """
                         .trimIndent()
                         .toByteArray()
                         .inputStream()
@@ -369,8 +379,6 @@ class RTMPDownloaderTest {
 
                 /* Then */
                 assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FAILED)
-                assertThat(numberOfChildrenFiles(ROOT_TEST_PATH.resolve(item.podcast.title)))
-                        .isEqualTo(0)
             }
         }
     }

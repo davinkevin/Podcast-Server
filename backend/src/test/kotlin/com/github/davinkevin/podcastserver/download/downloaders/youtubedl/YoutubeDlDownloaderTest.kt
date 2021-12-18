@@ -14,10 +14,7 @@ import com.sapher.youtubedl.DownloadProgressCallback
 import com.sapher.youtubedl.YoutubeDLResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
-import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.io.TempDir
 import org.junit.jupiter.params.ParameterizedTest
@@ -98,7 +95,6 @@ class YoutubeDlDownloaderTest(
         @BeforeEach
         fun beforeEach() {
             Mockito.reset(template, youtube, idm)
-            downloader.target = null
             downloader.itemDownloadManager = idm
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
             whenever(downloadRepository.finishDownload(any(), any(), anyOrNull(), any(), any()))
@@ -126,33 +122,6 @@ class YoutubeDlDownloaderTest(
             assertThat(rootFolder.resolve(item.podcast.title).resolve("one-${dItem.item.id}.mp3"))
                     .exists()
         }
-
-        @Test
-        fun `with a file created with double extension`(@TempDir rootFolder: Path) {
-            /* Given */
-            val url = "https://foo.bar.com/one.mp3"
-            downloader.downloadingInformation = dItem.copy(urls = listOf(url))
-
-            whenever(parameters.rootfolder).thenReturn(rootFolder)
-            whenever(youtube.extractName(url)).thenReturn("one.mp3")
-            whenever(youtube.download(eq(url), any(), any())).then {
-                val fileToCreate = it.getArgument<Path>(1)
-                val fileWithDoubleExt = fileToCreate
-                        .resolveSibling(fileToCreate.fileName.toString() + TEMPORARY_EXTENSION + ".mp3")
-                Files.createFile(fileWithDoubleExt)
-
-                mock<YoutubeDLResponse>()
-            }
-
-            /* When */
-            downloader.download()
-
-            /* Then */
-            assertThat(rootFolder.resolve(item.podcast.title).resolve("one-${dItem.item.id}.mp3"))
-                    .exists()
-        }
-
-
 
         @Nested
         @DisplayName("but fails due to error")
@@ -219,7 +188,6 @@ class YoutubeDlDownloaderTest(
                 Mockito.reset(template, youtube)
                 val url = "https://foo.bar.com/one.mp3"
                 downloader.downloadingInformation = dItem.copy(urls = listOf(url))
-                downloader.target = null
                 whenever(parameters.rootfolder).thenReturn(rootFolder)
                 whenever(youtube.extractName(url)).thenReturn("one.mp3")
                 whenever(youtube.download(eq(url), any(), any())).then {

@@ -85,7 +85,7 @@ class FfmpegDownloaderTest {
 
         @BeforeEach
         fun beforeEach() {
-            whenever(podcastServerParameters.downloadExtension).thenReturn(TEMPORARY_EXTENSION)
+//            whenever(podcastServerParameters.downloadExtension).thenReturn(TEMPORARY_EXTENSION)
 
             downloader = FfmpegDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock, ffmpegService, processService)
 
@@ -353,7 +353,6 @@ class FfmpegDownloaderTest {
 
         @BeforeEach
         fun beforeEach() {
-            whenever(podcastServerParameters.downloadExtension).thenReturn(TEMPORARY_EXTENSION)
             downloader = FfmpegDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock, ffmpegService, processService)
         }
 

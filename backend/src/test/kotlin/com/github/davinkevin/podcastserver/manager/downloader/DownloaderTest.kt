@@ -95,24 +95,7 @@ class DownloaderTest {
             /* Then */
             assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.STOPPED)
             verify(template, atLeast(1)).sendItem(any())
-            assertThat(downloader.target).isEqualTo(ROOT_TEST_PATH.resolve("baz").resolve("filename-${item.id}.mp4$TEMPORARY_EXTENSION"))
-        }
-
-        @Test
-        fun `should handle finish download without target`() {
-            /* Given */
-            downloader
-                    .with(DownloadingInformation(item,  listOf(), "filename.mp4", null), itemDownloadManager)
-
-            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
-
-            /* When */
-            downloader.finishDownload()
-
-            /* Then */
-            assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FAILED)
-            verify(template, atLeast(1)).sendItem(any())
-            assertThat(downloader.target).isNull()
+            assertThat(downloader.target.fileName.toString()).isEqualTo("filename-${item.id}.mp4")
         }
 
         @Test
@@ -152,48 +135,6 @@ class DownloaderTest {
         }
 
         @Test
-        fun `should get the same target file each call`() {
-            /* Given */
-            val information = DownloadingInformation(item, listOf(), "file.mp4", null)
-            downloader
-                    .with(information, itemDownloadManager)
-            whenever(podcastServerParameters.rootfolder).thenReturn(ROOT_TEST_PATH)
-
-            /* When */
-            downloader.target = downloader.computeTargetFile(information)
-            val target2 = downloader.computeTargetFile(information)
-
-            /* Then */
-            assertThat(downloader.target).isSameAs(target2)
-        }
-
-        @Test
-        @Disabled
-        fun `should handle error during creation of temp file`(@TempDir dir: Path) {
-            /* Given */
-            val subDir = dir.resolve(UUID.randomUUID().toString())
-            val readOnlyFolder = Files.createDirectory(subDir)
-            Files.setPosixFilePermissions(readOnlyFolder, setOf(PosixFilePermission.OWNER_READ))
-
-            /* Given */
-            // podcast.title = "bin"
-            // downloader.with(DownloadingInformation(item.apply { url = "http://foo.bar.com/bash" },  listOf(), null, null), itemDownloadManager)
-            val information = DownloadingInformation(item, listOf(), "file.mp4", null)
-            downloader.with(information, itemDownloadManager)
-
-            whenever(podcastServerParameters.rootfolder).thenReturn(subDir)
-            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(1.toMono())
-
-            /* When */
-            assertThatThrownBy { downloader.computeTargetFile(information) }
-                    .isInstanceOf(RuntimeException::class.java)
-                    .hasMessage("Error during creation of target file")
-
-            /* Then */
-            assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FAILED)
-        }
-
-        @Test
         @Suppress("UnassignedFluxMonoInstance")
         fun `should save sync with podcast`() {
             /* Given */
@@ -223,8 +164,7 @@ class DownloaderTest {
         fun `should trigger fail if download fail`() {
             /* Given */
             val d = AlwaysFailingDownloader(downloadRepository, podcastServerParameters, template, mimeTypeService, clock)
-            d
-                    .with(DownloadingInformation(item,  listOf(), "filename.mp4", null), itemDownloadManager)
+            d.with(DownloadingInformation(item,  listOf(), "filename.mp4", null), itemDownloadManager)
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
 
             /* When */
@@ -254,8 +194,7 @@ internal class SimpleDownloader(
             target = computeTargetFile(downloadingInformation)
             downloadingInformation = downloadingInformation.status(Status.FINISH)
             val item = downloadingInformation.item
-            Files.createFile(ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file.mp4${DownloaderTest.TEMPORARY_EXTENSION}"))
-            Files.createFile(ROOT_TEST_PATH.resolve(item.podcast.title).resolve("file.mp4"))
+            Files.createTempDirectory(item.podcast.title).resolve("file.mp4")
         } catch (e: IOException) {
             e.printStackTrace()
         }

@@ -78,7 +78,6 @@ class FranceTvUpdater(
                     ?.toMono() ?: Mono.empty()
             }
             .flatMap { pageItem ->
-//                println("""forV4("${pathUrl.substringAfterLast("/").substringBeforeLast(".")}", "${pageItem.videoId}"""")
                 franceTvApi.get()
                     .uri { it.path("v1/videos/${pageItem.videoId}")
                         .queryParam("country_code", "FR")
@@ -89,9 +88,6 @@ class FranceTvUpdater(
                     .retrieve()
                     .bodyToMono<FranceTvItemV2>()
                     .map { it.copy(externalDescription = pageItem.description) }
-//                    .doOnNext {
-//                        println("""forV4("${pathUrl.substringAfterLast("/").substringBeforeLast(".")}", "${pageItem.videoId}", "${it.coverUri().path}")""")
-//                    }
             }
             .flatMap { it.toMono().zipWith(image.fetchCoverInformationOrOption(it.coverUri())) }
             .map { (franceTvItem, cover) ->
