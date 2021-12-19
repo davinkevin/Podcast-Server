@@ -124,7 +124,7 @@ function toStatus(v: StatusesViewValue): Status[] {
 		case StatusesViewValue.DOWNLOADED:
 			return [Status.FINISH];
 		default:
-			return [Status.NOT_DOWNLOADED, Status.DELETED, Status.STARTED, Status.STOPPED, Status.PAUSED, Status.FAILED];
+			return [Status.NOT_DOWNLOADED, Status.DELETED, Status.STARTED, Status.STOPPED, Status.FAILED];
 	}
 }
 

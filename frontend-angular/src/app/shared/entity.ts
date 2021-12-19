@@ -81,7 +81,6 @@ export enum Status {
 	STARTED = 'STARTED',
 	FINISH = 'FINISH',
 	STOPPED = 'STOPPED',
-	PAUSED = 'PAUSED',
 	FAILED = 'FAILED'
 }
 
