@@ -1,4 +1,4 @@
-FROM flyway/flyway:7.3.2 AS flyway-base
+FROM flyway/flyway:8.2.2 AS flyway-base
 
 RUN find drivers -iname *.jar | grep -v postgresql | xargs rm && \
     rm -rf lib/enterprise lib/pro licenses/ README.txt flyway* \
@@ -6,7 +6,7 @@ RUN find drivers -iname *.jar | grep -v postgresql | xargs rm && \
 
 COPY database/migrations/*.sql /flyway/sql/
 
-FROM gcr.io/distroless/java-debian10:11 as base-image
+FROM gcr.io/distroless/java17-debian11:latest as base-image
 
 COPY --from=flyway-base /flyway/ /database/
 WORKDIR /database/

@@ -133,7 +133,8 @@ class PlaylistRepositoryTest(
                     .assertNext {
                         assertThat(it.name).isEqualTo("Conférence Rewind")
                         assertThat(it.id).isEqualTo(id)
-                        assertThat(it.items).hasSize(1).containsOnly(
+                        assertThat(it.items)
+                            .containsOnly(
                                 PlaylistWithItems. Item(
                                         id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
                                         title = "Geek INC 124",
@@ -167,7 +168,7 @@ class PlaylistRepositoryTest(
                     .assertNext {
                         assertThat(it.name).isEqualTo("Humour Playlist")
                         assertThat(it.id).isEqualTo(id)
-                        assertThat(it.items).hasSize(2).containsOnly(
+                        assertThat(it.items).containsOnly(
                                 PlaylistWithItems.Item(
                                         id = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"),
                                         title = "Appload 3",
@@ -295,7 +296,7 @@ class PlaylistRepositoryTest(
                     /* Then */
                     .expectSubscription()
                     .assertNext {
-                        assertThat(it.items).hasSize(1).containsOnly(
+                        assertThat(it.items).containsOnly(
                                 PlaylistWithItems. Item(
                                         id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"),
                                         title = "Geek INC 126",

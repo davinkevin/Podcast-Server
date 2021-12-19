@@ -1,15 +1,14 @@
 package com.github.davinkevin.podcastserver.manager.selector
 
-import com.github.davinkevin.podcastserver.update.updaters.rss.RSSUpdater
-import com.github.davinkevin.podcastserver.update.updaters.upload.UploadUpdater
+import com.github.davinkevin.podcastserver.update.updaters.Type
 import com.github.davinkevin.podcastserver.update.updaters.dailymotion.DailymotionUpdater
 import com.github.davinkevin.podcastserver.update.updaters.francetv.FranceTvUpdater
 import com.github.davinkevin.podcastserver.update.updaters.gulli.GulliUpdater
 import com.github.davinkevin.podcastserver.update.updaters.mytf1.MyTf1Updater
+import com.github.davinkevin.podcastserver.update.updaters.rss.RSSUpdater
+import com.github.davinkevin.podcastserver.update.updaters.upload.UploadUpdater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByApiUpdater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByXmlUpdater
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -21,6 +20,8 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.junit.jupiter.MockitoSettings
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness
 import java.net.URI
 import java.util.stream.Stream
@@ -75,7 +76,7 @@ class UpdaterSelectorTest {
     @Test
     fun `should serve types`() {
         /* Given */
-        val uTypes = setOf(
+        val uTypes: List<Type> = setOf(
                 dailymotionUpdater,
                 franceTvUpdater,
                 gulliUpdater,
@@ -92,9 +93,8 @@ class UpdaterSelectorTest {
 
         /* Then */
         assertThat(types)
-                .isNotEmpty
-                .hasSize(7)
                 .containsAll(uTypes)
+                .hasSize(7)
     }
 
     companion object {

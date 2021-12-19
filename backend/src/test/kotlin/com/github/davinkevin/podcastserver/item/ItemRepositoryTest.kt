@@ -24,6 +24,7 @@ import java.time.ZoneOffset
 import java.time.temporal.ChronoUnit.SECONDS
 import java.util.*
 import java.util.UUID.fromString
+import java.util.function.Consumer
 
 /**
  * Created by kevin on 2019-02-09
@@ -378,10 +379,10 @@ class ItemRepositoryTest(
                     .verifyComplete()
 
             val items = query.selectFrom(ITEM).where(ITEM.ID.`in`(ids)).fetch()
-            assertThat(items).allSatisfy {
+            assertThat(items).allSatisfy (Consumer {
                 assertThat(it.status).isEqualTo(DELETED)
                 assertThat(it.fileName).isNull()
-            }
+            })
         }
 
     }

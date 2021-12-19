@@ -95,7 +95,6 @@ class RSSUpdaterTest(
 
             /* When */
             StepVerifier.create(updater.findItems(podcast)
-                    .log()
                     .filter { it.cover?.url == URI("http://app-load.com/audio/itunes/appload1400.jpg") }
             )
                     /* Then */

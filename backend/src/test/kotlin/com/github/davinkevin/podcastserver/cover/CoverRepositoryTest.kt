@@ -105,7 +105,7 @@ class CoverRepositoryTest(
                     url = url
             )
             /* When */
-            StepVerifier.create(repository.save(cover).log())
+            StepVerifier.create(repository.save(cover))
                     /* Then */
                     .expectSubscription()
                     .assertNext {
