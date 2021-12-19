@@ -51,12 +51,6 @@ abstract class AbstractDownloader(
         }
     }
 
-    override fun pauseDownload() {
-        downloadingInformation = downloadingInformation.status(Status.PAUSED)
-        saveStateOfItem(downloadingInformation.item)
-        broadcast(downloadingInformation.item)
-    }
-
     override fun stopDownload() {
         downloadingInformation = downloadingInformation.status(Status.STOPPED)
         saveStateOfItem(downloadingInformation.item)

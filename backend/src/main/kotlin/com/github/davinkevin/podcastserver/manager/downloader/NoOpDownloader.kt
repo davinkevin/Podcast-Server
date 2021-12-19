@@ -18,8 +18,6 @@ class NoOpDownloader : Downloader {
 
     override fun download(): DownloadingItem = downloadingInformation.item
     override fun startDownload() = failDownload()
-    override fun pauseDownload() {}
-    override fun restartDownload() {}
     override fun stopDownload() {}
     override fun finishDownload() {}
     override fun failDownload() = itemDownloadManager.removeACurrentDownload(downloadingInformation.item.id)

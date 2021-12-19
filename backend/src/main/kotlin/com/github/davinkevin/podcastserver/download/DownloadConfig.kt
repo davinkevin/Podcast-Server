@@ -26,12 +26,9 @@ class DownloadRouterConfig {
             }
 
             POST("/stop", d::stopAll)
-            POST("/pause", d::pauseAll)
-            POST("/restart", d::restartAll)
 
             "/{id}".nest {
                 POST("/stop", d::stopOne)
-                POST("/toggle", d::toggleOne)
             }
 
             "/queue".nest {

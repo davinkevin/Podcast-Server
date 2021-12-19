@@ -98,30 +98,6 @@ class RTMPDownloader(
         super.startDownload()
     }
 
-    override fun pauseDownload() {
-        try {
-            stopDownloading.set(true)
-            val stopProcess = processService.newProcessBuilder("kill", "-STOP", pid.toString())
-            processService.start(stopProcess)
-            super.pauseDownload()
-        } catch (e: Exception) {
-            log.error("IOException :", e)
-            failDownload()
-        }
-    }
-
-    override fun restartDownload() =
-        try {
-            val restart = processService.newProcessBuilder("kill", "-SIGCONT", "" + pid.toString())
-            processService.start(restart)
-            downloadingInformation = downloadingInformation.status(Status.STARTED)
-            saveStateOfItem(downloadingInformation.item)
-            broadcast(downloadingInformation.item)
-        } catch (e: Exception) {
-            log.error("Error during restart of process :", e)
-            failDownload()
-        }
-
     override fun stopDownload() {
         stopDownloading.set(true)
         destroyProcess()

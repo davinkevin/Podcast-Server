@@ -4,14 +4,13 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Ignore
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
@@ -316,45 +315,6 @@ class DownloadHandlerTest(
         }
     }
 
-    @Nested
-    @DisplayName("should pause all downloads")
-    inner class ShouldPauseAllDownloads {
-
-        @Test
-        fun `with success`() {
-            /* Given */
-            /* When */
-            rest
-                    .post()
-                    .uri("/api/v1/downloads/pause")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isNoContent
-                    .expectBody().isEmpty
-
-            verify(idm, times(1)).pauseAllDownload()
-        }
-    }
-
-    @Nested
-    @DisplayName("should restart all downloads")
-    inner class ShouldRestartAllDownloads {
-
-        @Test
-        fun `with success`() {
-            /* Given */
-            /* When */
-            rest
-                    .post()
-                    .uri("/api/v1/downloads/restart")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isNoContent
-                    .expectBody().isEmpty
-
-            verify(idm, times(1)).restartAllDownload()
-        }
-    }
 
     @Nested
     @DisplayName("should stop one download")
@@ -374,27 +334,6 @@ class DownloadHandlerTest(
                     .expectBody().isEmpty
 
             verify(idm, times(1)).stopDownload(id)
-        }
-    }
-
-    @Nested
-    @DisplayName("should toggle one download")
-    inner class ShouldToggleOneDownload {
-
-        @Test
-        fun `with success`() {
-            /* Given */
-            val id = UUID.randomUUID()
-            /* When */
-            rest
-                    .post()
-                    .uri("/api/v1/downloads/{id}/toggle", id)
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isNoContent
-                    .expectBody().isEmpty
-
-            verify(idm, times(1)).toggleDownload(id)
         }
     }
 

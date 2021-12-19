@@ -2,23 +2,24 @@ package com.github.davinkevin.podcastserver.manager.downloader
 
 
 import com.github.davinkevin.podcastserver.ROOT_TEST_PATH
-import com.github.davinkevin.podcastserver.TEMPORARY_EXTENSION
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
-import com.github.davinkevin.podcastserver.service.FfmpegService
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
+import com.github.davinkevin.podcastserver.service.FfmpegService
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import org.mockito.kotlin.*
 import net.bramp.ffmpeg.builder.FFmpegBuilder
 import net.bramp.ffmpeg.progress.Progress
 import net.bramp.ffmpeg.progress.ProgressListener
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility.await
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
@@ -26,10 +27,10 @@ import org.mockito.Mock
 import org.mockito.Spy
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.*
 import org.springframework.util.FileSystemUtils
 import reactor.core.publisher.Mono
 import java.net.URI
-import java.util.Optional
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -220,83 +221,6 @@ class FfmpegDownloaderTest {
         @Nested
         inner class DuringDownloadOperation {
 
-            @Test
-            fun should_restart_a_current_download() {
-                /* Given */
-                val restartProcessBuilder = mock<ProcessBuilder>()
-                downloader.downloadingInformation = downloader.downloadingInformation.status(PAUSED)
-                downloader.process = mock()
-                whenever(processService.newProcessBuilder(anyVararg())).thenReturn(restartProcessBuilder)
-                whenever(processService.start(restartProcessBuilder)).thenReturn(mock())
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
-
-                /* When */
-                downloader.restartDownload()
-
-                /* Then */
-                await().atMost(5, SECONDS).untilAsserted {
-                    assertThat(downloader.downloadingInformation.item.status).isEqualTo(STARTED)
-                }
-            }
-
-            @Test
-            fun should_failed_to_restart() {
-                /* Given */
-                val restartProcessBuilder = mock<ProcessBuilder>()
-                downloader.downloadingInformation = downloader.downloadingInformation.status(PAUSED)
-                downloader.process = mock()
-                whenever(processService.newProcessBuilder(anyVararg())).thenReturn(restartProcessBuilder)
-                doAnswer { throw RuntimeException("Error when executing process") }
-                        .whenever(processService).start(restartProcessBuilder)
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
-
-                /* When */
-                downloader.restartDownload()
-
-                /* Then */
-                await().atMost(5, SECONDS).untilAsserted {
-                    assertThat(downloader.downloadingInformation.item.status).isEqualTo(FAILED)
-                }
-            }
-
-            @Test
-            fun should_paused_a_download() {
-                /* Given */
-                val pauseProcess = mock<ProcessBuilder>()
-                downloader.downloadingInformation = downloader.downloadingInformation.status(STARTED)
-                downloader.process = mock()
-                whenever(processService.newProcessBuilder(anyVararg())).thenReturn(pauseProcess)
-                whenever(processService.start(pauseProcess)).thenReturn(mock())
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
-
-                /* When */
-                downloader.pauseDownload()
-
-                /* Then */
-                await().atMost(5, SECONDS).untilAsserted {
-                    assertThat(downloader.downloadingInformation.item.status).isEqualTo(PAUSED)
-                }
-            }
-            //
-            @Test
-            fun should_failed_to_pause() {
-                /* Given */
-                val pauseProcess = mock<ProcessBuilder>()
-                downloader.downloadingInformation = downloader.downloadingInformation.status(STARTED)
-                downloader.process = mock()
-                whenever(processService.newProcessBuilder(anyVararg())).thenReturn(pauseProcess)
-                doAnswer { throw RuntimeException("Error when executing process") }
-                        .whenever(processService).start(pauseProcess)
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
-
-                /* When */
-                downloader.pauseDownload()
-
-                /* Then */
-                await().atMost(5, SECONDS).untilAsserted {
-                    assertThat(downloader.downloadingInformation.item.status).isEqualTo(FAILED)
-                }
-            }
 
             @Test
             fun should_stop_a_download() {

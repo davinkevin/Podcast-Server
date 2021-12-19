@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
 import com.github.davinkevin.podcastserver.ROOT_TEST_PATH
-import com.github.davinkevin.podcastserver.TEMPORARY_EXTENSION
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
@@ -10,7 +9,6 @@ import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import org.mockito.kotlin.*
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
@@ -21,6 +19,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.io.TempDir
 import org.mockito.Mock
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.*
 import org.springframework.util.FileSystemUtils
 import reactor.core.publisher.Mono
 import java.io.ByteArrayInputStream
@@ -208,130 +207,6 @@ class RTMPDownloaderTest {
                 fun beforeEach() {
                     whenever(p.waitFor()).then { isWaiting = true; SECONDS.sleep(4); 0 }
                     whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
-                }
-
-                @Nested
-                @DisplayName("pause")
-                inner class Pause {
-
-                    private val pauseParams = arrayOf("kill", "-STOP", pid.toString())
-                    private val pauseProcess = mock<ProcessBuilder>()
-
-                    @BeforeEach
-                    fun beforeEach() {
-                        doAnswer { pauseProcess }.whenever(processService).newProcessBuilder(*pauseParams)
-                    }
-
-                    @Test
-                    fun download(@TempDir rootFolder: Path) {
-                        /* GIVEN */
-                        whenever(podcastServerParameters.rootfolder).thenReturn(rootFolder)
-                        whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
-                        whenever(downloadRepository.finishDownload(
-                                id = item.id,
-                                length = 0,
-                                mimeType = "video/mp4",
-                                fileName = "file-${item.id}.mp4",
-                                downloadDate = fixedDate
-                        )).thenReturn(Mono.empty())
-
-                        /* WHEN  */
-                        runAsync { downloader.run() }
-                        await().until { isWaiting }
-                        downloader.pauseDownload()
-
-                        /* THEN  */
-                        assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.PAUSED)
-                        verify(processService).newProcessBuilder("kill", "-STOP", 1234.toString())
-                    }
-
-                    @Test
-                    fun `but fail`(@TempDir rootFolder: Path) {
-                        /* GIVEN */
-                        whenever(podcastServerParameters.rootfolder).thenReturn(rootFolder)
-                        whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
-                        whenever(downloadRepository.finishDownload(
-                                id = item.id,
-                                length = 0,
-                                mimeType = "video/mp4",
-                                fileName = "file-${item.id}.mp4",
-                                downloadDate = fixedDate
-                        )).thenReturn(Mono.empty())
-                        doAnswer { throw RuntimeException("Error during -STOP operation on process") }
-                                .whenever(processService).start(pauseProcess)
-
-                        /* WHEN  */
-                        runAsync { downloader.run() }
-                        await().until { isWaiting }
-                        downloader.pauseDownload()
-
-                        /* THEN  */
-                        assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FAILED)
-                        verify(processService).newProcessBuilder("kill", "-STOP", pid.toString())
-                    }
-
-                    @Nested
-                    @DisplayName("and restart")
-                    inner class AndRestart {
-
-                        private val restartParams = arrayOf("kill", "-SIGCONT", "" + pid.toString())
-                        private val restartProcess = mock<ProcessBuilder>()
-
-                        @BeforeEach
-                        fun beforeEach() {
-                            doAnswer { mock<Process>() }.whenever(processService).start(pauseProcess)
-                            doAnswer { restartProcess }.whenever(processService).newProcessBuilder(*restartParams)
-                        }
-
-                        @Test
-                        fun download(@TempDir rootFolder: Path) {
-                            /* GIVEN */
-                            whenever(podcastServerParameters.rootfolder).thenReturn(rootFolder)
-                            whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
-                            whenever(downloadRepository.finishDownload(
-                                    id = item.id,
-                                    length = 0,
-                                    mimeType = "video/mp4",
-                                    fileName = "file-${item.id}.mp4",
-                                    downloadDate = fixedDate
-                            )).thenReturn(Mono.empty())
-                            /* WHEN  */
-                            runAsync { downloader.run() }
-                            await().until { isWaiting }
-                            downloader.pauseDownload()
-                            downloader.restartDownload()
-
-                            /* THEN  */
-                            assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.STARTED)
-                            verify(processService).newProcessBuilder("kill", "-SIGCONT", 1234.toString())
-                        }
-
-                        @Test
-                        fun `but fail`(@TempDir rootFolder: Path) {
-                            /* GIVEN */
-                            whenever(podcastServerParameters.rootfolder).thenReturn(rootFolder)
-                            whenever(mimeTypeService.probeContentType(any())).thenReturn("video/mp4")
-                            whenever(downloadRepository.finishDownload(
-                                    id = item.id,
-                                    length = 0,
-                                    mimeType = "video/mp4",
-                                    fileName = "file-${item.id}.mp4",
-                                    downloadDate = fixedDate
-                            )).thenReturn(Mono.empty())
-                            doAnswer { throw RuntimeException("Error during -SIGCONT operation on process") }
-                                    .whenever(processService).start(restartProcess)
-
-                            /* WHEN  */
-                            runAsync { downloader.run() }
-                            await().until { isWaiting }
-                            downloader.pauseDownload()
-                            downloader.restartDownload()
-
-                            /* THEN  */
-                            assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FAILED)
-                            verify(processService).newProcessBuilder("kill", "-SIGCONT", pid.toString())
-                        }
-                    }
                 }
 
                 @Test

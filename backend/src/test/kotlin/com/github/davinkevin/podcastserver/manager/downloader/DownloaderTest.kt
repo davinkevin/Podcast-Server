@@ -7,25 +7,20 @@ import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.MimeTypeService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import org.mockito.kotlin.*
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.api.io.TempDir
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.*
 import org.springframework.util.FileSystemUtils
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
-import java.nio.file.attribute.PosixFilePermission
 import java.time.Clock
 import java.time.OffsetDateTime
 import java.time.ZoneId
@@ -96,22 +91,6 @@ class DownloaderTest {
             assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.STOPPED)
             verify(template, atLeast(1)).sendItem(any())
             assertThat(downloader.target.fileName.toString()).isEqualTo("filename-${item.id}.mp4")
-        }
-
-        @Test
-        fun `should pause a download`() {
-            /* Given */
-            downloader
-                    .with(DownloadingInformation(item,  listOf(), "filename.mp4", null), itemDownloadManager)
-
-            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
-
-            /* When */
-            downloader.pauseDownload()
-
-            /* Then */
-            assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.PAUSED)
-            verify(template, atLeast(1)).sendItem(any())
         }
 
         @Test

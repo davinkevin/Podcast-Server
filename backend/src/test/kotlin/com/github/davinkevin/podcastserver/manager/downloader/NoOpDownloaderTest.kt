@@ -2,12 +2,12 @@ package com.github.davinkevin.podcastserver.manager.downloader
 
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.times
 import org.mockito.Mockito.verify
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
 import java.net.URI
 import java.util.*
 
@@ -42,8 +42,6 @@ class NoOpDownloaderTest {
         }
 
         /* When */
-        downloader.pauseDownload()
-        downloader.restartDownload()
         downloader.stopDownload()
         downloader.finishDownload()
 

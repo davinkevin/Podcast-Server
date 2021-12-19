@@ -18,7 +18,6 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
 import java.util.*
-import java.util.concurrent.CompletableFuture.runAsync
 import java.util.concurrent.locks.ReentrantLock
 
 @Service
@@ -96,42 +95,13 @@ class ItemDownloadManager (
     }
 
     fun stopAllDownload() = this.downloadingQueue.values.forEach { it.stopDownload() }
-    fun pauseAllDownload() = this.downloadingQueue.values.forEach { it.pauseDownload() }
-
-    fun restartAllDownload() {
-        this.downloadingQueue
-                .values
-                .toFlux()
-                .filter { Status.PAUSED == it.downloadingInformation.item.status }
-                .map { it.downloadingInformation.item }
-                .subscribe { runAsync { launchDownloadFor(it) } }
-    }
-
-    // Change State of id identified download
     fun stopDownload(id: UUID) = findDownloaderOfItem(id)?.stopDownload()
-    fun pauseDownload(id: UUID) = findDownloaderOfItem(id)?.pauseDownload()
 
     private fun findDownloaderOfItem(id: UUID): Downloader? {
         return downloadingQueue
                 .filterKeys { it.id == id }
                 .values
                 .firstOrNull()
-    }
-
-    private fun restartDownload(id: UUID) {
-        val downloader = findDownloaderOfItem(id) ?: error("downloader not found for item with id $id")
-        downloadRepository.findDownloadingItemById(downloader.downloadingInformation.item.id)
-                .subscribe { launchDownloadFor(it) }
-    }
-
-    fun toggleDownload(id: UUID) {
-        val downloader = findDownloaderOfItem(id) ?: error("downloader not found for item with id $id")
-        val item = downloader.downloadingInformation.item
-
-        when {
-            Status.PAUSED == item.status -> restartDownload(id).also { log.debug("restart du download") }
-            Status.STARTED == item.status -> pauseDownload(id).also { log.debug("pause du download") }
-        }
     }
 
     fun addItemToQueue(id: UUID) {
@@ -172,25 +142,15 @@ class ItemDownloadManager (
     }
 
     private fun launchDownloadFor(item: DownloadingItem) {
-        when {
-            isInDownloadingQueue(item) -> downloadingQueue[item]
-                    ?.restartDownload()
-                    .also { log.debug("Restart Item : " + item.title) }
-            else -> launchWithNewWorkerFrom(item)
-        }
-    }
-
-    private fun launchWithNewWorkerFrom(item: DownloadingItem) {
-
         val dlItem = try { extractorSelector.of(item.url).extract(item) }
-                catch (e: Exception) {
-                    log.error("Error during extraction of {}", item.url, e)
-                    manageDownload()
-                    return
-                }
+        catch (e: Exception) {
+            log.error("Error during extraction of {}", item.url, e)
+            manageDownload()
+            return
+        }
 
         val downloader = downloaderSelector.of(dlItem)
-                .apply { with(dlItem, this@ItemDownloadManager) }
+            .apply { with(dlItem, this@ItemDownloadManager) }
 
         this.downloadingQueue = downloadingQueue.filterKeys { it != item } + Pair(item, downloader)
         downloadExecutor.execute(downloader)

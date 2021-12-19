@@ -11,8 +11,6 @@ interface Downloader : Runnable {
     fun download(): DownloadingItem
 
     fun startDownload()
-    fun pauseDownload()
-    fun restartDownload() = this.startDownload()
     fun stopDownload()
     fun failDownload()
     fun finishDownload()

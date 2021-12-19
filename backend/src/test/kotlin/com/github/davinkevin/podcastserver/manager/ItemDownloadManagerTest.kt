@@ -10,7 +10,6 @@ import com.github.davinkevin.podcastserver.manager.selector.ExtractorSelector
 import com.github.davinkevin.podcastserver.manager.worker.Extractor
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import org.mockito.kotlin.*
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.*
@@ -18,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.mockito.Mockito
+import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.TestConfiguration
@@ -32,7 +32,7 @@ import java.net.URI
 import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.util.*
-import java.util.concurrent.TimeUnit.*
+import java.util.concurrent.TimeUnit.SECONDS
 
 /**
  * Created by kevin on 06/05/15
@@ -178,29 +178,6 @@ class ItemDownloadManagerTest(
             /* Then */
             await().atMost(1, SECONDS).untilAsserted {
                 verify(messaging).sendWaitingQueue(emptyList())
-            }
-        }
-
-        @Test
-        fun `and restart item because there is already in the downloading queue `() {
-            /* Given */
-            val extractor = MockExtractor(information)
-            val downloader = mock<Downloader>()
-
-            whenever(downloadRepository.findAllToDownload(date.toOffsetDateTime(), 1))
-                    .thenReturn(Flux.just(item))
-            whenever(extractors.of(item.url)).thenReturn(extractor)
-            whenever(downloaders.of(information)).thenReturn(downloader)
-            downloadExecutor.corePoolSize = 2
-
-            /* When */
-            idm.launchDownload()
-            await().until { idm.downloadingItems.contains(item) }
-            idm.launchDownload()
-
-            /* Then */
-            await().atMost(1, SECONDS).untilAsserted {
-                verify(downloader).restartDownload()
             }
         }
 

@@ -4,7 +4,6 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
-import org.apache.commons.io.FilenameUtils
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.noContent
@@ -47,25 +46,9 @@ class DownloadHandler(private val downloadService: ItemDownloadManager) {
         return noContent().build()
     }
 
-    fun pauseAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> {
-        downloadService.pauseAllDownload()
-        return noContent().build()
-    }
-
-    fun restartAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> {
-        downloadService.restartAllDownload()
-        return noContent().build()
-    }
-
     fun stopOne(r: ServerRequest): Mono<ServerResponse> {
         val id = UUID.fromString(r.pathVariable("id"))
         downloadService.stopDownload(id)
-        return noContent().build()
-    }
-
-    fun toggleOne(r: ServerRequest): Mono<ServerResponse> {
-        val id = UUID.fromString(r.pathVariable("id"))
-        downloadService.toggleDownload(id)
         return noContent().build()
     }
 

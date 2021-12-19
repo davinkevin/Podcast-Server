@@ -112,28 +112,6 @@ class FfmpegDownloader(
         broadcast(downloadingInformation.item)
     }
 
-    override fun pauseDownload() =
-            try {
-                val pauseProcess = processService.newProcessBuilder("kill", "-STOP", "" + processService.pidOf(process))
-                processService.start(pauseProcess)
-                super.pauseDownload()
-            } catch (e: Exception) {
-                log.error("Error during pause of process :", e)
-                failDownload()
-            }
-
-    override fun restartDownload() =
-            try {
-                val restart = processService.newProcessBuilder("kill", "-SIGCONT", "" + processService.pidOf(process))
-                processService.start(restart)
-                downloadingInformation = downloadingInformation.status(Status.STARTED)
-                saveStateOfItem(downloadingInformation.item)
-                broadcast(downloadingInformation.item)
-            } catch (e: Exception) {
-                log.error("Error during restart of process :", e)
-                failDownload()
-            }
-
     override fun stopDownload() {
         try {
             process.destroy()
