@@ -12,11 +12,11 @@ build:
   - image: podcastserver/backend-base-image
     docker:
       dockerfile: backend/src/main/base-image/Dockerfile
-  - image: podcastserver/ui-v1
-    context: frontend-angularjs/target/
   - image: podcastserver/init-db
     docker:
       dockerfile: ./database/Dockerfile
+  - image: podcastserver/ui-v1
+    context: frontend-angularjs/target/
 deploy:
   kustomize:
     paths:
