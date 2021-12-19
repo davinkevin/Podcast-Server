@@ -68,10 +68,6 @@ export default class ItemMenuComponent {
         this.DownloadManager.stop(item);
     }
 
-    toggleDownload(item){
-        return this.DownloadManager.toggle(item);
-    }
-
     addOrRemove(item) {
         return this.playlistService.addOrRemove(item);
     }

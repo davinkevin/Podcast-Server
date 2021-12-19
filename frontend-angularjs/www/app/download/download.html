@@ -8,8 +8,6 @@
             </div>
         </div>
         <div class="btn-group pull-right">
-            <button ng-click="dc.restartAllDownload()" type="button" class="btn btn-default">Start</button>
-            <button ng-click="dc.pauseAllDownload()" type="button" class="btn btn-default">Pause</button>
             <button ng-click="dc.stopAllDownload()" type="button" class="btn btn-default">Stop</button>
         </div>
     </div>
@@ -17,7 +15,6 @@
 
         <div class="buttonList pull-right">
             <br/>
-            <button ng-click="dc.toggleDownload(item)" type="button" class="btn btn-sm" ng-class="{'btn-primary' : item.status === 'STARTED', 'btn-warning' : item.status === 'PAUSED'}"><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
             <button ng-click="dc.stopDownload(item)" type="button" class="btn btn-danger btn-sm"><span class="glyphicon glyphicon-stop"></span></button>
         </div>
 

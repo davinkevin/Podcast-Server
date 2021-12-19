@@ -40,12 +40,6 @@ export default class DownloadManager {
     stopAllDownload () {
         return this.$http.post(`/api/v1/downloads/stop`);
     }
-    pauseAllDownload () {
-        return this.$http.post(`/api/v1/downloads/pause`);
-    }
-    restartAllDownload() {
-        return this.$http.post(`/api/v1/downloads/restart`);
-    }
 
     updateNumberOfSimDl(number) {
         return this.$http.post(`/api/v1/downloads/limit`, number);
@@ -65,11 +59,6 @@ export default class DownloadManager {
     }
     removeFromQueue (item) {
         return this.$http.delete(`/api/v1/downloads/queue/${item.id}`);
-    }
-
-
-    toggle(item) {
-      return this.$http.post(`/api/v1/downloads/${item.id}/toggle`);
     }
     stop(item) {
       return this.$http.post(`/api/v1/downloads/${item.id}/stop`);

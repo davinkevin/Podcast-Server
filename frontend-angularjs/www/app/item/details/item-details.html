@@ -16,20 +16,15 @@
                 </a>
 
                 <div class="caption">
-
                     <div class="buttonList text-center">
-                        <!-- Téléchargement en cours -->
-                        <span ng-show="idc.item.status == 'STARTED' || idc.item.status == 'PAUSED'" >
-                            <button ng-click="idc.toggleDownload(idc.item)" type="button" class="btn btn-primary "><i class="glyphicon glyphicon-play"></i><i class="glyphicon glyphicon-pause"></i></button>
+                        <span ng-show="idc.item.status == 'STARTED'" >
                             <button ng-click="idc.stopDownload(idc.item)" type="button" class="btn btn-danger"><span class="glyphicon glyphicon-stop"></span></button>
                         </span>
 
-                        <!-- Lancer le téléchargement -->
-                        <button ng-click="idc.download()" ng-show="(idc.item.status != 'STARTED' && idc.item.status != 'PAUSED' ) && !idc.item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
+                        <button ng-click="idc.download()" ng-show="(idc.item.status != 'STARTED') && !idc.item.isDownloaded" type="button" class="btn btn-primary"><span class="glyphicon glyphicon-save"></span></button>
 
                         <a ng-click="idc.play()" ng-show="idc.item.isDownloaded" type="button" class="btn btn-success"><span class="ionicons ion-social-youtube"></span></a>
 
-                        <!-- Add to Playlist -->
                         <a ng-show="idc.item.isDownloaded && !idc.isVideo()" ng-click="idc.toggleInPlaylist()" type="button" class="btn btn-primary">
                             <span ng-hide="idc.isInPlaylist()" class="glyphicon glyphicon-plus"></span>
                             <span ng-show="idc.isInPlaylist()" class="glyphicon glyphicon-minus"></span>

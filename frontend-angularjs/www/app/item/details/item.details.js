@@ -62,10 +62,6 @@ export default class ItemDetailCtrl {
         this.DonwloadManager.stop(item);
     }
 
-    toggleDownload(item) {
-        this.DonwloadManager.toggle(item);
-    }
-
     redirect() {
         this.$location.path('/podcasts/'.concat(this.item.podcast.id));
     }

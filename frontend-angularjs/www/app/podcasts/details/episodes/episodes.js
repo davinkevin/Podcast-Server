@@ -97,10 +97,6 @@ export default class PodcastItemsListComponent {
         this.DownloadManager.stop(item);
     }
 
-    toggleDownload(item) {
-        this.DownloadManager.toggle(item);
-    }
-
     play(item){
         return this.itemService.play(item);
     }

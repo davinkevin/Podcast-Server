@@ -14,4 +14,3 @@ import ConfigModule from './config/config';
     modules : [ TitleComponent, SearchModule, PodcastsModule, ItemModule, DownloadModule, PlayerModule, StatsModule, ConfigModule ]
 })
 export default class App {}
-

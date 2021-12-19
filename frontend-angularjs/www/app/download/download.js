@@ -63,7 +63,6 @@ export default class DownloadCtrl {
         let elemToUpdate = this.items.find(i => i.id === item.id);
         switch (item.status) {
             case 'STARTED' :
-            case 'PAUSED' :
                 if (elemToUpdate)
                     Object.assign(elemToUpdate, item);
                 else
@@ -89,7 +88,7 @@ export default class DownloadCtrl {
     }
 
     getTypeFromStatus(item) {
-        return (item.status === "PAUSED") ? "warning" : "info";
+        return "info";
     }
     updateNumberOfSimDl(number) {
         this.DonwloadManager.updateNumberOfSimDl(number);
@@ -99,19 +98,10 @@ export default class DownloadCtrl {
     stopDownload(item){
         this.DonwloadManager.stop(item);
     }
-    toggleDownload(item){
-        this.DonwloadManager.toggle(item);
-    }
 
     /** Global **/
     stopAllDownload(){
         this.DonwloadManager.stopAllDownload();
-    }
-    pauseAllDownload(){
-        this.DonwloadManager.pauseAllDownload();
-    }
-    restartAllDownload(){
-        this.DonwloadManager.restartAllDownload();
     }
     removeFromQueue(item){
         this.DonwloadManager.removeFromQueue(item);
