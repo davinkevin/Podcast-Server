@@ -100,15 +100,18 @@ spec:
                 - name: PGPASSWORD
                   valueFrom:
                     secretKeyRef:
-                      name: podcast-server
-                      key: database.password
+                      name: database
+                      key: password
                 - name: POSTGRES_USER
                   valueFrom:
                     configMapKeyRef:
-                      name: podcast-server
-                      key: database.username
+                      name: database
+                      key: username
                 - name: POSTGRES_DB
-                  value: podcast-server
+                  valueFrom:
+                    configMapKeyRef:
+                      name: database
+                      key: name
               command:
                 - /bin/sh
               args:
