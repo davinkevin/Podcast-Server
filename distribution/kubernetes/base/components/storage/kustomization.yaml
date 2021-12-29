@@ -3,3 +3,11 @@ kind: Component
 
 resources:
   - storage.yaml
+
+configMapGenerator:
+  - name: storage
+    behavior: merge
+    literals:
+      - username=podcast-server-user
+      - bucket=data
+      - url=http://storage:9000/

@@ -1,9 +1,11 @@
 package com.github.davinkevin.podcastserver.cover
 
+import com.github.davinkevin.podcastserver.JooqR2DBCTest
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Item
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Podcast
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.r2dbc
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.insertInto
@@ -25,7 +27,7 @@ import java.util.UUID.fromString
 /**
  * Created by kevin on 14/09/2019
  */
-@JooqTest
+@JooqR2DBCTest
 @Transactional(propagation = NEVER)
 @Import(CoverRepository::class)
 class CoverRepositoryTest(
@@ -41,7 +43,7 @@ class CoverRepositoryTest(
                 truncate(ITEM).cascade(),
                 truncate(PODCAST).cascade(),
                 truncate(COVER).cascade(),
-        ).execute()
+        ).r2dbc().execute()
     }
 
     @Nested
@@ -92,7 +94,7 @@ class CoverRepositoryTest(
                             .values(fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
                             .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
 
-            ).execute()
+            ).r2dbc().execute()
         }
 
         @Test
@@ -116,7 +118,7 @@ class CoverRepositoryTest(
                     }
                     .verifyComplete()
 
-            val r = query.selectFrom(COVER).fetch()
+            val r = query.selectFrom(COVER).r2dbc().fetch()
             assertThat(r).hasSize(10)
 
             val coverRecord = r.first { it[COVER.URL] == url.toASCIIString() }
@@ -176,7 +178,7 @@ class CoverRepositoryTest(
                             .values(fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
                             .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
 
-            ).execute()
+            ).r2dbc().execute()
         }
 
         @Test

@@ -8,15 +8,7 @@ resources:
 configMapGenerator:
   - name: podcast-server
   - name: database
-    literals:
-      - username=podcast-server-user
-      - name=podcast-server
-      - url=jdbc:postgresql://database:5432/podcast-server
   - name: storage
-    literals:
-      - username=podcast-server-user
-      - bucket=data
-      - url=http://storage:9000/
 
 secretGenerator:
   - name: podcast-server
