@@ -1,0 +1,27 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+namespace: podcast-server
+
+resources:
+  - ../all-in-one
+  - ui
+  - ingress
+
+patchesStrategicMerge:
+  - volume.yaml
+
+secretGenerator:
+  - name: database
+    behavior: merge
+    literals:
+      - password=nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
+  - name: podcast-server
+    behavior: merge
+    literals:
+      - api.youtube=TO_BE_DEFINED
+    type: Opaque
+  - name: storage
+    behavior: merge
+    literals:
+      - password=Mns1G6RgPtLgy68H

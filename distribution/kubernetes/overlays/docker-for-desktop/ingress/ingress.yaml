@@ -1,0 +1,62 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: podcast-server
+spec:
+  tls:
+    - hosts:
+        - podcast.k8s.local
+      secretName: podcast-k8s-local
+  rules:
+    - host: podcast.k8s.local
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 8080
+          - path: /actuator
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 8080
+          - path: /data
+            pathType: Prefix
+            backend:
+              service:
+                name: storage
+                port:
+                  number: 9000
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: ui-v1
+                port:
+                  number: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: minio-console
+spec:
+  tls:
+    - hosts:
+        - minio.podcast.k8s.local
+      secretName: minio-podcast-k8s-local
+  rules:
+    - host: minio.podcast.k8s.local
+      http:
+        paths:
+          - pathType: Prefix
+            path: /
+            backend:
+              service:
+                name: storage
+                port:
+                  number: 9001

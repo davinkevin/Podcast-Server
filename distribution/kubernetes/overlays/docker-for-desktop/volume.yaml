@@ -1,6 +1,24 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
+  name: storage
+spec:
+  template:
+    spec:
+      containers:
+        - name: minio
+          volumeMounts:
+            - name: data
+              mountPath: "/data"
+      volumes:
+        - name: data
+          hostPath:
+            path: /tmp/podcast-server/files/
+            type: DirectoryOrCreate
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
   name: database
 spec:
   template:
@@ -19,8 +37,8 @@ spec:
             type: DirectoryOrCreate
         - name: init
           hostPath:
-              path: /tmp/podcast-server/database/init
-              type: DirectoryOrCreate
+            path: /tmp/podcast-server/database/init
+            type: DirectoryOrCreate
 ---
 apiVersion: batch/v1beta1
 kind: CronJob

@@ -22,4 +22,4 @@ build:
 deploy:
   kustomize:
     paths:
-    - distribution/kubernetes/docker-for-desktop/
+    - distribution/kubernetes/overlays/docker-for-desktop/
