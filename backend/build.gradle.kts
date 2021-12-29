@@ -52,6 +52,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
 	implementation("org.postgresql:postgresql")
+	runtimeOnly("io.r2dbc:r2dbc-postgresql")
 	jooqGenerator("org.postgresql:postgresql:" + dependencyManagement.importedProperties["postgresql.version"])
 
 	implementation("org.jdom:jdom2:2.0.6")
@@ -99,7 +100,7 @@ normalization {
 }
 
 flyway {
-	url = db["url"]
+	url = jdbc(db["url"])
 	user = db["user"]
 	password = db["password"]
 	locations = arrayOf("filesystem:${db["sqlFiles"]}")
@@ -119,7 +120,7 @@ jooq {
 				logging = INFO
 				jdbc.apply {
 					driver = "org.postgresql.Driver"
-					url = db["url"]
+					url = jdbc(db["url"])
 					user = db["user"]
 					password = db["password"]
 				}
@@ -182,9 +183,9 @@ tasks.register<FlywayMigrateTask>("flywaySetupDbForTests") { dependsOn("copyMigr
 tasks.test {
     useJUnitPlatform()
     systemProperty("user.timezone", "UTC")
-    systemProperty("spring.datasource.url", db["url"]!!)
-    systemProperty("spring.datasource.username", db["user"]!!)
-    systemProperty("spring.datasource.password", db["password"]!!)
+    systemProperty("spring.r2dbc.url", r2dbc(db["url"]))
+    systemProperty("spring.r2dbc.username", db["user"]!!)
+    systemProperty("spring.r2dbc.password", db["password"]!!)
 	jvmArgs = listOf("--add-opens", "java.base/java.time=ALL-UNNAMED")
     dependsOn(tasks.named("flywaySetupDbForTests"))
     finalizedBy(tasks.jacocoTestReport)
@@ -264,3 +265,5 @@ dependencyManagement {
     applyMavenExclusions(false)
 }
 
+fun jdbc(url: String?) = "jdbc:$url"
+fun r2dbc(url: String?) = "r2dbc:$url"

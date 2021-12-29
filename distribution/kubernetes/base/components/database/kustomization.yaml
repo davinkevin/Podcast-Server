@@ -3,3 +3,10 @@ kind: Component
 
 resources:
   - database.yaml
+
+configMapGenerator:
+  - name: database
+    behavior: merge
+    literals:
+      - username=podcast-server-user
+      - name=podcast-server
