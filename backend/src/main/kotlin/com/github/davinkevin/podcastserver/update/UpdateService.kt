@@ -122,7 +122,6 @@ private fun ItemFromUpdate.toCreation(podcastId: UUID) = ItemForCreation(
 )
 
 private fun ItemFromUpdate.Cover.toCreation() = CoverForCreation(width, height, url)
-private fun CoverForPodcast.toCreation() = CoverForCreation(width, height, url)
 
 fun ImageService.fetchCoverUpdateInformationOrOption(url: URI?): Mono<Optional<ItemFromUpdate.Cover>> {
     return Mono.justOrEmpty(url)

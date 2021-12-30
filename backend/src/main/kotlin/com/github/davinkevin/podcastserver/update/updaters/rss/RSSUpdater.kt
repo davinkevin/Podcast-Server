@@ -21,56 +21,59 @@ import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
 
+private val MEDIA = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")
+private val FEED_BURNER = Namespace.getNamespace("feedburner", "http://rssnamespace.org/feedburner/ext/1.0")
+private val ITUNES_NS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")!!
+
 class RSSUpdater(
-        private val imageService: ImageService,
-        private val wcb: WebClient.Builder
+    private val imageService: ImageService,
+    private val wcb: WebClient.Builder
 ) : Updater {
 
-    private val itunesNS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")!!
     private val log = LoggerFactory.getLogger(RSSUpdater::class.java)
 
     override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
         return fetchRss(podcast.url)
-                .map { SAXBuilder().build(it.inputStream) }
-                .flatMap { Mono.justOrEmpty(it.rootElement.getChild("channel")) }
-                .flatMapMany { channel -> channel
-                        .getChildren("item")
-                        .toFlux()
-                        .filter { hasEnclosure(it) }
-                        .flatMap { elem -> Mono.justOrEmpty(elem.getChild("thumbnail", MEDIA))
-                                .map { URI(it.getAttributeValue("url") ?: it.text) }
-                                .flatMap {
-                                    imageService.fetchCoverInformation(it)
-                                            .map { cover -> Optional.of(cover.toCoverFromUpdate()) }
-                                }
-                                .switchIfEmpty { findPodcastCover(channel) }
-                                .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
-                                .map {
-                                    val enclosure = elem.enclosure()
-                                    ItemFromUpdate(
-                                            title = elem.getChildText("title"),
-                                            pubDate = getPubDate(elem),
-                                            description = elem.getChildText("description"),
-                                            cover = it.orNull(),
-                                            url = urlOf(elem),
+            .map { SAXBuilder().build(it.inputStream) }
+            .flatMap { it.rootElement.getChild("channel").toMono() }
+            .flatMapMany { channel -> channel
+                .getChildren("item")
+                .toFlux()
+                .filter { hasEnclosure(it) }
+                .map { channel to it }
+            }
+            .flatMap { (channel, elem) -> findCoverForItem(channel, elem).toMono()
+                .flatMap { imageService.fetchCover(it) }
+                .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
+                .map { elem to it }
+            }
+            .map { (elem, cover) ->
+                ItemFromUpdate(
+                    title = elem.getChildText("title"),
+                    pubDate = getPubDate(elem),
+                    description = elem.getChildText("description"),
+                    cover = cover.orNull(),
+                    url = urlOf(elem),
 
-                                            length = enclosure.getAttributeValue("length")?.toLong(),
-                                            mimeType = mimeTypeOf(elem)
-                                    )
-                                }
-
-                        }
-                }
+                    length = elem.enclosure().getAttributeValue("length")?.toLong(),
+                    mimeType = mimeTypeOf(elem)
+                )
+            }
     }
 
-    private fun findPodcastCover(channelElement: Element): Mono<Optional<ItemFromUpdate.Cover>> {
+    private fun findCoverForItem(channelElement: Element, elem: Element): URI? {
+        val thumbnail = elem.getChild("thumbnail", MEDIA)
+
+        if (thumbnail != null) {
+            return URI.create(thumbnail.getAttributeValue("url") ?: thumbnail.text)
+        }
+
         val rss = channelElement.getChild("image")?.getChildText("url")
-        val itunes = channelElement.getChild("image", itunesNS)?.getAttributeValue("href")
+        val itunes = channelElement.getChild("image", ITUNES_NS)?.getAttributeValue("href")
 
-        val url = rss ?: itunes ?: return Optional.empty<ItemFromUpdate.Cover>().toMono()
+        val url = rss ?: itunes ?: return null
 
-        return imageService.fetchCoverInformation(URI(url))
-                .map { Optional.of(ItemFromUpdate.Cover(it.width, it.height, it.url)) }
+        return URI.create(url)
     }
 
     private fun hasEnclosure(item: Element) = item.enclosure() != null
@@ -103,24 +106,24 @@ class RSSUpdater(
         } .onFailure {
             log.error("Problem during date parsing of \"{}\" caused by {}", item.getChildText("title"), it.message)
         }
-                .getOrDefault(ZonedDateTime.now())
+            .getOrDefault(ZonedDateTime.now())
     }
 
     override fun signatureOf(url: URI): Mono<String> = fetchRss(url)
-            .map { DigestUtils.md5DigestAsHex(it.inputStream) }
-            .onErrorResume {
-                log.error("error during update", it)
-                "error_during_update".toMono()
-            }
+        .map { DigestUtils.md5DigestAsHex(it.inputStream) }
+        .onErrorResume {
+            log.error("error during update", it)
+            "error_during_update".toMono()
+        }
 
     private fun fetchRss(url: URI): Mono<ByteArrayResource> {
         return wcb
-                .clone()
-                .baseUrl(url.toASCIIString())
-                .build()
-                .get()
-                .retrieve()
-                .bodyToMono()
+            .clone()
+            .baseUrl(url.toASCIIString())
+            .build()
+            .get()
+            .retrieve()
+            .bodyToMono()
     }
 
     override fun type() = Type("RSS", "RSS")
@@ -129,11 +132,8 @@ class RSSUpdater(
         url.startsWith("http", true) -> Integer.MAX_VALUE - 1
         else -> Integer.MAX_VALUE
     }
-
-    companion object {
-        private val MEDIA = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")
-        private val FEED_BURNER = Namespace.getNamespace("feedburner", "http://rssnamespace.org/feedburner/ext/1.0")
-    }
 }
 
 private fun Element.enclosure() = this.getChild("enclosure")
+private fun ImageService.fetchCover(url: URI) = this.fetchCoverInformation(url)
+    .map { cover -> Optional.of(cover.toCoverFromUpdate()) }
