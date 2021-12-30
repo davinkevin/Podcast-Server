@@ -40,6 +40,7 @@ repositories {
 	maven { url = uri("https://jitpack.io") }
 }
 
+extra["jooq.version"] = "3.15.5"
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -109,7 +110,7 @@ tasks.register<FlywayMigrateTask>("flywayMigrateForJOOQ") {
 }
 
 jooq {
-	version.set(dependencyManagement.importedProperties["jooq.version"])
+	version.set(extra["jooq.version"].toString())
 	edition.set(OSS)
 
 	configurations {

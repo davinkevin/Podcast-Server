@@ -90,7 +90,7 @@ data class ItemForCreation(
         val status: Status,
 
         val podcastId: UUID,
-        val cover: CoverForCreation
+        val cover: CoverForCreation?
 )
 
 data class ItemPlaylist(val id: UUID, val name: String)

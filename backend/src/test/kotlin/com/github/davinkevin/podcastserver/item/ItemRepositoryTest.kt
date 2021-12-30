@@ -1433,203 +1433,298 @@ class ItemRepositoryTest(
                     .execute()
         }
 
+        @Nested
+        @DisplayName("a single item")
+        inner class ASingleItem {
 
-        @Test
-        fun `a simple item`() {
-            /* Given */
-            val item = ItemForCreation(
-                    title = "an item",
-                    url = "http://foo.bar.com/an_item",
+            @Nested
+            @DisplayName("with success")
+            inner class WithSuccess {
 
-                    pubDate = now(),
-                    downloadDate = now(),
-                    creationDate = now(),
+                @Test
+                fun `without any specificities`() {
+                    /* Given */
+                    val item = ItemForCreation(
+                            title = "an item",
+                            url = "http://foo.bar.com/an_item",
 
-                    description = "a description",
-                    mimeType = "audio/mp3",
-                    length = 1234,
-                    fileName = "ofejeaoijefa.mp3",
-                    status = FINISH,
+                            pubDate = now(),
+                            downloadDate = now(),
+                            creationDate = now(),
 
-                    podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
-                    cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
-            )
-            val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())!!
-            val numberOfCover = query.selectCount().from(COVER).fetchOne(count())!!
+                            description = "a description",
+                            mimeType = "audio/mp3",
+                            length = 1234,
+                            fileName = "ofejeaoijefa.mp3",
+                            status = FINISH,
 
-            /* When */
-            StepVerifier.create(repository.create(item))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.title).isEqualTo("an item")
-                        assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
-                        assertThat(it.pubDate).isCloseTo(now(), within(10, SECONDS))
-                        assertThat(it.downloadDate).isCloseTo(now(), within(10, SECONDS))
-                        assertThat(it.creationDate).isCloseTo(now(), within(10, SECONDS))
-                        assertThat(it.description).isEqualTo("a description")
-                        assertThat(it.mimeType).isEqualTo("audio/mp3")
-                        assertThat(it.length).isEqualTo(1234)
-                        assertThat(it.fileName).isEqualTo("ofejeaoijefa.mp3")
-                        assertThat(it.status).isEqualTo(FINISH)
+                            podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                            cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+                    )
+                    val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())!!
+                    val numberOfCover = query.selectCount().from(COVER).fetchOne(count())!!
 
-                        assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
-                        assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
-                        assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
+                    /* When */
+                    StepVerifier.create(repository.create(item))
+                            /* Then */
+                            .expectSubscription()
+                            .assertNext {
+                                assertThat(it.title).isEqualTo("an item")
+                                assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
+                                assertThat(it.pubDate).isCloseTo(now(), within(10, SECONDS))
+                                assertThat(it.downloadDate).isCloseTo(now(), within(10, SECONDS))
+                                assertThat(it.creationDate).isCloseTo(now(), within(10, SECONDS))
+                                assertThat(it.description).isEqualTo("a description")
+                                assertThat(it.mimeType).isEqualTo("audio/mp3")
+                                assertThat(it.length).isEqualTo(1234)
+                                assertThat(it.fileName).isEqualTo("ofejeaoijefa.mp3")
+                                assertThat(it.status).isEqualTo(FINISH)
 
-                        assertThat(it.cover.height).isEqualTo(100)
-                        assertThat(it.cover.width).isEqualTo(100)
-                        assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
-                    }
-                    .verifyComplete()
+                                assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
+                                assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
+                                assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
 
-            assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
-            assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
+                                assertThat(it.cover.height).isEqualTo(100)
+                                assertThat(it.cover.width).isEqualTo(100)
+                                assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
+                            }
+                            .verifyComplete()
+
+                    assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+                    assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
+                }
+
+                @Test
+                fun `but found an already existing item so don't do anything and return empty`() {
+                    /* Given */
+                    val item = ItemForCreation(
+                            title = "an item",
+                            url = "http://fakeurl.com/geekinc.123.mp3",
+
+                            pubDate = now(),
+                            downloadDate = now(),
+                            creationDate = now(),
+
+                            description = "a description",
+                            mimeType = "audio/mp3",
+                            length = 1234,
+                            fileName = "ofejeaoijefa.mp3",
+                            status = FINISH,
+
+                            podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                            cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+                    )
+                    val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())
+                    val numberOfCover = query.selectCount().from(COVER).fetchOne(count())
+
+                    /* When */
+                    StepVerifier.create(repository.create(item))
+                            /* Then */
+                            .expectSubscription()
+                            .verifyComplete()
+
+                    assertThat(numberOfItem).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+                    assertThat(numberOfCover).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
+                }
+
+                @Test
+                fun `a simple item with download date null`() {
+                    /* Given */
+                    val now = now()
+                    val item = ItemForCreation(
+                            title = "an item",
+                            url = "http://foo.bar.com/an_item",
+
+                            pubDate = now,
+                            downloadDate = null,
+                            creationDate = now,
+
+                            description = "a description",
+                            mimeType = "audio/mp3",
+                            length = 1234,
+                            fileName = "ofejeaoijefa.mp3",
+                            status = FINISH,
+
+                            podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                            cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+                    )
+                    val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())!!
+                    val numberOfCover = query.selectCount().from(COVER).fetchOne(count())!!
+
+                    /* When */
+                    StepVerifier.create(repository.create(item))
+                            /* Then */
+                            .expectSubscription()
+                            .assertNext {
+                                assertThat(it.title).isEqualTo("an item")
+                                assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
+                                assertThat(it.pubDate).isEqualToIgnoringNanos(now)
+                                assertThat(it.downloadDate).isNull()
+                                assertThat(it.creationDate).isEqualToIgnoringNanos(now)
+                                assertThat(it.description).isEqualTo("a description")
+                                assertThat(it.mimeType).isEqualTo("audio/mp3")
+                                assertThat(it.length).isEqualTo(1234)
+                                assertThat(it.fileName).isEqualTo("ofejeaoijefa.mp3")
+                                assertThat(it.status).isEqualTo(FINISH)
+
+                                assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
+                                assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
+                                assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
+
+                                assertThat(it.cover.height).isEqualTo(100)
+                                assertThat(it.cover.width).isEqualTo(100)
+                                assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
+                            }
+                            .verifyComplete()
+
+                    assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+                    assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
+                }
+            }
+
+            @Nested
+            @DisplayName("with error")
+            inner class WithError {
+
+                @Test
+                fun `but fail because mimetype is empty`() {
+                    /* Given */
+                    val item = ItemForCreation(
+                            title = "an item",
+                            url = "http://foo.bar.com/an_item",
+
+                            pubDate = now(),
+                            downloadDate = now(),
+                            creationDate = now(),
+
+                            description = "a description",
+                            mimeType = "",
+                            length = 1234,
+                            fileName = "ofejeaoijefa.mp3",
+                            status = FINISH,
+
+                            podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                            cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+                    )
+
+                    /* When */
+                    StepVerifier.create(repository.create(item))
+                            /* Then */
+                            .expectSubscription()
+                            .expectError(DataIntegrityViolationException::class.java)
+                            .verify()
+                }
+
+                @Test
+                fun `but fail because mimetype does not contain slash`() {
+                    /* Given */
+                    val item = ItemForCreation(
+                            title = "an item",
+                            url = "http://foo.bar.com/an_item",
+
+                            pubDate = now(),
+                            downloadDate = now(),
+                            creationDate = now(),
+
+                            description = "a description",
+                            mimeType = "foo",
+                            length = 1234,
+                            fileName = "ofejeaoijefa.mp3",
+                            status = FINISH,
+
+                            podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                            cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+                    )
+
+                    /* When */
+                    StepVerifier.create(repository.create(item))
+                            /* Then */
+                            .expectSubscription()
+                            .expectError(DataIntegrityViolationException::class.java)
+                            .verify()
+                }
+
+            }
+
         }
 
-        @Test
-        fun `but found an already existing item so don't do anything and return empty`() {
-            /* Given */
-            val item = ItemForCreation(
-                    title = "an item",
-                    url = "http://fakeurl.com/geekinc.123.mp3",
+        @Nested
+        @DisplayName("multiple items")
+        inner class MultipleItems {
+            val item1 = ItemForCreation(
+                title = "one",
+                url = "http://foo.bar.com/1",
 
-                    pubDate = now(),
-                    downloadDate = now(),
-                    creationDate = now(),
+                pubDate = now(),
+                downloadDate = now(),
+                creationDate = now(),
 
-                    description = "a description",
-                    mimeType = "audio/mp3",
-                    length = 1234,
-                    fileName = "ofejeaoijefa.mp3",
-                    status = FINISH,
+                description = "a description",
+                mimeType = "audio/mp3",
+                length = 1234,
+                fileName = "1.mp3",
+                status = FINISH,
 
-                    podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
-                    cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+                podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/1.jpg"))
             )
-            val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())
-            val numberOfCover = query.selectCount().from(COVER).fetchOne(count())
+            val item2 = ItemForCreation(
+                title = "two",
+                url = "http://foo.bar.com/2",
 
-            /* When */
-            StepVerifier.create(repository.create(item))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                pubDate = now(),
+                downloadDate = now(),
+                creationDate = now(),
 
-            assertThat(numberOfItem).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
-            assertThat(numberOfCover).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
-        }
+                description = "a description",
+                mimeType = "audio/mp3",
+                length = 1234,
+                fileName = "2.mp3",
+                status = FINISH,
 
-        @Test
-        fun `a simple item with download date null`() {
-            /* Given */
-            val now = now()
-            val item = ItemForCreation(
-                    title = "an item",
-                    url = "http://foo.bar.com/an_item",
-
-                    pubDate = now,
-                    downloadDate = null,
-                    creationDate = now,
-
-                    description = "a description",
-                    mimeType = "audio/mp3",
-                    length = 1234,
-                    fileName = "ofejeaoijefa.mp3",
-                    status = FINISH,
-
-                    podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
-                    cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+                podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/2.jpg"))
             )
-            val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())!!
-            val numberOfCover = query.selectCount().from(COVER).fetchOne(count())!!
+            val item3 = ItemForCreation(
+                title = "three",
+                url = "http://foo.bar.com/3",
 
-            /* When */
-            StepVerifier.create(repository.create(item))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.title).isEqualTo("an item")
-                        assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
-                        assertThat(it.pubDate).isEqualToIgnoringNanos(now)
-                        assertThat(it.downloadDate).isNull()
-                        assertThat(it.creationDate).isEqualToIgnoringNanos(now)
-                        assertThat(it.description).isEqualTo("a description")
-                        assertThat(it.mimeType).isEqualTo("audio/mp3")
-                        assertThat(it.length).isEqualTo(1234)
-                        assertThat(it.fileName).isEqualTo("ofejeaoijefa.mp3")
-                        assertThat(it.status).isEqualTo(FINISH)
+                pubDate = now(),
+                downloadDate = now(),
+                creationDate = now(),
 
-                        assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
-                        assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
-                        assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
+                description = "a description",
+                mimeType = "audio/mp3",
+                length = 1234,
+                fileName = "3.mp3",
+                status = FINISH,
 
-                        assertThat(it.cover.height).isEqualTo(100)
-                        assertThat(it.cover.width).isEqualTo(100)
-                        assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
-                    }
-                    .verifyComplete()
-
-            assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
-            assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
-        }
-
-        @Test
-        fun `but fail because mimetype is empty`() {
-            /* Given */
-            val item = ItemForCreation(
-                    title = "an item",
-                    url = "http://foo.bar.com/an_item",
-
-                    pubDate = now(),
-                    downloadDate = now(),
-                    creationDate = now(),
-
-                    description = "a description",
-                    mimeType = "",
-                    length = 1234,
-                    fileName = "ofejeaoijefa.mp3",
-                    status = FINISH,
-
-                    podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
-                    cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+                podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/3.jpg"))
             )
 
-            /* When */
-            StepVerifier.create(repository.create(item))
-                    /* Then */
-                    .expectSubscription()
-                    .expectError(DataIntegrityViolationException::class.java)
-                    .verify()
-        }
+            @Nested
+            @DisplayName("with success")
+            inner class WithSuccess {
 
-        @Test
-        fun `but fail because mimetype does not contain slash`() {
-            /* Given */
-            val item = ItemForCreation(
-                    title = "an item",
-                    url = "http://foo.bar.com/an_item",
+                @Test
+                fun `with no specificities`() {
+                    /* Given */
+                    val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())!!
+                    val numberOfCover = query.selectCount().from(COVER).fetchOne(count())!!
 
-                    pubDate = now(),
-                    downloadDate = now(),
-                    creationDate = now(),
+                    /* When */
+                    StepVerifier.create(repository.create(listOf(item1, item2, item3)))
+                        /* Then */
+                        .expectSubscription()
+                        .expectNextCount(3)
+                        .verifyComplete()
 
-                    description = "a description",
-                    mimeType = "foo",
-                    length = 1234,
-                    fileName = "ofejeaoijefa.mp3",
-                    status = FINISH,
+                    assertThat(numberOfItem + 3).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+                    assertThat(numberOfCover + 3).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
+                }
 
-                    podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
-                    cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
-            )
-
-            /* When */
-            StepVerifier.create(repository.create(item))
-                    /* Then */
-                    .expectSubscription()
-                    .expectError(DataIntegrityViolationException::class.java)
-                    .verify()
+            }
         }
 
 

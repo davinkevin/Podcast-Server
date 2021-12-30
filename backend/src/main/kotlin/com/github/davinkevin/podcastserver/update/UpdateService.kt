@@ -40,24 +40,24 @@ class UpdateService(
         liveUpdate.isUpdating(true)
 
         podcastRepository
-                .findAll()
-                .parallel(parameters.maxUpdateParallels)
-                .runOn(Schedulers.parallel())
-                .filter { it.url != null }
-                .map {
-                    val signature = if(force || it.signature == null) UUID.randomUUID().toString() else it.signature
-                    PodcastToUpdate(it.id, URI(it.url!!), signature)
-                }
-                .flatMap({ pu -> updaters.of(pu.url).update(pu) }, false, parameters.maxUpdateParallels)
-                .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
-                .sequential()
-                .collectList()
-                .subscribeOn(Schedulers.boundedElastic())
-                .subscribe {
-                    liveUpdate.isUpdating(false)
-                    log.info("End of the global update with ${it.size} found")
-                    if (download) idm.launchDownload()
-                }
+            .findAll()
+            .parallel(parameters.maxUpdateParallels)
+            .runOn(Schedulers.parallel())
+            .filter { it.url != null }
+            .map {
+                val signature = if(force || it.signature == null) UUID.randomUUID().toString() else it.signature
+                PodcastToUpdate(it.id, URI(it.url!!), signature)
+            }
+            .flatMap({ pu -> updaters.of(pu.url).update(pu) }, false, parameters.maxUpdateParallels)
+            .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
+            .sequential()
+            .collectList()
+            .subscribeOn(Schedulers.boundedElastic())
+            .subscribe {
+                liveUpdate.isUpdating(false)
+                log.info("End of the global update with ${it.size} found")
+                if (download) idm.launchDownload()
+            }
 
         return Mono.empty()
     }
@@ -66,58 +66,59 @@ class UpdateService(
         liveUpdate.isUpdating(true)
 
         podcastRepository
-                .findById(podcastId)
-                .filter { it.url != null }
-                .map { PodcastToUpdate(it.id, URI(it.url!!), UUID.randomUUID().toString()) }
-                .flatMap { updaters.of(it.url).update(it) }
-                .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
-                .doOnTerminate { liveUpdate.isUpdating(false) }
-                .subscribe()
+            .findById(podcastId)
+            .filter { it.url != null }
+            .map { PodcastToUpdate(it.id, URI(it.url!!), UUID.randomUUID().toString()) }
+            .flatMap { updaters.of(it.url).update(it) }
+            .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
+            .doOnTerminate { liveUpdate.isUpdating(false) }
+            .subscribe()
 
         return Mono.empty()
     }
 
     private fun saveSignatureAndCreateItems(
-            podcast: PodcastToUpdate,
-            items: Set<ItemFromUpdate>,
-            signature: String,
+        podcast: PodcastToUpdate,
+        items: Set<ItemFromUpdate>,
+        signature: String,
     ): Mono<Void> {
         val realSignature = if (items.isEmpty()) "" else signature
         val updateSignature = podcastRepository.updateSignature(podcast.id, realSignature).then(1.toMono())
-        val createItems = podcastRepository.findCover(podcast.id)
-                .map { items.map { item -> item.toCreation(podcast.id, it.toCreation()) } }
-                .flatMapMany { itemRepository.create(it) }
-                .flatMap { item -> fileService.downloadItemCover(item)
-                            .onErrorResume {
-                                log.error("Error during download of cover ${item.cover.url}")
-                                Mono.empty()
-                            }
-                            .then(item.toMono())
+        val createItems = items
+            .map { it.toCreation(podcast.id)}
+            .toMono()
+            .flatMapMany { itemRepository.create(it) }
+            .delayUntil { item -> fileService.downloadItemCover(item)
+                .onErrorResume {
+                    log.error("Error during download of cover ${item.cover.url}")
+                    Mono.empty()
                 }
-                .collectList()
-                .delayUntil { if (it.isNotEmpty()) podcastRepository.updateLastUpdate(podcast.id) else Mono.empty<Void>() }
+            }
+            .collectList()
+            .filter { it.isNotEmpty() }
+            .delayUntil { podcastRepository.updateLastUpdate(podcast.id) }
 
         return Mono.zip(updateSignature, createItems).then()
     }
 }
 
 
-private fun ItemFromUpdate.toCreation(podcastId: UUID, coverCreation: CoverForCreation) = ItemForCreation(
-        title = title!!,
-        url = url.toASCIIString(),
+private fun ItemFromUpdate.toCreation(podcastId: UUID) = ItemForCreation(
+    title = title!!,
+    url = url.toASCIIString(),
 
-        pubDate = pubDate?.toOffsetDateTime() ?: now(),
-        downloadDate = null,
-        creationDate = now(),
+    pubDate = pubDate?.toOffsetDateTime() ?: now(),
+    downloadDate = null,
+    creationDate = now(),
 
-        description = description ?: "",
-        mimeType = mimeType,
-        length = length,
-        fileName = null,
-        status = Status.NOT_DOWNLOADED,
+    description = description ?: "",
+    mimeType = mimeType,
+    length = length,
+    fileName = null,
+    status = Status.NOT_DOWNLOADED,
 
-        podcastId = podcastId,
-        cover = cover?.toCreation() ?: coverCreation
+    podcastId = podcastId,
+    cover = cover?.toCreation()
 )
 
 private fun ItemFromUpdate.Cover.toCreation() = CoverForCreation(width, height, url)
@@ -125,8 +126,8 @@ private fun CoverForPodcast.toCreation() = CoverForCreation(width, height, url)
 
 fun ImageService.fetchCoverUpdateInformationOrOption(url: URI?): Mono<Optional<ItemFromUpdate.Cover>> {
     return Mono.justOrEmpty(url)
-            .flatMap { fetchCoverInformation(url!!) }
-            .map { ItemFromUpdate.Cover(it.width, it.height, it.url) }
-            .map { Optional.of<ItemFromUpdate.Cover>(it) }
-            .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
+        .flatMap { fetchCoverInformation(url!!) }
+        .map { ItemFromUpdate.Cover(it.width, it.height, it.url) }
+        .map { Optional.of<ItemFromUpdate.Cover>(it) }
+        .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
 }
