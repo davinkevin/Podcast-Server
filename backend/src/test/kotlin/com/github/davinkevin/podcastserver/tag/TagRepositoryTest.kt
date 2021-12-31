@@ -1,8 +1,6 @@
 package com.github.davinkevin.podcastserver.tag
 
-import com.github.davinkevin.podcastserver.JooqR2DBCTest
 import com.github.davinkevin.podcastserver.database.tables.Tag.TAG
-import com.github.davinkevin.podcastserver.r2dbc
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
@@ -19,25 +17,23 @@ import java.util.UUID.fromString
 /**
  * Created by kevin on 2019-03-24
  */
-@JooqR2DBCTest
+@JooqTest
 @Import(TagRepository::class)
 class TagRepositoryTest(
-    @Autowired val repository: TagRepository,
-    @Autowired val query: DSLContext
+        @Autowired val repository: TagRepository,
+        @Autowired val query: DSLContext
 ) {
 
     @BeforeEach
     fun beforeEach() {
         query.batch(
-            truncate(TAG).cascade(),
-            insertInto(TAG)
-                .columns(TAG.ID, TAG.NAME)
-                .values(fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "Foo")
-                .values(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr")
-                .values(fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar")
-        )
-            .r2dbc()
-            .execute()
+                truncate(TAG).cascade(),
+                insertInto(TAG)
+                        .columns(TAG.ID, TAG.NAME)
+                        .values(fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "Foo")
+                        .values(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr")
+                        .values(fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar")
+        ).execute()
     }
 
     @Nested
@@ -51,10 +47,10 @@ class TagRepositoryTest(
 
             /* When */
             StepVerifier.create(repository.findById(id))
-                /* Then */
-                .expectSubscription()
-                .expectNext(Tag(id, "Foo"))
-                .verifyComplete()
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(Tag(id, "Foo"))
+                    .verifyComplete()
         }
 
         @Test
@@ -64,9 +60,9 @@ class TagRepositoryTest(
 
             /* When */
             StepVerifier.create(repository.findById(id))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
         }
 
     }
@@ -81,11 +77,11 @@ class TagRepositoryTest(
 
             /* When */
             StepVerifier.create(repository.findByNameLike("bar"))
-                /* Then */
-                .expectSubscription()
-                .expectNext(Tag(fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar"))
-                .expectNext(Tag(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr"))
-                .verifyComplete()
+                    /* Then */
+                    .expectSubscription()
+                    .expectNext(Tag(fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar"))
+                    .expectNext(Tag(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr"))
+                    .verifyComplete()
         }
 
         @Test
@@ -93,9 +89,9 @@ class TagRepositoryTest(
             /* Given */
             /* When */
             StepVerifier.create(repository.findByNameLike("boo"))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+                    /* Then */
+                    .expectSubscription()
+                    .verifyComplete()
         }
     }
 
@@ -109,16 +105,19 @@ class TagRepositoryTest(
             val name = "a_wonderful_tag_name"
             /* When */
             StepVerifier.create(repository.save(name))
-                /* Then */
-                .expectSubscription()
-                .assertNext {
-                    assertThat(it.id).isNotNull()
-                    assertThat(it.name).isEqualTo(name)
-                }
-                .verifyComplete()
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.id).isNotNull()
+                        assertThat(it.name).isEqualTo(name)
 
-            val numberOfTag = query.selectCount().from(TAG).r2dbc().fetchOne(count())
-            assertThat(numberOfTag).isEqualTo(4)
+                        val tagRecord = query.selectFrom(TAG).where(TAG.NAME.eq(name)).fetchOne()
+                        val numberOfTag = query.selectCount().from(TAG).fetchOne(count())
+                        assertThat(tagRecord?.id).isEqualTo(it.id)
+                        assertThat(numberOfTag).isEqualTo(4)
+                    }
+                    .verifyComplete()
+
         }
 
         @Test
@@ -127,17 +126,18 @@ class TagRepositoryTest(
             val name = "Foo"
             /* When */
             StepVerifier.create(repository.save(name))
-                /* Then */
-                .expectSubscription()
-                .assertNext {
-                    assertThat(it.id).isNotNull()
-                    assertThat(it.name).isEqualTo(name)
+                    /* Then */
+                    .expectSubscription()
+                    .assertNext {
+                        assertThat(it.id).isNotNull()
+                        assertThat(it.name).isEqualTo(name)
 
-                }
-                .verifyComplete()
-
-            val numberOfTag = query.selectCount().from(TAG).r2dbc().fetchOne(count())
-            assertThat(numberOfTag).isEqualTo(3)
+                        val tagRecord = query.selectFrom(TAG).where(TAG.NAME.eq(name)).fetchOne()
+                        val numberOfTag = query.selectCount().from(TAG).fetchOne(count())
+                        assertThat(tagRecord?.id).isEqualTo(it.id)
+                        assertThat(numberOfTag).isEqualTo(3)
+                    }
+                    .verifyComplete()
 
         }
 

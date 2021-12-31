@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.database.Tables.TAG
 import org.jooq.DSLContext
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import reactor.kotlin.core.publisher.switchIfEmpty
 import reactor.kotlin.core.publisher.toMono
 import java.util.*
@@ -18,6 +19,8 @@ class TagRepository(val query: DSLContext) {
                 .toMono()
                 .map { (id, name) -> Tag(id, name) }
     }
+                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.parallel())
 
     fun findByNameLike(name: String): Flux<Tag> {
         return Flux.from(
@@ -28,6 +31,8 @@ class TagRepository(val query: DSLContext) {
                         .orderBy(TAG.NAME.asc())
         )
                 .map { (id, name) -> Tag(id, name) }
+                .subscribeOn(Schedulers.boundedElastic())
+                .publishOn(Schedulers.parallel())
     }
 
     fun save(name: String): Mono<Tag> = Mono.defer {
@@ -47,5 +52,7 @@ class TagRepository(val query: DSLContext) {
                             .map { Tag(id, name) }
                 }
     }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
 
 }

@@ -42,15 +42,11 @@ spec:
         - name: init-db
           image: podcastserver/init-db
           env:
-            - name: DATABASE_NAME
+            - name: FLYWAY_URL
               valueFrom:
                 configMapKeyRef:
                   name: database
-                  key: name
-            - name: DATABASE_SERVICE_NAME
-              value: database
-            - name: FLYWAY_URL
-              value: jdbc:postgresql://$(DATABASE_SERVICE_NAME):5432/$(DATABASE_NAME)
+                  key: url
             - name: FLYWAY_USER
               valueFrom:
                 configMapKeyRef:
@@ -65,21 +61,17 @@ spec:
         - name: app
           image: podcastserver/backend
           env:
-            - name: DATABASE_NAME
+            - name: SPRING_DATASOURCE_URL
               valueFrom:
                 configMapKeyRef:
                   name: database
-                  key: name
-            - name: DATABASE_SERVICE_NAME
-              value: database
-            - name: SPRING_R2DBC_URL
-              value: r2dbc:postgresql://$(DATABASE_SERVICE_NAME):5432/$(DATABASE_NAME)
-            - name: SPRING_R2DBC_USERNAME
+                  key: url
+            - name: SPRING_DATASOURCE_USERNAME
               valueFrom:
                 configMapKeyRef:
                   name: database
                   key: username
-            - name: SPRING_R2DBC_PASSWORD
+            - name: SPRING_DATASOURCE_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: database

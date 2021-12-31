@@ -10,6 +10,8 @@ import org.jooq.impl.DSL.*
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
+import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
@@ -41,7 +43,9 @@ class ItemRepository(private val query: DSLContext) {
             )
             .where(ITEM.ID.`in`(ids))
         )
-            .map(::toItem)
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
+            .map { toItem(it) }
     }
 
 
@@ -56,6 +60,8 @@ class ItemRepository(private val query: DSLContext) {
         )
             .map { DeleteItemRequest(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
     }
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
 
     fun deleteById(id: UUID) = Mono.defer {
         val removeFromPlaylist = query
@@ -75,6 +81,8 @@ class ItemRepository(private val query: DSLContext) {
 
         removeFromPlaylist.then(delete)
     }
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
 
     fun updateAsDeleted(items: Collection<UUID>): Mono<Void> = Mono.defer {
         query
@@ -85,6 +93,8 @@ class ItemRepository(private val query: DSLContext) {
             .toMono()
             .then()
     }
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
 
     fun hasToBeDeleted(id: UUID): Mono<Boolean> = Mono.defer {
         query
@@ -94,6 +104,8 @@ class ItemRepository(private val query: DSLContext) {
             .toMono()
             .map { it[PODCAST.HAS_TO_BE_DELETED] }
     }
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
 
     fun resetById(id: UUID): Mono<Item> = Mono.defer {
         query
@@ -106,6 +118,8 @@ class ItemRepository(private val query: DSLContext) {
             .toMono()
             .flatMap { findById(id) }
     }
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
 
     fun search(q: String, tags: List<String>, status: List<Status>, page: ItemPageRequest, podcastId: UUID?): Mono<PageItem> = Mono.defer {
         Flux.from(
@@ -200,9 +214,14 @@ class ItemRepository(private val query: DSLContext) {
             }
     }
 
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
+
     fun create(item: ItemForCreation): Mono<Item> = Mono.defer {
         create(listOf(item)).toMono()
     }
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
 
     fun create(items: List<ItemForCreation>): Flux<Item> = Flux.defer {
         val itemsWithIds = items.map(::ItemForCreationWithId)
@@ -264,13 +283,17 @@ class ItemRepository(private val query: DSLContext) {
                 .onConflictDoNothing()
         }
 
-        Flux.from(query.batch(queries))
+        Mono.fromCompletionStage { query.batch(queries).executeAsync() }
+            .flatMapMany { it.toFlux() }
             .index()
             .filter { (_, isCreated) -> isCreated >= 1 }
             .map { (idx, _) -> itemsWithIds[idx.toInt()].id }
             .collectList()
             .flatMapMany { findById(it) }
     }
+
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
 
     fun resetItemWithDownloadingState(): Mono<Void> = Mono.defer {
         query
@@ -281,6 +304,8 @@ class ItemRepository(private val query: DSLContext) {
             .then()
             .doOnTerminate { log.info("Reset of item with downloading state done") }
     }
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
 
     fun findPlaylistsContainingItem(itemId: UUID): Flux<ItemPlaylist> = Flux.defer {
         Flux.from(

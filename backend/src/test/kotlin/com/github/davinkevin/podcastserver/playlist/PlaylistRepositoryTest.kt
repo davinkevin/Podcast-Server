@@ -1,9 +1,7 @@
 package com.github.davinkevin.podcastserver.playlist
 
-import com.github.davinkevin.podcastserver.JooqR2DBCTest
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.r2dbc
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
@@ -23,7 +21,7 @@ import java.util.UUID.fromString
 /**
  * Created by kevin on 2019-07-06
  */
-@JooqR2DBCTest
+@JooqTest
 @Import(PlaylistRepository::class)
 class PlaylistRepositoryTest(
     @Autowired val query: DSLContext,
@@ -84,7 +82,7 @@ class PlaylistRepositoryTest(
                         .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"))
                         .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"))
                 
-        ).r2dbc().execute()
+        ).execute()
     }
 
     @Nested
@@ -231,7 +229,7 @@ class PlaylistRepositoryTest(
                     }
                     .verifyComplete()
 
-            val numberOfPlaylist = query.selectCount().from(WATCH_LIST).r2dbc().fetchOne(count())
+            val numberOfPlaylist = query.selectCount().from(WATCH_LIST).fetchOne(count())
             assertThat(numberOfPlaylist).isEqualTo(4)
         }
 
@@ -249,7 +247,7 @@ class PlaylistRepositoryTest(
                     }
                     .verifyComplete()
 
-            val numberOfPlaylist = query.selectCount().from(WATCH_LIST).r2dbc().fetchOne(count())
+            val numberOfPlaylist = query.selectCount().from(WATCH_LIST).fetchOne(count())
             assertThat(numberOfPlaylist).isEqualTo(3)
         }
     }
@@ -266,8 +264,8 @@ class PlaylistRepositoryTest(
                     .expectSubscription()
                     .verifyComplete()
 
-            assertThat(query.selectCount().from(WATCH_LIST).r2dbc().fetchOne(count())).isEqualTo(2)
-            assertThat(query.selectCount().from(WATCH_LIST_ITEMS).r2dbc().fetchOne(count())).isEqualTo(3)
+            assertThat(query.selectCount().from(WATCH_LIST).fetchOne(count())).isEqualTo(2)
+            assertThat(query.selectCount().from(WATCH_LIST_ITEMS).fetchOne(count())).isEqualTo(3)
         }
 
         @Test
@@ -279,8 +277,8 @@ class PlaylistRepositoryTest(
                     .expectSubscription()
                     .verifyComplete()
 
-            assertThat(query.selectCount().from(WATCH_LIST).r2dbc().fetchOne(count())).isEqualTo(2)
-            assertThat(query.selectCount().from(WATCH_LIST_ITEMS).r2dbc().fetchOne(count())).isEqualTo(1)
+            assertThat(query.selectCount().from(WATCH_LIST).fetchOne(count())).isEqualTo(2)
+            assertThat(query.selectCount().from(WATCH_LIST_ITEMS).fetchOne(count())).isEqualTo(1)
         }
     }
 

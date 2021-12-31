@@ -6,7 +6,7 @@ if (env.containsKey("CI")) {
 
 if (env.containsKey("POSTGRES_DB") && env.containsKey("POSTGRES_USER") && env.containsKey("POSTGRES_PASSWORD")) {
     val databaseParameters by extra(mapOf(
-            "url" to "postgresql://postgres:5432/${env["POSTGRES_DB"]}",
+            "url" to "jdbc:postgresql://postgres:5432/${env["POSTGRES_DB"]}",
             "user" to env["POSTGRES_USER"]!!,
             "password" to env["POSTGRES_PASSWORD"]!!,
             "sqlFiles" to "$buildDir/flyway/migrations/"
