@@ -81,7 +81,7 @@ spec:
               containerPort: 5432
               protocol: TCP
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: database-backup

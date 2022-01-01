@@ -144,7 +144,7 @@ spec:
               path: /actuator/health/readiness
               port: 8080
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: update-and-download
@@ -164,7 +164,7 @@ spec:
                 - curl -qsL http://backend:8080/api/v1/podcasts/update?download=true
           restartPolicy: OnFailure
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: delete-old-covers
@@ -184,7 +184,7 @@ spec:
                 - curl -qsL -X DELETE http://backend:8080/api/v1/covers
           restartPolicy: OnFailure
 ---
-apiVersion: batch/v1beta1
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: delete-old-items
