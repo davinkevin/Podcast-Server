@@ -213,7 +213,10 @@ class ItemRepository(private val query: DSLContext) {
 
             val coverId = value(UUID.randomUUID()).cast(UUID::class.java)
             val itemNotExist =
-                notExists(selectFrom(ITEM).where(ITEM.URL.eq(item.url)).and(ITEM.PODCAST_ID.eq(item.podcastId)))
+                notExists(
+                    selectFrom(ITEM)
+                    .where(ITEM.URL.eq(item.url))
+                        .and(ITEM.PODCAST_ID.eq(item.podcastId)))
 
             val selectFromItem = select(
                 coverId,
@@ -235,6 +238,9 @@ class ItemRepository(private val query: DSLContext) {
                     .returning(COVER.ID)
             )
 
+            // To be removed when a solution is found for https://github.com/jOOQ/jOOQ/issues/12777
+            val dollarSafeValue: (s: String?) -> Param<String> = { value(it?.replace("$", "$ ")) }
+
             query.with(coverCreation)
                 .insertInto(
                     ITEM,
@@ -246,15 +252,15 @@ class ItemRepository(private val query: DSLContext) {
                 .select(
                     select(
                         value(id),
-                        value(item.title),
+                        dollarSafeValue(item.title),
                         value(item.url),
                         value(item.pubDate),
                         value(item.downloadDate),
                         value(item.creationDate),
-                        value(item.description),
-                        value(item.mimeType),
+                        dollarSafeValue(item.description),
+                        dollarSafeValue(item.mimeType),
                         value(item.length),
-                        value(item.fileName),
+                        dollarSafeValue(item.fileName),
                         value(item.status),
                         value(item.podcastId),
                         coverCreation.field(COVER.ID)

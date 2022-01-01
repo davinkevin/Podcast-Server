@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.entity.Status.*
 import com.github.davinkevin.podcastserver.r2dbc
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
+import org.assertj.core.api.Condition
 import org.jooq.DSLContext
 import org.jooq.exception.DataAccessException
 import org.jooq.impl.DSL.*
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import reactor.core.publisher.Flux
@@ -28,6 +30,7 @@ import java.time.temporal.ChronoUnit.SECONDS
 import java.util.*
 import java.util.UUID.fromString
 import java.util.function.Consumer
+import java.util.function.Predicate
 
 /**
  * Created by kevin on 2019-02-09
@@ -38,6 +41,8 @@ class ItemRepositoryTest(
     @Autowired val query: DSLContext,
     @Autowired val repository: ItemRepository
 ) {
+
+    private val log = LoggerFactory.getLogger(ItemRepositoryTest::class.java)
 
     private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
@@ -1495,6 +1500,68 @@ class ItemRepositoryTest(
                             assertThat(it.mimeType).isEqualTo("audio/mp3")
                             assertThat(it.length).isEqualTo(1234)
                             assertThat(it.fileName).isEqualTo("ofejeaoijefa.mp3")
+                            assertThat(it.status).isEqualTo(FINISH)
+
+                            assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
+                            assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
+                            assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
+
+                            assertThat(it.cover.height).isEqualTo(100)
+                            assertThat(it.cover.width).isEqualTo(100)
+                            assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
+                        }
+                        .verifyComplete()
+
+                    assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
+                    assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
+                }
+
+                @Test
+                fun `with dollar in text fields`() {
+                    /* Given */
+                    val item = ItemForCreation(
+                        title = "$1 item",
+                        url = "http://foo.bar.com/an_item",
+
+                        pubDate = now(),
+                        downloadDate = now(),
+                        creationDate = now(),
+
+                        description = "it costs $1",
+                        mimeType = "$1/mp3",
+                        length = 1234,
+                        fileName = "$1.mp3",
+                        status = FINISH,
+
+                        podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                        cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
+                    )
+                    val numberOfItem = query.selectCount().from(ITEM).r2dbc().fetchOne(count())!!
+                    val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())!!
+
+                    val originalOrEscaped: (s: String) -> Condition<String> = { original ->
+                        val isEqual: Predicate<String> = Predicate { (original == it)
+                                .also { r -> if (r) log.warn("modification following https://github.com/jOOQ/jOOQ/issues/12777 should be removed") }
+                        }
+                        val isEqualWithSpaceBeforeDollar: Predicate<String> = Predicate { original.replace("$", "$ ") == it }
+
+                        Condition(isEqual.or(isEqualWithSpaceBeforeDollar), "string comparison with possible escape due to https://github.com/jOOQ/jOOQ/issues/12777")
+                    }
+
+                    /* When */
+                    StepVerifier.create(repository.create(item))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.title).`is`(originalOrEscaped("$1 item"))
+                            assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
+                            assertThat(it.pubDate).isCloseTo(now(), within(10, SECONDS))
+                            assertThat(it.downloadDate).isCloseTo(now(), within(10, SECONDS))
+                            assertThat(it.creationDate).isCloseTo(now(), within(10, SECONDS))
+                            assertThat(it.description).`is`(originalOrEscaped("it costs $1"))
+                            assertThat(it.mimeType).`is`(originalOrEscaped("$1/mp3"))
+                            assertThat(it.length).isEqualTo(1234)
+                            assertThat(it.fileName).`is`(originalOrEscaped("$1.mp3"))
                             assertThat(it.status).isEqualTo(FINISH)
 
                             assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
