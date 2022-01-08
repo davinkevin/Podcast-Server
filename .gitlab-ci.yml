@@ -69,9 +69,9 @@ variables:
     changes:
       - documentation/**/*
 
-.not-on-master:
-  - &rule-not-on-master
-    if: '$CI_COMMIT_REF_NAME == "master"'
+.not-on-default-branch:
+  - &rule-not-on-default-branch
+    if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
     when: never
 
 .only-on-backend-changes:
@@ -323,7 +323,7 @@ stages:
     - delete_docker_hub_image backend
     - delete_docker_hub_image backend-base-image
   rules:
-    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == "master"'
+    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
       when: never
     - changes:
         - backend/**/*
@@ -345,7 +345,7 @@ stages:
     - kaniko_auth_docker_hub
   script:
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/database/Dockerfile --destination podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
-    - if [ "${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}" == "master" ]; then /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/database/Dockerfile --destination podcastserver/init-db:latest ; fi
+    - if [ "${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}" == "$CI_DEFAULT_BRANCH" ]; then /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/database/Dockerfile --destination podcastserver/init-db:latest ; fi
   environment:
     name: init-db/$CI_COMMIT_REF_SLUG
     url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/init-db/tags
@@ -358,7 +358,7 @@ stages:
     GIT_STRATEGY: none
     COMPONENT: init-db
   rules:
-    - *rule-not-on-master
+    - *rule-not-on-default-branch
     - <<: *changes_backend_files
       when: manual
       allow_failure: true
@@ -380,7 +380,7 @@ stages:
     - export VERSION="${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}"
     - export PROJECT_DIR=$CI_PROJECT_DIR/storage
     - /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/storage:${VERSION}
-    - if [ "$VERSION" == "master" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/storage:latest ; fi
+    - if [ "$VERSION" == "$CI_DEFAULT_BRANCH" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/storage:latest ; fi
   environment:
     name: storage/$CI_COMMIT_REF_SLUG
     url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/storage/tags
@@ -393,7 +393,7 @@ stages:
     GIT_STRATEGY: none
     COMPONENT: storage
   rules:
-    - *rule-not-on-master
+    - *rule-not-on-default-branch
     - <<: *changes_storage_files
       when: manual
       allow_failure: true
@@ -416,7 +416,7 @@ stages:
     - export VERSION="${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}"
     - export PROJECT_DIR=$CI_PROJECT_DIR/ui/target/docker/
     - /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/ui:${VERSION}
-    - if [ "$VERSION" == "master" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/ui:latest ; fi
+    - if [ "$VERSION" == "$CI_DEFAULT_BRANCH" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/ui:latest ; fi
   environment:
     name: ui/$CI_COMMIT_REF_SLUG
     url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/ui/tags
@@ -428,7 +428,7 @@ stages:
   variables:
     COMPONENT: ui
   rules:
-    - *rule-not-on-master
+    - *rule-not-on-default-branch
     - <<: *changes_frontend_files
       when: manual
       allow_failure: true

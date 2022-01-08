@@ -9,7 +9,7 @@ cd ${UI_FOLDER}/target/docker/ || exit 1
 docker build -t podcastserver/ui:"${VERSION}" .
 [ -n "$CI" ] && docker push "podcastserver/ui:${VERSION}"
 
-if [ "$VERSION" == "master" ]; then
+if [ "$VERSION" == "$CI_DEFAULT_BRANCH" ]; then
    docker tag "podcastserver/ui:${VERSION}" podcastserver/ui:latest
    [ -n "$CI" ] && docker push podcastserver/ui:latest
 fi
