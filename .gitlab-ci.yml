@@ -50,7 +50,7 @@ variables:
   - &changes_backend_files
     changes:
     - backend/**/*
-    - database/**/*
+    - init-db/**/*
 
 .storage_files:
   - &changes_storage_files
@@ -344,8 +344,8 @@ stages:
     - *cicd_utils
     - kaniko_auth_docker_hub
   script:
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/database/Dockerfile --destination podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
-    - if [ "${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}" == "$CI_DEFAULT_BRANCH" ]; then /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/database/Dockerfile --destination podcastserver/init-db:latest ; fi
+    - /kaniko/executor --context $CI_PROJECT_DIR/init-db --dockerfile $CI_PROJECT_DIR/init-db/Dockerfile --destination podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - if [ "${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}" == "$CI_DEFAULT_BRANCH" ]; then /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/init-db/Dockerfile --destination podcastserver/init-db:latest ; fi
   environment:
     name: init-db/$CI_COMMIT_REF_SLUG
     url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/init-db/tags

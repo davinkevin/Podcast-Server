@@ -27,5 +27,6 @@ buildCache {
 }
 
 include("backend")
+include("init-db")
 include("frontend-angular")
 include("frontend-angularjs")

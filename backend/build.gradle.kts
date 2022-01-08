@@ -18,6 +18,7 @@ plugins {
 	id("nu.studer.jooq") version "6.0.1"
 	id("com.google.cloud.tools.jib") version "3.1.4"
 	id("de.jansauer.printcoverage") version "2.0.0"
+	id("org.barfuin.gradle.taskinfo") version "1.3.1"
 
 	kotlin("jvm") version "1.6.0"
 	kotlin("plugin.spring") version "1.6.10"
@@ -34,6 +35,7 @@ apply(from = "gradle/profile-skaffold.gradle.kts")
 
 @Suppress("UNCHECKED_CAST")
 val db: Map<String, String> = project.extra["databaseParameters"] as Map<String, String>
+val initDbProject: Project = rootProject.allprojects.first { it.name == "init-db" }
 
 repositories {
 	mavenCentral()
@@ -87,11 +89,10 @@ configure<com.gorylenko.GitPropertiesPluginExtension> {
     customProperty("git.build.user.name", "none")
 }
 
-tasks.register<Copy>("copyMigrations") {
-	from("${project.rootDir}/database/migrations/")
+val copyMigrations = tasks.register<Sync>("copyMigrations") {
+	from(initDbProject.projectDir.resolve("migrations"))
 	include("*.sql")
 	into(db["sqlFiles"]!!)
-    outputs.cacheIf { true }
 }
 
 normalization {
@@ -100,15 +101,14 @@ normalization {
     }
 }
 
-flyway {
+val flywayMigrateForJOOQ = tasks.register<FlywayMigrateTask>("flywayMigrateForJOOQ") {
 	url = jdbc(db["url"])
 	user = db["user"]
 	password = db["password"]
 	locations = arrayOf("filesystem:${db["sqlFiles"]}")
-}
 
-tasks.register<FlywayMigrateTask>("flywayMigrateForJOOQ") {
-    dependsOn("copyMigrations")
+	outputs.upToDateWhen { false }
+	dependsOn(copyMigrations)
 }
 
 jooq {
@@ -157,13 +157,8 @@ jooq {
 }
 
 tasks.named<JooqGenerate>("generateJooq") {
-    inputs.dir(file("../database/migrations"))
-        .withPropertyName("migrations")
-        .withPathSensitivity(PathSensitivity.RELATIVE)
-
     allInputsDeclared.set(true)
-
-    dependsOn("flywayMigrateForJOOQ")
+	dependsOn(flywayMigrateForJOOQ)
 }
 
 tasks.withType<KotlinCompile> {
@@ -180,7 +175,6 @@ jacoco {
     toolVersion = "0.8.7"
 }
 
-tasks.register<FlywayMigrateTask>("flywaySetupDbForTests") { dependsOn("copyMigrations") }
 tasks.test {
     useJUnitPlatform()
     systemProperty("user.timezone", "UTC")
@@ -188,7 +182,6 @@ tasks.test {
     systemProperty("spring.r2dbc.username", db["user"]!!)
     systemProperty("spring.r2dbc.password", db["password"]!!)
 	jvmArgs = listOf("--add-opens", "java.base/java.time=ALL-UNNAMED")
-    dependsOn(tasks.named("flywaySetupDbForTests"))
     finalizedBy(tasks.jacocoTestReport)
     testLogging {
         exceptionFormat = TestExceptionFormat.FULL
@@ -261,6 +254,7 @@ tasks.register("downloadDependencies") {
         println("Downloaded all dependencies: ${allDeps + buildDeps}")
 	}
 }
+
 
 dependencyManagement {
     applyMavenExclusions(false)

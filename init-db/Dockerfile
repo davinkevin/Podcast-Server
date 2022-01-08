@@ -4,7 +4,7 @@ RUN find drivers -iname *.jar | grep -v postgresql | xargs rm && \
     rm -rf lib/enterprise lib/pro licenses/ README.txt flyway* \
     sql/put-your-sql-migrations-here.txt drivers/put-your-jdbc-drivers-here.txt
 
-COPY database/migrations/*.sql /flyway/sql/
+COPY migrations/*.sql /flyway/sql/
 
 FROM gcr.io/distroless/java17-debian11:latest as base-image
 
