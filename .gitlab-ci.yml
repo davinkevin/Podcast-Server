@@ -37,7 +37,7 @@ variables:
       - .trivy
 
 .delete-docker-image:
-  image: tutum/curl
+  image: curlimages/curl
   dependencies: []
   variables:
     GIT_STRATEGY: none
