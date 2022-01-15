@@ -2,15 +2,15 @@ package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
-import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
+import org.assertj.core.api.Assertions.assertThat
+import org.jooq.DSLContext
+import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.assertj.core.api.Assertions.assertThat
-import org.jooq.DSLContext
-import org.junit.jupiter.api.Test
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.context.annotation.UserConfigurations
 import org.springframework.boot.test.context.runner.ApplicationContextRunner

@@ -8,9 +8,9 @@ import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
-import com.github.davinkevin.podcastserver.service.FileMetaData
-import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.service.storage.FileMetaData
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested

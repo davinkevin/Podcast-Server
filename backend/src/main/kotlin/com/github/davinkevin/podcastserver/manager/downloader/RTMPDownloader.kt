@@ -4,10 +4,9 @@ package com.github.davinkevin.podcastserver.manager.downloader
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
 import org.springframework.context.annotation.Scope

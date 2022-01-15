@@ -5,7 +5,10 @@ import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.condition.EnabledOnOs
 import org.junit.jupiter.api.condition.OS
-import org.junit.jupiter.api.extension.*
+import org.junit.jupiter.api.extension.AfterAllCallback
+import org.junit.jupiter.api.extension.BeforeAllCallback
+import org.junit.jupiter.api.extension.ExtendWith
+import org.junit.jupiter.api.extension.ExtensionContext
 import org.springframework.boot.test.context.SpringBootTest
 
 /**
@@ -15,7 +18,8 @@ import org.springframework.boot.test.context.SpringBootTest
     properties = [
         "podcastserver.externaltools.ffmpeg=/bin/echo",
         "podcastserver.externaltools.ffprobe=/bin/echo",
-        "podcastserver.storage.url=http://localhost:9000/"
+        "podcastserver.storage.url=http://localhost:9000/",
+        "podcastserver.storage.bucket=bucket",
     ]
 )
 @ExtendWith(MockS3Server::class)
@@ -31,8 +35,7 @@ private class MockS3Server: BeforeAllCallback, AfterAllCallback {
     override fun beforeAll(p0: ExtensionContext?) {
         server = WireMockServer(9000).apply {
             start()
-            stubFor(head(urlEqualTo("/data")).willReturn(ok()))
-            stubFor(put(urlEqualTo("/data?policy")).willReturn(ok()))
+            stubFor(head(urlEqualTo("/bucket")).willReturn(ok()))
         }
     }
 

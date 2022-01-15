@@ -5,8 +5,8 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
-import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.slf4j.LoggerFactory
 import org.springframework.http.codec.multipart.FilePart
 import reactor.core.publisher.Flux

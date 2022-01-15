@@ -5,8 +5,7 @@ import com.github.davinkevin.podcastserver.manager.downloader.AbstractDownloader
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.FileStorageService
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.sapher.youtubedl.DownloadProgressCallback
 import org.slf4j.LoggerFactory
 import java.nio.file.Files

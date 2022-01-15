@@ -6,8 +6,8 @@ import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.FileMetaData
-import com.github.davinkevin.podcastserver.service.FileStorageService
+import com.github.davinkevin.podcastserver.service.storage.FileMetaData
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.sapher.youtubedl.DownloadProgressCallback
 import com.sapher.youtubedl.YoutubeDLResponse
 import org.assertj.core.api.Assertions.assertThat

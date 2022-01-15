@@ -4,6 +4,9 @@ kind: Component
 resources:
   - storage.yaml
 
+patchesStrategicMerge:
+  - backend-set-internal-storage.yaml
+
 configMapGenerator:
   - name: storage
     behavior: merge

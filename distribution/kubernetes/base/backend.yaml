@@ -130,7 +130,10 @@ spec:
                   name: storage
                   key: bucket
             - name: PODCASTSERVER_STORAGE_URL
-              value: http://storage:9000/
+              valueFrom:
+                configMapKeyRef:
+                  name: storage
+                  key: url
           ports:
             - name: http-port
               containerPort: 8080

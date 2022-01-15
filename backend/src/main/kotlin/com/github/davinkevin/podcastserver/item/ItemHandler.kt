@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
-import com.github.davinkevin.podcastserver.service.FileStorageService
+import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.NOT_FOUND
@@ -65,9 +66,7 @@ class ItemHandler(
                 .flatMap { item -> item
                         .toMono()
                         .filter { it.isDownloaded() }
-                        .map { UriComponentsBuilder.fromUri(host)
-                                .pathSegment("data", it.podcast.title, it.fileName)
-                                .build().toUri() }
+                        .map { fileService.toExternalUrl(FileDescriptor(it.podcast.title, it.fileName!!), host) }
                         .switchIfEmpty { URI(item.url!!).toMono() }
                 }
                 .doOnNext { log.debug("Redirect content playable to {}", it)}
@@ -83,10 +82,7 @@ class ItemHandler(
                 .flatMap { item -> item
                         .toMono()
                         .flatMap { fileService.coverExists(it) }
-                        .map { UriComponentsBuilder.fromUri(host)
-                                .pathSegment("data", item.podcast.title, it)
-                                .build().toUri()
-                        }
+                        .map { fileService.toExternalUrl(FileDescriptor(item.podcast.title, it), host) }
                         .switchIfEmpty { item.cover.url.toMono() }
                 }
                 .doOnNext { log.debug("Redirect cover to {}", it)}

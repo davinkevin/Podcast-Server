@@ -25,7 +25,7 @@ spec:
                 name: backend
                 port:
                   number: 8080
-          - path: /data
+          - path: /dev-podcasts
             pathType: Prefix
             backend:
               service:

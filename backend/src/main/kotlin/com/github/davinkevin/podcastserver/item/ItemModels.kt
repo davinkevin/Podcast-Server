@@ -33,7 +33,7 @@ data class Item(
         val podcast: Podcast,
         val cover: Cover
 ) {
-    fun isDownloaded() = Status.FINISH == status
+    fun isDownloaded() = Status.FINISH == status && fileName != null
 
     data class Podcast(val id: UUID, val title: String, val url: String?)
     data class Cover(val id: UUID, val url: URI, val width: Int, val height: Int)

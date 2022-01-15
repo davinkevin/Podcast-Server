@@ -2,7 +2,8 @@ package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
-import com.github.davinkevin.podcastserver.service.FileStorageService
+import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.web.reactive.function.server.ServerRequest
@@ -75,10 +76,11 @@ class PodcastHandler(
                         .toMono()
                         .flatMap { fileService.coverExists(it) }
                         .map { it.toString().substringAfterLast("/") }
-                        .map { UriComponentsBuilder.fromUri(host)
-                                .pathSegment("data", podcast.title, it)
-                                .build().toUri()
-                        }
+//                        .map { UriComponentsBuilder.fromUri(host)
+//                                .pathSegment("data", podcast.title, it)
+//                                .build().toUri()
+//                        }
+                        .map { fileService.toExternalUrl(FileDescriptor(podcast.title, it), host) }
                         .switchIfEmpty { podcast.cover.url.toMono() }
                 }
                 .doOnNext { log.debug("Redirect cover to {}", it)}

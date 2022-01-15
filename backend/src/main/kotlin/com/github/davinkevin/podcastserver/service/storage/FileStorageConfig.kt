@@ -1,7 +1,5 @@
-package com.github.davinkevin.podcastserver.config
+package com.github.davinkevin.podcastserver.service.storage
 
-import com.github.davinkevin.podcastserver.service.FileStorageService
-import org.slf4j.LoggerFactory
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
@@ -10,14 +8,12 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.client.reactive.ReactorClientHttpConnector
 import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import reactor.netty.http.client.HttpClient
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.S3Configuration
+import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import java.net.URI
 
 /**
@@ -42,14 +38,35 @@ class FileStorageConfig {
             .credentialsProvider { s3Credentials }
             .serviceConfiguration(s3conf)
             .endpointOverride(properties.url)
-            .region(Region.EU_CENTRAL_1)
+            .region(Region.AWS_GLOBAL)
             .build()
+
+        val preSigner = S3Presigner.builder()
+            .region(Region.AWS_GLOBAL)
+            .credentialsProvider { s3Credentials }
+            .endpointOverride(properties.url)
+            .build()
+
+        val externalPreSigner: (URI) -> S3Presigner = { preSigner }
+        val requestSpecificPreSigner: (URI) -> S3Presigner = { S3Presigner.builder()
+            .region(Region.AWS_GLOBAL)
+            .credentialsProvider { s3Credentials }
+            .endpointOverride(it)
+            .build()
+        }
+
+        val preSignerBuilder = if (properties.isInternal) requestSpecificPreSigner else externalPreSigner
 
         val wcb = webClientBuilder
             .clone()
             .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
 
-        return FileStorageService(wcb, bucketClient, properties.bucket)
+        return FileStorageService(
+            wcb = wcb,
+            bucket = bucketClient,
+            preSignerBuilder = preSignerBuilder,
+            properties = properties,
+        )
     }
 
     @Bean
@@ -61,8 +78,9 @@ class FileStorageConfig {
 @ConstructorBinding
 @ConfigurationProperties(value = "podcastserver.storage")
 data class StorageProperties(
-    val bucket: String = "data",
+    val bucket: String,
     val username: String,
     val password: String,
-    val url: URI = URI.create("http://storage:9000/")
+    val url: URI,
+    val isInternal: Boolean = false,
 )

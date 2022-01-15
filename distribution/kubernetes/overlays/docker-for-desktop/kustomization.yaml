@@ -11,6 +11,12 @@ resources:
 patchesStrategicMerge:
   - volume.yaml
 
+configMapGenerator:
+  - name: storage
+    behavior: merge
+    literals:
+      - bucket=dev-podcasts
+
 secretGenerator:
   - name: database
     behavior: merge

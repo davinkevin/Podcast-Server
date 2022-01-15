@@ -1,4 +1,4 @@
-package com.github.davinkevin.podcastserver.service
+package com.github.davinkevin.podcastserver.service.storage
 
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest
 import com.github.davinkevin.podcastserver.item.DeleteItemRequest
@@ -18,6 +18,7 @@ import reactor.util.retry.Retry
 import software.amazon.awssdk.core.async.AsyncRequestBody
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.model.*
+import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
@@ -30,7 +31,8 @@ import java.util.*
 class FileStorageService(
     private val wcb: WebClient.Builder,
     private val bucket: S3AsyncClient,
-    private val bucketName: String,
+    private val preSignerBuilder: (URI) -> S3Presigner,
+    private val properties: StorageProperties,
 ) {
 
     private val log = LoggerFactory.getLogger(FileStorageService::class.java)
@@ -38,7 +40,7 @@ class FileStorageService(
     fun deletePodcast(podcast: DeletePodcastRequest) = Mono.defer {
         log.info("Deletion of podcast {}", podcast.title)
 
-        bucket.listObjects { it.bucket(bucketName).prefix(podcast.title) }.toMono()
+        bucket.listObjects { it.bucket(properties.bucket).prefix(podcast.title) }.toMono()
             .flatMapIterable { it.contents() }
             .flatMap { bucket.deleteObject(it.toDeleteRequest()).toMono() }
             .then(true.toMono())
@@ -50,7 +52,7 @@ class FileStorageService(
 
         log.info("Deletion of file {}", path)
 
-        bucket.deleteObject { it.bucket(bucketName).key(path) }.toMono()
+        bucket.deleteObject { it.bucket(properties.bucket).key(path) }.toMono()
             .map { true }
             .onErrorReturn(false)
     }
@@ -60,7 +62,7 @@ class FileStorageService(
 
         log.info("Deletion of file {}", path)
 
-        bucket.deleteObject { it.bucket(bucketName).key(path) }.toMono()
+        bucket.deleteObject { it.bucket(properties.bucket).key(path) }.toMono()
             .map { true }
             .onErrorReturn(false)
     }
@@ -69,7 +71,7 @@ class FileStorageService(
     fun coverExists(i: Item): Mono<String> = coverExists(i.podcast.title, i.id, i.cover.extension())
     fun coverExists(podcastTitle: String, itemId: UUID, extension: String): Mono<String> {
         val path = "$podcastTitle/$itemId.$extension"
-        return bucket.headObject { it.bucket(bucketName).key(path) }.toMono()
+        return bucket.headObject { it.bucket(properties.bucket).key(path) }.toMono()
             .map { true }
             .onErrorReturn(false)
             .filter { it }
@@ -86,7 +88,7 @@ class FileStorageService(
 
     private fun upload(key: String, resource: ByteArrayResource): Mono<PutObjectResponse> {
         val request = PutObjectRequest.builder()
-            .bucket(bucketName)
+            .bucket(properties.bucket)
             .acl(ObjectCannedACL.PUBLIC_READ)
             .key(key)
             .build()
@@ -106,7 +108,7 @@ class FileStorageService(
 
     fun movePodcast(request: MovePodcastRequest): Mono<Void> = Mono.defer {
         val listRequest = ListObjectsRequest.builder()
-            .bucket(bucketName)
+            .bucket(properties.bucket)
             .prefix(request.from)
             .build()
 
@@ -129,7 +131,7 @@ class FileStorageService(
 
     fun upload(podcastTitle: String, file: Path): Mono<PutObjectResponse> {
         val request = PutObjectRequest.builder()
-            .bucket(bucketName)
+            .bucket(properties.bucket)
             .acl(ObjectCannedACL.PUBLIC_READ)
             .key("$podcastTitle/${file.fileName}")
             .build()
@@ -141,53 +143,43 @@ class FileStorageService(
 
     fun metadata(title: String, file: Path): Mono<FileMetaData> {
         val key = "$title/${file.fileName}"
-        return Mono.defer { bucket.headObject() { it.bucket(bucketName).key(key) }.toMono() }
+        return Mono.defer { bucket.headObject() { it.bucket(properties.bucket).key(key) }.toMono() }
             .retryWhen(Retry.backoff(3, Duration.ofSeconds(1)))
             .map { FileMetaData(contentType = it.contentType(), size = it.contentLength()) }
     }
 
-    private fun S3Object.toDeleteRequest(bucket: String = bucketName): DeleteObjectRequest = DeleteObjectRequest.builder()
-        .bucket(bucket)
-        .key(this.key())
-        .build()
+    private fun S3Object.toDeleteRequest(bucket: String = properties.bucket): DeleteObjectRequest =
+        DeleteObjectRequest.builder()
+            .bucket(bucket)
+            .key(this.key())
+            .build()
 
-    private fun S3Object.toCopyRequest(key: String, bucket: String = bucketName): CopyObjectRequest = CopyObjectRequest.builder()
-        .sourceBucket(bucket)
-        .sourceKey(this.key())
-        .destinationBucket(bucket)
-        .destinationKey("$key/" + this.key().substringAfterLast("/"))
-        .build()
+    private fun S3Object.toCopyRequest(key: String, bucket: String = properties.bucket): CopyObjectRequest =
+        CopyObjectRequest.builder()
+            .sourceBucket(bucket)
+            .sourceKey(this.key())
+            .destinationBucket(bucket)
+            .destinationKey("$key/" + this.key().substringAfterLast("/"))
+            .build()
 
     fun initBucket(): Mono<Void> {
-        val policy = """{
-         "Statement": [
-          {
-           "Action": [ "s3:GetBucketLocation", "s3:ListBucket", "s3:ListBucketMultipartUploads" ],
-           "Effect": "Allow",
-           "Principal": { "AWS": [ "*" ] },
-           "Resource": [ "arn:aws:s3:::data" ] },
-          {
-           "Action": [ "s3:GetObject" ],
-           "Effect": "Allow",
-           "Principal": { "AWS": [ "*" ] },
-           "Resource": [ "arn:aws:s3:::data/*" ]
-          }
-         ],
-         "Version": "2012-10-17"
-        }"""
-
-        return bucket.headBucket { it.bucket(bucketName) }.toMono()
+        return bucket.headBucket { it.bucket(properties.bucket) }.toMono()
             .doOnSuccess { log.info("🗂 Bucket already present") }
             .then()
-            .onErrorResume { bucket.createBucket { it.bucket(bucketName) }.toMono()
+            .onErrorResume { bucket.createBucket { it.bucket(properties.bucket) }.toMono()
                 .doOnSuccess { log.info("✅ Bucket creation done") }
                 .then()
             }
-            .then(
-                Mono.defer { bucket.putBucketPolicy { it.bucket(bucketName).policy(policy) }.toMono() }
-                    .doOnSuccess { log.info("🔐 Bucket ACL set done") }
-            )
-            .then()
+    }
+
+    fun toExternalUrl(file: FileDescriptor, requestedHost: URI): URI {
+        return preSignerBuilder(requestedHost).presignGetObject { sign -> sign
+            .signatureDuration(Duration.ofDays(1))
+            .getObjectRequest { request -> request
+                .bucket(properties.bucket)
+                .key("${file.podcastTitle}/${file.fileName}")
+            }
+        }.url().toURI()
     }
 }
 
@@ -196,3 +188,4 @@ private fun Item.Cover.extension() = FilenameUtils.getExtension(url.toASCIIStrin
 
 data class MovePodcastRequest(val id: UUID, val from: String, val to: String)
 data class FileMetaData(val contentType: String, val size: Long)
+data class FileDescriptor(val podcastTitle: String, val fileName: String)

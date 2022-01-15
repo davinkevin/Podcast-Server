@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.FileStorageService
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock

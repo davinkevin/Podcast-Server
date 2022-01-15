@@ -1,0 +1,12 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+spec:
+  template:
+    spec:
+      containers:
+        - name: app
+          env:
+            - name: PODCASTSERVER_STORAGE_IS_INTERNAL
+              value: "true"

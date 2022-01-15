@@ -5,9 +5,8 @@ import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.FfmpegService
-import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.ProcessService
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import net.bramp.ffmpeg.builder.FFmpegBuilder
 import net.bramp.ffmpeg.progress.ProgressListener
 import org.slf4j.LoggerFactory

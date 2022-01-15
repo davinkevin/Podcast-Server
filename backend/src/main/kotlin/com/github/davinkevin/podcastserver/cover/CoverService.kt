@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.cover
 
-import com.github.davinkevin.podcastserver.service.FileStorageService
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import reactor.core.publisher.Mono
 import java.time.OffsetDateTime
 

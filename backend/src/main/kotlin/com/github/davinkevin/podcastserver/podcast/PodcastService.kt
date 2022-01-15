@@ -2,8 +2,8 @@ package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverRepository
-import com.github.davinkevin.podcastserver.service.FileStorageService
-import com.github.davinkevin.podcastserver.service.MovePodcastRequest
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
+import com.github.davinkevin.podcastserver.service.storage.MovePodcastRequest
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.davinkevin.podcastserver.tag.TagRepository
 import reactor.core.publisher.Flux

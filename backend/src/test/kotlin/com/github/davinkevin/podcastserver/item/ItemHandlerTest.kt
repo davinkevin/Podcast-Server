@@ -2,12 +2,15 @@ package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
-import com.github.davinkevin.podcastserver.service.FileStorageService
-import org.mockito.kotlin.*
-import org.apache.commons.io.FilenameUtils
+import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.anyOrNull
+import org.mockito.kotlin.eq
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
@@ -115,10 +118,13 @@ class ItemHandlerTest(
         @Test
         fun `by redirecting to local file server`() {
             /* Given */
+            val host = URI.create("https://localhost:8080/")
             val itemDownloaded = item.copy(
                     status = Status.FINISH, fileName = "file_to_download.mp4"
             )
             whenever(itemService.findById(item.id)).thenReturn(itemDownloaded.toMono())
+            whenever(fileService.toExternalUrl(FileDescriptor(itemDownloaded.podcast.title, itemDownloaded.fileName!!), host))
+                .thenReturn(URI.create("https://localhost:8080/data/Podcast%20Bar/file_to_download.mp4"))
 
             /* When */
             rest
@@ -173,12 +179,11 @@ class ItemHandlerTest(
         @Test
         fun `by redirecting to local file server if cover exists locally`() {
             /* Given */
+            val host = URI.create("https://localhost:8080/")
             whenever(itemService.findById(item.id)).thenReturn(item.toMono())
-            whenever(fileService.coverExists(any<Item>())).then {
-                val item = it.getArgument<Item>(0)
-                val extension = FilenameUtils.getExtension(item.cover.url.toASCIIString())
-                "${item.id}.$extension".toMono()
-            }
+            whenever(fileService.coverExists(any<Item>())).thenReturn("${item.id}.png".toMono())
+            whenever(fileService.toExternalUrl(FileDescriptor(item.podcast.title, "${item.id}.png"), host))
+                .thenReturn(URI.create("https://localhost:8080/data/Podcast%20Bar/27184b1a-7642-4ffd-ac7e-14fb36f7f15c.png"))
 
             /* When */
             rest
@@ -195,7 +200,7 @@ class ItemHandlerTest(
         fun `by redirecting to external file if cover does not exist locally`() {
             /* Given */
             whenever(itemService.findById(item.id)).thenReturn(item.toMono())
-            whenever(fileService.coverExists(any<Item>())).then { Mono.empty<Path>() }
+            whenever(fileService.coverExists(item)).thenReturn(Mono.empty())
 
             /* When */
             rest

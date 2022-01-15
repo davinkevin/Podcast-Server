@@ -1,6 +1,5 @@
-package com.github.davinkevin.podcastserver.service
+package com.github.davinkevin.podcastserver.service.storage
 
-import com.github.davinkevin.podcastserver.config.FileStorageConfig
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.*
 import com.github.davinkevin.podcastserver.entity.Status
@@ -33,6 +32,7 @@ import org.springframework.http.codec.multipart.FilePart
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.DigestUtils
+import org.springframework.web.reactive.function.client.WebClient
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
@@ -590,10 +590,12 @@ class FileStorageServiceTest(
             StepVerifier.create(fileService.metadata("podcast-title", Paths.get("dd16b2eb-657e-4064-b470-5b99397ce729.png")))
                 /* Then */
                 .expectSubscription()
-                .expectNext(FileMetaData(
+                .expectNext(
+                    FileMetaData(
                     contentType = "image/png",
                     size = 123L
-                ))
+                )
+                )
                 .verifyComplete()
         }
 
@@ -603,31 +605,12 @@ class FileStorageServiceTest(
     @DisplayName("should init bucket")
     inner class ShouldInitBucket {
 
-        private val policy = """{
-         "Statement": [
-          {
-           "Action": [ "s3:GetBucketLocation", "s3:ListBucket", "s3:ListBucketMultipartUploads" ],
-           "Effect": "Allow",
-           "Principal": { "AWS": [ "*" ] },
-           "Resource": [ "arn:aws:s3:::data" ] },
-          {
-           "Action": [ "s3:GetObject" ],
-           "Effect": "Allow",
-           "Principal": { "AWS": [ "*" ] },
-           "Resource": [ "arn:aws:s3:::data/*" ]
-          }
-         ],
-         "Version": "2012-10-17"
-        }"""
-
-
         @Test
         fun `with no bucket before`() {
             /* Given */
             s3Backend.apply {
                 stubFor(head(urlEqualTo("/data")).willReturn(notFound()))
                 stubFor(put("/data").willReturn(ok()))
-                stubFor(put("/data?policy").withRequestBody(equalToJson(policy)).willReturn(ok()))
             }
             /* When */
             StepVerifier.create(fileService.initBucket())
@@ -639,15 +622,62 @@ class FileStorageServiceTest(
         @Test
         fun `with an already existing bucket`() {
             /* Given */
-            s3Backend.apply {
-                stubFor(head(urlEqualTo("/data")).willReturn(ok()))
-                stubFor(put("/data?policy").withRequestBody(equalToJson(policy)).willReturn(ok()))
-            }
+            s3Backend.stubFor(head(urlEqualTo("/data")).willReturn(ok()))
             /* When */
             StepVerifier.create(fileService.initBucket())
                 /* Then */
                 .expectSubscription()
                 .verifyComplete()
+        }
+
+    }
+
+    @Nested
+    @DisplayName("should sign url")
+    inner class ShouldSignUrl {
+
+        private val storageProperties = StorageProperties(
+            bucket = "foo",
+            username = "name",
+            password = "pass",
+            url = URI.create("https://storage.local/"),
+            isInternal = true
+        )
+
+        @Test
+        fun `with domain from request`() {
+            /* Given */
+            val onDemandFileStorageService = FileStorageConfig().fileStorageService(
+                WebClient.builder(),
+                storageProperties.copy(isInternal = true)
+            )
+
+            /* When */
+            val uri = onDemandFileStorageService.toExternalUrl(
+                FileDescriptor("foo", "bar"),
+                URI.create("https://request.local/")
+            )
+
+            /* Then */
+            assertThat(uri.host).isEqualTo("request.local")
+        }
+
+        @Test
+        fun `with domain from storage`() {
+            /* Given */
+            val onDemandFileStorageService = FileStorageConfig().fileStorageService(
+                WebClient.builder(),
+                storageProperties.copy(isInternal = false)
+            )
+
+            /* When */
+            val uri = onDemandFileStorageService.toExternalUrl(
+                FileDescriptor("foo", "bar"),
+                URI.create("https://request.local/")
+            )
+
+            /* Then */
+            assertThat(uri.host).isEqualTo("storage.local")
         }
 
     }

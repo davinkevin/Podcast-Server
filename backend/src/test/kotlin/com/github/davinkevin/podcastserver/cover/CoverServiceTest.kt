@@ -2,14 +2,14 @@ package com.github.davinkevin.podcastserver.cover
 
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Item
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Podcast
-import com.github.davinkevin.podcastserver.service.FileStorageService
-import org.mockito.kotlin.*
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
+import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import

@@ -32,8 +32,6 @@ spec:
                 secretKeyRef:
                   name: storage
                   key: password
-            - name: MINIO_DOMAIN
-              value: MINIO_DOMAIN
           ports:
             - containerPort: 9000
             - containerPort: 9001

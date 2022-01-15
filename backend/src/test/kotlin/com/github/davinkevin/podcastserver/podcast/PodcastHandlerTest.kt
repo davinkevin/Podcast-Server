@@ -2,15 +2,15 @@ package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.item.ItemService
-import com.github.davinkevin.podcastserver.service.FileStorageService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.tag.Tag
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
-import org.apache.commons.io.FilenameUtils
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
@@ -24,7 +24,6 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
-import java.nio.file.Path
 import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -538,10 +537,13 @@ class PodcastHandlerTest(
         @Test
         fun `by redirecting to local file server if cover exists locally`() {
             /* Given */
+            val host = URI.create("https://localhost:8080/")
             whenever(podcastService.findById(podcast.id)).thenReturn(podcast.toMono())
-            whenever(fileService.coverExists(any<Podcast>())).then {
-                FilenameUtils.getName(it.getArgument<Podcast>(0).cover.url.toASCIIString()).toMono()
-            }
+            whenever(fileService.coverExists(podcast)).thenReturn(
+                podcast.cover.url.toASCIIString().substringAfterLast("/").toMono()
+            )
+            whenever(fileService.toExternalUrl(FileDescriptor(podcast.title, "cover.png"), host))
+                .thenReturn(URI.create("https://localhost:8080/data/Podcast%20title/cover.png"))
             /* When */
             rest
                     .get()
@@ -557,7 +559,7 @@ class PodcastHandlerTest(
         fun `by redirecting to external file if cover does not exist locally`() {
             /* Given */
             whenever(podcastService.findById(podcast.id)).thenReturn(podcast.toMono())
-            whenever(fileService.coverExists(any<Podcast>())).then { Mono.empty<Path>() }
+            whenever(fileService.coverExists(podcast)).thenReturn(Mono.empty())
 
             /* When */
             rest
