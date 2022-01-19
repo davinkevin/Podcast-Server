@@ -291,7 +291,7 @@ stages:
   stage: 🐳 packaging
   extends: [ .only-on-backend-changes ]
   image: openjdk:17-slim
-  needs: [🧪 backend, 👷 backend-base-image]
+  needs: [👷 backend-base-image]
   services:
     - postgres:12.3-alpine
   variables:
