@@ -10,7 +10,7 @@ import nu.studer.gradle.jooq.JooqGenerate
 import org.flywaydb.gradle.task.FlywayMigrateTask
 
 plugins {
-	id("org.springframework.boot") version "2.6.2"
+	id("org.springframework.boot") version "2.6.3"
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 
 	id("com.gorylenko.gradle-git-properties") version "2.3.2"
@@ -19,7 +19,7 @@ plugins {
 	id("com.google.cloud.tools.jib") version "3.1.4"
 	id("de.jansauer.printcoverage") version "2.0.0"
 
-	kotlin("jvm") version "1.6.0"
+	kotlin("jvm") version "1.6.10"
 	kotlin("plugin.spring") version "1.6.10"
 	jacoco
 }
