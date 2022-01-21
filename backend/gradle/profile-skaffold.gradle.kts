@@ -8,6 +8,6 @@ if (System.getenv("SKAFFOLD") != null || (skaffold?.toBoolean() == true)) {
             "sqlFiles" to "$buildDir/flyway/migrations/"
     ))
 
-    val imageTags by extra(setOf("master"))
+    val imageTags by extra(setOf("main"))
 }
 

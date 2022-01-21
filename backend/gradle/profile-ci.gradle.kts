@@ -17,12 +17,13 @@ if (env.containsKey("POSTGRES_DB") && env.containsKey("POSTGRES_USER") && env.co
 fun generateTagsList(): Set<String> {
     val CI_COMMIT_TAG = env["CI_COMMIT_TAG"]
     val CI_COMMIT_REF_SLUG = env["CI_COMMIT_REF_SLUG"] ?: error("CI_COMMIT_REF_SLUG not defined")
+    val CI_DEFAULT_BRANCH = env["CI_DEFAULT_BRANCH"] ?: error("CI_DEFAULT_BRANCH not defined")
 
     if (CI_COMMIT_TAG != null) {
         return setOf(CI_COMMIT_TAG)
     }
 
-    if(CI_COMMIT_REF_SLUG != "master") {
+    if(CI_COMMIT_REF_SLUG != CI_DEFAULT_BRANCH) {
         return setOf(CI_COMMIT_REF_SLUG)
     }
 
