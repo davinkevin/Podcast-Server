@@ -31,3 +31,4 @@ Backend/etc
 /backend/buildSrc/build/
 /backend/buildSrc/gradle/wrapper/
 /documentation/dist/
+/build/
