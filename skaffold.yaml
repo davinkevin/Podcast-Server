@@ -7,6 +7,7 @@ build:
       dockerfile: backend/src/main/base-image/Dockerfile
   - image: podcastserver/backend
     jib:
+      fromImage: podcastserver/backend-base-image
       project: backend
       args:
       - -Pskaffold=true
