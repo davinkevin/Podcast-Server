@@ -40,7 +40,7 @@ repositories {
 	maven { url = uri("https://jitpack.io") }
 }
 
-extra["jooq.version"] = "3.15.5"
+extra["jooq.version"] = "3.16.2"
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -54,6 +54,7 @@ dependencies {
 	implementation("org.postgresql:postgresql")
 	runtimeOnly("io.r2dbc:r2dbc-postgresql")
 	jooqGenerator("org.postgresql:postgresql:" + dependencyManagement.importedProperties["postgresql.version"])
+	jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
 
 	implementation("org.jdom:jdom2:2.0.6")
 	implementation("org.jsoup:jsoup:1.13.1")
