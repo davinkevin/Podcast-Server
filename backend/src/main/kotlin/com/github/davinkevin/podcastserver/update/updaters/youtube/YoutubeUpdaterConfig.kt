@@ -1,8 +1,9 @@
 package com.github.davinkevin.podcastserver.update.updaters.youtube
 
-import com.github.davinkevin.podcastserver.update.updaters.Updater
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
-import com.github.davinkevin.podcastserver.service.properties.Api
+import com.github.davinkevin.podcastserver.update.updaters.Updater
+import org.springframework.boot.context.properties.ConfigurationProperties
+import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -16,13 +17,13 @@ import reactor.netty.http.client.HttpClient
  */
 @Configuration
 @Import(ImageServiceConfig::class)
-@EnableConfigurationProperties(Api::class)
+@EnableConfigurationProperties(YoutubeApi::class)
 class YoutubeUpdaterConfig {
 
     @Bean
     fun youtubeUpdater(
-            api: Api,
-            wcb: WebClient.Builder
+        api: YoutubeApi,
+        wcb: WebClient.Builder
     ): Updater {
         val key = api.youtube
 
@@ -46,3 +47,7 @@ class YoutubeUpdaterConfig {
         )
     }
 }
+
+@ConstructorBinding
+@ConfigurationProperties("podcastserver.api")
+data class YoutubeApi(val youtube: String = "")

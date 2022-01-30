@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.find.FindConfig
 import com.github.davinkevin.podcastserver.item.ItemConfig
 import com.github.davinkevin.podcastserver.playlist.PlaylistConfig
 import com.github.davinkevin.podcastserver.podcast.PodcastConfig
-import com.github.davinkevin.podcastserver.service.properties.Api
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.tag.TagConfig
@@ -24,7 +23,7 @@ import java.nio.file.Paths
  * Created by kevin on 26/12/2013.
  */
 @Configuration
-@EnableConfigurationProperties(PodcastServerParameters::class, Api::class, ExternalTools::class)
+@EnableConfigurationProperties(PodcastServerParameters::class, ExternalTools::class)
 @Import(
         ItemConfig::class,
         UpdateConfig::class,
