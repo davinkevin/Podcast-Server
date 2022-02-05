@@ -1,6 +1,22 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2022.2.0
+
+### <!-- 0 -->Features
+
+- **backend:** Upgrade spring boot to 2.6.3 ([a427794](a427794ee5faa15d6b7acf7aa32a93580568b235))
+- **storage:** Support external bucket system ([12cb036](12cb036bd9769eb4c86a618519b73db495287366))
+
+### <!-- 1 -->Bug Fixes
+
+- **backend:** Use a ffmpeg 4.4 by default ([ca9adb8](ca9adb80c0869da41c3c9d4f8ea54852a43ad6b1))
+- **ci:** Publish backend image to latest if on default branch ([0a7efbf](0a7efbf7e4279a6c0c960edcb01808f3f592fcc7))
+
+### <!-- 3 -->Refactor
+
+- **backend:** Use a simpler solution to instantiate the jackson mapper ([fa02147](fa02147fbd8c397ac677d2da6c9d3960e11f8621))
+
 ## 2022.1.0
 
 ### <!-- 0 -->Features
