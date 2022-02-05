@@ -61,6 +61,10 @@ tasks.register<NpmTask>("skaffold_build") {
     .withPropertyName("source")
     .withPathSensitivity(PathSensitivity.RELATIVE)
 
+  inputs.files(file("www/index.html"), file("www/config.js"))
+    .withPropertyName("index")
+    .withPathSensitivity(PathSensitivity.RELATIVE)
+
   outputs.dir(file("$projectDir/target/dist"))
     .withPropertyName("dist")
 
