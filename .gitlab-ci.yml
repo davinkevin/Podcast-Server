@@ -441,7 +441,7 @@ stages:
   extends: [.container-scanning-with-trivy, .only-on-backend-changes]
   needs: [⬇ container analysis db, 🐳 backend]
   script:
-    - trivy --cache-dir .trivy/ image --format template --template ".gitlab/scans/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/backend:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --cache-dir .trivy/ image --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/backend:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
     - trivy --cache-dir .trivy/ image --exit-code 0 --no-progress podcastserver/backend:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
 
 🔎 init-db:
@@ -449,7 +449,7 @@ stages:
   extends: [.container-scanning-with-trivy, .only-on-backend-changes]
   needs: [⬇ container analysis db, 🐳 init-db]
   script:
-    - trivy --cache-dir .trivy/ image --format template --template ".gitlab/scans/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --cache-dir .trivy/ image --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
     - trivy --cache-dir .trivy/ image --exit-code 0 --no-progress podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
 
 🔎 storage:
@@ -457,7 +457,7 @@ stages:
   extends: [.container-scanning-with-trivy, .only-on-storage-changes]
   needs: [⬇ container analysis db, 🐳 storage]
   script:
-    - trivy --cache-dir .trivy/ image --format template --template ".gitlab/scans/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/storage:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --cache-dir .trivy/ image --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/storage:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
     - trivy --cache-dir .trivy/ image --exit-code 0 --no-progress podcastserver/storage:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
 
 🔎 ui:
@@ -465,5 +465,5 @@ stages:
   extends: [.container-scanning-with-trivy, .only-on-frontend-changes]
   needs: [⬇ container analysis db, 🐳 ui]
   script:
-    - trivy --cache-dir .trivy/ image --format template --template ".gitlab/scans/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/ui:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --cache-dir .trivy/ image --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/ui:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
     - trivy --cache-dir .trivy/ image --exit-code 0 --no-progress podcastserver/ui:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
