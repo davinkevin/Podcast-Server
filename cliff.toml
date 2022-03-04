@@ -15,9 +15,12 @@ body = """
     ## unreleased\
 {% endif %}
 {% for group, commits in commits | group_by(attribute="group") %}
-    ### {{ group | upper_first }}
+    ### {{ group | striptags | trim | upper_first }}
     {% for commit in commits | filter(attribute="scope") | sort(attribute="scope") %}
-        - **{{commit.scope}}:** {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}]({{ commit.id }}))
+        - **{{commit.scope}}:** {{ commit.message | upper_first }} ([{{ commit.id | truncate(length=7, end="") }}]({{ commit.id }})\
+          {%- if commit.links %}{% for link in commit.links %} - [{{link.text}}]({{link.href}}){% endfor -%}{% endif %}\
+        )
+
         {%- if commit.breaking %}
         {% raw %}  {% endraw %}- **BREAKING**: {{commit.breaking_description}} ([{{ commit.id | truncate(length=7, end="") }}]({{ commit.id }}))
         {%- endif -%}
@@ -71,3 +74,6 @@ ignore_tags = ""
 topo_order = false
 # sort the commits inside sections by oldest/newest order
 sort_commits = "oldest"
+link_parsers = [
+    { pattern = "#(\\d+)", href = "https://gitlab.com/davinkevin/Podcast-Server/-/issues/$1"}
+]
