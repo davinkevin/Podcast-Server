@@ -1,5 +1,13 @@
 rootProject.name = "Podcast-Server"
 
+pluginManagement {
+    repositories {
+        maven { url = uri("https://repo.spring.io/release") }
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
 val buildCacheUsernameProperty = "BUILD_CACHE__PODCAST_SERVER__USERNAME"
 val buildCachePasswordProperty = "BUILD_CACHE__PODCAST_SERVER__PASSWORD"
 
@@ -29,3 +37,4 @@ buildCache {
 include("backend")
 include("frontend-angular")
 include("frontend-angularjs")
+
