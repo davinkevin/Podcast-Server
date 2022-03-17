@@ -52,11 +52,13 @@ class UpdateService(
             .sequential()
             .collectList()
             .subscribeOn(Schedulers.boundedElastic())
-            .subscribe {
+            .doOnNext {
                 liveUpdate.isUpdating(false)
                 log.info("End of the global update with ${it.size} found")
-                if (download) idm.launchDownload()
             }
+            .filter { download }
+            .flatMap { idm.launchDownload() }
+            .subscribe()
 
         return Mono.empty()
     }
