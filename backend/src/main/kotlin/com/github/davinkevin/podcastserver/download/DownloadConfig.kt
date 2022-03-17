@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.download
 
-import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import

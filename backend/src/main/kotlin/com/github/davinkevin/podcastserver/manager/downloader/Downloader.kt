@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
-import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
+import com.github.davinkevin.podcastserver.download.ItemDownloadManager
+
 
 interface Downloader : Runnable {
 

@@ -1,8 +1,8 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
 import com.github.davinkevin.podcastserver.download.DownloadRepository
+import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.manager.ItemDownloadManager
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
@@ -46,8 +46,8 @@ private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC
  */
 @ExtendWith(SpringExtension::class)
 class YoutubeDlDownloaderTest(
-        @Autowired private val downloader: YoutubeDlDownloader,
-        @Autowired private val idm: ItemDownloadManager,
+    @Autowired private val downloader: YoutubeDlDownloader,
+    @Autowired private val idm: ItemDownloadManager,
 ) {
 
     private val item: DownloadingItem = DownloadingItem (

@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.manager
 
 import com.github.davinkevin.podcastserver.download.DownloadRepository
+import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.Downloader
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation

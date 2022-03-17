@@ -1,6 +1,6 @@
 @file:Suppress("SpringJavaInjectionPointsAutowiringInspection")
 
-package com.github.davinkevin.podcastserver.manager
+package com.github.davinkevin.podcastserver.download
 
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
