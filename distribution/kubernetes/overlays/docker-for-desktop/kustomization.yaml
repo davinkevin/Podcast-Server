@@ -3,6 +3,9 @@ kind: Kustomization
 
 namespace: podcast-server
 
+components:
+  - ../../base/components/namespace
+
 resources:
   - ../all-in-one
   - ui
