@@ -2,7 +2,6 @@
 
 package com.github.davinkevin.podcastserver.download
 
-import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.Downloader
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
@@ -16,183 +15,125 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
+import reactor.core.publisher.Sinks
 import reactor.kotlin.core.publisher.toFlux
+import reactor.kotlin.core.publisher.toMono
 import java.util.*
-import java.util.concurrent.locks.ReentrantLock
+import java.util.function.Predicate.not
 
 @Service
 class ItemDownloadManager (
-        private val template: MessagingTemplate,
-        private val downloadRepository: DownloadRepository,
-        private val podcastServerParameters: PodcastServerParameters,
-        private val downloaderSelector: DownloaderSelector,
-        private val extractorSelector: ExtractorSelector,
-        @param:Qualifier("DownloadExecutor") private val downloadExecutor: ThreadPoolTaskExecutor
+    private val template: MessagingTemplate,
+    private val downloadRepository: DownloadRepository,
+    podcastServerParameters: PodcastServerParameters,
+    private val downloaderSelector: DownloaderSelector,
+    private val extractorSelector: ExtractorSelector,
+    @param:Qualifier("DownloadExecutor") private val downloadExecutor: ThreadPoolTaskExecutor
 ) {
 
     private val log = LoggerFactory.getLogger(ItemDownloadManager::class.java)!!
-    private val mainLock = ReentrantLock()
 
-    var waitingQueue = ArrayDeque<DownloadingItem>()
-    var downloadingQueue = mapOf<DownloadingItem, Downloader>()
+    val queues = QueueProxy(
+        repository = downloadRepository,
+        parameters = podcastServerParameters
+    )
 
     val queue: Flux<DownloadingItem>
-        get() = waitingQueue.toFlux()
+        get() = queues.waitingQueue.toFlux()
 
     val downloading: Flux<DownloadingItem>
-        get() = this.downloadingQueue.values
-                .map { it.downloadingInformation.item }
-                .toFlux()
+        get() = queues.downloadingQueue.values
+            .map { it.downloadingInformation.item }
+            .toFlux()
 
     /* GETTER & SETTER */
     val limitParallelDownload: Int
         get() = downloadExecutor.corePoolSize
 
-    fun setLimitParallelDownload(limitParallelDownload: Int) {
+    fun setLimitParallelDownload(limitParallelDownload: Int): Mono<Void> {
         downloadExecutor.corePoolSize = limitParallelDownload
-        manageDownload()
+        return manageDownload()
     }
 
-    private fun manageDownload() {
-        val manageDownloadLock = this.mainLock
-
-        manageDownloadLock.lock()
-        try {
-            while (this.downloadingQueue.size < downloadExecutor.corePoolSize && !waitingQueue.isEmpty()) {
-
-                val (currentItem, newQueue) = waitingQueue.dequeue()
-                waitingQueue = newQueue
-
-                if (!isStartedOrFinished(currentItem)) {
-                    launchDownloadFor(currentItem)
-                }
-            }
-        } finally {
-            manageDownloadLock.unlock()
-        }
-
-        this.convertAndSendWaitingQueue()
+    private fun manageDownload(): Mono<Void> = Mono.defer {
+        queues.findAllToDownload(limitParallelDownload)
+            .doOnNext(::launchDownloadFor)
+            .doOnTerminate(::convertAndSendWaitingQueue)
+            .then()
     }
 
-    private fun isStartedOrFinished(currentItem: DownloadingItem) =
-            Status.STARTED == currentItem.status || Status.FINISH == currentItem.status
-
-    private fun initDownload(): Mono<List<DownloadingItem>> {
-        return downloadRepository.findAllToDownload(podcastServerParameters.limitDownloadDate().toOffsetDateTime(), podcastServerParameters.numberOfTry)
-                .filter { it !in waitingQueue }
-                .collectList()
+    fun launchDownload(): Mono<Void> {
+        return queues.initDownload()
+            .then(manageDownload())
     }
 
-    fun launchDownload() {
-        initDownload().subscribe {
-            log.info("add ${it.size} to waiting queue")
-            waitingQueue = waitingQueue.enqueueAll(it)
-            manageDownload()
-        }
-    }
+    fun stopAllDownload() = queues.allCurrentDownloader().forEach { it.stopDownload() }
 
-    fun stopAllDownload() = this.downloadingQueue.values.forEach { it.stopDownload() }
-    fun stopDownload(id: UUID) = findDownloaderOfItem(id)?.stopDownload()
-
-    private fun findDownloaderOfItem(id: UUID): Downloader? {
-        return downloadingQueue
-                .filterKeys { it.id == id }
-                .values
-                .firstOrNull()
-    }
-
-    fun addItemToQueue(id: UUID) {
-        downloadRepository.findDownloadingItemById(id).subscribe { addItemToQueue(it) }
-    }
-
-    internal fun addItemToQueue(item: DownloadingItem) {
-        if (item in waitingQueue || isInDownloadingQueue(item)) {
-            return
-        }
-
-        waitingQueue = waitingQueue.enqueue(item)
-
-        manageDownload()
+    fun addItemToQueue(id: UUID): Mono<Void> {
+        return downloadRepository.findDownloadingItemById(id)
+            .flatMap(queues::addItemToQueue)
+            .then(manageDownload())
     }
 
     fun removeItemFromQueue(id: UUID, stopItem: Boolean) {
-        removeItemFromQueue(id)
-
-        if (stopItem) {
-            downloadRepository
-                    .stopItem(id)
-                    .subscribe()
-        }
-
-        convertAndSendWaitingQueue()
-    }
-
-    private fun removeItemFromQueue(id: UUID) {
-        waitingQueue = waitingQueue.delete(id)
+        queues
+            .removeItemFromQueue(id, stopItem)
+            .subscribeAndTerminateWith(::convertAndSendWaitingQueue)
     }
 
     fun removeACurrentDownload(id: UUID) {
-        val pairs = this.downloadingQueue.map { it.toPair() }.filter { it.first.id != id }.toTypedArray()
-        this.downloadingQueue = mapOf(*pairs)
-
-        manageDownload()
+        queues.removeACurrentDownload(id)
+            .then(manageDownload())
+            .subscribe()
     }
 
     private fun launchDownloadFor(item: DownloadingItem) {
-        val dlItem = try { extractorSelector.of(item.url).extract(item) }
-        catch (e: Exception) {
-            log.error("Error during extraction of {}", item.url, e)
-            manageDownload()
+        val dlItem = Result.runCatching { extractorSelector.of(item.url).extract(item) }
+            .getOrElse {
+            log.error("Error during extraction of {}", item.url, it)
+            queues.removeItemFromQueue(item.id)
+                .then(manageDownload())
+                .subscribe()
+
             return
         }
 
         val downloader = downloaderSelector.of(dlItem)
             .apply { with(dlItem, this@ItemDownloadManager) }
 
-        this.downloadingQueue = downloadingQueue.filterKeys { it != item } + Pair(item, downloader)
-        downloadExecutor.execute(downloader)
+        queues.addToDownloadingQueue(item, downloader)
+            .doOnTerminate { downloadExecutor.execute(downloader) }
+            .subscribe()
     }
 
-    fun removeItemFromQueueAndDownload(id: UUID) {
-        when {
-            isInDownloadingQueueById(id) -> stopDownload(id)
-            isInWaitingQueueById(id) -> removeItemFromQueue(id)
-        }
-        this.convertAndSendWaitingQueue()
+    fun removeItemFromQueueAndDownload(id: UUID): Mono<Void> {
+        val removeFromDownloading = isInDownloadingQueueById(id)
+            .filter { it == true }
+            .flatMap { queues.findDownloaderOfItem(id) }
+            .doOnNext { it.stopDownload() }
+
+        val removeFromWaiting = isInWaitingQueueById(id)
+            .filter { it == true }
+            .flatMap { queues.removeItemFromQueue(id) }
+
+        return Mono.zip(removeFromDownloading, removeFromWaiting)
+            .then()
+            .doOnTerminate(::convertAndSendWaitingQueue)
     }
 
-    private fun convertAndSendWaitingQueue() = template.sendWaitingQueue(waitingQueue.toList())
+    private fun convertAndSendWaitingQueue(): Sinks.EmitResult {
+        return template.sendWaitingQueue(queues.waitingQueue.toList())
+    }
 
-    fun isInDownloadingQueue(item: DownloadingItem) = this.downloadingQueue.containsKey(item)
-    fun isInDownloadingQueueById(id: UUID) = this.downloadingQueue.keys.asSequence().map { it.id }.any { it == id }
-    fun isInWaitingQueueById(id: UUID) = waitingQueue.asSequence().map { it.id }.any { it == id }
+    fun isInDownloadingQueueById(id: UUID) = queues.isInDownloadingQueueById(id)
+    fun isInWaitingQueueById(id: UUID) = queues.isInWaitingQueueById(id)
 
     fun moveItemInQueue(itemId: UUID, position: Int) {
-        val itemToMove = waitingQueue
-                .firstOrNull { it.id == itemId }
-                ?: error("Moving element in waiting list not authorized : Element wasn't in the list")
-
-        waitingQueue = waitingQueue
-                .filter { it.id != itemId }
-                .toMutableList()
-                .apply { add(position, itemToMove) }
-                .let { ArrayDeque(it) }
-
-        convertAndSendWaitingQueue()
+        queues.moveItemInQueue(itemId, position)
+            .subscribeAndTerminateWith(::convertAndSendWaitingQueue)
     }
 }
 
-private fun <T> ArrayDeque<T>.dequeue(): Pair<T, ArrayDeque<T>> {
-    val i = this.first
-    val newQueue = ArrayDeque(this.filter { it !== i })
-    return Pair(i, newQueue)
-}
-
-private fun <T> ArrayDeque<T>.enqueueAll(e: Collection<T>): ArrayDeque<T> {
-    val joined = this.toMutableList()
-    joined.addAll(e)
-    return ArrayDeque(joined)
-}
 private fun <T> ArrayDeque<T>.enqueue(item: T): ArrayDeque<T> {
     val joined = this.toMutableList()
     joined.add(item)
@@ -202,3 +143,101 @@ private fun ArrayDeque<DownloadingItem>.delete(id: UUID): ArrayDeque<Downloading
     val joined = this.toMutableList().filter { it.id != id }
     return ArrayDeque(joined)
 }
+
+class QueueProxy(
+    var waitingQueue: ArrayDeque<DownloadingItem> = ArrayDeque<DownloadingItem>(),
+    var downloadingQueue: Map<DownloadingItem, Downloader> = mapOf(),
+    private val repository: DownloadRepository,
+    private val parameters: PodcastServerParameters
+) {
+
+    private val log = LoggerFactory.getLogger(QueueProxy::class.java)
+
+    fun initDownload(): Mono<Void> {
+        return repository.findAllToDownload(parameters.limitDownloadDate().toOffsetDateTime(), parameters.numberOfTry)
+            .filter { it !in waitingQueue }
+            .doOnNext {
+                log.info("add item to waiting queue")
+                waitingQueue = waitingQueue.enqueue(it)
+            }
+            .then()
+    }
+
+    fun allCurrentDownloader() = downloadingQueue.values
+
+    fun findDownloaderOfItem(id: UUID): Mono<Downloader> {
+        return downloadingQueue
+            .filterKeys { it.id == id }
+            .values
+            .firstOrNull()
+            .toMono()
+    }
+
+    fun addItemToQueue(item: DownloadingItem): Mono<Void> {
+        if (item in waitingQueue || downloadingQueue.containsKey(item)) {
+            return Mono.empty()
+        }
+
+        waitingQueue = waitingQueue.enqueue(item)
+        return Mono.empty()
+    }
+
+    fun removeItemFromQueue(id: UUID): Mono<Void> {
+        waitingQueue = waitingQueue.delete(id)
+        return Mono.empty()
+    }
+
+    fun removeItemFromQueue(id: UUID, hasToBeStopped: Boolean): Mono<Void> {
+        val stopItem = if (hasToBeStopped) repository.stopItem(id).then() else Mono.empty()
+
+        return Mono.zip(removeItemFromQueue(id), stopItem)
+            .then()
+    }
+
+    fun removeACurrentDownload(id: UUID): Mono<Void> {
+        downloadingQueue = downloadingQueue
+            .filter { (downloadingItem) -> downloadingItem.id != id }
+
+        return Mono.empty()
+    }
+
+    fun addToDownloadingQueue(item: DownloadingItem, downloader: Downloader): Mono<Void> {
+        return removeItemFromQueue(item.id)
+            .then(Mono.defer {
+                downloadingQueue = downloadingQueue.filterKeys { it != item } + Pair(item, downloader)
+                Mono.empty()
+            })
+    }
+
+    fun isInDownloadingQueueById(id: UUID) = Mono.just(downloadingQueue.keys.asSequence().map { it.id }.any { it == id })
+    fun isInWaitingQueueById(id: UUID): Mono<Boolean> = Mono.just(waitingQueue.asSequence().map { it.id }.any { it == id })
+
+    fun moveItemInQueue(itemId: UUID, position: Int): Mono<Void> {
+        val itemToMove = waitingQueue
+            .firstOrNull { it.id == itemId }
+            ?: error("Moving element in waiting list not authorized : Element wasn't in the list")
+
+        waitingQueue = waitingQueue
+            .filter { it.id != itemId }
+            .toMutableList()
+            .apply { add(position, itemToMove) }
+            .let { ArrayDeque(it) }
+
+        return Mono.empty()
+    }
+
+    fun findAllToDownload(limit: Int): Flux<DownloadingItem> = Flux.defer {
+        val remainingDownloadingSlots = limit - downloadingQueue.size
+        waitingQueue
+            .toFlux()
+            .filter(not(::isStartedOrFinished))
+            .take(remainingDownloadingSlots.toLong())
+    }
+}
+
+private fun <T> Mono<T>.subscribeAndTerminateWith(complete: Runnable) {
+    this.subscribe(null, null, complete)
+}
+
+private fun isStartedOrFinished(currentItem: DownloadingItem) =
+    Status.STARTED == currentItem.status || Status.FINISH == currentItem.status

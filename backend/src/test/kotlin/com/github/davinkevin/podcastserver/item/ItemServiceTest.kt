@@ -131,7 +131,7 @@ class ItemServiceTest(
         @Test
         fun `and do nothing because item is currently downloading`() {
             /* Given */
-            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(true)
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(true.toMono())
             whenever(repository.resetById(item.id)).thenReturn(item.toMono())
 
             /* When */
@@ -149,7 +149,7 @@ class ItemServiceTest(
         @Test
         fun `and do nothing because the podcast is delete protected`() {
             /* Given */
-            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
             whenever(repository.resetById(item.id)).thenReturn(item.toMono())
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(false.toMono())
 
@@ -168,7 +168,7 @@ class ItemServiceTest(
         fun `and do nothing because element is not downloaded`() {
             /* Given */
             whenever(repository.resetById(item.id)).thenReturn(item.toMono())
-            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
             whenever(repository.findById(item.id)).thenReturn(item.toMono())
 
@@ -187,7 +187,7 @@ class ItemServiceTest(
             /* Given */
             val currentItem = item.copy(status = FINISH, fileName = null)
             whenever(repository.resetById(item.id)).thenReturn(item.toMono())
-            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
             whenever(repository.findById(item.id)).thenReturn(currentItem.toMono())
 
@@ -206,7 +206,7 @@ class ItemServiceTest(
             /* Given */
             val currentItem = item.copy(status = FINISH, fileName = "")
             whenever(repository.resetById(item.id)).thenReturn(item.toMono())
-            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
             whenever(repository.findById(item.id)).thenReturn(currentItem.toMono())
 
@@ -226,7 +226,7 @@ class ItemServiceTest(
             val currentItem = item.copy(status = FINISH, fileName = "foo.mp4")
             val deleteItemInformation = DeleteItemRequest(currentItem.id, currentItem.fileName!!, currentItem.podcast.title)
             whenever(repository.resetById(item.id)).thenReturn(item.toMono())
-            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
             whenever(repository.findById(item.id)).thenReturn(currentItem.toMono())
             whenever(fileService.deleteItem(deleteItemInformation)).thenReturn(Mono.empty())
@@ -339,6 +339,7 @@ class ItemServiceTest(
             /* Given */
             val id = UUID.randomUUID()
             whenever(repository.deleteById(id)).thenReturn(Mono.empty())
+            whenever(idm.removeItemFromQueueAndDownload(id)).thenReturn(Mono.empty())
             /* When */
             StepVerifier.create(itemService.deleteById(id))
                     /* Then */
@@ -355,6 +356,7 @@ class ItemServiceTest(
             val deleteItem = DeleteItemRequest(id, "foo", "bar")
             whenever(repository.deleteById(id)).thenReturn(Mono.just(deleteItem))
             whenever(fileService.deleteItem(deleteItem)).thenReturn(Mono.empty())
+            whenever(idm.removeItemFromQueueAndDownload(id)).thenReturn(Mono.empty())
 
             /* When */
             StepVerifier.create(itemService.deleteById(id))

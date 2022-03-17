@@ -56,8 +56,8 @@ class ItemDownloadManagerTest(
     fun afterEach() {
         Mockito.reset(messaging)
         idm.apply {
-            waitingQueue = ArrayDeque()
-            downloadingQueue = mapOf()
+            queues.waitingQueue = ArrayDeque()
+            queues.downloadingQueue = mapOf()
         }
         downloadExecutor.corePoolSize = 1
     }
@@ -79,11 +79,11 @@ class ItemDownloadManagerTest(
                     .thenReturn(Flux.empty())
 
             /* When */
-            idm.launchDownload()
+            idm.launchDownload().subscribe()
 
             /* Then */
             await().atMost(1, SECONDS).untilAsserted {
-                assertThat(idm.waitingQueue).isEmpty()
+                assertThat(idm.queues.waitingQueue).isEmpty()
                 verify(messaging).sendWaitingQueue(emptyList())
             }
         }
@@ -124,7 +124,7 @@ class ItemDownloadManagerTest(
             whenever(downloaders.of(information)).thenReturn(downloader)
 
             /* When */
-            idm.launchDownload()
+            idm.launchDownload().subscribe()
 
             /* Then */
             await().atMost(1, SECONDS).untilAsserted {
@@ -141,7 +141,7 @@ class ItemDownloadManagerTest(
                     .thenReturn(Flux.just(item))
 
             /* When */
-            idm.launchDownload()
+            idm.launchDownload().subscribe()
 
             /* Then */
             await().atMost(1, SECONDS).untilAsserted {
@@ -151,6 +151,7 @@ class ItemDownloadManagerTest(
 
         @ParameterizedTest
         @EnumSource(value = Status::class, names = ["STARTED", "FINISH"])
+        @Disabled("because request comes from database, loading such item is not possible")
         fun `and doesnt download because item is`(status: Status) {
             /* Given */
             val item = DownloadingItem(
@@ -174,7 +175,7 @@ class ItemDownloadManagerTest(
                     .thenReturn(Flux.just(item))
 
             /* When */
-            idm.launchDownload()
+            idm.launchDownload().subscribe()
 
             /* Then */
             await().atMost(1, SECONDS).untilAsserted {
@@ -183,6 +184,7 @@ class ItemDownloadManagerTest(
         }
 
         @Test
+        @Timeout(1)
         fun `with an error during extraction`() {
             /* Given */
             val downloader = mock<Downloader>()
@@ -193,7 +195,7 @@ class ItemDownloadManagerTest(
             whenever(downloaders.of(information)).thenReturn(downloader)
 
             /* When */
-            idm.launchDownload()
+            idm.launchDownload().subscribe()
 
             /* Then */
             await().atMost(1, SECONDS).untilAsserted {
@@ -217,8 +219,8 @@ class ItemDownloadManagerTest(
         fun afterEach() {
             Mockito.reset(messaging)
             idm.apply {
-                waitingQueue = ArrayDeque()
-                downloadingQueue = mapOf()
+                queues.waitingQueue = ArrayDeque()
+                queues.downloadingQueue = mapOf()
             }
             downloadExecutor.corePoolSize = 1
         }
@@ -293,7 +295,7 @@ class ItemDownloadManagerTest(
             whenever(downloaders.of(information)).thenReturn(downloader)
 
             /* When */
-            idm.launchDownload()
+            idm.launchDownload().subscribe()
 
             /* Then */
             await().atMost(1, SECONDS).untilAsserted {
@@ -317,7 +319,7 @@ class ItemDownloadManagerTest(
             whenever(downloaders.of(information)).thenReturn(downloader)
             whenever(downloader.downloadingInformation).thenReturn(information)
             /* When */
-            idm.launchDownload()
+            idm.launchDownload().subscribe()
 
             /* Then */
             await().atMost(1, SECONDS).untilAsserted {
@@ -339,7 +341,7 @@ class ItemDownloadManagerTest(
             whenever(downloadRepository.findAllToDownload(date.toOffsetDateTime(), 1))
                     .thenReturn(Flux.empty())
             /* When */
-            idm.setLimitParallelDownload(3)
+            idm.setLimitParallelDownload(3).subscribe()
 
             /* Then */
             await().atMost(1, SECONDS).untilAsserted {

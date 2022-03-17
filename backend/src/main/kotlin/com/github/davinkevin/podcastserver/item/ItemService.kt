@@ -49,7 +49,7 @@ class ItemService(
         .then(repository.resetById(id))
 
     private fun deleteItemFiles(id: UUID): Mono<Void> = id.toMono()
-        .filter { !idm.isInDownloadingQueueById(it) }
+        .filterWhen { idm.isInDownloadingQueueById(it).map { v -> !v } }
         .filterWhen { repository.hasToBeDeleted(it) }
         .flatMap { repository.findById(it) }
         .delayUntil { item -> item.toMono()
@@ -108,13 +108,12 @@ class ItemService(
         repository.findPlaylistsContainingItem(itemId)
 
     fun deleteById(itemId: UUID): Mono<Void> {
-
-        idm.removeItemFromQueueAndDownload(itemId)
-
-        return repository
-            .deleteById(itemId)
-            .delayUntil { file.deleteItem(it) }
-            .then()
+        return idm.removeItemFromQueueAndDownload(itemId).then(
+            repository
+                .deleteById(itemId)
+                .delayUntil { file.deleteItem(it) }
+                .then()
+        )
     }
 }
 

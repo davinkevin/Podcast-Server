@@ -18,6 +18,7 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
 import java.net.URI
 import java.util.*
 
@@ -72,6 +73,7 @@ class DownloadHandlerTest(
         fun `with success`() {
             /* Given */
             val id = UUID.randomUUID()
+            whenever(idm.addItemToQueue(id)).thenReturn(Mono.empty())
             /* When */
             rest
                     .post()
@@ -276,6 +278,7 @@ class DownloadHandlerTest(
         @Test
         fun `with success`() {
             /* Given */
+            whenever(idm.setLimitParallelDownload(12)).thenReturn(Mono.empty())
             /* When */
             rest
                     .post()
@@ -323,6 +326,7 @@ class DownloadHandlerTest(
         fun `with success`() {
             /* Given */
             val id = UUID.randomUUID()
+            whenever(idm.removeItemFromQueueAndDownload(id)).thenReturn(Mono.empty())
             /* When */
             rest
                     .post()
@@ -332,7 +336,7 @@ class DownloadHandlerTest(
                     .expectStatus().isNoContent
                     .expectBody().isEmpty
 
-            verify(idm, times(1)).stopDownload(id)
+            verify(idm, times(1)).removeItemFromQueueAndDownload(id)
         }
     }
 

@@ -20,8 +20,8 @@ class DownloadHandler(private val downloadService: ItemDownloadManager) {
 
     fun download(r: ServerRequest): Mono<ServerResponse> {
         val id = UUID.fromString(r.pathVariable("id"))
-        downloadService.addItemToQueue(id)
-        return noContent().build()
+        return downloadService.addItemToQueue(id)
+            .then(noContent().build())
     }
 
     fun downloading(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> =
@@ -37,7 +37,7 @@ class DownloadHandler(private val downloadService: ItemDownloadManager) {
 
     fun updateLimit(r: ServerRequest): Mono<ServerResponse> =
             r.bodyToMono<Int>()
-                    .delayUntil { downloadService.setLimitParallelDownload(it); Mono.empty<Void>() }
+                    .delayUntil { downloadService.setLimitParallelDownload(it) }
                     .flatMap { ok().bodyValue(it) }
 
     fun stopAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> {
@@ -47,8 +47,8 @@ class DownloadHandler(private val downloadService: ItemDownloadManager) {
 
     fun stopOne(r: ServerRequest): Mono<ServerResponse> {
         val id = UUID.fromString(r.pathVariable("id"))
-        downloadService.stopDownload(id)
-        return noContent().build()
+        return downloadService.removeItemFromQueueAndDownload(id)
+            .then(noContent().build())
     }
 
     fun queue(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> =
