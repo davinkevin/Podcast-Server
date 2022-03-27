@@ -35,8 +35,8 @@ System.config({
     "clean-css": "npm:clean-css@3.4.18",
     "clipboard": "github:zenorocha/clipboard.js@1.5.12",
     "core-js": "npm:core-js@1.2.6",
-    "css": "github:systemjs/plugin-css@0.1.23",
-    "font-awesome": "github:components/font-awesome@4.5.0",
+    "css": "github:systemjs/plugin-css@0.1.37",
+    "font-awesome": "npm:font-awesome@4.5.0",
     "highcharts": "github:highcharts/highcharts-dist@4.2.3",
     "highcharts-ng": "github:pablojim/highcharts-ng@0.0.11",
     "ionicons": "github:driftyco/ionicons@2.0.1",
@@ -74,7 +74,7 @@ System.config({
     },
     "github:chieffancypants/angular-loading-bar@0.8.0": {
       "angular": "github:angular/bower-angular@1.5.7",
-      "css": "github:systemjs/plugin-css@0.1.23"
+      "css": "github:systemjs/plugin-css@0.1.37"
     },
     "github:distros/bootstrap-less@3.3.9": {
       "jquery": "github:components/jquery@3.0.0"
@@ -122,7 +122,7 @@ System.config({
     },
     "github:mbenford/ngTagsInput@3.1.1": {
       "angular": "github:angular/bower-angular@1.5.7",
-      "css": "github:systemjs/plugin-css@0.1.23"
+      "css": "github:systemjs/plugin-css@0.1.37"
     },
     "npm:amdefine@1.0.0": {
       "fs": "github:jspm/nodelibs-fs@0.1.2",
@@ -176,6 +176,9 @@ System.config({
     },
     "npm:core-util-is@1.0.2": {
       "buffer": "github:jspm/nodelibs-buffer@0.1.0"
+    },
+    "npm:font-awesome@4.5.0": {
+      "css": "github:systemjs/plugin-css@0.1.37"
     },
     "npm:graceful-readlink@1.0.1": {
       "fs": "github:jspm/nodelibs-fs@0.1.2"

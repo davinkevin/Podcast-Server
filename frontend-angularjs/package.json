@@ -61,7 +61,7 @@
       "animate.css": "github:animate-css/animate.css@^3.4.0",
       "bootstrap-less": "github:distros/bootstrap-less@^3.3.9",
       "clipboard": "github:zenorocha/clipboard.js@^1.5.5",
-      "font-awesome": "github:components/font-awesome@4.5.0",
+      "font-awesome": "npm:font-awesome@4.5.0",
       "highcharts": "github:highcharts/highcharts-dist@4.2.3",
       "highcharts-ng": "github:pablojim/highcharts-ng@^0.0.11",
       "ionicons": "github:ionic-team/ionicons?access_token=d016ed03db6cebd33b8a722a35b9cc51cf3f0b0b@2.0.1",
