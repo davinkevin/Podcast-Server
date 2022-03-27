@@ -17453,8 +17453,8 @@
     },
     "istanbul": {
       "version": "0.3.17",
-      "from": "git://github.com/gotwarlost/istanbul.git#db701e170ba4cb11af3bac09411296cdb0e8215a",
-      "resolved": "git://github.com/gotwarlost/istanbul.git#db701e170ba4cb11af3bac09411296cdb0e8215a",
+      "from": "https://github.com/gotwarlost/istanbul.git#db701e170ba4cb11af3bac09411296cdb0e8215a",
+      "resolved": "https://github.com/gotwarlost/istanbul.git#db701e170ba4cb11af3bac09411296cdb0e8215a",
       "dependencies": {
         "esprima": {
           "version": "2.4.1",
