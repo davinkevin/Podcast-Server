@@ -33,7 +33,8 @@ apply(from = "gradle/profile-ci.gradle.kts")
 apply(from = "gradle/profile-skaffold.gradle.kts")
 
 @Suppress("UNCHECKED_CAST")
-val db: Map<String, String> = project.extra["databaseParameters"] as Map<String, String>
+val db = (project.extra["databaseParameters"] as Map<String, String>)
+	.let(::DatabaseConfiguration)
 
 repositories {
 	mavenCentral()
@@ -82,33 +83,33 @@ dependencies {
 
 configure<com.gorylenko.GitPropertiesPluginExtension> {
 	(dotGitDirectory as DirectoryProperty).set(projectDir)
-    customProperty("git.build.host", "none")
-    customProperty("git.build.user.email", "none")
-    customProperty("git.build.user.name", "none")
+	customProperty("git.build.host", "none")
+	customProperty("git.build.user.email", "none")
+	customProperty("git.build.user.name", "none")
 }
 
 tasks.register<Copy>("copyMigrations") {
 	from("${project.rootDir}/database/migrations/")
 	include("*.sql")
-	into(db["sqlFiles"]!!)
-    outputs.cacheIf { true }
+	into(db.sqlFiles)
+	outputs.cacheIf { true }
 }
 
 normalization {
-    runtimeClasspath {
-        ignore("git.properties")
-    }
+	runtimeClasspath {
+		ignore("git.properties")
+	}
 }
 
 flyway {
-	url = jdbc(db["url"])
-	user = db["user"]
-	password = db["password"]
-	locations = arrayOf("filesystem:${db["sqlFiles"]}")
+	url = db.jdbc()
+	user = db.user
+	password = db.password
+	locations = arrayOf("filesystem:${db.sqlFiles}")
 }
 
 tasks.register<FlywayMigrateTask>("flywayMigrateForJOOQ") {
-    dependsOn("copyMigrations")
+	dependsOn("copyMigrations")
 }
 
 jooq {
@@ -121,9 +122,9 @@ jooq {
 				logging = INFO
 				jdbc.apply {
 					driver = "org.postgresql.Driver"
-					url = jdbc(db["url"])
-					user = db["user"]
-					password = db["password"]
+					url = db.jdbc()
+					user = db.user
+					password = db.password
 				}
 
 				generator.apply {
@@ -157,42 +158,42 @@ jooq {
 }
 
 tasks.named<JooqGenerate>("generateJooq") {
-    inputs.dir(file("../database/migrations"))
-        .withPropertyName("migrations")
-        .withPathSensitivity(PathSensitivity.RELATIVE)
+	inputs.dir(file("../database/migrations"))
+		.withPropertyName("migrations")
+		.withPathSensitivity(PathSensitivity.RELATIVE)
 
-    allInputsDeclared.set(true)
+	allInputsDeclared.set(true)
 
-    dependsOn("flywayMigrateForJOOQ")
+	dependsOn("flywayMigrateForJOOQ")
 }
 
 tasks.withType<KotlinCompile> {
-    kotlinOptions {
-        freeCompilerArgs = listOf(
-            "-Xjsr305=strict",
-            "-Xallow-result-return-type",
-        )
-        jvmTarget = "11"
-    }
+	kotlinOptions {
+		freeCompilerArgs = listOf(
+			"-Xjsr305=strict",
+			"-Xallow-result-return-type",
+		)
+		jvmTarget = "11"
+	}
 }
 
 jacoco {
-    toolVersion = "0.8.7"
+	toolVersion = "0.8.7"
 }
 
 tasks.register<FlywayMigrateTask>("flywaySetupDbForTests") { dependsOn("copyMigrations") }
 tasks.test {
-    useJUnitPlatform()
-    systemProperty("user.timezone", "UTC")
-    systemProperty("spring.r2dbc.url", r2dbc(db["url"]))
-    systemProperty("spring.r2dbc.username", db["user"]!!)
-    systemProperty("spring.r2dbc.password", db["password"]!!)
+	useJUnitPlatform()
+	systemProperty("user.timezone", "UTC")
+	systemProperty("spring.r2dbc.url", db.r2dbc())
+	systemProperty("spring.r2dbc.username", db.user)
+	systemProperty("spring.r2dbc.password", db.password)
 	jvmArgs = listOf("--add-opens", "java.base/java.time=ALL-UNNAMED")
-    dependsOn(tasks.named("flywaySetupDbForTests"))
-    finalizedBy(tasks.jacocoTestReport)
-    testLogging {
-        exceptionFormat = TestExceptionFormat.FULL
-    }
+	dependsOn(tasks.named("flywaySetupDbForTests"))
+	finalizedBy(tasks.jacocoTestReport)
+	testLogging {
+		exceptionFormat = TestExceptionFormat.FULL
+	}
 }
 
 tasks.jacocoTestReport {
@@ -202,19 +203,19 @@ tasks.jacocoTestReport {
 	}
 	executionData(layout.buildDirectory.file("jacoco/test.exec"))
 
-    dependsOn(tasks.test)
+	dependsOn(tasks.test)
 	finalizedBy(tasks.printCoverage)
 }
 
 tasks.printCoverage {
-    dependsOn(tasks.jacocoTestReport)
+	dependsOn(tasks.jacocoTestReport)
 
-    outputs.upToDateWhen { true }
-    outputs.cacheIf { !System.getenv("CI_JOB_STAGE").contains("test") }
+	outputs.upToDateWhen { true }
+	outputs.cacheIf { !System.getenv("CI_JOB_STAGE").contains("test") }
 
-    inputs.dir(file(layout.buildDirectory.dir("reports")))
-        .withPropertyName("reports")
-        .withPathSensitivity(PathSensitivity.RELATIVE)
+	inputs.dir(file(layout.buildDirectory.dir("reports")))
+		.withPropertyName("reports")
+		.withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 jib {
@@ -251,20 +252,30 @@ tasks.register("downloadDependencies") {
 	}
 	doLast {
 		val buildDeps = buildscript
-            .configurations
-            .sumOf { it.resolve().size }
+			.configurations
+			.sumOf { it.resolve().size }
 
-        val allDeps = configurations
-            .filter { it.isCanBeResolved && !it.isDeprecated() }
-            .sumOf { it.resolve().size }
+		val allDeps = configurations
+			.filter { it.isCanBeResolved && !it.isDeprecated() }
+			.sumOf { it.resolve().size }
 
-        println("Downloaded all dependencies: ${allDeps + buildDeps}")
+		println("Downloaded all dependencies: ${allDeps + buildDeps}")
 	}
 }
 
 dependencyManagement {
-    applyMavenExclusions(false)
+	applyMavenExclusions(false)
 }
 
-fun jdbc(url: String?) = "jdbc:$url"
-fun r2dbc(url: String?) = "r2dbc:$url"
+data class DatabaseConfiguration(val url: String, val user: String, val password: String, val sqlFiles: String) {
+
+	constructor(map: Map<String, String>): this(
+		url = map["url"]!!,
+		user = map["user"]!!,
+		password = map["password"]!!,
+		sqlFiles = map["sqlFiles"]!!,
+	)
+
+	fun jdbc() = "jdbc:$url"
+	fun r2dbc() = "r2dbc:$url"
+}
