@@ -1,11 +1,13 @@
 package com.github.davinkevin.podcastserver.download
 
 import com.github.davinkevin.podcastserver.database.Tables.*
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem.Cover
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem.Podcast
 import org.jooq.DSLContext
+import org.jooq.Record9
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
@@ -23,23 +25,16 @@ class DownloadRepository(private val query: DSLContext) {
             query
                 .select(
                     ITEM.ID, ITEM.TITLE, ITEM.STATUS, ITEM.URL, ITEM.NUMBER_OF_FAIL,
-                    PODCAST.ID, PODCAST.TITLE,
-                    COVER.ID, COVER.URL
+                    ITEM.podcast().ID, ITEM.podcast().TITLE,
+                    ITEM.cover().ID, ITEM.cover().URL
                 )
-                .from(ITEM
-                    .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
-                    .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
-                )
+                .from(ITEM)
                 .where(ITEM.PUB_DATE.greaterThan(fromDate))
                 .and(ITEM.STATUS.eq(NOT_DOWNLOADED))
                 .and(ITEM.NUMBER_OF_FAIL.lt(withMaxNumberOfTry))
                 .orderBy(ITEM.PUB_DATE.asc())
         )
-            .map { DownloadingItem(
-                it[ITEM.ID], it[ITEM.TITLE], it[ITEM.STATUS], URI(it[ITEM.URL]), it[ITEM.NUMBER_OF_FAIL], 0,
-                Podcast(it[PODCAST.ID], it[PODCAST.TITLE]),
-                Cover(it[COVER.ID], URI(it[COVER.URL]))
-            ) }
+            .map(::toDownloadingItem)
 
     }
 
@@ -47,20 +42,13 @@ class DownloadRepository(private val query: DSLContext) {
         query
             .select(
                 ITEM.ID, ITEM.TITLE, ITEM.STATUS, ITEM.URL, ITEM.NUMBER_OF_FAIL,
-                PODCAST.ID, PODCAST.TITLE,
-                COVER.ID, COVER.URL
+                ITEM.podcast().ID, ITEM.podcast().TITLE,
+                ITEM.cover().ID, ITEM.cover().URL
             )
-            .from(ITEM
-                .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
-                .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
-            )
+            .from(ITEM)
             .where(ITEM.ID.eq(id))
             .toMono()
-            .map { DownloadingItem(
-                it[ITEM.ID], it[ITEM.TITLE], it[ITEM.STATUS], URI(it[ITEM.URL]), it[ITEM.NUMBER_OF_FAIL],0,
-                Podcast(it[PODCAST.ID], it[PODCAST.TITLE]),
-                Cover(it[COVER.ID], URI(it[COVER.URL]))
-            ) }
+            .map(::toDownloadingItem)
     }
 
     fun stopItem(id: UUID) = Mono.defer {
@@ -91,4 +79,12 @@ class DownloadRepository(private val query: DSLContext) {
             .where(ITEM.ID.eq(id))
             .toMono()
     }
+}
+
+private fun toDownloadingItem(it: Record9<UUID, String, Status, String, Int, UUID, String, UUID, String>): DownloadingItem {
+    return DownloadingItem(
+        it[ITEM.ID], it[ITEM.TITLE], it[ITEM.STATUS], URI(it[ITEM.URL]), it[ITEM.NUMBER_OF_FAIL], 0,
+        Podcast(it[ITEM.podcast().ID], it[ITEM.podcast().TITLE]),
+        Cover(it[ITEM.cover().ID], URI(it[ITEM.cover().URL])),
+    )
 }
