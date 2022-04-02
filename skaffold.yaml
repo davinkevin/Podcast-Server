@@ -1,4 +1,4 @@
-apiVersion: skaffold/v2beta10
+apiVersion: skaffold/v2beta28
 kind: Config
 build:
   artifacts:
@@ -7,12 +7,12 @@ build:
       dockerfile: backend/src/main/base-image/Dockerfile
   - image: podcastserver/backend
     jib:
-      fromImage: podcastserver/backend-base-image
       project: backend
       args:
       - -Pskaffold=true
+      fromImage: podcastserver/backend-base-image
     requires:
-      - image: podcastserver/backend-base-image
+    - image: podcastserver/backend-base-image
   - image: podcastserver/init-db
     docker:
       dockerfile: ./database/Dockerfile

@@ -16,7 +16,7 @@ plugins {
 	id("com.gorylenko.gradle-git-properties") version "2.3.2"
 	id("org.flywaydb.flyway") version "8.5.5"
 	id("nu.studer.jooq") version "6.0.1"
-	id("com.google.cloud.tools.jib") version "3.1.4"
+	id("com.google.cloud.tools.jib") version "3.2.1"
 	id("de.jansauer.printcoverage") version "2.0.0"
 
 	kotlin("jvm") version "1.6.10"
