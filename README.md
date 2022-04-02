@@ -30,7 +30,7 @@ To see how to install the application, follow the [install documentation](https:
 
 ## License
 
-Copyright 2020 DAVIN KEVIN
+Copyright 2022 DAVIN KEVIN
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
