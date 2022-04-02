@@ -37,7 +37,7 @@ class DownloadHandler(private val downloadService: ItemDownloadManager) {
 
     fun updateLimit(r: ServerRequest): Mono<ServerResponse> =
             r.bodyToMono<Int>()
-                    .delayUntil { downloadService.setLimitParallelDownload(it) }
+                    .doOnNext { downloadService.limitParallelDownload = it }
                     .flatMap { ok().bodyValue(it) }
 
     fun stopAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> {
@@ -62,7 +62,7 @@ class DownloadHandler(private val downloadService: ItemDownloadManager) {
 
     fun moveInQueue(r: ServerRequest): Mono<ServerResponse> =
             r.bodyToMono<MovingItemInQueueForm>()
-                    .delayUntil { downloadService.moveItemInQueue(it.id, it.position); Mono.empty<Void>() }
+                    .delayUntil { downloadService.moveItemInQueue(it.id, it.position) }
                     .flatMap { noContent().build() }
 
     fun removeFromQueue(r: ServerRequest): Mono<ServerResponse> {

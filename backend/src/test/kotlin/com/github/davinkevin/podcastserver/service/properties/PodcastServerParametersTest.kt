@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.service.properties
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
+import java.time.OffsetDateTime
 import java.time.ZonedDateTime.now
 
 /**
@@ -42,8 +43,8 @@ class PodcastServerParametersTest {
         assertThat(parameters.numberOfTry).isEqualTo(20)
         assertThat(parameters.rssDefaultNumberItem).isEqualTo(25L)
         assertThat(parameters.limitDownloadDate())
-                .isBeforeOrEqualTo(now().minusDays(parameters.numberOfDayToDownload))
-                .isAfterOrEqualTo(now().minusDays(parameters.numberOfDayToDownload).minusMinutes(1))
+                .isBeforeOrEqualTo(OffsetDateTime.now().minusDays(parameters.numberOfDayToDownload))
+                .isAfterOrEqualTo(OffsetDateTime.now().minusDays(parameters.numberOfDayToDownload).minusMinutes(1))
     }
 
 }

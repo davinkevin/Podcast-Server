@@ -2,8 +2,7 @@ package com.github.davinkevin.podcastserver.service.properties
 
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.ConstructorBinding
-import java.nio.file.Path
-import java.nio.file.Paths
+import java.time.OffsetDateTime
 import java.time.ZonedDateTime.now
 
 /**
@@ -19,6 +18,6 @@ data class PodcastServerParameters(
         val numberOfDayToSaveCover: Long = 365L,
         val rssDefaultNumberItem: Long = 50L
 ) {
-    fun limitDownloadDate() = now().minusDays(numberOfDayToDownload)!!
+    fun limitDownloadDate() = OffsetDateTime.now().minusDays(numberOfDayToDownload)!!
     fun limitToKeepCoverOnDisk() = now().minusDays(numberOfDayToSaveCover)!!
 }

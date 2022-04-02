@@ -27,9 +27,10 @@ abstract class AbstractDownloader(
     internal lateinit var itemDownloadManager: ItemDownloadManager
     var target: Path = Files.createTempFile("default-init-file", ".ext")
 
-    override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager) {
+    override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager): Downloader {
         this.downloadingInformation = information
         this.itemDownloadManager = itemDownloadManager
+        return this
     }
 
     override fun run() {

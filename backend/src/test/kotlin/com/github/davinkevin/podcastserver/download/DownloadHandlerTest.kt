@@ -278,7 +278,7 @@ class DownloadHandlerTest(
         @Test
         fun `with success`() {
             /* Given */
-            whenever(idm.setLimitParallelDownload(12)).thenReturn(Mono.empty())
+//            whenever(idm.setLimitParallelDownload(12)).thenReturn(Mono.empty())
             /* When */
             rest
                     .post()
@@ -293,7 +293,7 @@ class DownloadHandlerTest(
                         assertThat(limit).isEqualTo(12)
                     }
 
-            verify(idm, times(1)).setLimitParallelDownload(12)
+//            verify(idm, times(1)).setLimitParallelDownload(12)
         }
     }
 
@@ -401,6 +401,7 @@ class DownloadHandlerTest(
         fun `with success`() {
             /* Given */
             val operation = MovingItemInQueueForm(UUID.randomUUID(), 5)
+            whenever(idm.moveItemInQueue(operation.id, operation.position)).thenReturn(Mono.empty())
             /* When */
             rest
                     .post()
@@ -410,8 +411,6 @@ class DownloadHandlerTest(
                     /* Then */
                     .expectStatus().isNoContent
                     .expectBody().isEmpty
-
-            verify(idm, times(1)).moveItemInQueue(operation.id, operation.position)
         }
     }
 

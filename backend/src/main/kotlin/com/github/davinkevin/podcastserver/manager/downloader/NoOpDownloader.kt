@@ -12,9 +12,10 @@ class NoOpDownloader : Downloader {
     override lateinit var downloadingInformation: DownloadingInformation
     private lateinit var itemDownloadManager: ItemDownloadManager
 
-    override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager) {
+    override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager): Downloader {
         this.downloadingInformation = information
         this.itemDownloadManager = itemDownloadManager
+        return this
     }
 
     override fun download(): DownloadingItem = downloadingInformation.item

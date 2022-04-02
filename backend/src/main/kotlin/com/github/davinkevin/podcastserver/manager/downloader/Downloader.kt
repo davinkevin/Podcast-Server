@@ -7,7 +7,7 @@ interface Downloader : Runnable {
 
     val downloadingInformation: DownloadingInformation
 
-    fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager)
+    fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager): Downloader
 
     fun download(): DownloadingItem
 
