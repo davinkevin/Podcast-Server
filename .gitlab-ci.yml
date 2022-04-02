@@ -279,6 +279,7 @@ stages:
 
 👷 documentation:
   stage: 👷‍ build
+  needs: []
   extends: [ .only-on-documentation-changes ]
   image: antora/antora
   script:
