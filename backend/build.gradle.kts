@@ -14,7 +14,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 
 	id("com.gorylenko.gradle-git-properties") version "2.3.2"
-	id("org.flywaydb.flyway") version "8.2.2"
+	id("org.flywaydb.flyway") version "8.5.5"
 	id("nu.studer.jooq") version "6.0.1"
 	id("com.google.cloud.tools.jib") version "3.1.4"
 	id("de.jansauer.printcoverage") version "2.0.0"
