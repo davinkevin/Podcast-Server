@@ -1,6 +1,27 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2022.4.0
+
+### Features
+
+- **backend:** Upgrade to spring boot 2.6.5 ([232f665](232f66523708cd7733b011d3a8552da645b01c5b) - [#164](https://gitlab.com/davinkevin/Podcast-Server/-/issues/164))
+- **backend:** Upgrade storage implemntation to minio:RELEASE.2022-04-01T03-41-39Z ([e448e45](e448e45244a70eae1567f4bcd6b163df8da89fcb))
+- **database:** Upgrade flyway to version 8.5.5 ([239132b](239132b40743326d006427ced7b1e7a4271dfda1) - [#165](https://gitlab.com/davinkevin/Podcast-Server/-/issues/165))
+- **distribution:** Provide a default namespace in kustomize component ([ecd86fc](ecd86fc9db5bbeb8a26539e8a99f38d47e7434fd))
+
+### Bug Fixes
+
+- **database:** Prevent usage of null value for COVER object ([7058f6d](7058f6dfa1570818c860b5bcca88de13462fa6f0) - [#165](https://gitlab.com/davinkevin/Podcast-Server/-/issues/165))
+- **frontend:** Use new cover placeholder for podcast creation ([6a8da43](6a8da438a0b2030b53189405e8a566e19d2a0fa6) - [#165](https://gitlab.com/davinkevin/Podcast-Server/-/issues/165))
+- **frontendjs:** Change dependency used during jspm build ([e913284](e913284d6711049b9db3d5eae514a2c8b47ed043) - [#161](https://gitlab.com/davinkevin/Podcast-Server/-/issues/161))
+
+### Refactor
+
+- **backend:** Usage of type inside build configuration ([0393c18](0393c18d60a4bd63a03829e6b80c1fe24864632b))
+- **download:** Relocate download manager into download package ([aa67021](aa670213a3dddca9297c161c137af3a964f544e6))
+- **download-manager:** Intermediate modifications before migration to SQL ([f048cdb](f048cdb7c19d3af37c8b46558fe47445c845f584) - [#151](https://gitlab.com/davinkevin/Podcast-Server/-/issues/151))
+
 ## 2022.3.0
 
 ### Features

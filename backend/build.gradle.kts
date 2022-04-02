@@ -25,7 +25,7 @@ plugins {
 }
 
 group = "com.github.davinkevin.podcastserver"
-version = "2022.3.0"
+version = "2022.4.0"
 java.sourceCompatibility = JavaVersion.VERSION_11
 
 apply(from = "gradle/profile-default.gradle.kts")
