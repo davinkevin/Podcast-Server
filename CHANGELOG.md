@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2022.5.0
+
+### Features
+
+- **backend:** Upgrade jooq to version 3.16+ ([c8a4901](c8a4901ad991c15659c9f87c985f5419b5765b1d))
+- **backend:** Use multiset to improve performance during podcast reading operations ([4779a2e](4779a2e6a61cf364fcd57fa1aa41b7efb54b420c))
+- **backend:** Upgrade to spring boot 2.6.7 ([0c9bec8](0c9bec854b71f3b48a2beb0c474ddbce5ffecc19) - [#167](https://gitlab.com/davinkevin/Podcast-Server/-/issues/167))
+
+### Refactor
+
+- **backend:** Simplify download database access to improve perf and maintainability ([807de13](807de13c9f74f680737b12b2b68e38c8a3043be7))
+
 ## 2022.4.0
 
 ### Features
