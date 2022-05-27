@@ -10,7 +10,7 @@ import nu.studer.gradle.jooq.JooqGenerate
 import org.flywaydb.gradle.task.FlywayMigrateTask
 
 plugins {
-	id("org.springframework.boot") version "2.6.7"
+	id("org.springframework.boot") version "2.7.0"
 	id("io.spring.dependency-management") version "1.0.11.RELEASE"
 
 	id("com.gorylenko.gradle-git-properties") version "2.4.1"
@@ -53,7 +53,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
 	implementation("org.postgresql:postgresql")
-	runtimeOnly("io.r2dbc:r2dbc-postgresql")
+	runtimeOnly("org.postgresql:r2dbc-postgresql")
 	jooqGenerator("org.postgresql:postgresql:" + dependencyManagement.importedProperties["postgresql.version"])
 	jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
 
