@@ -108,96 +108,88 @@ class ItemRepository(private val query: DSLContext) {
     }
 
     fun search(q: String, tags: List<String>, status: List<Status>, page: ItemPageRequest, podcastId: UUID?): Mono<PageItem> = Mono.defer {
-        Flux.from(
-            query
-                .select(TAG.ID)
-                .from(TAG)
-                .where(TAG.NAME.`in`(tags))
-        )
-            .map { (v) -> v }
-            .collectList()
-            .flatMap { tagIds ->
 
-                val statusesCondition = if (status.isEmpty()) noCondition() else ITEM.STATUS.`in`(status)
-                val tagsCondition = if (tagIds.isEmpty()) noCondition() else {
-                    tagIds
-                        .map {
-                            value(it).`in`(query
-                                .select(PODCAST_TAGS.TAGS_ID)
-                                .from(PODCAST_TAGS)
-                                .where(ITEM.PODCAST_ID.eq(PODCAST_TAGS.PODCASTS_ID)))
-                        }
-                        .reduce(DSL::and)
+        val statusesCondition = if (status.isEmpty()) noCondition() else ITEM.STATUS.`in`(status)
+
+        val tagsCondition = if (tags.isEmpty()) noCondition() else {
+            tags
+                .map {
+                    value(it).`in`(query
+                        .select(TAG.NAME)
+                        .from(PODCAST_TAGS.innerJoin(TAG).on(TAG.ID.eq(PODCAST_TAGS.TAGS_ID)))
+                        .where(ITEM.PODCAST_ID.eq(PODCAST_TAGS.PODCASTS_ID)))
                 }
-                val queryCondition = if (q.isEmpty()) noCondition()
-                else or( ITEM.TITLE.containsIgnoreCase(q), ITEM.DESCRIPTION.containsIgnoreCase(q) )
+                .reduce(DSL::and)
+        }
 
-                val podcastCondition = if(podcastId == null) noCondition() else ITEM.PODCAST_ID.eq(podcastId)
+        val queryCondition = if (q.isEmpty()) noCondition()
+        else or( ITEM.TITLE.containsIgnoreCase(q), ITEM.DESCRIPTION.containsIgnoreCase(q) )
 
-                val filterConditions = and(statusesCondition, tagsCondition, queryCondition, podcastCondition)
+        val podcastCondition = if(podcastId == null) noCondition() else ITEM.PODCAST_ID.eq(podcastId)
 
-                val fi = name("FILTERED_ITEMS").`as`(
-                    select(
-                        ITEM.ID, ITEM.TITLE, ITEM.URL,
-                        ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
-                        ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.FILE_NAME, ITEM.STATUS,
+        val filterConditions = and(statusesCondition, tagsCondition, queryCondition, podcastCondition)
 
-                        ITEM.PODCAST_ID, ITEM.COVER_ID
-                    )
-                        .from(ITEM)
-                        .where(filterConditions)
-                        .orderBy(page.sort.toOrderBy(ITEM.DOWNLOAD_DATE, ITEM.PUB_DATE), ITEM.ID.asc())
-                        .limit((page.size * page.page), page.size)
-                )
+        val fi = name("FILTERED_ITEMS").`as`(
+            select(
+                ITEM.ID, ITEM.TITLE, ITEM.URL,
+                ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
+                ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.FILE_NAME, ITEM.STATUS,
 
-                val content: Mono<List<Item>> = Flux.from(query
-                    .with(fi)
-                    .select(
-                        fi.field(ITEM.ID), fi.field(ITEM.TITLE), fi.field(ITEM.URL),
-                        fi.field(ITEM.PUB_DATE), fi.field(ITEM.DOWNLOAD_DATE), fi.field(ITEM.CREATION_DATE),
-                        fi.field(ITEM.DESCRIPTION), fi.field(ITEM.MIME_TYPE), fi.field(ITEM.LENGTH),
-                        fi.field(ITEM.FILE_NAME), fi.field(ITEM.STATUS),
+                ITEM.PODCAST_ID, ITEM.COVER_ID
+            )
+                .from(ITEM)
+                .where(filterConditions)
+                .orderBy(page.sort.toOrderBy(ITEM.DOWNLOAD_DATE, ITEM.PUB_DATE), ITEM.ID.asc())
+                .limit((page.size * page.page), page.size)
+        )
 
-                        PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
-                        COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT
-                    )
-                    .from(
-                        fi
-                            .innerJoin(COVER).on(fi.field(ITEM.COVER_ID)?.eq(COVER.ID))
-                            .innerJoin(PODCAST).on(fi.field(ITEM.PODCAST_ID)?.eq(PODCAST.ID))
-                    )
-                    .orderBy(page.sort.toOrderBy(fi.field(ITEM.DOWNLOAD_DATE)!!, fi.field(ITEM.PUB_DATE)!!), fi.field(ITEM.ID))
-                )
-                    .map { (
-                               id, title, url,
-                               pubDate, downloadDate, creationDate,
-                               description, mimeType, length,
-                               fileName, status,
+        val content: Mono<List<Item>> = Flux.from(query
+            .with(fi)
+            .select(
+                fi.field(ITEM.ID), fi.field(ITEM.TITLE), fi.field(ITEM.URL),
+                fi.field(ITEM.PUB_DATE), fi.field(ITEM.DOWNLOAD_DATE), fi.field(ITEM.CREATION_DATE),
+                fi.field(ITEM.DESCRIPTION), fi.field(ITEM.MIME_TYPE), fi.field(ITEM.LENGTH),
+                fi.field(ITEM.FILE_NAME), fi.field(ITEM.STATUS),
 
-                               podcastId, podcastTitle, podcastUrl,
-                               coverId, coverUrl, coverWidth, coverHeight
-                           ) -> Item(
-                        id, title, url,
-                        pubDate, downloadDate, creationDate,
-                        description, mimeType, length, fileName, status,
+                PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
+                COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT
+            )
+            .from(
+                fi
+                    .innerJoin(COVER).on(fi.field(ITEM.COVER_ID)?.eq(COVER.ID))
+                    .innerJoin(PODCAST).on(fi.field(ITEM.PODCAST_ID)?.eq(PODCAST.ID))
+            )
+            .orderBy(page.sort.toOrderBy(fi.field(ITEM.DOWNLOAD_DATE)!!, fi.field(ITEM.PUB_DATE)!!), fi.field(ITEM.ID))
+        )
+            .map { (
+                       id, title, url,
+                       pubDate, downloadDate, creationDate,
+                       description, mimeType, length,
+                       fileName, status,
 
-                        Item.Podcast(podcastId, podcastTitle, podcastUrl),
-                        Item.Cover(coverId, URI(coverUrl), coverWidth, coverHeight)
-                    )
-                    }
-                    .collectList()
+                       podcastId, podcastTitle, podcastUrl,
+                       coverId, coverUrl, coverWidth, coverHeight
+                   ) -> Item(
+                id, title, url,
+                pubDate, downloadDate, creationDate,
+                description, mimeType, length, fileName, status,
 
-                val totalElements = query
-                    .select(countDistinct(ITEM.ID))
-                    .from(ITEM)
-                    .where(filterConditions)
-                    .toMono()
-                    .map { (v) -> v }
-
-
-                Mono.zip(content, totalElements)
-                    .map { (content, totalElements) -> PageItem.of(content, totalElements, page) }
+                Item.Podcast(podcastId, podcastTitle, podcastUrl),
+                Item.Cover(coverId, URI(coverUrl), coverWidth, coverHeight)
+            )
             }
+            .collectList()
+
+        val totalElements = query
+            .select(countDistinct(ITEM.ID))
+            .from(ITEM)
+            .where(filterConditions)
+            .toMono()
+            .map { (v) -> v }
+
+
+        Mono.zip(content, totalElements)
+            .map { (content, totalElements) -> PageItem.of(content, totalElements, page) }
     }
 
     fun create(item: ItemForCreation): Mono<Item> = Mono.defer {
