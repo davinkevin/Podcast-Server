@@ -2,7 +2,7 @@
 <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:media="http://search.yahoo.com/mrss/">
     <channel>
         <title>Podcast title</title>
-        <link>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729</link>
+        <link>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/rss?limit=false</link>
         <description>desc</description>
         <itunes:subtitle>desc</itunes:subtitle>
         <itunes:summary>desc</itunes:summary>

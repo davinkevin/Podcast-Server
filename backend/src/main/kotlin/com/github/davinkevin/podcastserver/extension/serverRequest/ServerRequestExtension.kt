@@ -1,6 +1,8 @@
 package com.github.davinkevin.podcastserver.extension.serverRequest
 
 import org.springframework.web.reactive.function.server.ServerRequest
+import org.springframework.web.util.UriBuilder
+import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 
 /**
@@ -26,5 +28,13 @@ fun ServerRequest.extractHost(): URI {
 
     val portAsString = if(port in EMPTY_PORTS) "" else ":$port"
 
-    return URI("$proto://$host$portAsString/")
+    return URI.create("$proto://$host$portAsString/")
+}
+
+fun ServerRequest.normalizedURI(): URI {
+    return UriComponentsBuilder.fromUri(extractHost())
+        .path(path())
+        .queryParams(queryParams())
+        .build(true)
+        .toUri()
 }

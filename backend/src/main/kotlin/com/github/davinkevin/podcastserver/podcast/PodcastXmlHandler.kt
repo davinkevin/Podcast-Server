@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
+import com.github.davinkevin.podcastserver.extension.serverRequest.normalizedURI
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemPageRequest
 import com.github.davinkevin.podcastserver.item.ItemService
@@ -15,6 +16,7 @@ import org.jdom2.output.XMLOutputter
 import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
+import org.springframework.web.reactive.function.server.queryParamOrNull
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
@@ -25,59 +27,58 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 class PodcastXmlHandler(
-        private val podcastService: PodcastService,
-        private val itemService: ItemService
+    private val podcastService: PodcastService,
+    private val itemService: ItemService
 ) {
 
     fun opml(r: ServerRequest): Mono<ServerResponse> {
         val host = r.extractHost()
         return podcastService.findAll()
-                .map { OpmlOutline(it, host)}
-                .sort { a,b -> a.title.compareTo(b.title) }
-                .collectList()
-                .map { Opml(it).toXML() }
-                .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_XML).bodyValue(it) }
+            .map { OpmlOutline(it, host)}
+            .sort { a,b -> a.title.compareTo(b.title) }
+            .collectList()
+            .map { Opml(it).toXML() }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_XML).bodyValue(it) }
     }
 
     fun rss(r: ServerRequest): Mono<ServerResponse> {
-        val host = r.extractHost()
+        val baseUrl = r.extractHost()
+        val callUrl = r.normalizedURI()
         val podcastId = UUID.fromString(r.pathVariable("id"))
-        val limit  = r.queryParam("limit")
-                .map { it!!.toBoolean() }
-                .orElse(true)
+
+        val limit = (r.queryParamOrNull("limit") ?: "true").toBoolean()
         val limitNumber = if (limit) 50 else Int.MAX_VALUE
 
         val itemPageable = ItemPageRequest(0, limitNumber, ItemSort("DESC", "pubDate"))
 
         val items = itemService.search(
-                q = "",
-                tags = listOf(),
-                status = listOf(),
-                page = itemPageable,
-                podcastId = podcastId
+            q = "",
+            tags = listOf(),
+            status = listOf(),
+            page = itemPageable,
+            podcastId = podcastId
         )
-                .flatMapMany { it.content.toFlux() }
-                .map { toRssItem(it, host) }
-                .collectList()
+            .flatMapMany { it.content.toFlux() }
+            .map { toRssItem(it, baseUrl) }
+            .collectList()
 
         val podcast = podcastService
-                .findById(podcastId)
-                .map { toRssChannel(it, host) }
-
+            .findById(podcastId)
+            .map { toRssChannel(it, baseUrl, callUrl) }
 
         return Mono
-                .zip(items, podcast)
-                .map { (itemRss, podcastRss) -> podcastRss.addContent(itemRss) }
-                .map {
-                    val rss = Element("rss").apply {
-                        addContent(it)
-                        addNamespaceDeclaration(itunesNS)
-                        addNamespaceDeclaration(mediaNS)
-                    }
-
-                    XMLOutputter(Format.getPrettyFormat()).outputString(Document(rss))
+            .zip(items, podcast)
+            .map { (itemRss, podcastRss) -> podcastRss.addContent(itemRss) }
+            .map {
+                val rss = Element("rss").apply {
+                    addContent(it)
+                    addNamespaceDeclaration(itunesNS)
+                    addNamespaceDeclaration(mediaNS)
                 }
-                .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_XML).bodyValue(it) }
+
+                XMLOutputter(Format.getPrettyFormat()).outputString(Document(rss))
+            }
+            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_XML).bodyValue(it) }
     }
 
 
@@ -94,11 +95,11 @@ private class Opml(val podcastOutlines: List<OpmlOutline>) {
             }
 
             val outlines = podcastOutlines
-                    .sortedBy { it.title }
-                    .map { it.toXML() }
+                .sortedBy { it.title }
+                .map { it.toXML() }
 
             val body = Element("body")
-                    .addContent(outlines)
+                .addContent(outlines)
 
             addContent(head)
             addContent(body)
@@ -109,12 +110,10 @@ private class Opml(val podcastOutlines: List<OpmlOutline>) {
 }
 
 private class OpmlOutline(p: Podcast, host: URI) {
-    val text = p.title
+
+    val title = p.title
     val description = p.description
     val htmlUrl = host.toASCIIString()!! + "podcasts/${p.id}"
-    val title = p.title
-    val type = "rss"
-    val version = "RSS2"
     val xmlUrl = host.toASCIIString()!! + "api/podcasts/${p.id}/rss"
 
     fun toXML() = Element("outline").apply {
@@ -137,27 +136,27 @@ private fun toRssItem(item: Item, host: URI): Element {
 
     val coverExtension = (FilenameUtils.getExtension(item.cover.url.toASCIIString()) ?: "jpg").substringBeforeLast("?")
     val coverUrl = UriComponentsBuilder.fromUri(host)
-            .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$coverExtension")
-            .build(true)
-            .toUriString()
+        .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$coverExtension")
+        .build(true)
+        .toUriString()
 
     val itunesItemThumbnail = Element("image", itunesNS).setContent(Text(coverUrl))
     val thumbnail = Element("thumbnail", mediaNS).setAttribute("url", coverUrl)
 
     val extension = Optional.ofNullable(item.fileName)
-            .map { FilenameUtils.getExtension(it) }
-            .map { it.substringBeforeLast("?") }
-            .or { Optional.ofNullable(item.mimeType).map { it.substringAfter("/") } }
-            .map { ".$it" }
-            .orElse("")
-            
+        .map { FilenameUtils.getExtension(it) }
+        .map { it.substringBeforeLast("?") }
+        .or { Optional.ofNullable(item.mimeType).map { it.substringAfter("/") } }
+        .map { ".$it" }
+        .orElse("")
+
     val title = item.title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
 
     val proxyURL = UriComponentsBuilder
-            .fromUri(host)
-            .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), title)
-            .build(true)
-            .toUriString()
+        .fromUri(host)
+        .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), title)
+        .build(true)
+        .toUriString()
 
     val itemEnclosure = Element("enclosure").apply {
         setAttribute("url", proxyURL)
@@ -173,10 +172,10 @@ private fun toRssItem(item: Item, host: URI): Element {
 
     val guid = Element("guid").apply {
         val uuidUrl = UriComponentsBuilder
-                .fromUri(host)
-                .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString())
-                .build(true)
-                .toUriString()
+            .fromUri(host)
+            .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString())
+            .build(true)
+            .toUriString()
 
         addContent(Text(uuidUrl))
     }
@@ -196,14 +195,9 @@ private fun toRssItem(item: Item, host: URI): Element {
 
 }
 
-private fun toRssChannel(podcast: Podcast, host: URI): Element {
-    val url = UriComponentsBuilder
-            .fromUri(host)
-            .pathSegment("api", "v1", "podcasts", podcast.id.toString())
-            .build(true)
-            .toUriString()
-
-    val coverUrl = UriComponentsBuilder.fromUri(host)
+private fun toRssChannel(podcast: Podcast, baseUrl: URI, callUrl: URI): Element {
+    val url = UriComponentsBuilder.fromUri(callUrl).build(true).toUriString()
+    val coverUrl = UriComponentsBuilder.fromUri(baseUrl)
             .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "cover." + FilenameUtils.getExtension(podcast.cover.url.path))
             .build(true)
             .toUriString()

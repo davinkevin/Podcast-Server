@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:media="http://search.yahoo.com/mrss/">
+    <channel>
+        <title>Podcast title</title>
+        <link>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/rss?v=1234&amp;limit=false</link>
+        <description>desc</description>
+        <itunes:subtitle>desc</itunes:subtitle>
+        <itunes:summary>desc</itunes:summary>
+        <language>fr-fr</language>
+        <itunes:author>RSS</itunes:author>
+        <itunes:category />
+        <pubDate>Sun, 31 Mar 2019 11:21:32 +0100</pubDate>
+        <image>
+            <height>200</height>
+            <url>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/cover.png</url>
+            <width>200</width>
+        </image>
+        <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/cover.png</itunes:image>
+    </channel>
+</rss>

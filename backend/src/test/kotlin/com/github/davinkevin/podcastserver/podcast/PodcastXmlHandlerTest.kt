@@ -39,21 +39,21 @@ class PodcastXmlHandlerTest(
     @MockBean private lateinit var podcastService: PodcastService
 
     val podcast = Podcast(
-            id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
-            title = "Podcast title",
-            description = "desc",
-            signature = null,
-            url = "https://foo.bar.com/app/file.rss",
-            hasToBeDeleted = true,
-            lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
-            type = "RSS",
-            tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+        id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
+        title = "Podcast title",
+        description = "desc",
+        signature = null,
+        url = "https://foo.bar.com/app/file.rss",
+        hasToBeDeleted = true,
+        lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+        type = "RSS",
+        tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-            cover = CoverForPodcast(
-                    id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
-                    url = URI("https://external.domain.tld/cover.png"),
-                    height = 200, width = 200
-            )
+        cover = CoverForPodcast(
+            id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+            url = URI("https://external.domain.tld/cover.png"),
+            height = 200, width = 200
+        )
     )
 
     @Nested
@@ -61,55 +61,55 @@ class PodcastXmlHandlerTest(
     inner class ShouldGenerateOPML {
 
         private val podcast1 = Podcast(
-                id = UUID.fromString("ad16b2eb-657e-4064-b470-5b99397ce729"),
-                title = "Podcast first",
-                description = "desc",
-                signature = null,
-                url = "https://foo.bar.com/app/1.rss",
-                hasToBeDeleted = true,
-                lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
-                type = "RSS",
-                tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+            id = UUID.fromString("ad16b2eb-657e-4064-b470-5b99397ce729"),
+            title = "Podcast first",
+            description = "desc",
+            signature = null,
+            url = "https://foo.bar.com/app/1.rss",
+            hasToBeDeleted = true,
+            lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+            type = "RSS",
+            tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-                cover = CoverForPodcast(
-                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
-                        url = URI("https://external.domain.tld/1.png"),
-                        height = 200, width = 200
-                )
+            cover = CoverForPodcast(
+                id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                url = URI("https://external.domain.tld/1.png"),
+                height = 200, width = 200
+            )
         )
         private val podcast2 = Podcast(
-                id = UUID.fromString("bd16b2eb-657e-4064-b470-5b99397ce729"),
-                title = "Podcast second",
-                description = "desc",
-                signature = null,
-                url = "https://foo.bar.com/app/2.rss",
-                hasToBeDeleted = true,
-                lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
-                type = "RSS",
-                tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+            id = UUID.fromString("bd16b2eb-657e-4064-b470-5b99397ce729"),
+            title = "Podcast second",
+            description = "desc",
+            signature = null,
+            url = "https://foo.bar.com/app/2.rss",
+            hasToBeDeleted = true,
+            lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+            type = "RSS",
+            tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-                cover = CoverForPodcast(
-                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
-                        url = URI("https://external.domain.tld/2.png"),
-                        height = 200, width = 200
-                )
+            cover = CoverForPodcast(
+                id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                url = URI("https://external.domain.tld/2.png"),
+                height = 200, width = 200
+            )
         )
         private val podcast3 = Podcast(
-                id = UUID.fromString("cd16b2eb-657e-4064-b470-5b99397ce729"),
-                title = "Podcast third",
-                description = "desc",
-                signature = null,
-                url = "https://foo.bar.com/app/3.rss",
-                hasToBeDeleted = true,
-                lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
-                type = "RSS",
-                tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
+            id = UUID.fromString("cd16b2eb-657e-4064-b470-5b99397ce729"),
+            title = "Podcast third",
+            description = "desc",
+            signature = null,
+            url = "https://foo.bar.com/app/3.rss",
+            hasToBeDeleted = true,
+            lastUpdate = OffsetDateTime.of(2019, 3, 31, 11, 21, 32, 45, ZoneOffset.ofHours(1)),
+            type = "RSS",
+            tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-                cover = CoverForPodcast(
-                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
-                        url = URI("https://external.domain.tld/3.png"),
-                        height = 200, width = 200
-                )
+            cover = CoverForPodcast(
+                id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                url = URI("https://external.domain.tld/3.png"),
+                height = 200, width = 200
+            )
         )
 
         @Test
@@ -119,13 +119,13 @@ class PodcastXmlHandlerTest(
 
             /* When */
             rest
-                    .get()
-                    .uri("https://localhost:8080/api/v1/podcasts/opml")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
-                    .expectBody()
-                    .xml("""
+                .get()
+                .uri("https://localhost:8080/api/v1/podcasts/opml")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .xml("""
                         <?xml version="1.0" encoding="UTF-8"?>
                         <opml version="2.0">
                           <head>
@@ -143,13 +143,13 @@ class PodcastXmlHandlerTest(
 
             /* When */
             rest
-                    .get()
-                    .uri("https://localhost:8080/api/v1/podcasts/opml")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
-                    .expectBody()
-                    .xml("""
+                .get()
+                .uri("https://localhost:8080/api/v1/podcasts/opml")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .xml("""
                         <?xml version="1.0" encoding="UTF-8"?>
                         <opml version="2.0">
                           <head>
@@ -169,13 +169,13 @@ class PodcastXmlHandlerTest(
 
             /* When */
             rest
-                    .get()
-                    .uri("https://localhost:8080/api/v1/podcasts/opml")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
-                    .expectBody()
-                    .xml("""
+                .get()
+                .uri("https://localhost:8080/api/v1/podcasts/opml")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .xml("""
                         <?xml version="1.0" encoding="UTF-8"?>
                         <opml version="2.0">
                           <head>
@@ -204,13 +204,13 @@ class PodcastXmlHandlerTest(
                 /* Given */
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/podcasts/opml")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody()
-                        .xml("""
+                    .get()
+                    .uri("https://localhost:8080/api/v1/podcasts/opml")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .xml("""
                         <?xml version="1.0" encoding="UTF-8"?>
                         <opml version="2.0">
                           <head>
@@ -237,14 +237,14 @@ class PodcastXmlHandlerTest(
 
                     /* When */
                     rest
-                            .get()
-                            .uri("https://localhost:8080/api/v1/podcasts/opml")
-                            .header("Host", "custom-host")
-                            .exchange()
-                            /* Then */
-                            .expectStatus().isOk
-                            .expectBody()
-                            .xml("""
+                        .get()
+                        .uri("https://localhost:8080/api/v1/podcasts/opml")
+                        .header("Host", "custom-host")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody()
+                        .xml("""
                                 <?xml version="1.0" encoding="UTF-8"?>
                                 <opml version="2.0">
                                   <head>
@@ -267,14 +267,14 @@ class PodcastXmlHandlerTest(
 
                     /* When */
                     rest
-                            .get()
-                            .uri("https://localhost:8080/api/v1/podcasts/opml")
-                            .header("X-Forwarded-Host", "custom-host")
-                            .exchange()
-                            /* Then */
-                            .expectStatus().isOk
-                            .expectBody()
-                            .xml("""
+                        .get()
+                        .uri("https://localhost:8080/api/v1/podcasts/opml")
+                        .header("X-Forwarded-Host", "custom-host")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody()
+                        .xml("""
                                 <?xml version="1.0" encoding="UTF-8"?>
                                 <opml version="2.0">
                                   <head>
@@ -301,14 +301,14 @@ class PodcastXmlHandlerTest(
 
                     /* When */
                     rest
-                            .get()
-                            .uri("https://localhost:8080/api/v1/podcasts/opml")
-                            .header("X-Forwarded-Proto", "http")
-                            .exchange()
-                            /* Then */
-                            .expectStatus().isOk
-                            .expectBody()
-                            .xml("""
+                        .get()
+                        .uri("https://localhost:8080/api/v1/podcasts/opml")
+                        .header("X-Forwarded-Proto", "http")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody()
+                        .xml("""
                                 <?xml version="1.0" encoding="UTF-8"?>
                                 <opml version="2.0">
                                   <head>
@@ -336,14 +336,14 @@ class PodcastXmlHandlerTest(
 
                     /* When */
                     rest
-                            .get()
-                            .uri("https://localhost:8080/api/v1/podcasts/opml")
-                            .header("X-Forwarded-Port", "9876")
-                            .exchange()
-                            /* Then */
-                            .expectStatus().isOk
-                            .expectBody()
-                            .xml("""
+                        .get()
+                        .uri("https://localhost:8080/api/v1/podcasts/opml")
+                        .header("X-Forwarded-Port", "9876")
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody()
+                        .xml("""
                                 <?xml version="1.0" encoding="UTF-8"?>
                                 <opml version="2.0">
                                   <head>
@@ -359,7 +359,7 @@ class PodcastXmlHandlerTest(
                                 </opml>
                             """.trimIndent())
                 }
-                
+
             }
 
         }
@@ -371,38 +371,38 @@ class PodcastXmlHandlerTest(
     inner class ShouldGenerateRss {
 
         private val coverForItem = Item.Cover(
-                id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                url = URI("https://external.domain.tld/foo/bar.png"),
-                width = 200,
-                height = 200
+            id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
+            url = URI("https://external.domain.tld/foo/bar.png"),
+            width = 200,
+            height = 200
         )
 
         private val podcastForItem = Item.Podcast(
-                id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
-                title = "Podcast title",
-                url = "https://foo.bar.com/app/file.rss"
+            id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
+            title = "Podcast title",
+            url = "https://foo.bar.com/app/file.rss"
         )
 
         private val items = (200 downTo 1)
-                .map { it.toString().padStart(3, '0') }
-                .map { Item(
-                        id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f$it"),
-                        title = "Foo $it",
-                        url = "https://external.domain.tld/foo/bar.$it.mp4",
+            .map { it.toString().padStart(3, '0') }
+            .map { Item(
+                id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f$it"),
+                title = "Foo $it",
+                url = "https://external.domain.tld/foo/bar.$it.mp4",
 
-                        pubDate = OffsetDateTime.of(2019, 6, 24, 5, 28, 54, 34, ZoneOffset.ofHours(2)).minusDays(200 - it.toLong() ),
-                        creationDate = OffsetDateTime.of(2019, 6, 24, 5, 29, 54, 34, ZoneOffset.ofHours(2)).minusDays(200 - it.toLong()),
-                        downloadDate = OffsetDateTime.of(2019, 6, 25, 5, 30, 54, 34, ZoneOffset.ofHours(2)).minusDays(200 - it.toLong()),
+                pubDate = OffsetDateTime.of(2019, 6, 24, 5, 28, 54, 34, ZoneOffset.ofHours(2)).minusDays(200 - it.toLong() ),
+                creationDate = OffsetDateTime.of(2019, 6, 24, 5, 29, 54, 34, ZoneOffset.ofHours(2)).minusDays(200 - it.toLong()),
+                downloadDate = OffsetDateTime.of(2019, 6, 25, 5, 30, 54, 34, ZoneOffset.ofHours(2)).minusDays(200 - it.toLong()),
 
-                        description = "desc $it",
-                        mimeType = "video/mp4",
-                        length = 100,
-                        fileName = null,
-                        status = Status.NOT_DOWNLOADED,
+                description = "desc $it",
+                mimeType = "video/mp4",
+                length = 100,
+                fileName = null,
+                status = Status.NOT_DOWNLOADED,
 
-                        podcast = podcastForItem,
-                        cover = coverForItem
-                ) }
+                podcast = podcastForItem,
+                cover = coverForItem
+            ) }
 
         @Test
         fun `for podcast with limit`() {
@@ -413,21 +413,21 @@ class PodcastXmlHandlerTest(
             val result = PageItem.of(items.take(size), size, page)
 
             whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                    .thenReturn(result.toMono())
+                .thenReturn(result.toMono())
             whenever(podcastService.findById(podcastId))
-                    .thenReturn(podcast.toMono())
+                .thenReturn(podcast.toMono())
 
             val xml = fileAsString("/xml/podcast-with-50-items.xml")
 
             /* When */
             rest
-                    .get()
-                    .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
-                    .expectBody()
-                    .xml(xml.trimIndent())
+                .get()
+                .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .xml(xml.trimIndent())
         }
 
         @Test
@@ -438,25 +438,55 @@ class PodcastXmlHandlerTest(
             val result = PageItem.of(items.take(200), 200, page)
 
             whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                    .thenReturn(result.toMono())
+                .thenReturn(result.toMono())
             whenever(podcastService.findById(podcastId))
-                    .thenReturn(podcast.toMono())
+                .thenReturn(podcast.toMono())
 
             val xml = fileAsString("/xml/podcast-with-200-items.xml")
 
             /* When */
             rest
-                    .get()
-                    .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss?limit=false")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
-                    .expectBody()
-                    .xml(xml.trimIndent())
+                .get()
+                .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss?limit=false")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .xml(xml.trimIndent())
         }
 
+        @Test
+        fun `for podcast with amy parameters`() {
+            /* Given */
+            val podcastId = podcastForItem.id
+            val page = ItemPageRequest(0, Int.MAX_VALUE, ItemSort("DESC", "pubDate"))
+            val result = PageItem.of(emptyList(), 0, page)
 
+            whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
+                .thenReturn(result.toMono())
+            whenever(podcastService.findById(podcastId)).thenReturn(podcast.toMono())
 
+            val xml = fileAsString("/xml/podcast-with-lots-of-parameters.xml")
+
+            /* When */
+            rest
+                .get()
+//                .uri { it
+//                    .host("localhost")
+//                    .scheme("https")
+//                    .port(8080)
+//                    .path("/api/v1/podcasts/$podcastId/rss")
+//                    .queryParam("v", "1234")
+//                    .queryParam("limit", false)
+//                    .build()
+//                }
+                .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss?v=1234&limit=false")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .xml(xml.trimIndent())
+        }
     }
 }
 
