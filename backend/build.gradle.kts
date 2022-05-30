@@ -18,6 +18,7 @@ plugins {
 	id("nu.studer.jooq") version "7.1.1"
 	id("com.google.cloud.tools.jib") version "3.2.1"
 	id("de.jansauer.printcoverage") version "2.0.0"
+	id("org.jetbrains.kotlinx.kover") version "0.5.0"
 
 	kotlin("jvm") version "1.6.21"
 	kotlin("plugin.spring") version "1.6.21"
@@ -215,7 +216,7 @@ tasks.printCoverage {
 	outputs.upToDateWhen { true }
 	outputs.cacheIf { !System.getenv("CI_JOB_STAGE").contains("test") }
 
-	inputs.dir(file(layout.buildDirectory.dir("reports")))
+	inputs.dir(file(layout.buildDirectory.dir("reports/jacoco")))
 		.withPropertyName("reports")
 		.withPathSensitivity(PathSensitivity.RELATIVE)
 }
