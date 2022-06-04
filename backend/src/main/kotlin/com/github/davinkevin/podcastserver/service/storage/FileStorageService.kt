@@ -13,6 +13,7 @@ import org.springframework.http.MediaType
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.reactive.function.client.WebClient
 import reactor.core.publisher.Mono
+import reactor.core.scheduler.Schedulers
 import reactor.kotlin.core.publisher.toMono
 import reactor.util.retry.Retry
 import software.amazon.awssdk.core.async.AsyncRequestBody
@@ -122,12 +123,18 @@ class FileStorageService(
     }
 
     fun cache(filePart: FilePart, destination: Path): Mono<Path> = Mono.defer {
-        val tempLocation = Files.createTempDirectory("upload-temp")
-            .resolve(destination.fileName)
-
-        filePart.transferTo(tempLocation)
-            .then(tempLocation.toMono())
+        Files.createTempDirectory("upload-temp")
+            .toMono()
+            .map { it.resolve(destination.fileName) }
+            .subscribeOn(Schedulers.boundedElastic())
+            .publishOn(Schedulers.parallel())
+            .flatMap {
+                filePart.transferTo(it)
+                    .then(it.toMono())
+            }
     }
+        .subscribeOn(Schedulers.boundedElastic())
+        .publishOn(Schedulers.parallel())
 
     fun upload(podcastTitle: String, file: Path): Mono<PutObjectResponse> {
         val request = PutObjectRequest.builder()
@@ -138,7 +145,11 @@ class FileStorageService(
 
         return bucket.putObject(request, file).toMono()
             .retryWhen(Retry.backoff(3, Duration.ofSeconds(1)))
-            .delayUntil { Files.deleteIfExists(file).toMono() }
+            .delayUntil {
+                Files.deleteIfExists(file).toMono()
+                    .subscribeOn(Schedulers.boundedElastic())
+                    .publishOn(Schedulers.parallel())
+            }
     }
 
     fun metadata(title: String, file: Path): Mono<FileMetaData> {
