@@ -8,6 +8,7 @@ import AppRouteConfig from '../../config/route';
 import UpdateService from '../../common/service/data/updateService';
 import PodcastService from '../../common/service/data/podcastService';
 import template from './details.html!text';
+import Rx from "rx";
 
 
 @Module({
@@ -27,6 +28,8 @@ import template from './details.html!text';
 export default class PodcastDetailCtrl {
 
     totalItems = null;
+    upload$ = new Rx.ReplaySubject(0);
+
 
     constructor($scope, podcastService, $timeout, TitleService){
         "ngInject";
@@ -40,7 +43,11 @@ export default class PodcastDetailCtrl {
         this.TitleService.title = this.podcast.title;
 
         this.$scope.$on("podcastEdition:save", () => this.refreshItems());
-        this.$scope.$on("podcastEdition:upload", () => this.refreshItems());
+        this.$scope.$on("podcastEdition:upload", () => this.upload$.onNext());
+
+        this.upload$
+            .debounce(2000)
+            .subscribe(() =>  this.refreshItems())
 
         this.podcastTabs = [
             { heading : 'Episodes', active : true},
