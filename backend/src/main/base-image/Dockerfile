@@ -7,7 +7,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /opt/ffmpeg && \
-    curl -qsSL https://www.johnvansickle.com/ffmpeg/old-releases/ffmpeg-4.4-amd64-static.tar.xz | tar xJv -C /opt/ffmpeg --strip-components 1
+    curl -qsSL https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz | tar xJv -C /opt/ffmpeg --strip-components 1
 
 RUN mkdir /opt/youtube-dl && \
     ## Youtube DL Installation
