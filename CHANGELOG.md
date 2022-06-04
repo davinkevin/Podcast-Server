@@ -1,6 +1,15 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2022.6.0
+
+### Features
+
+- **backend:** Upgrade to spring boot 2.7.0 ([72e9ce5](72e9ce517ac5ebdd1c149d91b438bbf3f89f3e10))
+- **backend:** Simplify sql query for search ([2a76653](2a76653c293d647758584579c5f64662c95e9777))
+- **backend:** Move download state to database instead of memory ([fbb41dc](fbb41dc15728652fcaee6a68394fc9ad46d2b63f) - [#151](https://gitlab.com/davinkevin/Podcast-Server/-/issues/151))
+- **backend:** Channel link in rss targets rss url with parameters ([9bbb4a4](9bbb4a43714376ea62676639d0f580f44cf65c79) - [#170](https://gitlab.com/davinkevin/Podcast-Server/-/issues/170))
+
 ## 2022.5.0
 
 ### Features
