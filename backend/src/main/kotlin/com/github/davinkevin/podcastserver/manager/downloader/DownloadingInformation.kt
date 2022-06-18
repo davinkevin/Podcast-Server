@@ -13,7 +13,8 @@ import kotlin.io.path.nameWithoutExtension
  */
 data class DownloadingInformation(val item: DownloadingItem, val urls: List<URI>, val filename: Path, val userAgent: String?) {
 
-    fun url(): URI = urls.firstOrNull() ?: item.url
+    val url: URI
+        get() = urls.firstOrNull() ?: item.url
 
     fun status(status: Status): DownloadingInformation {
         val newItem = this.item.copy(status = status)

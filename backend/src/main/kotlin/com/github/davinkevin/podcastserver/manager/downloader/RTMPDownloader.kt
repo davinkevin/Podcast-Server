@@ -45,7 +45,7 @@ class RTMPDownloader(
                 .newProcessBuilder(
                     externalTools.rtmpdump,
                     "-r",
-                    downloadingInformation.url().toASCIIString(),
+                    downloadingInformation.url.toASCIIString(),
                     "-o",
                     target.toAbsolutePath().toString()
                 )

@@ -29,7 +29,7 @@ class YoutubeDlDownloader(
     private val log = LoggerFactory.getLogger(YoutubeDlDownloader::class.java)
 
     override fun download(): DownloadingItem {
-        val url = downloadingInformation.url().toASCIIString()
+        val url = downloadingInformation.url.toASCIIString()
         downloadingInformation = downloadingInformation.fileName(youtubeDl.extractName(url))
 
         target = computeTargetFile(downloadingInformation)
