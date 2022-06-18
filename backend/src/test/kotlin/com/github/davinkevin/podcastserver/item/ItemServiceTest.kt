@@ -1,11 +1,11 @@
 package com.github.davinkevin.podcastserver.item
 
+import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.FINISH
 import com.github.davinkevin.podcastserver.entity.Status.NOT_DOWNLOADED
-import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
@@ -386,7 +386,7 @@ class ItemServiceTest(
                     lastUpdate = OffsetDateTime.now(),
                     type = "RSS",
                     tags = emptyList(),
-                    cover = CoverForPodcast(
+                    cover = Cover(
                             id = UUID.fromString("e63f4c96-ce26-485a-bb8a-c3e799f843dd"),
                             url = URI("17aaa117-afe7-4165-9468-fafb61d13bdb"),
                             height = 100,

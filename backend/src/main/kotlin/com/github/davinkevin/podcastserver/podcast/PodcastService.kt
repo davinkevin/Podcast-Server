@@ -63,7 +63,7 @@ class PodcastService(
         val cover =
                 if (!newCover.url.toASCIIString().startsWith("/") && oldCover.url != newCover.url)
                     coverRepository.save(newCover).delayUntil {
-                        fileService.downloadPodcastCover(p.copy(cover = CoverForPodcast(it.id, it.url, it.height, it.width)))
+                        fileService.downloadPodcastCover(p.copy(cover = Cover(it.id, it.url, it.height, it.width)))
                     }
                 else Cover(oldCover.id, oldCover.url, oldCover.height, oldCover.width).toMono()
 

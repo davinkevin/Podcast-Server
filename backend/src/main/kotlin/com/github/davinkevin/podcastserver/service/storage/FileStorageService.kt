@@ -1,9 +1,9 @@
 package com.github.davinkevin.podcastserver.service.storage
 
+import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest
 import com.github.davinkevin.podcastserver.item.DeleteItemRequest
 import com.github.davinkevin.podcastserver.item.Item
-import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.DeletePodcastRequest
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import org.apache.commons.io.FilenameUtils
@@ -194,7 +194,7 @@ class FileStorageService(
     }
 }
 
-private fun CoverForPodcast.extension(): String = FilenameUtils.getExtension(url.toASCIIString()).ifBlank { "jpg" }
+private fun Cover.extension(): String = FilenameUtils.getExtension(url.toASCIIString()).ifBlank { "jpg" }
 private fun Item.Cover.extension() = FilenameUtils.getExtension(url.toASCIIString()).ifBlank { "jpg" }
 
 data class MovePodcastRequest(val id: UUID, val from: String, val to: String)

@@ -1,12 +1,12 @@
 package com.github.davinkevin.podcastserver.service.storage
 
+import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.*
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.fileAsByteArray
 import com.github.davinkevin.podcastserver.item.DeleteItemRequest
 import com.github.davinkevin.podcastserver.item.Item
-import com.github.davinkevin.podcastserver.podcast.CoverForPodcast
 import com.github.davinkevin.podcastserver.podcast.DeletePodcastRequest
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.tag.Tag
@@ -237,7 +237,7 @@ class FileStorageServiceTest(
                 type = "RSS",
                 tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-                cover = CoverForPodcast(
+                cover = Cover(
                     id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
                     url = URI("https://external.domain.tld/cover.png"),
                     height = 200, width = 200
@@ -393,7 +393,7 @@ class FileStorageServiceTest(
                 type = "RSS",
                 tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-                cover = CoverForPodcast(
+                cover = Cover(
                     id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
                     url = URI("http://localhost:8089/img/image.png"),
                     height = 200, width = 200

@@ -227,7 +227,7 @@ private fun toPodcast(r: Record13<UUID, String, String, String, String, Boolean,
         hasToBeDeleted = r[PODCAST.HAS_TO_BE_DELETED],
         lastUpdate = r[PODCAST.LAST_UPDATE],
         type = r[PODCAST.TYPE],
-        cover = CoverForPodcast(
+        cover = Cover(
             id = r[PODCAST.cover().ID],
             url = URI(r[PODCAST.cover().URL]),
             height = r[PODCAST.cover().HEIGHT],

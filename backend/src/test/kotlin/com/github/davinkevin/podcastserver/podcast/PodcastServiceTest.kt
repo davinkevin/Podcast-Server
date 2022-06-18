@@ -52,10 +52,10 @@ class PodcastServiceTest(
             type = "RSS",
             tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-            cover = CoverForPodcast(
-                    id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
-                    url = URI("https://external.domain.tld/cover.png"),
-                    height = 200, width = 200
+            cover = Cover(
+                id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                url = URI("https://external.domain.tld/cover.png"),
+                height = 200, width = 200
             )
     )
 
@@ -86,10 +86,10 @@ class PodcastServiceTest(
                 type = "RSS",
                 tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-                cover = CoverForPodcast(
-                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
-                        url = URI("https://external.domain.tld/1.png"),
-                        height = 200, width = 200
+                cover = Cover(
+                    id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                    url = URI("https://external.domain.tld/1.png"),
+                    height = 200, width = 200
                 )
         )
         private val podcast2 = Podcast(
@@ -103,10 +103,10 @@ class PodcastServiceTest(
                 type = "RSS",
                 tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-                cover = CoverForPodcast(
-                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
-                        url = URI("https://external.domain.tld/2.png"),
-                        height = 200, width = 200
+                cover = Cover(
+                    id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                    url = URI("https://external.domain.tld/2.png"),
+                    height = 200, width = 200
                 )
         )
         private val podcast3 = Podcast(
@@ -120,10 +120,10 @@ class PodcastServiceTest(
                 type = "RSS",
                 tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-                cover = CoverForPodcast(
-                        id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
-                        url = URI("https://external.domain.tld/3.png"),
-                        height = 200, width = 200
+                cover = Cover(
+                    id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
+                    url = URI("https://external.domain.tld/3.png"),
+                    height = 200, width = 200
                 )
         )
 
@@ -299,7 +299,7 @@ class PodcastServiceTest(
                 /* Given */
                 val tags = emptySet<TagForCreation>()
                 val p = podcastForCreation.copy(tags = tags)
-                val savedCover = p.cover.toPodcastCover()
+                val savedCover = p.cover.toCover()
                 whenever(coverRepository.save(p.cover)).thenReturn(savedCover.toMono())
                 whenever(repository.save(eq(p.title), eq(p.url!!.toASCIIString()), eq(p.hasToBeDeleted), eq(p.type), argThat { isEmpty() }, eq(savedCover)))
                         .thenReturn(podcast.toMono())
@@ -321,7 +321,7 @@ class PodcastServiceTest(
                         TagForCreation(UUID.fromString("f9d92928-1c4c-47a5-965d-efbb2d422f0c"), "Sport")
                 )
                 val p = podcastForCreation.copy(tags = tags)
-                val savedCover = p.cover.toPodcastCover()
+                val savedCover = p.cover.toCover()
 
                 whenever(coverRepository.save(p.cover)).thenReturn(savedCover.toMono())
                 whenever(repository.save(
@@ -352,7 +352,7 @@ class PodcastServiceTest(
                         TagForCreation(null, "Sport")
                 )
                 val p = podcastForCreation.copy(tags = tags)
-                val savedCover = p.cover.toPodcastCover()
+                val savedCover = p.cover.toCover()
 
                 whenever(coverRepository.save(p.cover)).thenReturn(savedCover.toMono())
                 whenever(tagRepository.save("Sport")).thenReturn(Tag(newTagId, "Sport").toMono())
@@ -765,4 +765,4 @@ class PodcastServiceTest(
     }
 }
 
-private fun CoverForCreation.toPodcastCover() = Cover(UUID.randomUUID(), url = url, height = height, width = width)
+private fun CoverForCreation.toCover() = Cover(UUID.randomUUID(), url = url, height = height, width = width)

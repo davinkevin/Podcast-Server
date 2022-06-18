@@ -23,7 +23,6 @@ import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
 import java.time.ZoneOffset
 import java.util.UUID.fromString
-import javax.sql.DataSource
 
 /**
  * Created by kevin on 2019-02-16
@@ -155,7 +154,7 @@ class PodcastRepositoryTest(
                         assertThat(it.type).isEqualTo("Youtube")
                         assertThat(it.lastUpdate).isBetween(currentNow.minusDays(46), currentNow.minusDays(44))
                         assertThat(it.tags).hasSize(0)
-                        assertThat(it.cover).isEqualTo(CoverForPodcast(fromString("c46d93af-4461-4299-a42a-dd28d3f376e9"), URI("http://fake.url.com/notags/cover.png"), 100, 100))
+                        assertThat(it.cover).isEqualTo(Cover(fromString("c46d93af-4461-4299-a42a-dd28d3f376e9"), URI("http://fake.url.com/notags/cover.png"), 100, 100))
                     }
                     .assertNext {
                         assertThat(it.id).isEqualTo(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"))
@@ -166,7 +165,7 @@ class PodcastRepositoryTest(
                         assertThat(it.lastUpdate).isBetween(currentNow.minusDays(16), currentNow.minusDays(14))
                         assertThat(it.tags).hasSize(1)
                         assertThat(it.tags.map(Tag::name)).containsExactly("French Spin")
-                        assertThat(it.cover).isEqualTo(CoverForPodcast(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), URI("http://fake.url.com/appload/cover.png"), 100, 100))
+                        assertThat(it.cover).isEqualTo(Cover(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), URI("http://fake.url.com/appload/cover.png"), 100, 100))
                     }
                     .assertNext {
                         assertThat(it.id).isEqualTo(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"))
@@ -177,7 +176,7 @@ class PodcastRepositoryTest(
                         assertThat(it.lastUpdate).isBetween(currentNow.minusDays(31), currentNow.minusDays(29))
                         assertThat(it.tags).hasSize(2)
                         assertThat(it.tags.map(Tag::name)).containsExactly("Studio Renegade", "Geek")
-                        assertThat(it.cover).isEqualTo(CoverForPodcast(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), URI("http://fake.url.com/geekinc/cover.png"), 100, 100))
+                        assertThat(it.cover).isEqualTo(Cover(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), URI("http://fake.url.com/geekinc/cover.png"), 100, 100))
                     }
                     .verifyComplete()
         }
@@ -473,7 +472,7 @@ class PodcastRepositoryTest(
                             lastUpdate = null,
                             type = "RSS",
                             tags = listOf(),
-                            cover = CoverForPodcast(id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_1.png"), height = 100, width = 100)
+                            cover = Cover(id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_1.png"), height = 100, width = 100)
                     ))
                     .verifyComplete()
         }
@@ -504,7 +503,7 @@ class PodcastRepositoryTest(
                             lastUpdate = null,
                             type = "RSS",
                             tags = listOf(),
-                            cover = CoverForPodcast(id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_1.png"), height = 100, width = 100)
+                            cover = Cover(id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_1.png"), height = 100, width = 100)
                     ))
                     .verifyComplete()
         }
@@ -535,7 +534,7 @@ class PodcastRepositoryTest(
                             lastUpdate = null,
                             type = "RSS",
                             tags = listOf(),
-                            cover = CoverForPodcast(id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_1.png"), height = 100, width = 100)
+                            cover = Cover(id = fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_1.png"), height = 100, width = 100)
                     ))
                     .verifyComplete()
         }
@@ -566,7 +565,7 @@ class PodcastRepositoryTest(
                             lastUpdate = null,
                             type = "RSS",
                             tags = listOf(),
-                            cover = CoverForPodcast(id = fromString("8ea0373e-7af9-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_4.png"), height = 400, width = 400)
+                            cover = Cover(id = fromString("8ea0373e-7af9-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_4.png"), height = 400, width = 400)
                     ))
                     .verifyComplete()
         }
@@ -598,7 +597,7 @@ class PodcastRepositoryTest(
                         assertThat(it.hasToBeDeleted).isEqualTo(true)
                         assertThat(it.type).isEqualTo("RSS")
                         assertThat(it.tags).containsExactlyInAnyOrder(tag1, tag2, tag3)
-                        assertThat(it.cover).isEqualTo(CoverForPodcast(id = fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_2.png"), height = 200, width = 200))
+                        assertThat(it.cover).isEqualTo(Cover(id = fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_2.png"), height = 200, width = 200))
                     }
                     .verifyComplete()
         }
@@ -626,7 +625,7 @@ class PodcastRepositoryTest(
                         assertThat(it.hasToBeDeleted).isEqualTo(true)
                         assertThat(it.type).isEqualTo("RSS")
                         assertThat(it.tags).isEmpty()
-                        assertThat(it.cover).isEqualTo(CoverForPodcast(id = fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_2.png"), height = 200, width = 200))
+                        assertThat(it.cover).isEqualTo(Cover(id = fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822ec"), url = URI("http://fake.url.com/a-podcast-to-update/cover_2.png"), height = 200, width = 200))
                     }
                     .verifyComplete()
         }

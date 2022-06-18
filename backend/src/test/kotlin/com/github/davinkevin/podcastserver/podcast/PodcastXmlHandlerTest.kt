@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.podcast
 
+import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.item.*
@@ -49,7 +50,7 @@ class PodcastXmlHandlerTest(
         type = "RSS",
         tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-        cover = CoverForPodcast(
+        cover = Cover(
             id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
             url = URI("https://external.domain.tld/cover.png"),
             height = 200, width = 200
@@ -71,7 +72,7 @@ class PodcastXmlHandlerTest(
             type = "RSS",
             tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-            cover = CoverForPodcast(
+            cover = Cover(
                 id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
                 url = URI("https://external.domain.tld/1.png"),
                 height = 200, width = 200
@@ -88,7 +89,7 @@ class PodcastXmlHandlerTest(
             type = "RSS",
             tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-            cover = CoverForPodcast(
+            cover = Cover(
                 id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
                 url = URI("https://external.domain.tld/2.png"),
                 height = 200, width = 200
@@ -105,7 +106,7 @@ class PodcastXmlHandlerTest(
             type = "RSS",
             tags = setOf(Tag(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma")),
 
-            cover = CoverForPodcast(
+            cover = Cover(
                 id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
                 url = URI("https://external.domain.tld/3.png"),
                 height = 200, width = 200
