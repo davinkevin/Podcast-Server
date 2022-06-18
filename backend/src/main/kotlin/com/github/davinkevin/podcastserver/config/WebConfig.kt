@@ -9,7 +9,6 @@ import org.springframework.http.codec.json.Jackson2JsonEncoder
 import org.springframework.web.reactive.config.WebFluxConfigurer
 
 @Configuration
-@ComponentScan("com.github.davinkevin.podcastserver.controller")
 class WebFluxConfig(private val om: ObjectMapper) : WebFluxConfigurer {
     override fun configureHttpMessageCodecs(configurer: ServerCodecConfigurer) {
         configurer.defaultCodecs().jackson2JsonDecoder(Jackson2JsonDecoder(om))
