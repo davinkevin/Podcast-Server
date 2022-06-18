@@ -1,4 +1,4 @@
-package com.github.davinkevin.podcastserver.service
+package com.github.davinkevin.podcastserver.service.ffmpeg
 
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.ProcessListener

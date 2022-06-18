@@ -4,7 +4,7 @@ package com.github.davinkevin.podcastserver.manager.downloader
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.FfmpegService
+import com.github.davinkevin.podcastserver.service.ffmpeg.FfmpegService
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import net.bramp.ffmpeg.builder.FFmpegBuilder

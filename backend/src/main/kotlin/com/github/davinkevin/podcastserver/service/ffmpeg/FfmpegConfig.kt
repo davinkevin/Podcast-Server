@@ -1,6 +1,5 @@
-package com.github.davinkevin.podcastserver.config
+package com.github.davinkevin.podcastserver.service.ffmpeg
 
-import com.github.davinkevin.podcastserver.service.FfmpegService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc
 import net.bramp.ffmpeg.FFmpeg
