@@ -208,11 +208,11 @@ private fun toRssItem(item: PlaylistWithItems.Item, host: URI): Element {
     val itunesItemThumbnail = Element("image", itunesNS).setContent(Text(coverUrl))
     val thumbnail = Element("thumbnail", mediaNS).setAttribute("url", coverUrl)
 
-    val extension = Optional.ofNullable(item.fileName)
-            .map { FilenameUtils.getExtension(it) }
-            .map { it.substringBeforeLast("?") }
-            .map { ".$it" }
-            .orElse("")
+    val extension = item.fileName?.let {
+        "." + FilenameUtils
+            .getExtension(it)
+            .substringBeforeLast("?")
+    } ?: ""
 
     val title = item.title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
 

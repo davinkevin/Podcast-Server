@@ -472,15 +472,6 @@ class PodcastXmlHandlerTest(
             /* When */
             rest
                 .get()
-//                .uri { it
-//                    .host("localhost")
-//                    .scheme("https")
-//                    .port(8080)
-//                    .path("/api/v1/podcasts/$podcastId/rss")
-//                    .queryParam("v", "1234")
-//                    .queryParam("limit", false)
-//                    .build()
-//                }
                 .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss?v=1234&limit=false")
                 .exchange()
                 /* Then */

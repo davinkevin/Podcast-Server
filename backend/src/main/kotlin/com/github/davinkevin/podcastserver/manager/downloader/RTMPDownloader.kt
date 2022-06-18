@@ -45,7 +45,7 @@ class RTMPDownloader(
                 .newProcessBuilder(
                     externalTools.rtmpdump,
                     "-r",
-                    downloadingInformation.url(),
+                    downloadingInformation.url().toASCIIString(),
                     "-o",
                     target.toAbsolutePath().toString()
                 )
@@ -113,7 +113,7 @@ class RTMPDownloader(
     }
 
     override fun compatibility(downloadingInformation: DownloadingInformation) =
-        if (downloadingInformation.urls.size == 1 && downloadingInformation.urls.first().startsWith("rtmp://")) 1
+        if (downloadingInformation.urls.size == 1 && downloadingInformation.urls.first().toASCIIString().startsWith("rtmp://")) 1
         else Integer.MAX_VALUE
 
     private fun broadcastProgression(item: DownloadingItem, progression: Int) {

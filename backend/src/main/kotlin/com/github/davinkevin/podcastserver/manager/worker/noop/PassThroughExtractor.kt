@@ -3,11 +3,11 @@ package com.github.davinkevin.podcastserver.manager.worker.noop
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.worker.Extractor
-import org.apache.commons.io.FilenameUtils
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 import java.lang.Integer.MAX_VALUE
 import java.net.URI
+import kotlin.io.path.Path
 
 /**
  * Created by kevin on 03/12/2017
@@ -17,10 +17,8 @@ import java.net.URI
 class PassThroughExtractor : Extractor {
 
     override fun extract(item: DownloadingItem): DownloadingInformation {
-        val url = item.url.toASCIIString()
-        val fileName = FilenameUtils.getName(url.substringBefore("?"))
-
-        return DownloadingInformation(item, listOf(url), fileName, null)
+        val fileName = Path(item.url.path).fileName
+        return DownloadingInformation(item, listOf(item.url), fileName, null)
     }
 
 

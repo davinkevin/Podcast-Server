@@ -29,7 +29,7 @@ class YoutubeDlDownloader(
     private val log = LoggerFactory.getLogger(YoutubeDlDownloader::class.java)
 
     override fun download(): DownloadingItem {
-        val url = downloadingInformation.url()
+        val url = downloadingInformation.url().toASCIIString()
         downloadingInformation = downloadingInformation.fileName(youtubeDl.extractName(url))
 
         target = computeTargetFile(downloadingInformation)
@@ -61,7 +61,7 @@ class YoutubeDlDownloader(
     }
 
     override fun compatibility(downloadingInformation: DownloadingInformation): Int {
-        val url = downloadingInformation.urls.first().lowercase(Locale.getDefault())
+        val url = downloadingInformation.urls.first().toASCIIString().lowercase(Locale.getDefault())
 
         return when {
             downloadingInformation.urls.size > 1 -> Int.MAX_VALUE

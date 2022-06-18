@@ -203,11 +203,11 @@ data class ItemHAL(
 
     val proxyURL: URI
         get() {
-            val extension = Optional.ofNullable(fileName)
-                    .map { FilenameUtils.getExtension(it) }
-                    .map { it.substringBeforeLast("?") }
-                    .map { ".$it" }
-                    .orElse("")
+            val extension = fileName?.let {
+                "." + FilenameUtils
+                    .getExtension(it)
+                    .substringBeforeLast("?")
+            } ?: ""
 
             val title = title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
 

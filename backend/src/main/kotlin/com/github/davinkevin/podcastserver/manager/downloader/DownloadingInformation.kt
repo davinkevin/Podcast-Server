@@ -1,15 +1,19 @@
 package com.github.davinkevin.podcastserver.manager.downloader
 
 import com.github.davinkevin.podcastserver.entity.Status
-import org.apache.commons.io.FilenameUtils
 import java.net.URI
+import java.nio.file.Path
 import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.extension
+import kotlin.io.path.nameWithoutExtension
 
 /**
  * Created by kevin on 03/12/2017
  */
-data class DownloadingInformation(val item: DownloadingItem, val urls: List<String>, val filename: String, val userAgent: String?) {
-    fun url(): String = urls.firstOrNull() ?: item.url.toASCIIString()
+data class DownloadingInformation(val item: DownloadingItem, val urls: List<URI>, val filename: Path, val userAgent: String?) {
+
+    fun url(): URI = urls.firstOrNull() ?: item.url
 
     fun status(status: Status): DownloadingInformation {
         val newItem = this.item.copy(status = status)
@@ -27,14 +31,16 @@ data class DownloadingInformation(val item: DownloadingItem, val urls: List<Stri
     }
 
     fun fileName(filename: String): DownloadingInformation {
-        val extension = FilenameUtils.getExtension(filename)
-        val base = FilenameUtils.getBaseName(filename)
+        val newFileName = Path(filename)
+        val extension = newFileName.extension
+        val base = newFileName.nameWithoutExtension
 
         val safeFilename = base
             .replace("\n".toRegex(), "")
             .replace("[^a-zA-Z0-9.-]".toRegex(), "_")
             .take(100)
             .plus(".$extension")
+            .let(::Path)
 
         return this.copy(filename = safeFilename)
     }

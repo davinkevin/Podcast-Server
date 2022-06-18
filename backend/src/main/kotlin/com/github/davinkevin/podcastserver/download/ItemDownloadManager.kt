@@ -17,6 +17,9 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.io.path.Path
+import kotlin.io.path.name
+import kotlin.io.path.toPath
 
 @Service
 class ItemDownloadManager (
@@ -115,8 +118,6 @@ class ItemDownloadManager (
 }
 
 private fun DownloadingItem.toInformation(): DownloadingInformation {
-    val url = url.toASCIIString()
-    val fileName = FilenameUtils.getName(url.substringBefore("?"))
-
+    val fileName = Path(url.path).fileName
     return DownloadingInformation(this, listOf(url), fileName, null)
 }

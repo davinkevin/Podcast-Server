@@ -39,7 +39,7 @@ class PassThroughExtractorTest {
 
         /* THEN  */
         assertThat(extractedValue.item).isEqualTo(item)
-        assertThat(extractedValue.urls).containsOnly(item.url.toASCIIString())
+        assertThat(extractedValue.urls).containsOnly(item.url)
     }
 
     @Test

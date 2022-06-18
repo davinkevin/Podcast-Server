@@ -41,9 +41,9 @@ class FfmpegDownloader(
         target = computeTargetFile(downloadingInformation)
 
         globalDuration = downloadingInformation.urls
-                .sumOf { ffmpegService.getDurationOf(it, downloadingInformation.userAgent) }
+                .sumOf { ffmpegService.getDurationOf(it.toASCIIString(), downloadingInformation.userAgent) }
 
-        val multiDownloads = downloadingInformation.urls.map { download(it) }
+        val multiDownloads = downloadingInformation.urls.map { download(it.toASCIIString()) }
 
         Result.runCatching {
             if (multiDownloads.any { it.isFailure }) {
@@ -120,7 +120,7 @@ class FfmpegDownloader(
     }
 
     override fun compatibility(downloadingInformation: DownloadingInformation) =
-            if (downloadingInformation.urls.map { it.lowercase(Locale.getDefault()) }.all { "m3u8" in it || "mp4" in it }) 10
+            if (downloadingInformation.urls.map { it.toASCIIString().lowercase(Locale.getDefault()) }.all { "m3u8" in it || "mp4" in it }) 10
             else Integer.MAX_VALUE
 }
 

@@ -35,6 +35,7 @@ import java.time.ZoneOffset
 import java.util.*
 import java.util.concurrent.CompletableFuture.runAsync
 import java.util.concurrent.TimeUnit.SECONDS
+import kotlin.io.path.Path
 
 private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
@@ -93,7 +94,7 @@ class RTMPDownloaderTest {
             downloader = RTMPDownloader(downloadRepository, template, clock, file, processService, externalTools)
 
             downloader.with(
-                    DownloadingInformation(item,  listOf(), "file.mp4", null),
+                    DownloadingInformation(item,  listOf(), Path("file.mp4"), null),
                     itemDownloadManager
             )
         }
@@ -283,7 +284,7 @@ class RTMPDownloaderTest {
         @Test
         fun `should be compatible with only one url starting with rtmp`() {
             /* Given */
-            val di = DownloadingInformation(item, listOf("rtmp://foo.bar.com/end.M3U8"), "file.mp4", null)
+            val di = DownloadingInformation(item, listOf("rtmp://foo.bar.com/end.M3U8").map(URI::create), Path("file.mp4"), null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -293,7 +294,7 @@ class RTMPDownloaderTest {
         @Test
         fun `should not be compatible with multiple url`() {
             /* Given */
-            val di = DownloadingInformation(item, listOf("rmtp://foo.bar.com/end.m3u8", "rmtp://foo.bar.com/end.M3U8"), "file.mp4", null)
+            val di = DownloadingInformation(item, listOf("rmtp://foo.bar.com/end.m3u8", "rmtp://foo.bar.com/end.M3U8").map(URI::create), Path("file.mp4"), null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -303,7 +304,7 @@ class RTMPDownloaderTest {
         @Test
         fun `should not be compatible with url not starting by rtmp`() {
             /* Given */
-            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.MP4"), "file.mp4", null)
+            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.MP4").map(URI::create), Path("file.mp4"), null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */

@@ -12,6 +12,8 @@ import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.OffsetDateTime
 import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.extension
 
 class CoverRepository(private val query: DSLContext) {
 
@@ -44,7 +46,7 @@ class CoverRepository(private val query: DSLContext) {
             .map { (podcastId, podcastTitle, itemId, itemTitle, coverId, coverUrl) ->
                 DeleteCoverRequest(
                     id = coverId,
-                    extension = coverUrl.substringAfterLast("."),
+                    extension = Path(coverUrl).extension,
                     item = Item(itemId, itemTitle),
                     podcast = Podcast(podcastId, podcastTitle)
                 )

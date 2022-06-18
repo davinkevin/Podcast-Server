@@ -10,6 +10,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.mock
 import java.net.URI
 import java.util.*
+import kotlin.io.path.Path
 
 /**
  * Created by kevin on 16/03/2016 for Podcast Server
@@ -36,7 +37,7 @@ class NoOpDownloaderTest {
     @Test
     fun `should return default value`() {
         /* Given */
-        val info = DownloadingInformation(item,  listOf(), "noop.mp4", null)
+        val info = DownloadingInformation(item,  listOf(), Path("noop.mp4"), null)
         val downloader = NoOpDownloader().apply {
             with(info, mock())
         }
@@ -54,7 +55,7 @@ class NoOpDownloaderTest {
     fun `should remove itself from idm when start`() {
         /* GIVEN */
         val idm = mock<ItemDownloadManager>()
-        val info = DownloadingInformation(item,  listOf(), "", "")
+        val info = DownloadingInformation(item,  listOf(), Path(""), "")
         val noOpDownloader = NoOpDownloader().apply {
                 with(info, idm)
         }

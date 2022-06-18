@@ -39,6 +39,7 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.*
 import java.util.concurrent.TimeUnit.SECONDS
+import kotlin.io.path.Path
 
 private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
@@ -87,7 +88,7 @@ class FfmpegDownloaderTest {
             downloader = FfmpegDownloader(downloadRepository, template, clock, file, ffmpegService, processService)
 
             downloader
-                    .with(DownloadingInformation(item, listOf(item.url.toASCIIString(), "http://foo.bar.com/end.mp4"), "file.mp4", "Fake UserAgent"), itemDownloadManager)
+                    .with(DownloadingInformation(item, listOf(item.url, URI.create("http://foo.bar.com/end.mp4")), Path("file.mp4"), "Fake UserAgent"), itemDownloadManager)
         }
 
         @Nested
@@ -279,7 +280,7 @@ class FfmpegDownloaderTest {
         @Test
         fun `should be compatible with multiple urls ending with M3U8 and MP4`() {
             /* Given */
-            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.M3U8", "http://foo.bar.com/end.mp4"), "end.mp4", null)
+            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.M3U8", "http://foo.bar.com/end.mp4").map(URI::create), Path("end.mp4"), null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -289,7 +290,7 @@ class FfmpegDownloaderTest {
         @Test
         fun `should be compatible with only urls ending with M3U8`() {
             /* Given */
-            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.m3u8", "http://foo.bar.com/end.M3U8"), "end.mp4", null)
+            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.m3u8", "http://foo.bar.com/end.M3U8").map(URI::create), Path("end.mp4"), null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -299,7 +300,7 @@ class FfmpegDownloaderTest {
         @Test
         fun `should be compatible with only urls ending with mp4`() {
             /* Given */
-            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.MP4", "http://foo.bar.com/end.mp4"), "end.mp4", null)
+            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.MP4", "http://foo.bar.com/end.mp4").map(URI::create), Path("end.mp4"), null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -311,7 +312,7 @@ class FfmpegDownloaderTest {
         @ValueSource(strings = ["m3u8", "mp4"])
         fun `should be compatible with only one url with extension`(ext: String) {
             /* Given */
-            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.$ext"), "end.mp4", null)
+            val di = DownloadingInformation(item, listOf(URI.create("http://foo.bar.com/end.$ext")), Path("end.mp4"), null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */
@@ -323,7 +324,7 @@ class FfmpegDownloaderTest {
         @ValueSource(strings = ["http://foo.bar.com/end.webm", "http://foo.bar.com/end.manifest"])
         fun `should not be compatible with`(url: String) {
             /* Given */
-            val di = DownloadingInformation(item, listOf(url), "end.mp4", null)
+            val di = DownloadingInformation(item, listOf(URI.create(url)), Path("end.mp4"), null)
             /* When */
             val compatibility = downloader.compatibility(di)
             /* Then */

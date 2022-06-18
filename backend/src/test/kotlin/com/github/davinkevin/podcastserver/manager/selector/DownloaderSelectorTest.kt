@@ -2,10 +2,10 @@ package com.github.davinkevin.podcastserver.manager.selector
 
 import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.YoutubeDlDownloader
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.manager.downloader.*
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.manager.downloader.FfmpegDownloader
+import com.github.davinkevin.podcastserver.manager.downloader.RTMPDownloader
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -14,16 +14,17 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
 import org.mockito.junit.jupiter.MockitoSettings
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.ApplicationContext
-import org.springframework.context.annotation.Bean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
 import java.util.*
 import java.util.stream.Stream
+import kotlin.io.path.Path
 import kotlin.reflect.KClass
 
 @ExtendWith(SpringExtension::class)
@@ -50,7 +51,7 @@ class DownloaderSelectorTest(
     @Test
     fun `should reject empty url`() {
         /* When */
-        assertThat(selector.of(DownloadingInformation(dItem, listOf(), "file.mp4", null))).isEqualTo(DownloaderSelector.NO_OP_DOWNLOADER)
+        assertThat(selector.of(DownloadingInformation(dItem, listOf(), Path("file.mp4"), null))).isEqualTo(DownloaderSelector.NO_OP_DOWNLOADER)
     }
 
     @MethodSource("urlToDownloader")
@@ -65,12 +66,12 @@ class DownloaderSelectorTest(
 
     companion object {
         @JvmStatic
-        fun urlToDownloader() =
+        fun urlToDownloader(): Stream<DownloaderArgument> =
                 Stream.of(
-                        DownloaderArgument("http://foo.bar.com/a/path/with/file.mp3", YoutubeDlDownloader::class),
-                        DownloaderArgument("http://foo.bar.com/a/path/with/file.m3u8", FfmpegDownloader::class),
-                        DownloaderArgument("rtmp://ma.video.free.fr/video.mp4/audio/tnt/tnt1217/tnt1217.mp3", RTMPDownloader::class),
-                        DownloaderArgument("https://www.youtube.com/watch?v=RKh4T3m-Qlk&feature=youtube_gdata", YoutubeDlDownloader::class)
+                        DownloaderArgument(URI.create("http://foo.bar.com/a/path/with/file.mp3"), YoutubeDlDownloader::class),
+                        DownloaderArgument(URI.create("http://foo.bar.com/a/path/with/file.m3u8"), FfmpegDownloader::class),
+                        DownloaderArgument(URI.create("rtmp://ma.video.free.fr/video.mp4/audio/tnt/tnt1217/tnt1217.mp3"), RTMPDownloader::class),
+                        DownloaderArgument(URI.create("https://www.youtube.com/watch?v=RKh4T3m-Qlk&feature=youtube_gdata"), YoutubeDlDownloader::class)
                 )
     }
 }
@@ -93,8 +94,8 @@ private val dItem: DownloadingItem = DownloadingItem (
 )
 
 
-class DownloaderArgument(val url: String, val clazz: KClass<*>) {
-    val item = DownloadingInformation(dItem, listOf(url), "file.mp4", null)
+class DownloaderArgument(val url: URI, val clazz: KClass<*>) {
+    val item = DownloadingInformation(dItem, listOf(url), Path("file.mp4"), null)
 
     override fun toString(): String {
         return "${clazz.simpleName} for $url"

@@ -12,7 +12,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Clock
 import java.time.OffsetDateTime
-import kotlin.io.path.absolutePathString
+import kotlin.io.path.*
 
 abstract class AbstractDownloader(
     private val downloadRepository: DownloadRepository,
@@ -102,12 +102,13 @@ abstract class AbstractDownloader(
     }
 
     private fun computeDestinationFile(info: DownloadingInformation): Path {
-        val simplifiedFilename = info.filename
+        val simplifiedFilename = info.filename.name
             .replace("\n".toRegex(), "")
             .replace("[^a-zA-Z0-9.-]".toRegex(), "_")
+            .let(::Path)
 
-        val name = FilenameUtils.getBaseName(simplifiedFilename) + "-${downloadingInformation.item.id}"
-        val extension = FilenameUtils.getExtension(simplifiedFilename)
+        val name = simplifiedFilename.nameWithoutExtension + "-${downloadingInformation.item.id}"
+        val extension = simplifiedFilename.extension
 
         return Files.createTempDirectory(info.item.podcast.title)
             .resolve("$name.$extension")

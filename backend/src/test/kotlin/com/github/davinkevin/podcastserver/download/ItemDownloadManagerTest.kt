@@ -34,6 +34,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 import java.util.concurrent.TimeUnit.SECONDS
+import kotlin.io.path.Path
 
 /**
  * Created by kevin on 06/05/15
@@ -674,9 +675,7 @@ class ItemDownloadManagerTest(
 }
 
 private fun DownloadingItem.toInformation(): DownloadingInformation {
-    val url = url.toASCIIString()
-    val fileName = FilenameUtils.getName(url.substringBefore("?"))
-
+    val fileName = Path(url.path).fileName
     return DownloadingInformation(this, listOf(url), fileName, null)
 }
 

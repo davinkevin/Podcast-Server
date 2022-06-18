@@ -23,8 +23,11 @@ import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.net.URI
+import java.nio.file.Paths
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.extension
 
 class PodcastXmlHandler(
     private val podcastService: PodcastService,
@@ -142,15 +145,13 @@ private fun toRssItem(item: Item, host: URI): Element {
 
     val itunesItemThumbnail = Element("image", itunesNS).setContent(Text(coverUrl))
     val thumbnail = Element("thumbnail", mediaNS).setAttribute("url", coverUrl)
+    val extension = item.fileName?.let {
+        FilenameUtils
+            .getExtension(it)
+            .substringBeforeLast("?")
+    } ?: item.mimeType.substringAfter("/")
 
-    val extension = Optional.ofNullable(item.fileName)
-        .map { FilenameUtils.getExtension(it) }
-        .map { it.substringBeforeLast("?") }
-        .or { Optional.ofNullable(item.mimeType).map { it.substringAfter("/") } }
-        .map { ".$it" }
-        .orElse("")
-
-    val title = item.title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
+    val title = item.title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + ".$extension"
 
     val proxyURL = UriComponentsBuilder
         .fromUri(host)

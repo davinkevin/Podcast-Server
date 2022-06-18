@@ -38,6 +38,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.*
+import kotlin.io.path.Path
 
 private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
@@ -86,7 +87,7 @@ class YoutubeDlDownloaderTest(
         private val dItem = DownloadingInformation(
                 item = item,
                 urls = listOf(),
-                filename = "one.mp3",
+                filename = Path("one.mp3"),
                 userAgent = null
         )
 
@@ -106,11 +107,11 @@ class YoutubeDlDownloaderTest(
         @Test
         fun `with a simple url`() {
             /* Given */
-            val url = "https://foo.bar.com/one.mp3"
+            val url = URI.create("https://foo.bar.com/one.mp3")
             var finalFile: Path = Files.createTempFile("not-used-for-now", ".mp3")
             downloader.downloadingInformation = dItem.copy(urls = listOf(url))
-            whenever(youtube.extractName(url)).thenReturn("one.mp3")
-            whenever(youtube.download(eq(url), any(), any())).then {
+            whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
+            whenever(youtube.download(eq(url.toASCIIString()), any(), any())).then {
                 val fileToCreate = it.getArgument<Path>(1)
                 finalFile = Files.createFile(fileToCreate)
                 mock<YoutubeDLResponse>()
@@ -128,7 +129,7 @@ class YoutubeDlDownloaderTest(
         @DisplayName("but fails due to error")
         inner class ButFailsDueToError {
 
-            val url = "https://foo.bar.com/one.mp3"
+            val url = URI.create("https://foo.bar.com/one.mp3")
 
             @Nested
             @DisplayName("DuringDownload")
@@ -139,9 +140,9 @@ class YoutubeDlDownloaderTest(
                     /* Given */
                     downloader.downloadingInformation = dItem.copy(urls = listOf(url))
 
-                    whenever(youtube.extractName(url)).thenReturn("one.mp3")
+                    whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
                     doThrow(RuntimeException("fake error"))
-                            .whenever(youtube).download(eq(url), any(), any())
+                            .whenever(youtube).download(eq(url.toASCIIString()), any(), any())
 
                     /* When */
                     assertThatThrownBy { downloader.download() }
@@ -159,13 +160,13 @@ class YoutubeDlDownloaderTest(
                 fun beforeEach() {
                     downloader.downloadingInformation = dItem.copy(urls = listOf(url))
 
-                    whenever(youtube.extractName(url)).thenReturn("one.mp3")
+                    whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
                 }
 
                 @Test
                 fun `should throw error if file not created by youtube-dl`() {
                     /* Given */
-                    whenever(youtube.download(eq(url), any(), any())).thenReturn(mock())
+                    whenever(youtube.download(eq(url.toASCIIString()), any(), any())).thenReturn(mock())
                     /* When */
                     assertThatThrownBy { downloader.download() }
                             /* Then */
@@ -185,10 +186,10 @@ class YoutubeDlDownloaderTest(
             @BeforeEach
             fun beforeEach() {
                 Mockito.reset(template, youtube)
-                val url = "https://foo.bar.com/one.mp3"
+                val url = URI.create("https://foo.bar.com/one.mp3")
                 downloader.downloadingInformation = dItem.copy(urls = listOf(url))
-                whenever(youtube.extractName(url)).thenReturn("one.mp3")
-                whenever(youtube.download(eq(url), any(), any())).then {
+                whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
+                whenever(youtube.download(eq(url.toASCIIString()), any(), any())).then {
                     Files.createFile(it.getArgument(1))
                     mock<YoutubeDLResponse>()
                 }
@@ -234,8 +235,8 @@ class YoutubeDlDownloaderTest(
             /* Given */
             val dItem = DownloadingInformation(
                     item = item,
-                    urls = listOf("https://foo.bar.com/one.mp3", "https://foo.bar.com/two.mp3"),
-                    filename = "one.mp3",
+                    urls = listOf("https://foo.bar.com/one.mp3", "https://foo.bar.com/two.mp3").map(URI::create),
+                    filename = Path("one.mp3"),
                     userAgent = null
             )
             /* When */
@@ -257,8 +258,8 @@ class YoutubeDlDownloaderTest(
             /* Given */
             val dItem = DownloadingInformation(
                     item = item,
-                    urls = listOf(url),
-                    filename = "one.mp3",
+                    urls = listOf(URI.create(url)),
+                    filename = Path("one.mp3"),
                     userAgent = null
             )
 
@@ -274,8 +275,8 @@ class YoutubeDlDownloaderTest(
             /* Given */
             val dItem = DownloadingInformation(
                     item = item,
-                    urls = listOf("https://foo.bar.com/one.mp3"),
-                    filename = "one.mp3",
+                    urls = listOf(URI.create("https://foo.bar.com/one.mp3")),
+                    filename = Path("one.mp3"),
                     userAgent = null
             )
             /* When */
@@ -289,8 +290,8 @@ class YoutubeDlDownloaderTest(
             /* Given */
             val dItem = DownloadingInformation(
                     item = item,
-                    urls = listOf("rtmp://foo.bar.com/one.mp3"),
-                    filename = "one.mp3",
+                    urls = listOf(URI.create("rtmp://foo.bar.com/one.mp3")),
+                    filename = Path("one.mp3"),
                     userAgent = null
             )
             /* When */

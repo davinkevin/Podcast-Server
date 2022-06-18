@@ -20,6 +20,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.*
+import kotlin.io.path.Path
 import kotlin.io.path.writeText
 
 private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
@@ -66,7 +67,7 @@ class DownloaderTest {
         fun `should stop download`() {
             /* Given */
             downloader
-                    .with(DownloadingInformation(item,  listOf(), "filename.mp4", null), itemDownloadManager)
+                    .with(DownloadingInformation(item,  listOf(), Path("filename.mp4"), null), itemDownloadManager)
 
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
 
@@ -84,7 +85,7 @@ class DownloaderTest {
         @Suppress("UnassignedFluxMonoInstance")
         fun `should save sync with podcast`() {
             /* Given */
-            val information = DownloadingInformation(item, listOf(), "file.mp4", null)
+            val information = DownloadingInformation(item, listOf(), Path("file.mp4"), null)
             downloader.with(information, itemDownloadManager)
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
 
@@ -99,7 +100,7 @@ class DownloaderTest {
         @Suppress("UnassignedFluxMonoInstance")
         fun `should failed if error occurs during finish method`() {
             /* Given */
-            val information = DownloadingInformation(item, listOf(), "file.mp4", null)
+            val information = DownloadingInformation(item, listOf(), Path("file.mp4"), null)
             downloader.with(information, itemDownloadManager)
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
             whenever(file.upload(any(), any())).thenReturn(RuntimeException("not expected error").toMono())
@@ -132,7 +133,7 @@ class DownloaderTest {
         fun `should trigger fail if download fail`() {
             /* Given */
             val d = AlwaysFailingDownloader(downloadRepository, template, clock, file)
-            d.with(DownloadingInformation(item,  listOf(), "filename.mp4", null), itemDownloadManager)
+            d.with(DownloadingInformation(item,  listOf(), Path("filename.mp4"), null), itemDownloadManager)
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
 
             /* When */
