@@ -16,6 +16,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
+import java.nio.file.Path
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -203,7 +204,7 @@ class DownloadRepository(private val query: DSLContext) {
             .toMono()
     }
 
-    fun finishDownload(id: UUID, length: Long, mimeType: String, fileName: String, downloadDate: OffsetDateTime): Mono<Int> = Mono.defer {
+    fun finishDownload(id: UUID, length: Long, mimeType: String, fileName: Path, downloadDate: OffsetDateTime): Mono<Int> = Mono.defer {
         query
             .update(ITEM)
             .set(ITEM.STATUS, FINISH)

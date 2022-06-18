@@ -43,7 +43,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 import kotlin.io.path.writeText
-
+import kotlin.io.path.Path
 
 /**
  * Created by kevin on 2019-02-12
@@ -150,7 +150,7 @@ class FileStorageServiceTest(
     @DisplayName("should delete item file")
     inner class ShouldDeleteItemFile {
 
-        val request = DeleteItemRequest(UUID.randomUUID(), "foo.txt", "podcast-title")
+        val request = DeleteItemRequest(UUID.randomUUID(), Path("foo.txt"), "podcast-title")
 
         @Test
         fun `with success`() {
@@ -254,7 +254,7 @@ class FileStorageServiceTest(
                 StepVerifier.create(fileService.coverExists(podcast))
                     .expectSubscription()
                     /* Then */
-                    .expectNext("dd16b2eb-657e-4064-b470-5b99397ce729.png")
+                    .expectNext(Path("dd16b2eb-657e-4064-b470-5b99397ce729.png"))
                     .verifyComplete()
             }
 
@@ -271,7 +271,7 @@ class FileStorageServiceTest(
                 StepVerifier.create(fileService.coverExists(specificPodcast))
                     .expectSubscription()
                     /* Then */
-                    .expectNext("dd16b2eb-657e-4064-b470-5b99397ce729.jpg")
+                    .expectNext(Path("dd16b2eb-657e-4064-b470-5b99397ce729.jpg"))
                     .verifyComplete()
             }
 
@@ -331,7 +331,7 @@ class FileStorageServiceTest(
                 StepVerifier.create(fileService.coverExists(item))
                     .expectSubscription()
                     /* Then */
-                    .expectNext("27184b1a-7642-4ffd-ac7e-14fb36f7f15c.png")
+                    .expectNext(Path("27184b1a-7642-4ffd-ac7e-14fb36f7f15c.png"))
                     .verifyComplete()
             }
 
@@ -350,7 +350,7 @@ class FileStorageServiceTest(
                 StepVerifier.create(fileService.coverExists(specificItem))
                     .expectSubscription()
                     /* Then */
-                    .expectNext("27184b1a-7642-4ffd-ac7e-14fb36f7f15c.jpg")
+                    .expectNext(Path("27184b1a-7642-4ffd-ac7e-14fb36f7f15c.jpg"))
                     .verifyComplete()
             }
 
@@ -435,7 +435,7 @@ class FileStorageServiceTest(
                 description = null,
                 mimeType = "audio/mp3",
                 length = null,
-                fileName = "item.1.mp3",
+                fileName = Path("item.1.mp3"),
                 status = Status.NOT_DOWNLOADED,
 
                 podcast = Item.Podcast(
@@ -654,7 +654,7 @@ class FileStorageServiceTest(
 
             /* When */
             val uri = onDemandFileStorageService.toExternalUrl(
-                FileDescriptor("foo", "bar"),
+                FileDescriptor("foo", Path("bar")),
                 URI.create("https://request.local/")
             )
 
@@ -672,7 +672,7 @@ class FileStorageServiceTest(
 
             /* When */
             val uri = onDemandFileStorageService.toExternalUrl(
-                FileDescriptor("foo", "bar"),
+                FileDescriptor("foo", Path("bar")),
                 URI.create("https://request.local/")
             )
 

@@ -182,7 +182,7 @@ class RTMPDownloaderTest {
                         id = item.id,
                         length = 123L,
                         mimeType = "video/mp4",
-                        fileName = "file-${item.id}.mp4",
+                        fileName = Path("file-${item.id}.mp4"),
                         downloadDate = fixedDate
                 )).thenReturn(Mono.empty())
 
@@ -216,7 +216,7 @@ class RTMPDownloaderTest {
                             id = item.id,
                             length = 123L,
                             mimeType = "video/mp4",
-                            fileName = "file-${item.id}.mp4",
+                            fileName = Path("file-${item.id}.mp4"),
                             downloadDate = fixedDate
                     )).thenReturn(Mono.empty())
 

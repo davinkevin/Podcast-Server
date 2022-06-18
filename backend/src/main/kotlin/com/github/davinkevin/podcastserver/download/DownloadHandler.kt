@@ -90,7 +90,7 @@ private data class DownloadingItemHAL(
 }
 
 private fun toDownloadingItem(item: DownloadingItem): DownloadingItemHAL {
-    val extension = item.cover.url.extension()
+    val extension = item.cover.url.extension().ifBlank { "jpg" }
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
             .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$extension")

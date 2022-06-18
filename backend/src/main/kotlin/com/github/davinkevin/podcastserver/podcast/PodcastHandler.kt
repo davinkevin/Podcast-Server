@@ -5,7 +5,6 @@ import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
 import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
-import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
@@ -19,6 +18,8 @@ import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.OffsetDateTime
 import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.extension
 
 /**
  * Created by kevin on 2019-02-15
@@ -76,7 +77,6 @@ class PodcastHandler(
                 .flatMap { podcast -> podcast
                         .toMono()
                         .flatMap { fileService.coverExists(it) }
-                        .map { it.toString().substringAfterLast("/") }
 //                        .map { UriComponentsBuilder.fromUri(host)
 //                                .pathSegment("data", podcast.title, it)
 //                                .build().toUri()
@@ -132,9 +132,7 @@ private data class CoverHAL(val id: UUID, val width: Int, val height: Int, val u
 private data class TagHAL(val id: UUID, val name: String)
 
 private fun Cover.extension(): String {
-    val ext = FilenameUtils.getExtension(url.path)
-
-    return if(ext.isNullOrBlank()) "jpg" else ext
+    return Path(url.path).extension.ifBlank { "jpg" }
 }
 
 private fun toPodcastHAL(p: Podcast): PodcastHAL {

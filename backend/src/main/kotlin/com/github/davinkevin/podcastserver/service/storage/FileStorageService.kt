@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.item.DeleteItemRequest
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.podcast.DeletePodcastRequest
 import com.github.davinkevin.podcastserver.podcast.Podcast
-import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
@@ -25,6 +24,8 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Duration
 import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.extension
 
 /**
  * Created by kevin on 2019-02-09
@@ -68,15 +69,16 @@ class FileStorageService(
             .onErrorReturn(false)
     }
 
-    fun coverExists(p: Podcast): Mono<String> = coverExists(p.title, p.id, p.cover.extension())
-    fun coverExists(i: Item): Mono<String> = coverExists(i.podcast.title, i.id, i.cover.extension())
-    fun coverExists(podcastTitle: String, itemId: UUID, extension: String): Mono<String> {
+    fun coverExists(p: Podcast): Mono<Path> = coverExists(p.title, p.id, p.cover.extension())
+    fun coverExists(i: Item): Mono<Path> = coverExists(i.podcast.title, i.id, i.cover.extension())
+    fun coverExists(podcastTitle: String, itemId: UUID, extension: String): Mono<Path> {
         val path = "$podcastTitle/$itemId.$extension"
         return bucket.headObject { it.bucket(properties.bucket).key(path) }.toMono()
             .map { true }
             .onErrorReturn(false)
             .filter { it }
             .map { path.substringAfterLast("/") }
+            .map { Path(it) }
     }
 
     private fun download(url: URI) = wcb.clone()
@@ -194,9 +196,9 @@ class FileStorageService(
     }
 }
 
-private fun Cover.extension(): String = FilenameUtils.getExtension(url.toASCIIString()).ifBlank { "jpg" }
-private fun Item.Cover.extension() = FilenameUtils.getExtension(url.toASCIIString()).ifBlank { "jpg" }
+private fun Cover.extension(): String = Path(url.path).extension.ifBlank { "jpg" }
+private fun Item.Cover.extension() = Path(url.path).extension.ifBlank { "jpg" }
 
 data class MovePodcastRequest(val id: UUID, val from: String, val to: String)
 data class FileMetaData(val contentType: String, val size: Long)
-data class FileDescriptor(val podcastTitle: String, val fileName: String)
+data class FileDescriptor(val podcastTitle: String, val fileName: Path)

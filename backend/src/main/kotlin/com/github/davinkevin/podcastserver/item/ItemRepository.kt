@@ -14,6 +14,7 @@ import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.net.URI
+import java.nio.file.Path
 import java.time.OffsetDateTime
 import java.util.*
 
@@ -80,7 +81,7 @@ class ItemRepository(private val query: DSLContext) {
         query
             .update(ITEM)
             .set(ITEM.STATUS, DELETED)
-            .set(ITEM.FILE_NAME, null as String?)
+            .set(ITEM.FILE_NAME, null as Path?)
             .where(ITEM.ID.`in`(items))
             .toMono()
             .then()
@@ -100,7 +101,7 @@ class ItemRepository(private val query: DSLContext) {
             .update(ITEM)
             .set(ITEM.STATUS, NOT_DOWNLOADED)
             .set(ITEM.DOWNLOAD_DATE, null as OffsetDateTime?)
-            .set(ITEM.FILE_NAME, null as String?)
+            .set(ITEM.FILE_NAME, null as Path?)
             .set(ITEM.NUMBER_OF_FAIL, 0)
             .where(ITEM.ID.eq(id))
             .toMono()
@@ -252,7 +253,7 @@ class ItemRepository(private val query: DSLContext) {
                         dollarSafeValue(item.description),
                         dollarSafeValue(item.mimeType),
                         value(item.length),
-                        dollarSafeValue(item.fileName),
+                        value(item.fileName),
                         value(item.status),
                         value(item.podcastId),
                         coverCreation.field(COVER.ID)
@@ -295,7 +296,7 @@ class ItemRepository(private val query: DSLContext) {
     }
 }
 
-private fun toItem(it: Record18<UUID, String, String, OffsetDateTime, OffsetDateTime, OffsetDateTime, String, String, Long, String, Status, UUID, String, String, UUID, String, Int, Int>): Item {
+private fun toItem(it: Record18<UUID, String, String, OffsetDateTime, OffsetDateTime, OffsetDateTime, String, String, Long, Path, Status, UUID, String, String, UUID, String, Int, Int>): Item {
     val c = Item.Cover(it[COVER.ID], URI(it[COVER.URL]), it[COVER.WIDTH], it[COVER.HEIGHT])
     val p = Item.Podcast(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
     return Item(

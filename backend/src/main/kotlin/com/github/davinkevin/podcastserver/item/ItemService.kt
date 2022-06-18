@@ -4,7 +4,6 @@ import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
@@ -19,6 +18,7 @@ import java.nio.file.Paths
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.io.path.Path
 
 /**
  * Created by kevin on 2019-02-09
@@ -55,7 +55,7 @@ class ItemService(
         .flatMap { repository.findById(it) }
         .delayUntil { item -> item.toMono()
             .filter { it.isDownloaded() }
-            .filter { !it.fileName.isNullOrEmpty() }
+            .filter { it.fileName != Path("") }
             .map { DeleteItemRequest(it.id, it.fileName!!, it.podcast.title) }
             .flatMap { file.deleteItem(it) }
         }
@@ -94,7 +94,7 @@ class ItemService(
                     description = podcast.description,
                     mimeType = metadata.contentType,
                     length = metadata.size,
-                    fileName = filename.fileName.toString(),
+                    fileName = filename.fileName,
                     status = Status.FINISH,
 
                     podcastId = podcast.id,

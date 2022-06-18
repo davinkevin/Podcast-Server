@@ -24,6 +24,7 @@ import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
+import kotlin.io.path.Path
 
 /**
  * Created by kevin on 2019-07-06
@@ -159,7 +160,7 @@ class PlaylistHandlerTest (
                                         title = "a title",
                                         description = "a desc",
                                         mimeType = "audio/mp3",
-                                        fileName = "file.mp3",
+                                        fileName = Path("file.mp3"),
                                         length = 10L,
                                         pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
                                         podcast = PlaylistWithItems.Item.Podcast(
@@ -223,7 +224,7 @@ class PlaylistHandlerTest (
                                         title = "a title",
                                         description = "a desc",
                                         mimeType = "audio/mp3",
-                                        fileName = "file.mp3",
+                                        fileName = Path("file.mp3"),
                                         length = 10L,
                                         pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
                                         podcast = PlaylistWithItems.Item.Podcast(
@@ -242,7 +243,7 @@ class PlaylistHandlerTest (
                                         title = "2 a title",
                                         description = "a desc",
                                         mimeType = "audio/mp3",
-                                        fileName = "file2.mp3",
+                                        fileName = Path("file2.mp3"),
                                         length = 10L,
                                         pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
                                         podcast = PlaylistWithItems.Item.Podcast(
@@ -324,7 +325,7 @@ class PlaylistHandlerTest (
                         title = "a title",
                         description = "a desc",
                         mimeType = "audio/mp3",
-                        fileName = "file.mp3",
+                        fileName = Path("file.mp3"),
                         length = 10L,
                         pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
                         podcast = PlaylistWithItems.Item.Podcast(
@@ -414,7 +415,7 @@ class PlaylistHandlerTest (
                     title = "a title",
                     description = "a desc",
                     mimeType = "audio/mp3",
-                    fileName = "file.mp3",
+                    fileName = Path("file.mp3"),
                     length = 10L,
                     pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
                     podcast = PlaylistWithItems.Item.Podcast(

@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
 import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
-import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus.NOT_FOUND
 import org.springframework.http.codec.multipart.FilePart
@@ -21,9 +20,11 @@ import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.switchIfEmpty
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
+import java.nio.file.Path
 import java.time.Clock
 import java.time.OffsetDateTime
 import java.util.*
+import kotlin.io.path.extension
 
 /**
  * Created by kevin on 2019-02-09
@@ -82,7 +83,8 @@ class ItemHandler(
                 .flatMap { item -> item
                         .toMono()
                         .flatMap { fileService.coverExists(it) }
-                        .map { fileService.toExternalUrl(FileDescriptor(item.podcast.title, it), host) }
+                        .map { FileDescriptor(item.podcast.title, it) }
+                        .map { fileService.toExternalUrl(it, host) }
                         .switchIfEmpty { item.cover.url.toMono() }
                 }
                 .doOnNext { log.debug("Redirect cover to {}", it)}
@@ -194,21 +196,16 @@ class ItemHandler(
 }
 
 data class ItemHAL(
-        val id: UUID, val title: String, val url: String?,
-        val pubDate: OffsetDateTime?, val downloadDate: OffsetDateTime?, val creationDate: OffsetDateTime?,
-        val description: String?, val mimeType: String, val length: Long?, val fileName: String?, val status: Status,
-        val podcast: Podcast, val cover: Cover
+    val id: UUID, val title: String, val url: String?,
+    val pubDate: OffsetDateTime?, val downloadDate: OffsetDateTime?, val creationDate: OffsetDateTime?,
+    val description: String?, val mimeType: String, val length: Long?, val fileName: Path?, val status: Status,
+    val podcast: Podcast, val cover: Cover
 ) {
     val podcastId = podcast.id
 
     val proxyURL: URI
         get() {
-            val extension = fileName?.let {
-                "." + FilenameUtils
-                    .getExtension(it)
-                    .substringBeforeLast("?")
-            } ?: ""
-
+            val extension = fileName?.extension?.let { ".$it" } ?: ""
             val title = title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
 
             return UriComponentsBuilder.fromPath("/")
@@ -227,7 +224,7 @@ data class ItemHAL(
 
 private fun Item.toHAL(): ItemHAL {
 
-    val extension = cover.url.extension()
+    val extension = cover.url.extension().ifBlank { "jpg" }
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
             .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), "cover.$extension")

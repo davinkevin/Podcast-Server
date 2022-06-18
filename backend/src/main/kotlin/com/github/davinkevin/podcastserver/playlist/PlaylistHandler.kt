@@ -2,7 +2,6 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
-import org.apache.commons.io.FilenameUtils
 import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.Namespace
@@ -20,6 +19,7 @@ import reactor.core.publisher.Mono
 import java.net.URI
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.io.path.extension
 
 class PlaylistHandler(
         private val playlistService: PlaylistService
@@ -135,16 +135,15 @@ private class PlaylistWithItemsHAL(val id: UUID, val name: String, val items: Co
 }
 
 private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
-    val extension = cover.url.extension()
+    val coverExtension = cover.url.extension().ifBlank { "jpg" }
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
-            .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), "cover.$extension")
+            .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), "cover.$coverExtension")
             .build(true)
             .toUri()
 
-    val fileName = title
-            .replace("[^a-zA-Z0-9.-]".toRegex(), "_") +
-            (fileName ?: "").let { "." + FilenameUtils.getExtension(it).substringBeforeLast("?") }
+    val extension = this.fileName?.extension?.let { ".$it" } ?: ""
+    val fileName = title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
 
     val itemUrl = UriComponentsBuilder.fromPath("/")
             .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), fileName)
@@ -198,7 +197,7 @@ private fun PlaylistWithItems.toRss(host: URI): Element {
 }
 
 private fun toRssItem(item: PlaylistWithItems.Item, host: URI): Element {
-    val coverExtension = item.cover.url.extension()
+    val coverExtension = item.cover.url.extension().ifBlank { "jpg" }
 
     val coverUrl = UriComponentsBuilder.fromUri(host)
             .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$coverExtension")
@@ -208,12 +207,7 @@ private fun toRssItem(item: PlaylistWithItems.Item, host: URI): Element {
     val itunesItemThumbnail = Element("image", itunesNS).setContent(Text(coverUrl))
     val thumbnail = Element("thumbnail", mediaNS).setAttribute("url", coverUrl)
 
-    val extension = item.fileName?.let {
-        "." + FilenameUtils
-            .getExtension(it)
-            .substringBeforeLast("?")
-    } ?: ""
-
+    val extension = item.fileName?.extension?.let { ".$it" } ?: ""
     val title = item.title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
 
     val proxyURL = UriComponentsBuilder

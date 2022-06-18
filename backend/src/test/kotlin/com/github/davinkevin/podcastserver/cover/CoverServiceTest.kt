@@ -21,6 +21,7 @@ import reactor.test.StepVerifier
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID.randomUUID
+import kotlin.io.path.Path
 
 @ExtendWith(SpringExtension::class)
 @Import(CoverService::class)
@@ -62,7 +63,7 @@ class CoverServiceTest (
                     randomCover("item3", "podcast3")
             )
             whenever(cover.findCoverOlderThan(date)).thenReturn(covers.toFlux())
-            whenever(file.coverExists(any(), any(), any())).thenReturn(Mono.just(""))
+            whenever(file.coverExists(any(), any(), any())).thenReturn(Mono.just(Path("file.mp3")))
             whenever(file.deleteCover(any())).thenReturn(Mono.empty())
 
             /* When */

@@ -33,6 +33,7 @@ import java.net.URI
 import java.nio.file.Paths
 import java.time.*
 import java.util.*
+import kotlin.io.path.Path
 
 /**
  * Created by kevin on 2019-02-12
@@ -85,9 +86,9 @@ class ItemServiceTest(
         /* Given */
         val limit = OffsetDateTime.now().minusDays(30)
         val items = listOf(
-                DeleteItemRequest(UUID.fromString("2e7d6cc7-c3ed-47d1-866f-7f797624124d"), "foo", "bar"),
-                DeleteItemRequest(UUID.fromString("dca41d0b-a59c-43fa-8d2d-2129fb637546"), "num1", "num2"),
-                DeleteItemRequest(UUID.fromString("40430ce3-b421-4c82-b34d-2deb4c46b1cd"), "itemT", "podcastT")
+                DeleteItemRequest(UUID.fromString("2e7d6cc7-c3ed-47d1-866f-7f797624124d"), Path("foo"), "bar"),
+                DeleteItemRequest(UUID.fromString("dca41d0b-a59c-43fa-8d2d-2129fb637546"), Path("num1"), "num2"),
+                DeleteItemRequest(UUID.fromString("40430ce3-b421-4c82-b34d-2deb4c46b1cd"), Path("itemT"), "podcastT")
         )
         val repoResponse = Flux.fromIterable(items)
         whenever(repository.findAllToDelete(limit)).thenReturn(repoResponse)
@@ -204,7 +205,7 @@ class ItemServiceTest(
         @Test
         fun `and do nothing because element has filename empty`() {
             /* Given */
-            val currentItem = item.copy(status = FINISH, fileName = "")
+            val currentItem = item.copy(status = FINISH, fileName = Path(""))
             whenever(repository.resetById(item.id)).thenReturn(item.toMono())
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
@@ -223,7 +224,7 @@ class ItemServiceTest(
         @Test
         fun `and delete files`() {
             /* Given */
-            val currentItem = item.copy(status = FINISH, fileName = "foo.mp4")
+            val currentItem = item.copy(status = FINISH, fileName = Path("foo.mp4"))
             val deleteItemInformation = DeleteItemRequest(currentItem.id, currentItem.fileName!!, currentItem.podcast.title)
             whenever(repository.resetById(item.id)).thenReturn(item.toMono())
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
@@ -353,7 +354,7 @@ class ItemServiceTest(
         fun `an item which should be deleted from disk`() {
             /* Given */
             val id = UUID.randomUUID()
-            val deleteItem = DeleteItemRequest(id, "foo", "bar")
+            val deleteItem = DeleteItemRequest(id, Path("foo"), "bar")
             whenever(repository.deleteById(id)).thenReturn(Mono.just(deleteItem))
             whenever(fileService.deleteItem(deleteItem)).thenReturn(Mono.empty())
             whenever(idm.removeItemFromQueueAndDownload(id)).thenReturn(Mono.empty())
@@ -406,7 +407,7 @@ class ItemServiceTest(
                     description = podcast.description,
                     mimeType = "audio/mp3",
                     length = 1234L,
-                    fileName = "Podcast_Name_-_2020-01-02_-_title.mp3",
+                    fileName = Path("Podcast_Name_-_2020-01-02_-_title.mp3"),
                     status = FINISH,
 
                     podcastId = podcast.id,

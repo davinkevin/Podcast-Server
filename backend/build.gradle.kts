@@ -62,7 +62,6 @@ dependencies {
 	implementation("org.jdom:jdom2:2.0.6")
 	implementation("org.jsoup:jsoup:1.13.1")
 	implementation("com.github.pedroviniv:youtubedl-java:ef7110605d23eaaae4796312163bcf84c7099311")
-	implementation("commons-io:commons-io:2.4")
 	implementation("net.bramp.ffmpeg:ffmpeg:0.6.1")
 
 	implementation("io.r2dbc:r2dbc-pool")
@@ -139,7 +138,11 @@ jooq {
 							ForcedType()
 								.withUserType("com.github.davinkevin.podcastserver.entity.Status")
 								.withConverter("com.github.davinkevin.podcastserver.database.StatusConverter")
-								.withIncludeExpression("""ITEM\.STATUS""")
+								.withIncludeExpression("""ITEM\.STATUS"""),
+							ForcedType()
+								.withUserType("java.nio.file.Path")
+								.withConverter("com.github.davinkevin.podcastserver.database.PathConverter")
+								.withIncludeExpression("""ITEM\.FILE_NAME""")
 						)
 						isIncludeTables = true
 						isIncludePackages = false

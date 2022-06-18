@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
-import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
@@ -81,7 +80,7 @@ abstract class AbstractDownloader(
                     id = downloadingInformation.item.id,
                     length = size,
                     mimeType = mimeType,
-                    fileName = target.fileName.toString(),
+                    fileName = target.fileName,
                     downloadDate = OffsetDateTime.now(clock)
                 ) }
             .doOnSuccess {

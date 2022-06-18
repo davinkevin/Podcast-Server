@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemPageRequest
 import com.github.davinkevin.podcastserver.item.ItemService
 import com.github.davinkevin.podcastserver.item.ItemSort
-import org.apache.commons.io.FilenameUtils
 import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.Namespace
@@ -23,11 +22,11 @@ import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.net.URI
-import java.nio.file.Paths
 import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.io.path.Path
 import kotlin.io.path.extension
+import kotlin.io.path.nameWithoutExtension
 
 class PodcastXmlHandler(
     private val podcastService: PodcastService,
@@ -137,7 +136,7 @@ private val ITUNES_NAMESPACE = Namespace.getNamespace("itunes", "http://www.itun
 
 private fun toRssItem(item: Item, host: URI): Element {
 
-    val coverExtension = (FilenameUtils.getExtension(item.cover.url.toASCIIString()) ?: "jpg").substringBeforeLast("?")
+    val coverExtension = (Path(item.cover.url.path).extension.ifBlank { "jpg" })
     val coverUrl = UriComponentsBuilder.fromUri(host)
         .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$coverExtension")
         .build(true)
@@ -145,12 +144,7 @@ private fun toRssItem(item: Item, host: URI): Element {
 
     val itunesItemThumbnail = Element("image", itunesNS).setContent(Text(coverUrl))
     val thumbnail = Element("thumbnail", mediaNS).setAttribute("url", coverUrl)
-    val extension = item.fileName?.let {
-        FilenameUtils
-            .getExtension(it)
-            .substringBeforeLast("?")
-    } ?: item.mimeType.substringAfter("/")
-
+    val extension = item.fileName?.nameWithoutExtension ?: item.mimeType.substringAfter("/")
     val title = item.title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + ".$extension"
 
     val proxyURL = UriComponentsBuilder
@@ -199,7 +193,7 @@ private fun toRssItem(item: Item, host: URI): Element {
 private fun toRssChannel(podcast: Podcast, baseUrl: URI, callUrl: URI): Element {
     val url = UriComponentsBuilder.fromUri(callUrl).build(true).toUriString()
     val coverUrl = UriComponentsBuilder.fromUri(baseUrl)
-            .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "cover." + FilenameUtils.getExtension(podcast.cover.url.path))
+            .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "cover." + Path(podcast.cover.url.path).extension)
             .build(true)
             .toUriString()
 

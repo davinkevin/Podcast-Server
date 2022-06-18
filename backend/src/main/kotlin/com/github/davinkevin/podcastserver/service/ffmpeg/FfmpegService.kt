@@ -6,7 +6,6 @@ import net.bramp.ffmpeg.FFmpegExecutor
 import net.bramp.ffmpeg.FFprobe
 import net.bramp.ffmpeg.builder.FFmpegBuilder
 import net.bramp.ffmpeg.progress.ProgressListener
-import org.apache.commons.io.FilenameUtils
 import org.slf4j.LoggerFactory
 import org.springframework.util.FileSystemUtils
 import java.nio.file.Files
@@ -15,6 +14,8 @@ import java.nio.file.StandardCopyOption
 import java.util.concurrent.CompletableFuture.runAsync
 import java.util.concurrent.CompletableFuture.supplyAsync
 import java.util.concurrent.TimeUnit
+import kotlin.io.path.extension
+import kotlin.io.path.nameWithoutExtension
 
 /**
  * Created by kevin on 19/07/2014 for Podcast Server
@@ -98,12 +99,12 @@ class FfmpegService(
     }
 
     private fun generateTempFileFor(dest: Path, video: Path): Path {
-        val extension = FilenameUtils.getExtension(video.fileName.toString())!!
+        val extension = video.extension
         return Files.createTempFile(dest.parent, dest.fileName.toString(), ".$extension")
     }
 
     private fun changeExtension(audioFile: Path, ext: String): Path {
-        val newName = FilenameUtils.getBaseName(audioFile.fileName.toString()) + "." + ext
+        val newName = "${audioFile.fileName.nameWithoutExtension}.$ext"
         return audioFile.resolveSibling(newName)
     }
 

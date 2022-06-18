@@ -29,6 +29,7 @@ import java.time.LocalDate
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
+import kotlin.io.path.Path
 
 /**
  * Created by kevin on 2019-02-16
@@ -541,9 +542,9 @@ class PodcastHandlerTest(
             val host = URI.create("https://localhost:8080/")
             whenever(podcastService.findById(podcast.id)).thenReturn(podcast.toMono())
             whenever(fileService.coverExists(podcast)).thenReturn(
-                podcast.cover.url.toASCIIString().substringAfterLast("/").toMono()
+                Path(podcast.cover.url.toASCIIString().substringAfterLast("/")).toMono()
             )
-            whenever(fileService.toExternalUrl(FileDescriptor(podcast.title, "cover.png"), host))
+            whenever(fileService.toExternalUrl(FileDescriptor(podcast.title, Path("cover.png")), host))
                 .thenReturn(URI.create("https://localhost:8080/data/Podcast%20title/cover.png"))
             /* When */
             rest

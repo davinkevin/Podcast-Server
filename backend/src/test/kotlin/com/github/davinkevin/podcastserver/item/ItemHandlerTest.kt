@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.item
 
+import com.github.davinkevin.podcastserver.config.JacksonConfig
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
@@ -37,12 +38,14 @@ import java.time.OffsetDateTime.now
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.name
 
 /**
  * Created by kevin on 2019-02-12
  */
 @WebFluxTest(controllers = [ItemHandler::class])
-@Import(ItemRoutingConfig::class)
+@Import(ItemRoutingConfig::class, JacksonConfig::class)
 @ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
 class ItemHandlerTest(
     @Autowired val rest: WebTestClient,
@@ -120,7 +123,7 @@ class ItemHandlerTest(
             /* Given */
             val host = URI.create("https://localhost:8080/")
             val itemDownloaded = item.copy(
-                    status = Status.FINISH, fileName = "file_to_download.mp4"
+                    status = Status.FINISH, fileName = Path("file_to_download.mp4")
             )
             whenever(itemService.findById(item.id)).thenReturn(itemDownloaded.toMono())
             whenever(fileService.toExternalUrl(FileDescriptor(itemDownloaded.podcast.title, itemDownloaded.fileName!!), host))
@@ -181,8 +184,8 @@ class ItemHandlerTest(
             /* Given */
             val host = URI.create("https://localhost:8080/")
             whenever(itemService.findById(item.id)).thenReturn(item.toMono())
-            whenever(fileService.coverExists(any<Item>())).thenReturn("${item.id}.png".toMono())
-            whenever(fileService.toExternalUrl(FileDescriptor(item.podcast.title, "${item.id}.png"), host))
+            whenever(fileService.coverExists(any<Item>())).thenReturn(Path("${item.id}.png").toMono())
+            whenever(fileService.toExternalUrl(FileDescriptor(item.podcast.title, Path("${item.id}.png")), host))
                 .thenReturn(URI.create("https://localhost:8080/data/Podcast%20Bar/27184b1a-7642-4ffd-ac7e-14fb36f7f15c.png"))
 
             /* When */
@@ -294,7 +297,7 @@ class ItemHandlerTest(
         fun `with downloaded item`() {
             /* Given */
             val downloadedItem = notDownloadedItem.copy(
-                    fileName = "foo.mp4",
+                    fileName = Path("foo.mp4"),
                     mimeType = "video/mp4",
                     status = Status.FINISH
             )
@@ -338,8 +341,6 @@ class ItemHandlerTest(
                         } """)
                     }
         }
-
-
     }
 
     @Nested
@@ -837,7 +838,7 @@ class ItemHandlerTest(
                     description = "item 1 desc",
                     mimeType = "audio/mp3",
                     length = 1234,
-                    fileName = "1.mp3",
+                    fileName = Path("1.mp3"),
                     status = Status.FINISH,
 
                     podcast = podcast,
@@ -855,7 +856,7 @@ class ItemHandlerTest(
                     description = "item 2 desc",
                     mimeType = "audio/mp3",
                     length = 1234,
-                    fileName = "2.mp3",
+                    fileName = Path("2.mp3"),
                     status = Status.FINISH,
 
                     podcast = podcast,
@@ -873,7 +874,7 @@ class ItemHandlerTest(
                     description = "item 3 desc",
                     mimeType = "audio/mp3",
                     length = 1234,
-                    fileName = "3.mp3",
+                    fileName = Path("3.mp3"),
                     status = Status.FINISH,
 
                     podcast = podcast,
@@ -1449,7 +1450,7 @@ class ItemHandlerTest(
                 description = "item 1 desc",
                 mimeType = "audio/mp3",
                 length = 1234,
-                fileName = "1.mp3",
+                fileName = Path("1.mp3"),
                 status = Status.FINISH,
 
                 podcast = Item.Podcast(UUID.fromString("ef62c5c3-e79f-4474-8228-40b76abcdb57"), "podcast 1", "https/foo.bar.com/rss"),
