@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.item
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.entity.Status
 import java.net.URI
+import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.OffsetDateTime
 import java.util.*
@@ -12,7 +13,7 @@ import kotlin.math.ceil
  * Created by kevin on 2019-02-09
  */
 data class DeleteItemRequest(val id: UUID, val fileName: String, val podcastTitle: String) {
-    val path = Paths.get(podcastTitle, fileName)!!
+    val path: Path = Paths.get(podcastTitle, fileName)
 }
 
 data class Item(

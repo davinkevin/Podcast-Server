@@ -67,13 +67,13 @@ class FranceTvUpdater(
 
                 val pageItems = document.select("script")
                     .map { it.html() }
-                    .firstOrNull() { "FTVPlayerVideos" in it }
+                    .firstOrNull { "FTVPlayerVideos" in it }
                     ?.substringAfterLast("FTVPlayerVideos = ")
                     ?.trim(';')
                     ?.let { mapper.readValue<Set<FranceTvPageItem>>(it) } ?: emptySet()
 
                 pageItems
-                    .firstOrNull() { it.contentId in pathUrl }
+                    .firstOrNull { it.contentId in pathUrl }
                     ?.copy(description = description)
                     ?.toMono() ?: Mono.empty()
             }

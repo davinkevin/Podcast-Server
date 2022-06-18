@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.config
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import org.springframework.context.annotation.ComponentScan
 import org.springframework.context.annotation.Configuration
 import org.springframework.http.codec.ServerCodecConfigurer
 import org.springframework.http.codec.json.Jackson2JsonDecoder

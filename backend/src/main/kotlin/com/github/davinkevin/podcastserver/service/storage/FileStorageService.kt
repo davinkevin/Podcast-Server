@@ -154,7 +154,7 @@ class FileStorageService(
 
     fun metadata(title: String, file: Path): Mono<FileMetaData> {
         val key = "$title/${file.fileName}"
-        return Mono.defer { bucket.headObject() { it.bucket(properties.bucket).key(key) }.toMono() }
+        return Mono.defer { bucket.headObject { it.bucket(properties.bucket).key(key) }.toMono() }
             .retryWhen(Retry.backoff(3, Duration.ofSeconds(1)))
             .map { FileMetaData(contentType = it.contentType(), size = it.contentLength()) }
     }

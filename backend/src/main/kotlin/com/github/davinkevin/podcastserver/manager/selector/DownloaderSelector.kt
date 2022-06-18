@@ -14,14 +14,15 @@ import org.springframework.stereotype.Service
 class DownloaderSelector(val context: ApplicationContext, val downloaders: Set<Downloader>) {
 
     @Suppress("UNCHECKED_CAST")
-    fun of(information: DownloadingInformation): Downloader =
-            if (information.urls.isEmpty()) {
-                NO_OP_DOWNLOADER
-            } else {
-                val d = downloaders.minByOrNull { it: Downloader -> it.compatibility(information) }!!
-                val clazz = (if (d is TargetClassAware) d.targetClass else d.javaClass) as Class<Downloader>
-                context.getBean(clazz)
-            }
+    fun of(information: DownloadingInformation): Downloader {
+        if (information.urls.isEmpty()) {
+            return NO_OP_DOWNLOADER
+        }
+
+        val d = downloaders.minByOrNull { it.compatibility(information) }!!
+        val clazz = (if (d is TargetClassAware) d.targetClass else d.javaClass) as Class<Downloader>
+        return context.getBean(clazz)
+    }
 
     companion object {
         val NO_OP_DOWNLOADER = NoOpDownloader()

@@ -3,20 +3,19 @@ package com.github.davinkevin.podcastserver.find.finders.mytf1
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
 import com.github.davinkevin.podcastserver.find.finders.Finder
-import org.apache.commons.lang3.StringUtils
+import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
+import com.github.davinkevin.podcastserver.service.image.ImageService
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.web.reactive.function.client.WebClient
 import org.springframework.web.reactive.function.client.bodyToMono
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.util.*
-import com.github.davinkevin.podcastserver.service.image.ImageService
 
 /**
  * Created by kevin on 12/01/2020

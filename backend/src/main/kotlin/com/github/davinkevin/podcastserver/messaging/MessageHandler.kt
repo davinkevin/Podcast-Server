@@ -1,18 +1,16 @@
 package com.github.davinkevin.podcastserver.messaging
 
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.treeToValue
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import org.springframework.http.codec.ServerSentEvent
-import org.springframework.web.reactive.function.server.*
+import org.springframework.web.reactive.function.server.ServerRequest
+import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.ok
+import org.springframework.web.reactive.function.server.body
+import org.springframework.web.reactive.function.server.sse
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.Sinks
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.Duration.ZERO
 import java.time.Duration.ofSeconds

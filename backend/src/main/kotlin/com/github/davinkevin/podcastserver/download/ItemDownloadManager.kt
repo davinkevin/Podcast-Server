@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.manager.downloader.Downloader
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector
-import com.github.davinkevin.podcastserver.manager.selector.ExtractorSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.apache.commons.io.FilenameUtils
@@ -15,9 +14,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.core.publisher.Sinks
 import reactor.kotlin.core.publisher.toMono
-import java.time.Duration
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
 

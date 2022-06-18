@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.AutoConfigureOrder
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.core.annotation.Order
 import org.springframework.web.reactive.function.server.router
 
 @Configuration

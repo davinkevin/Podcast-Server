@@ -94,9 +94,7 @@ class MyTf1Updater(
 
     private fun extractBaseVideoUrl(url: URI): String {
         val urlAscii = url.toASCIIString()
-        val endsWithSection = allowedTypes
-                .asSequence()
-                .any { urlAscii.endsWith(it) }
+        val endsWithSection = allowedTypes.any { urlAscii.endsWith(it) }
 
         if (endsWithSection) {
             return urlAscii.substringBeforeLast("/")

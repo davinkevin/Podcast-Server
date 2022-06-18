@@ -139,8 +139,8 @@ class FfmpegService(
     }
 
     companion object {
-        val AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC = "aac_adtstoasc"
-        val CODEC_COPY = "copy"
-        private val FORMAT_CONCAT = "concat"
+        const val AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC = "aac_adtstoasc"
+        const val CODEC_COPY = "copy"
+        private const val FORMAT_CONCAT = "concat"
     }
 }
