@@ -11,9 +11,12 @@ server:
 
 management:
   endpoint:
-    health.show-details: always
+    health:
+     show-details: always
+     group:
+      liveness.include:  ["r2dbc", "ping", "livenessState"]
+      readiness.include: ["ping", "readinessState"]
   endpoints.web.exposure.include: ['health', 'info', 'env', 'configprops', 'prometheus', 'metrics']
-
 
 ##############################
 #    Application Specific    #
