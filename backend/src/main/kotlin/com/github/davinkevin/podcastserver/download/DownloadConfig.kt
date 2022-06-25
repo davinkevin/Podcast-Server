@@ -1,8 +1,10 @@
 package com.github.davinkevin.podcastserver.download
 
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
+import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.web.reactive.function.server.router
 
 /**
@@ -46,4 +48,11 @@ class DownloadRouterConfig {
         ItemDownloadManager::class,
         DownloadRepository::class
 )
-class DownloadConfig
+class DownloadConfig {
+    @Bean
+    fun downloadExecutor(parameters: PodcastServerParameters) = ThreadPoolTaskExecutor().apply {
+        corePoolSize = parameters.concurrentDownload
+        setThreadNamePrefix("Downloader-")
+        initialize()
+    }
+}

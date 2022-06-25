@@ -6,7 +6,9 @@ import com.github.davinkevin.podcastserver.service.properties.PodcastServerParam
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.springframework.beans.factory.getBean
 import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.context.annotation.Bean
@@ -52,12 +54,27 @@ class DownloadConfigTest {
             assertThat(it).hasSingleBean(DownloadHandler::class.java)
         }
     }
+
+    @Test
+    fun `should generate a thread pool executor`() {
+        /* Given */
+
+        /* When */
+        contextRunner.run {
+            /* Then */
+            assertThat(it).hasSingleBean(ThreadPoolTaskExecutor::class.java)
+            val pool = it.getBean<ThreadPoolTaskExecutor>()
+            assertThat(pool.corePoolSize).isEqualTo(123)
+            assertThat(pool.threadNamePrefix).isEqualTo("Downloader-")
+        }
+    }
 }
 
 private class LocalTestConfiguration {
     @Bean fun query(): DSLContext = mock()
     @Bean fun messaging(): MessagingTemplate = mock()
-    @Bean fun params(): PodcastServerParameters = mock()
+    @Bean fun params(): PodcastServerParameters = mock {
+        on { concurrentDownload } doReturn 123
+    }
     @Bean fun downloaderSelector(): DownloaderSelector = mock()
-    @Bean(name = ["DownloadExecutor"]) fun threadPoolTaskExecutor(): ThreadPoolTaskExecutor = mock()
 }

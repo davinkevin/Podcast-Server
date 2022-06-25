@@ -8,7 +8,6 @@ import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.stereotype.Service
 import reactor.core.publisher.Flux
@@ -24,7 +23,7 @@ class ItemDownloadManager (
     private val repository: DownloadRepository,
     private val parameters: PodcastServerParameters,
     private val downloaderSelector: DownloaderSelector,
-    @param:Qualifier("DownloadExecutor") private val downloadExecutor: ThreadPoolTaskExecutor
+    private val downloadExecutor: ThreadPoolTaskExecutor
 ) {
 
     private var downloaders = ConcurrentHashMap<UUID, Downloader>()
