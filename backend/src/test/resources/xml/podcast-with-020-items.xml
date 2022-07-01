@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd" xmlns:media="http://search.yahoo.com/mrss/">
+    <channel>
+        <title>Podcast title</title>
+        <link>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/rss?limit=20</link>
+        <description>desc</description>
+        <itunes:subtitle>desc</itunes:subtitle>
+        <itunes:summary>desc</itunes:summary>
+        <language>fr-fr</language>
+        <itunes:author>RSS</itunes:author>
+        <itunes:category />
+        <pubDate>Sun, 31 Mar 2019 11:21:32 +0100</pubDate>
+        <image>
+            <height>200</height>
+            <url>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/cover.png</url>
+            <width>200</width>
+        </image>
+        <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/cover.png</itunes:image>
+        <item>
+            <title>Foo 200</title>
+            <description>desc 200</description>
+            <pubDate>Mon, 24 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 200</itunes:subtitle>
+            <itunes:summary>desc 200</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200/Foo_200.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 199</title>
+            <description>desc 199</description>
+            <pubDate>Sun, 23 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 199</itunes:subtitle>
+            <itunes:summary>desc 199</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f199</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f199/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f199/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f199/Foo_199.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 198</title>
+            <description>desc 198</description>
+            <pubDate>Sat, 22 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 198</itunes:subtitle>
+            <itunes:summary>desc 198</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f198</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f198/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f198/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f198/Foo_198.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 197</title>
+            <description>desc 197</description>
+            <pubDate>Fri, 21 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 197</itunes:subtitle>
+            <itunes:summary>desc 197</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f197</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f197/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f197/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f197/Foo_197.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 196</title>
+            <description>desc 196</description>
+            <pubDate>Thu, 20 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 196</itunes:subtitle>
+            <itunes:summary>desc 196</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f196</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f196/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f196/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f196/Foo_196.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 195</title>
+            <description>desc 195</description>
+            <pubDate>Wed, 19 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 195</itunes:subtitle>
+            <itunes:summary>desc 195</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f195</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f195/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f195/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f195/Foo_195.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 194</title>
+            <description>desc 194</description>
+            <pubDate>Tue, 18 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 194</itunes:subtitle>
+            <itunes:summary>desc 194</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f194</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f194/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f194/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f194/Foo_194.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 193</title>
+            <description>desc 193</description>
+            <pubDate>Mon, 17 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 193</itunes:subtitle>
+            <itunes:summary>desc 193</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f193</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f193/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f193/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f193/Foo_193.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 192</title>
+            <description>desc 192</description>
+            <pubDate>Sun, 16 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 192</itunes:subtitle>
+            <itunes:summary>desc 192</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f192</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f192/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f192/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f192/Foo_192.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 191</title>
+            <description>desc 191</description>
+            <pubDate>Sat, 15 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 191</itunes:subtitle>
+            <itunes:summary>desc 191</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f191</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f191/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f191/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f191/Foo_191.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 190</title>
+            <description>desc 190</description>
+            <pubDate>Fri, 14 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 190</itunes:subtitle>
+            <itunes:summary>desc 190</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f190</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f190/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f190/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f190/Foo_190.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 189</title>
+            <description>desc 189</description>
+            <pubDate>Thu, 13 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 189</itunes:subtitle>
+            <itunes:summary>desc 189</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f189</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f189/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f189/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f189/Foo_189.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 188</title>
+            <description>desc 188</description>
+            <pubDate>Wed, 12 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 188</itunes:subtitle>
+            <itunes:summary>desc 188</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f188</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f188/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f188/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f188/Foo_188.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 187</title>
+            <description>desc 187</description>
+            <pubDate>Tue, 11 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 187</itunes:subtitle>
+            <itunes:summary>desc 187</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f187</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f187/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f187/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f187/Foo_187.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 186</title>
+            <description>desc 186</description>
+            <pubDate>Mon, 10 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 186</itunes:subtitle>
+            <itunes:summary>desc 186</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f186</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f186/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f186/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f186/Foo_186.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 185</title>
+            <description>desc 185</description>
+            <pubDate>Sun, 9 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 185</itunes:subtitle>
+            <itunes:summary>desc 185</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f185</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f185/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f185/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f185/Foo_185.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 184</title>
+            <description>desc 184</description>
+            <pubDate>Sat, 8 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 184</itunes:subtitle>
+            <itunes:summary>desc 184</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f184</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f184/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f184/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f184/Foo_184.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 183</title>
+            <description>desc 183</description>
+            <pubDate>Fri, 7 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 183</itunes:subtitle>
+            <itunes:summary>desc 183</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f183</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f183/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f183/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f183/Foo_183.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 182</title>
+            <description>desc 182</description>
+            <pubDate>Thu, 6 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 182</itunes:subtitle>
+            <itunes:summary>desc 182</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f182</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f182/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f182/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f182/Foo_182.mp4" length="100" type="video/mp4" />
+        </item>
+        <item>
+            <title>Foo 181</title>
+            <description>desc 181</description>
+            <pubDate>Wed, 5 Jun 2019 05:28:54 +0200</pubDate>
+            <itunes:explicit>No</itunes:explicit>
+            <itunes:subtitle>Foo 181</itunes:subtitle>
+            <itunes:summary>desc 181</itunes:summary>
+            <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f181</guid>
+            <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f181/cover.png</itunes:image>
+            <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f181/cover.png" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f181/Foo_181.mp4" length="100" type="video/mp4" />
+        </item>
+    </channel>
+</rss>

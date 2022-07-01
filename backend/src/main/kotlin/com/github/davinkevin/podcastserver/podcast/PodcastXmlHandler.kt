@@ -48,10 +48,8 @@ class PodcastXmlHandler(
         val callUrl = r.normalizedURI()
         val podcastId = UUID.fromString(r.pathVariable("id"))
 
-        val limit = (r.queryParamOrNull("limit") ?: "true").toBoolean()
-        val limitNumber = if (limit) 50 else Int.MAX_VALUE
-
-        val itemPageable = ItemPageRequest(0, limitNumber, ItemSort("DESC", "pubDate"))
+        val limit = r.queryParamOrNull("limit").toLimit()
+        val itemPageable = ItemPageRequest(0, limit, ItemSort("DESC", "pubDate"))
 
         val items = itemService.search(
             q = "",
@@ -223,4 +221,16 @@ private fun toRssChannel(podcast: Podcast, baseUrl: URI, callUrl: URI): Element 
         addContent(image)
         addContent(itunesImage)
     }
+}
+
+private fun String?.toLimit(): Int {
+    val limitAsBooleanOrNull = this?.toBooleanStrictOrNull()
+        ?: return this?.toIntOrNull()
+            ?: 50
+
+    if (limitAsBooleanOrNull) {
+        return 50
+    }
+
+    return Int.MAX_VALUE
 }

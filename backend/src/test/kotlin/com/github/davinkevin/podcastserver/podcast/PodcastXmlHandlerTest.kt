@@ -10,6 +10,8 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
@@ -218,10 +220,10 @@ class PodcastXmlHandlerTest(
                             <title>Podcast-Server</title>
                           </head>
                           <body>
-                            <outline htmlUrl="https://localhost:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729" 
-                                        text="Podcast first" description="desc" 
-                                        title="Podcast first" type="rss" version="RSS2" 
-                                        xmlUrl="https://localhost:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss" 
+                            <outline htmlUrl="https://localhost:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729"
+                                        text="Podcast first" description="desc"
+                                        title="Podcast first" type="rss" version="RSS2"
+                                        xmlUrl="https://localhost:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss"
                                     />
                           </body>
                         </opml>
@@ -252,10 +254,10 @@ class PodcastXmlHandlerTest(
                                     <title>Podcast-Server</title>
                                   </head>
                                   <body>
-                                    <outline htmlUrl="https://custom-host:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729" 
-                                        text="Podcast first" description="desc" 
-                                        title="Podcast first" type="rss" version="RSS2" 
-                                        xmlUrl="https://custom-host:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss" 
+                                    <outline htmlUrl="https://custom-host:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729"
+                                        text="Podcast first" description="desc"
+                                        title="Podcast first" type="rss" version="RSS2"
+                                        xmlUrl="https://custom-host:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss"
                                     />
                                   </body>
                                 </opml>
@@ -282,10 +284,10 @@ class PodcastXmlHandlerTest(
                                     <title>Podcast-Server</title>
                                   </head>
                                   <body>
-                                    <outline htmlUrl="https://custom-host:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729" 
-                                        text="Podcast first" description="desc" 
-                                        title="Podcast first" type="rss" version="RSS2" 
-                                        xmlUrl="https://custom-host:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss" 
+                                    <outline htmlUrl="https://custom-host:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729"
+                                        text="Podcast first" description="desc"
+                                        title="Podcast first" type="rss" version="RSS2"
+                                        xmlUrl="https://custom-host:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss"
                                     />
                                   </body>
                                 </opml>
@@ -316,10 +318,10 @@ class PodcastXmlHandlerTest(
                                     <title>Podcast-Server</title>
                                   </head>
                                   <body>
-                                    <outline htmlUrl="http://localhost:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729" 
-                                        text="Podcast first" description="desc" 
-                                        title="Podcast first" type="rss" version="RSS2" 
-                                        xmlUrl="http://localhost:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss" 
+                                    <outline htmlUrl="http://localhost:8080/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729"
+                                        text="Podcast first" description="desc"
+                                        title="Podcast first" type="rss" version="RSS2"
+                                        xmlUrl="http://localhost:8080/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss"
                                     />
                                   </body>
                                 </opml>
@@ -351,10 +353,10 @@ class PodcastXmlHandlerTest(
                                     <title>Podcast-Server</title>
                                   </head>
                                   <body>
-                                    <outline htmlUrl="https://localhost:9876/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729" 
-                                        text="Podcast first" description="desc" 
-                                        title="Podcast first" type="rss" version="RSS2" 
-                                        xmlUrl="https://localhost:9876/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss" 
+                                    <outline htmlUrl="https://localhost:9876/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729"
+                                        text="Podcast first" description="desc"
+                                        title="Podcast first" type="rss" version="RSS2"
+                                        xmlUrl="https://localhost:9876/api/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/rss"
                                     />
                                   </body>
                                 </opml>
@@ -405,56 +407,97 @@ class PodcastXmlHandlerTest(
                 cover = coverForItem
             ) }
 
-        @Test
-        fun `for podcast with limit`() {
-            /* Given */
-            val podcastId = podcastForItem.id
-            val size = 50
-            val page = ItemPageRequest(0, size, ItemSort("DESC", "pubDate"))
-            val result = PageItem.of(items.take(size), size, page)
+        @Nested
+        @DisplayName("for podcast with boolean limit")
+        inner class ForPodcastWithBooleanLimit {
 
-            whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                .thenReturn(result.toMono())
-            whenever(podcastService.findById(podcastId))
-                .thenReturn(podcast.toMono())
+            @Test
+            fun `set to true`() {
+                /* Given */
+                val podcastId = podcastForItem.id
+                val size = 50
+                val page = ItemPageRequest(0, size, ItemSort("DESC", "pubDate"))
+                val result = PageItem.of(items.take(size), size, page)
 
-            val xml = fileAsString("/xml/podcast-with-50-items.xml")
+                whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
+                    .thenReturn(result.toMono())
+                whenever(podcastService.findById(podcastId))
+                    .thenReturn(podcast.toMono())
 
-            /* When */
-            rest
-                .get()
-                .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss")
-                .exchange()
-                /* Then */
-                .expectStatus().isOk
-                .expectBody()
-                .xml(xml.trimIndent())
+                val xml = fileAsString("/xml/podcast-with-50-items.xml")
+
+                /* When */
+                rest
+                    .get()
+                    .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .xml(xml.trimIndent())
+            }
+
+            @Test
+            fun `set to false`() {
+                /* Given */
+                val podcastId = podcastForItem.id
+                val page = ItemPageRequest(0, Int.MAX_VALUE, ItemSort("DESC", "pubDate"))
+                val result = PageItem.of(items.take(200), 200, page)
+
+                whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
+                    .thenReturn(result.toMono())
+                whenever(podcastService.findById(podcastId))
+                    .thenReturn(podcast.toMono())
+
+                val xml = fileAsString("/xml/podcast-with-200-items.xml")
+
+                /* When */
+                rest
+                    .get()
+                    .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss?limit=false")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .xml(xml.trimIndent())
+            }
         }
 
-        @Test
-        fun `for podcast without limit`() {
-            /* Given */
-            val podcastId = podcastForItem.id
-            val page = ItemPageRequest(0, Int.MAX_VALUE, ItemSort("DESC", "pubDate"))
-            val result = PageItem.of(items.take(200), 200, page)
+        @Nested
+        @DisplayName("for podcast with integer limit")
+        inner class ForPodcastWithIntegerLimit {
 
-            whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                .thenReturn(result.toMono())
-            whenever(podcastService.findById(podcastId))
-                .thenReturn(podcast.toMono())
+            val pageWith = { it: Int -> ItemPageRequest(0, it, ItemSort("DESC", "pubDate"))}
+            val resultWith = { it: Int -> PageItem.of(items.take(it), it, pageWith(it))}
+            val xmlWith = { it: Int -> fileAsString("/xml/podcast-with-${it.toString().padStart(3, '0')}-items.xml")}
 
-            val xml = fileAsString("/xml/podcast-with-200-items.xml")
+            @ParameterizedTest
+            @ValueSource(ints = [1, 20, 123])
+            fun `set to`(numberOfItem: Int) {
+                /* Given */
+                val podcastId = podcastForItem.id
+                val page = pageWith(numberOfItem)
+                val result = resultWith(numberOfItem)
 
-            /* When */
-            rest
-                .get()
-                .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss?limit=false")
-                .exchange()
-                /* Then */
-                .expectStatus().isOk
-                .expectBody()
-                .xml(xml.trimIndent())
+                whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
+                    .thenReturn(result.toMono())
+                whenever(podcastService.findById(podcastId))
+                    .thenReturn(podcast.toMono())
+
+                val xml = xmlWith(numberOfItem)
+
+                /* When */
+                rest
+                    .get()
+                    .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss?limit=$numberOfItem")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .xml(xml.trimIndent())
+            }
         }
+
 
         @Test
         fun `for podcast with amy parameters`() {
