@@ -1,6 +1,33 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2022.7.0
+
+### Features
+
+- **backend:** Update compatibility to ffmpeg v5 ([bc4c92a](bc4c92a82d2016828e60d0d8fd5f9f33306d2201) - [#160](https://gitlab.com/davinkevin/Podcast-Server/-/issues/160))
+- **backend:** Finer definition of liveness probes and readiness probes ([b155b3b](b155b3b7224f15901398ea5ff480a6f23085b571))
+- **backend:** Feat(backend): upgrade to spring boot 2.7.1 ([589fa2a](589fa2abdbfef6ba3e88b7b6d067901fa137c90e))
+- **backend:** Add support for integer as limit parameter for RSS ([5605087](56050877f0ea261e4c0c14a6b9baf08c9d256987) - [#172](https://gitlab.com/davinkevin/Podcast-Server/-/issues/172))
+- **backend:** Increase timeout & failure threshold for liveness probe ([8f4c36b](8f4c36b704e83fcd50ec7ea3256d715328cb53be))
+
+### Bug Fixes
+
+- **backend:** Wrap Files.* operations into Mono to prevent thread starvation ([566b975](566b975c9108ed59b423478bf069f905651f378f) - [#169](https://gitlab.com/davinkevin/Podcast-Server/-/issues/169))
+- **frontend:** Update UI only once after multiple uploads ([815f8b2](815f8b2332435c47c8cf527aae20eeca770c3374) - [#169](https://gitlab.com/davinkevin/Podcast-Server/-/issues/169))
+
+### Refactor
+
+- **backend:** Remove useless web configuration ([fd90680](fd906805be1ae2af0413178c1138031b6c207c76))
+- **backend:** Move ffmpeg services to a dedicated package ([8dad1ed](8dad1ed2b0f5ee967f427fdee4e5ec79084baef8))
+- **backend:** Multiple refactor following code analysis ([e362e1e](e362e1e3f5a43867e83b16d32cba80451bf78eec))
+- **backend:** Use standard cover for podcasts ([43182c9](43182c90d437f84338bd6a100cdfdc3b10096955))
+- **backend:** Use kotlin.io.path instead of FilenameUtils ([c4c5c12](c4c5c12ddb68eb99b31554dba9c84cb97b2dae30))
+- **backend:** Remove Extractor logic from code base ([db73f33](db73f338375aa88a1ea2ef6cbdc30700f6ad29d8))
+- **backend:** Use attribute instead of function for donwloading item information ([7f9882b](7f9882b61827487e0bd25c5d6bb02c81b1475726))
+- **backend:** Use kotlin.io.path instead of FilenameUtils ([02204c3](02204c399290e1108b7d6ed5cedb3ed153712e4e))
+- **backend:** Remove executor config used only by downloader part ([5e24c12](5e24c12e03962915f87ff3496f955cf5b1f24838))
+
 ## 2022.6.0
 
 ### Features
