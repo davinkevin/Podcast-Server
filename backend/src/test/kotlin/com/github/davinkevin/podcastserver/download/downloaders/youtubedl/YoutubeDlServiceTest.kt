@@ -64,6 +64,16 @@ class YoutubeDlServiceTest(
         }
 
         @Test
+        fun `should use simple filename if not from video platform`() {
+            /* Given */
+            val itemUrl = "https://feeds.soundcloud.com/stream/1273036843-themarvelinitiative-hawkeye.mp3"
+            /* When */
+            val result = youtube.extractName(itemUrl)
+            /* Then */
+            assertThat(result).isEqualTo("1273036843-themarvelinitiative-hawkeye.mp3")
+        }
+
+        @Test
         fun `with error`() {
             /* Given */
             /* When */

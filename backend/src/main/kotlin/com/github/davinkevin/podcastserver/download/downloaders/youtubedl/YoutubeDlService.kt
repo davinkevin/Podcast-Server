@@ -7,6 +7,7 @@ import com.sapher.youtubedl.YoutubeDLResponse
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
+import kotlin.io.path.Path
 
 /**
  * Created by kevin on 08/05/2020
@@ -16,7 +17,11 @@ class YoutubeDlService(private val youtube: YoutubeDL) {
     private val log = LoggerFactory.getLogger(YoutubeDlService::class.java)
 
     fun extractName(url: String): String {
-        val request = YoutubeDLRequest(url, null).apply {
+        if (!isFromVideoPlatform(url)) {
+            return Path(url).fileName.toString()
+        }
+
+        val request = YoutubeDLRequest(url).apply {
             setOption("get-filename")
         }
 
