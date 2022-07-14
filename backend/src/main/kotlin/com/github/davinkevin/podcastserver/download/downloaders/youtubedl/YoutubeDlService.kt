@@ -19,6 +19,7 @@ class YoutubeDlService(private val youtube: YoutubeDL) {
     fun extractName(url: String): String {
         if (!isFromVideoPlatform(url)) {
             return Path(url).fileName.toString()
+                .substringBefore("?")
         }
 
         val request = YoutubeDLRequest(url).apply {
