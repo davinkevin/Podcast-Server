@@ -199,7 +199,7 @@ class FfmpegDownloaderTest {
 
             private fun outputPath(i: InvocationOnMock) = i.getArgument<FFmpegBuilder>(1).build().last()!!
             private fun sendProgress(i: InvocationOnMock, outTimeMs: Long) =
-                    i.getArgument<ProgressListener>(2).progress(Progress().apply { out_time_ms = outTimeMs })
+                    i.getArgument<ProgressListener>(2).progress(Progress().apply { out_time_ns = outTimeMs })
             private fun writeEmptyFileTo(location: String): Path =
                     Files.write(Paths.get(location), "".toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
             private fun numberOfChildrenFiles(location: Path) = Files

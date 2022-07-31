@@ -10,15 +10,15 @@ import nu.studer.gradle.jooq.JooqGenerate
 import org.flywaydb.gradle.task.FlywayMigrateTask
 
 plugins {
-	id("org.springframework.boot") version "2.7.1"
-	id("io.spring.dependency-management") version "1.0.11.RELEASE"
+	id("org.springframework.boot") version "2.7.2"
+	id("io.spring.dependency-management") version "1.0.12.RELEASE"
 
 	id("com.gorylenko.gradle-git-properties") version "2.4.1"
-	id("org.flywaydb.flyway") version "8.5.5"
+	id("org.flywaydb.flyway") version "9.0.4"
 	id("nu.studer.jooq") version "7.1.1"
 	id("com.google.cloud.tools.jib") version "3.2.1"
 	id("de.jansauer.printcoverage") version "2.0.0"
-	id("org.jetbrains.kotlinx.kover") version "0.5.0"
+	id("org.jetbrains.kotlinx.kover") version "0.5.1"
 
 	kotlin("jvm") version "1.6.21"
 	kotlin("plugin.spring") version "1.6.21"
@@ -27,7 +27,7 @@ plugins {
 
 group = "com.github.davinkevin.podcastserver"
 version = "2022.7.0"
-java.sourceCompatibility = JavaVersion.VERSION_11
+java.sourceCompatibility = JavaVersion.VERSION_17
 
 apply(from = "gradle/profile-default.gradle.kts")
 apply(from = "gradle/profile-ci.gradle.kts")
@@ -59,10 +59,10 @@ dependencies {
 	jooqGenerator("org.postgresql:postgresql:" + dependencyManagement.importedProperties["postgresql.version"])
 	jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
 
-	implementation("org.jdom:jdom2:2.0.6")
-	implementation("org.jsoup:jsoup:1.13.1")
+	implementation("org.jdom:jdom2:2.0.6.1")
+	implementation("org.jsoup:jsoup:1.15.2")
 	implementation("com.github.pedroviniv:youtubedl-java:ef7110605d23eaaae4796312163bcf84c7099311")
-	implementation("net.bramp.ffmpeg:ffmpeg:0.6.1")
+	implementation("net.bramp.ffmpeg:ffmpeg:0.7.0")
 
 	implementation("io.r2dbc:r2dbc-pool")
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
@@ -72,7 +72,6 @@ dependencies {
 	implementation(platform("software.amazon.awssdk:bom:2.17.100"))
 	implementation("software.amazon.awssdk:s3")
 	implementation("software.amazon.awssdk:netty-nio-client")
-
 
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
@@ -179,7 +178,7 @@ tasks.withType<KotlinCompile> {
 			"-Xjsr305=strict",
 			"-Xallow-result-return-type",
 		)
-		jvmTarget = "11"
+		jvmTarget = "17"
 	}
 }
 

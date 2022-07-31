@@ -1541,27 +1541,18 @@ class ItemRepositoryTest(
                     val numberOfItem = query.selectCount().from(ITEM).r2dbc().fetchOne(count())!!
                     val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())!!
 
-                    val originalOrEscaped: (s: String) -> Condition<String> = { original ->
-                        val isEqual: Predicate<String> = Predicate { (original == it)
-                                .also { r -> if (r) log.warn("modification following https://github.com/jOOQ/jOOQ/issues/12777 should be removed") }
-                        }
-                        val isEqualWithSpaceBeforeDollar: Predicate<String> = Predicate { original.replace("$", "$ ") == it }
-
-                        Condition(isEqual.or(isEqualWithSpaceBeforeDollar), "string comparison with possible escape due to https://github.com/jOOQ/jOOQ/issues/12777")
-                    }
-
                     /* When */
                     StepVerifier.create(repository.create(item))
                         /* Then */
                         .expectSubscription()
                         .assertNext {
-                            assertThat(it.title).`is`(originalOrEscaped("$1 item"))
+                            assertThat(it.title).isEqualTo("$1 item")
                             assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
                             assertThat(it.pubDate).isCloseTo(now(), within(10, SECONDS))
                             assertThat(it.downloadDate).isCloseTo(now(), within(10, SECONDS))
                             assertThat(it.creationDate).isCloseTo(now(), within(10, SECONDS))
-                            assertThat(it.description).`is`(originalOrEscaped("it costs $1"))
-                            assertThat(it.mimeType).`is`(originalOrEscaped("$1/mp3"))
+                            assertThat(it.description).isEqualTo("it costs $1")
+                            assertThat(it.mimeType).isEqualTo("$1/mp3")
                             assertThat(it.length).isEqualTo(1234)
                             assertThat(it.fileName).isEqualTo(Path("$1.mp3"))
                             assertThat(it.status).isEqualTo(FINISH)

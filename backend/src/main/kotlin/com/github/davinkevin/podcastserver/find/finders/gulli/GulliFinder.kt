@@ -33,7 +33,7 @@ class GulliFinder(
                 .map { Jsoup.parse(it, url) }
                 .flatMap { findCover(it).zipWith(it.toMono()) }
                 .map { (cover, d) -> FindPodcastInformation(
-                        title = d.select("ol.breadcrumb li.active").first().text(),
+                        title = d.select("ol.breadcrumb li.active").first()!!.text(),
                         cover = cover.orNull(),
                         description = d.select(".container_full .description").text(),
                         url = URI(url),

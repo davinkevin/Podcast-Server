@@ -113,7 +113,7 @@ class FfmpegService(
 
         val duration = supplyAsync {
             Result.runCatching { ffprobe.probe(url, userAgent).getFormat().duration }
-                    .map { d -> d * 1000000 }
+                    .map { d -> d * 1_000_000 }
                     .getOrElse { throw RuntimeException(it) }
         }
 

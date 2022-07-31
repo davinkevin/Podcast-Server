@@ -231,9 +231,6 @@ class ItemRepository(private val query: DSLContext) {
                     .returning(COVER.ID)
             )
 
-            // To be removed when a solution is found for https://github.com/jOOQ/jOOQ/issues/12777
-            val dollarSafeValue: (s: String?) -> Param<String> = { value(it?.replace("$", "$ ")) }
-
             query.with(coverCreation)
                 .insertInto(
                     ITEM,
@@ -245,13 +242,13 @@ class ItemRepository(private val query: DSLContext) {
                 .select(
                     select(
                         value(id),
-                        dollarSafeValue(item.title),
+                        value(item.title),
                         value(item.url),
                         value(item.pubDate),
                         value(item.downloadDate),
                         value(item.creationDate),
-                        dollarSafeValue(item.description),
-                        dollarSafeValue(item.mimeType),
+                        value(item.description),
+                        value(item.mimeType),
                         value(item.length),
                         value(item.fileName),
                         value(item.status),

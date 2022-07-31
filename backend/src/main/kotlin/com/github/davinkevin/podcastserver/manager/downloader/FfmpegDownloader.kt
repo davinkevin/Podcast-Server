@@ -96,7 +96,7 @@ class FfmpegDownloader(
 
     private fun handleProgression(alreadyDoneDuration: Double, globalDuration: Double) =
             ProgressListener{
-                broadcastProgression(((it.out_time_ms.toFloat() + alreadyDoneDuration.toFloat()) / globalDuration.toFloat() * 100).toInt())
+                broadcastProgression(((it.out_time_ns.toFloat() + alreadyDoneDuration.toFloat()) / globalDuration.toFloat() * 100).toInt())
             }
 
     private fun broadcastProgression(progress: Int) {
