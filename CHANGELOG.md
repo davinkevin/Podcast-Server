@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2022.8.0
+
+### Features
+
+- **backend:** Upgrade to Spring Boot 2.7.2 and other dependencies upgrades ([7142b27](7142b27ca779bda8193824a94f3aaf89356cdff1))
+
+### Bug Fixes
+
+- **backend:** Keep standard name if url is not from a video platform ([bacfebc](bacfebcb7db5f2968bca8c15648d1416630bd4f2) - [#173](https://gitlab.com/davinkevin/Podcast-Server/-/issues/173))
+- **backend:** Remove suffix from specific url ([6e800a3](6e800a3450b021e87d07172cf848afc72cc6f5eb))
+
 ## 2022.7.0
 
 ### Features
