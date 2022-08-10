@@ -98,6 +98,7 @@ variables:
 
 stages:
   - ⬇ download
+  - 👨‍🎤 lint
   - 🧪 test
   - 👷‍ build
   - 🐳 packaging
@@ -167,6 +168,30 @@ stages:
       - .yarn
       - frontend-angular/.gradle
       - frontend-angular/node_modules/
+
+👨‍🎤 backend:
+  stage: 👨‍🎤 lint
+  extends: [ .only-on-backend-changes ]
+  needs: [⬇ backend]
+  image:
+    name: jetbrains/qodana
+    entrypoint: [ '' ]
+  script:
+    - /opt/idea/bin/entrypoint --results-dir=$CI_PROJECT_DIR/qodana --save-report --report-dir=$CI_PROJECT_DIR/qodana/report
+  artifacts:
+    paths:
+      - qodana/report/
+    expose_as: 'Qodana report'
+  cache:
+    key:
+      files:
+        - backend/build.gradle.kts
+      prefix: "backend"
+    policy: pull
+    paths:
+      - .gradle/
+      - backend/build
+  retry: 2
 
 🧪 backend:
   stage: 🧪 test
