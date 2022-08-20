@@ -10,8 +10,8 @@ import nu.studer.gradle.jooq.JooqGenerate
 import org.flywaydb.gradle.task.FlywayMigrateTask
 
 plugins {
-	id("org.springframework.boot") version "2.7.2"
-	id("io.spring.dependency-management") version "1.0.12.RELEASE"
+	id("org.springframework.boot") version "2.7.3"
+	id("io.spring.dependency-management") version "1.0.13.RELEASE"
 
 	id("com.gorylenko.gradle-git-properties") version "2.4.1"
 	id("org.flywaydb.flyway") version "9.0.4"
@@ -42,7 +42,7 @@ repositories {
 	maven { url = uri("https://jitpack.io") }
 }
 
-extra["jooq.version"] = "3.16.5"
+extra["jooq.version"] = "3.17.3"
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
