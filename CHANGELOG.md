@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2022.9.0
+
+### Features
+
+- **backend:** Upgrade to Spring Boot 2.7.3 and other dependencies upgrades ([40058ca](40058ca745a2e5cb1d19a8721537d12bde56a0ae))
+
 ## 2022.8.0
 
 ### Features
