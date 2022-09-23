@@ -10,8 +10,8 @@ import nu.studer.gradle.jooq.JooqGenerate
 import org.flywaydb.gradle.task.FlywayMigrateTask
 
 plugins {
-	id("org.springframework.boot") version "2.7.5"
-	id("io.spring.dependency-management") version "1.0.15.RELEASE"
+	id("org.springframework.boot") version "3.0.0"
+	id("io.spring.dependency-management") version "1.1.0"
 
 	id("com.gorylenko.gradle-git-properties") version "2.4.1"
 	id("org.flywaydb.flyway") version "9.7.0"
@@ -20,8 +20,8 @@ plugins {
 	id("de.jansauer.printcoverage") version "2.0.0"
 	id("org.jetbrains.kotlinx.kover") version "0.6.1"
 
-	kotlin("jvm") version "1.6.21"
-	kotlin("plugin.spring") version "1.6.21"
+	kotlin("jvm") version "1.7.21"
+	kotlin("plugin.spring") version "1.7.21"
 	jacoco
 }
 
@@ -42,7 +42,13 @@ repositories {
 	maven { url = uri("https://jitpack.io") }
 }
 
-extra["jooq.version"] = "3.17.3"
+"jooq-and-r2dbc-compatibility-for-spring-boot-3".apply {
+	extra["r2dbc-spi.version"] = "0.9.1.RELEASE"
+	extra["r2dbc-proxy.version"] = "0.9.1.RELEASE"
+	extra["r2dbc-pool.version"] = "0.9.2.RELEASE"
+	extra["r2dbc-postgresql.version"] = "0.9.2.RELEASE"
+}
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter")
 	implementation("org.springframework.boot:spring-boot-starter-webflux")
@@ -77,7 +83,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.mockito.kotlin:mockito-kotlin:2.2.11")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:2.10.0")
-	testImplementation("com.github.tomakehurst:wiremock-jre8:2.32.0")
+	testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.0")
 	testImplementation("org.awaitility:awaitility:3.1.6")
 
 }
@@ -89,7 +95,7 @@ configure<com.gorylenko.GitPropertiesPluginExtension> {
 	customProperty("git.build.user.name", "none")
 }
 
-tasks.register<Copy>("copyMigrations") {
+tasks.register<Sync>("copyMigrations") {
 	from("${project.rootDir}/database/migrations/")
 	include("*.sql")
 	into(db.sqlFiles)
@@ -114,7 +120,7 @@ tasks.register<FlywayMigrateTask>("flywayMigrateForJOOQ") {
 }
 
 jooq {
-	version.set(extra["jooq.version"].toString())
+	version.set(dependencyManagement.importedProperties["jooq.version"].toString())
 	edition.set(OSS)
 
 	configurations {

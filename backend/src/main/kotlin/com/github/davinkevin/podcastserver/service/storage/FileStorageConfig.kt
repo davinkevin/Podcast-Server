@@ -2,7 +2,6 @@ package com.github.davinkevin.podcastserver.service.storage
 
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -75,7 +74,6 @@ class FileStorageConfig {
     }
 }
 
-@ConstructorBinding
 @ConfigurationProperties(value = "podcastserver.storage")
 data class StorageProperties(
     val bucket: String,

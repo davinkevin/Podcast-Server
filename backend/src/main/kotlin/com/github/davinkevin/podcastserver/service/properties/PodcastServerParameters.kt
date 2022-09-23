@@ -1,14 +1,12 @@
 package com.github.davinkevin.podcastserver.service.properties
 
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 import java.time.OffsetDateTime
 import java.time.ZonedDateTime.now
 
 /**
  * Created by kevin on 03/02/15.
  */
-@ConstructorBinding
 @ConfigurationProperties(value = "podcastserver")
 data class PodcastServerParameters(
         val maxUpdateParallels: Int = 256,

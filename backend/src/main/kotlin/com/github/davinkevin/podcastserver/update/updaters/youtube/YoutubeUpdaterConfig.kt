@@ -3,7 +3,6 @@ package com.github.davinkevin.podcastserver.update.updaters.youtube
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
 import com.github.davinkevin.podcastserver.update.updaters.Updater
 import org.springframework.boot.context.properties.ConfigurationProperties
-import org.springframework.boot.context.properties.ConstructorBinding
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -48,6 +47,5 @@ class YoutubeUpdaterConfig {
     }
 }
 
-@ConstructorBinding
 @ConfigurationProperties("podcastserver.api")
 data class YoutubeApi(val youtube: String = "")
