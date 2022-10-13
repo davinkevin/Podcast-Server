@@ -1,0 +1,22 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+resources:
+  - ingress.yaml
+
+replacements:
+  - source:
+      version: v1
+      kind: ConfigMap
+      name: installation-parameters
+      fieldPath: .data.domain
+    targets:
+      - select:
+          group: networking.k8s.io
+          version: v1
+          kind: Ingress
+          name: podcast-server
+        fieldPaths:
+          - spec.rules.0.host
+        options:
+          create: true

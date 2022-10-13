@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: storage
+spec:
+  template:
+    spec:
+      containers:
+        - name: minio
+          volumeMounts:
+            - name: data
+              mountPath: "/data"
+      volumes:
+        - name: data
+          hostPath:
+            path: installation-path/podcast-server/files/
+            type: DirectoryOrCreate
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: database
+spec:
+  template:
+    spec:
+      containers:
+        - name: database
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/postgresql/data
+            - name: init
+              mountPath: /docker-entrypoint-initdb.d
+      volumes:
+        - name: data
+          hostPath:
+            path: installation-path/podcast-server/database/data
+            type: DirectoryOrCreate
+        - name: init
+          hostPath:
+            path: installation-path/podcast-server/database/init
+            type: DirectoryOrCreate
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: database-backup
+spec:
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+            - name: database-backup
+              volumeMounts:
+                - name: backup
+                  mountPath: /backup
+          volumes:
+            - name: backup
+              hostPath:
+                path: installation-path/podcast-server/database/backup/
+                type: DirectoryOrCreate

@@ -4,25 +4,18 @@
 
 === Kubernetes Cluster
 
-To be able to run the *Podcast-Server*, you have to install a `Kubernetes` cluster. `Kubernetes` is used as a deployment
-platform, but you don't have to configure it for high availability. The main goal of the *Podcast-Server* is to be run
-in your local network, managed `Kubernetes` (like GKE, AKS, EKS…) are not a coherent solution.
+To run the *Podcast-Server*, you have to use a `Kubernetes` cluster. `Kubernetes` is used as a deployment platform, but you don't have to configure it for high availability. The main goal of the *Podcast-Server* is to be run in your local network, so managed `Kubernetes` distribution (like Google Kubernetes Engine, Azure Kubernetes Service, Elastic Kubernetes Service…) are not recommended.
 
 You can install `Kubernetes` version 1.14+ with:
 
 * https://k3s.io/[K3S]
 * https://microk8s.io/[MicroK8S]
 * https://github.com/kubernetes/minikube[Minikube]
-* https://www.docker.com/products/docker-desktop[Docker for Desktop]
-
-Then, configure your `kubectl` client to be able to access your installed cluster.
+* https://www.docker.com/products/docker-desktop[Docker for Desktop with Kubernetes enabled]
 
 === Command Line Tools
 
-You need to have the following tools installed and available in the `PATH`:
-
-* `kpt` (https://googlecontainertools.github.io/kpt/installation/[installation instruction])
-* `kustomize` (https://kubernetes-sigs.github.io/kustomize/installation/[installation instruction])
+You need to have `kubectl` installed and connected to your kubernetes cluster
 
 == Installation
 
