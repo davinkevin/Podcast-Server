@@ -10,15 +10,15 @@ import nu.studer.gradle.jooq.JooqGenerate
 import org.flywaydb.gradle.task.FlywayMigrateTask
 
 plugins {
-	id("org.springframework.boot") version "2.7.3"
-	id("io.spring.dependency-management") version "1.0.13.RELEASE"
+	id("org.springframework.boot") version "2.7.5"
+	id("io.spring.dependency-management") version "1.0.15.RELEASE"
 
 	id("com.gorylenko.gradle-git-properties") version "2.4.1"
-	id("org.flywaydb.flyway") version "9.0.4"
-	id("nu.studer.jooq") version "7.1.1"
-	id("com.google.cloud.tools.jib") version "3.2.1"
+	id("org.flywaydb.flyway") version "9.7.0"
+	id("nu.studer.jooq") version "8.0"
+	id("com.google.cloud.tools.jib") version "3.3.1"
 	id("de.jansauer.printcoverage") version "2.0.0"
-	id("org.jetbrains.kotlinx.kover") version "0.5.1"
+	id("org.jetbrains.kotlinx.kover") version "0.6.1"
 
 	kotlin("jvm") version "1.6.21"
 	kotlin("plugin.spring") version "1.6.21"
@@ -60,7 +60,7 @@ dependencies {
 	jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
 
 	implementation("org.jdom:jdom2:2.0.6.1")
-	implementation("org.jsoup:jsoup:1.15.2")
+	implementation("org.jsoup:jsoup:1.15.3")
 	implementation("com.github.pedroviniv:youtubedl-java:ef7110605d23eaaae4796312163bcf84c7099311")
 	implementation("net.bramp.ffmpeg:ffmpeg:0.7.0")
 
