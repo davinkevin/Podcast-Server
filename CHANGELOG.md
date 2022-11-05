@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2022.11.0
+
+### Features
+
+- **backend:** Upgrade multiple framework & libraries ([cd82908](cd829089b10fb84cfc96c890def00c7519464e1c))
+
 ## 2022.9.0
 
 ### Features
