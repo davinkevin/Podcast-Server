@@ -61,7 +61,7 @@ class FranceTvFinderTest(
             ).toMono())
 
             backend.stubFor(get("/france-3/secrets-d-histoire/")
-                .willReturn(ok(fileAsString("/remote/podcast/francetv/v4/secrets-d-histoire/secrets-d-histoire.html"))))
+                .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/secrets-d-histoire.html"))))
 
             /* When */
             StepVerifier.create(finder.findInformation(url))
@@ -88,7 +88,7 @@ class FranceTvFinderTest(
 
             whenever(image.fetchCoverInformation(any())).thenReturn(Mono.empty())
             backend.stubFor(get("/france-3/secrets-d-histoire/")
-                .willReturn(ok(fileAsString("/remote/podcast/francetv/v4/secrets-d-histoire/secrets-d-histoire.html"))))
+                .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/secrets-d-histoire.html"))))
 
             /* When */
             StepVerifier.create(finder.findInformation(url))

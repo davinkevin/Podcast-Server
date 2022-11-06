@@ -49,8 +49,8 @@ class FranceTvUpdater(
             .retrieve()
             .bodyToMono<String>()
             .map { Jsoup.parse(it, url) }
-            .flatMapIterable { it.select(".c-wall__item > .c-card-video") }
-            .filter { it.classNames().none { c -> c.contains("unavailable") } }
+            .flatMapIterable { it.select(".c-wall__item > [data-video-id]") }
+            .filter { !it.html().contains("indisponible") }
             .map { it.select("a[href]").attr("href") }
             .flatMap { urlToItem(it) }
     }
@@ -89,7 +89,9 @@ class FranceTvUpdater(
                     .bodyToMono<FranceTvItemV2>()
                     .map { it.copy(externalDescription = pageItem.description) }
             }
-            .flatMap { it.toMono().zipWith(image.fetchCoverInformationOrOption(it.coverUri())) }
+            .flatMap {
+                it.toMono().zipWith(image.fetchCoverInformationOrOption(it.coverUri()))
+            }
             .map { (franceTvItem, cover) ->
                 ItemFromUpdate(
                     title = franceTvItem.title(),
@@ -118,8 +120,8 @@ class FranceTvUpdater(
             .retrieve()
             .bodyToMono<String>()
             .map { Jsoup.parse(it, url.toASCIIString()) }
-            .flatMapIterable { it.select(".c-wall__item > .c-card-video") }
-            .filter { it.classNames().none { c -> c.contains("unavailable") } }
+            .flatMapIterable { it.select(".c-wall__item > [data-video-id]") }
+            .filter { !it.html().contains("indisponible") }
             .map { it.select("a[href]").attr("href") }
             .sort()
             .reduce { t, u -> """$t-$u""" }
