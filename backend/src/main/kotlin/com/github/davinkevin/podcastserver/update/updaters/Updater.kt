@@ -25,7 +25,10 @@ interface Updater {
                     findItems(podcast)
                             .collectList()
                             .map { it.toSet() }
-                            .doOnNext { log.debug("podcast {} has {} items found", podcast.url, it.size) }
+                            .doOnNext {
+                                if (it.isEmpty()) log.warn("podcast {} has no item found, potentially updater {} not working anymore", podcast.url, this::class)
+                                else log.debug("podcast {} has {} items found", podcast.url, it.size)
+                            }
                             .map { items -> UpdatePodcastInformation(podcast, items, sign) }
                 }
                 .doOnSuccess { log.info("podcast {} ends update", podcast.url) }
