@@ -228,6 +228,7 @@ class ItemRepository(private val query: DSLContext) {
             val selectFromPodcast = select(coverId, COVER.HEIGHT, COVER.WIDTH, COVER.URL)
                 .from(PODCAST.innerJoin(COVER).on(PODCAST.COVER_ID.eq(COVER.ID)))
                 .where(itemNotExist)
+                .and(PODCAST.ID.eq(item.podcastId))
 
             val coverCreation: CommonTableExpression<CoverRecord> = name("COVER_CREATION").`as`(
                 insertInto(COVER, COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL).select(
