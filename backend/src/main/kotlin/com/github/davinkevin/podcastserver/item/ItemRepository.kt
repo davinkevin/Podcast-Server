@@ -207,7 +207,8 @@ class ItemRepository(private val query: DSLContext) {
             val coverId = value(UUID.randomUUID()).cast(UUID::class.java)
             val itemNotExist =
                 notExists(
-                    selectFrom(ITEM)
+                    selectOne()
+                    .from(ITEM)
                     .where(ITEM.URL.eq(item.url))
                         .and(ITEM.PODCAST_ID.eq(item.podcastId)))
 
@@ -218,6 +219,11 @@ class ItemRepository(private val query: DSLContext) {
                 value(item.cover?.url?.toASCIIString())
             )
                 .where(itemNotExist)
+                .and(
+                    value(item.cover?.height).isNotNull
+                    .and(value(item.cover?.width).isNotNull)
+                    .and(value(item.cover?.url).isNotNull)
+                )
 
             val selectFromPodcast = select(coverId, COVER.HEIGHT, COVER.WIDTH, COVER.URL)
                 .from(PODCAST.innerJoin(COVER).on(PODCAST.COVER_ID.eq(COVER.ID)))

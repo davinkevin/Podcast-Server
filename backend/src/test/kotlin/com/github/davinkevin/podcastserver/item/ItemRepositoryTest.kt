@@ -8,7 +8,6 @@ import com.github.davinkevin.podcastserver.entity.Status.*
 import com.github.davinkevin.podcastserver.r2dbc
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
-import org.assertj.core.api.Condition
 import org.jooq.DSLContext
 import org.jooq.exception.DataAccessException
 import org.jooq.impl.DSL.*
@@ -20,10 +19,10 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Hooks
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
-import java.nio.file.Path
 import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
 import java.time.ZoneOffset
@@ -31,7 +30,6 @@ import java.time.temporal.ChronoUnit.SECONDS
 import java.util.*
 import java.util.UUID.fromString
 import java.util.function.Consumer
-import java.util.function.Predicate
 import kotlin.io.path.Path
 
 /**
@@ -1418,9 +1416,9 @@ class ItemRepositoryTest(
                     .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100),
 
                 insertInto(PODCAST)
-                    .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED)
-                    .values(fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), "AppLoad", null, "RSS", false)
-                    .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Geek Inc HD", "http://fake.url.com/rss", "YOUTUBE", true),
+                    .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED, PODCAST.COVER_ID)
+                    .values(fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), "AppLoad", null, "RSS", false, fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"))
+                    .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Geek Inc HD", "http://fake.url.com/rss", "YOUTUBE", true, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68")),
 
                 insertInto(ITEM)
                     .columns(ITEM.ID, ITEM.TITLE, ITEM.URL, ITEM.FILE_NAME, ITEM.PODCAST_ID, ITEM.STATUS, ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE, ITEM.NUMBER_OF_FAIL, ITEM.COVER_ID, ITEM.DESCRIPTION, ITEM.MIME_TYPE)
@@ -1651,6 +1649,60 @@ class ItemRepositoryTest(
                             assertThat(it.cover.height).isEqualTo(100)
                             assertThat(it.cover.width).isEqualTo(100)
                             assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
+                        }
+                        .verifyComplete()
+
+                    assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
+                    assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
+                }
+
+                @Test
+                fun `an item without cover, so it has to fallback to podcast cover`() {
+                    /* Given */
+                    val now = now()
+                    val item = ItemForCreation(
+                        title = "an item",
+                        url = "http://foo.bar.com/an_item",
+
+                        pubDate = now,
+                        downloadDate = now(),
+                        creationDate = now,
+
+                        description = "a description",
+                        mimeType = "audio/mp3",
+                        length = 1234,
+                        fileName = Path("ofejeaoijefa.mp3"),
+                        status = NOT_DOWNLOADED,
+
+                        podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
+                        cover = null
+                    )
+                    val numberOfItem = query.selectCount().from(ITEM).r2dbc().fetchOne(count())
+                    val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())
+
+                    /* When */
+                    StepVerifier.create(repository.create(item))
+                        /* Then */
+                        .expectSubscription()
+                        .assertNext {
+                            assertThat(it.title).isEqualTo("an item")
+                            assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
+                            assertThat(it.pubDate).isEqualToIgnoringNanos(now)
+                            assertThat(it.downloadDate).isEqualToIgnoringNanos(now)
+                            assertThat(it.creationDate).isEqualToIgnoringNanos(now)
+                            assertThat(it.description).isEqualTo("a description")
+                            assertThat(it.mimeType).isEqualTo("audio/mp3")
+                            assertThat(it.length).isEqualTo(1234)
+                            assertThat(it.fileName).isEqualTo(Path("ofejeaoijefa.mp3"))
+                            assertThat(it.status).isEqualTo(NOT_DOWNLOADED)
+
+                            assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
+                            assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
+                            assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
+
+                            assertThat(it.cover.height).isEqualTo(100)
+                            assertThat(it.cover.width).isEqualTo(100)
+                            assertThat(it.cover.url).isEqualTo(URI("http://fake.url.com/geekinc/cover.png"))
                         }
                         .verifyComplete()
 
