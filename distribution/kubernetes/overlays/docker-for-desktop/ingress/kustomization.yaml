@@ -5,13 +5,8 @@ resources:
   - ingress.yaml
 
 secretGenerator:
-  - name: podcast-k8s-local
+  - name: certificates-k8s-local
     files:
-      - podcast.k8s.local/tls.crt
-      - podcast.k8s.local/tls.key
-    type: kubernetes.io/tls
-  - name: minio-podcast-k8s-local
-    files:
-      - minio.podcast.k8s.local/tls.crt
-      - minio.podcast.k8s.local/tls.key
+      - tls.crt
+      - tls.key
     type: kubernetes.io/tls

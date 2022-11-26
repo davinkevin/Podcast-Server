@@ -6,7 +6,7 @@ spec:
   tls:
     - hosts:
         - podcast.k8s.local
-      secretName: podcast-k8s-local
+      secretName: certificates-k8s-local
   rules:
     - host: podcast.k8s.local
       http:
@@ -48,7 +48,7 @@ spec:
   tls:
     - hosts:
         - minio.podcast.k8s.local
-      secretName: minio-podcast-k8s-local
+      secretName: certificates-k8s-local
   rules:
     - host: minio.podcast.k8s.local
       http:
