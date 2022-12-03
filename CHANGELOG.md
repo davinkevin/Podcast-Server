@@ -1,6 +1,20 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2022.12.0
+
+### Features
+
+- **backend:** Add warn log if podcast has no item found ([cb72b41](cb72b41eaace01a4204eefad62f48a007f582fad))
+- **backend:** Migration to spring boot 3.0.0 ([d9649f4](d9649f4cff4f1336975d4aef4ad218c5c258deab) - [#178](https://gitlab.com/davinkevin/Podcast-Server/-/issues/178))
+- **storage:** Migrate to minio:RELEASE.2022-11-17T23-20-09Z version ([8f25a2d](8f25a2d45bc456a13664103b9738c3e2706576ac))
+
+### Bug Fixes
+
+- **backend:** Fallback to podcast cover if item cover information is not available ([6f88e61](6f88e61bfe8d6c6561ce9b128f254014f88a8a88))
+- **backend:** Use podcast cover as fallback instead of random one 🤷 ([8164cc8](8164cc88424df2aee05cd246ee501741c145831b))
+- **franceTv:** Update algorithm to find items in FranceTV following site modification ([db50c9e](db50c9e9989d30f8169a93084db31fa6eda3522e) - [#182](https://gitlab.com/davinkevin/Podcast-Server/-/issues/182))
+
 ## 2022.11.0
 
 ### Features
