@@ -12,7 +12,7 @@ variables:
 .cicd_utils: &cicd_utils |
   function delete_docker_hub_image() {
     COMPONENT=$1
-    JWT_TOKEN=$(curl -s -H 'Content-Type: application/json' -d '{"username": "'${DOCKER_IO_USER}'", "password": "'${DOCKER_IO_PASSWORD}'"}' https://hub.docker.com/v2/users/login/ | sed 's@.*token": "\([^"]*\)".*@\1@g')
+    JWT_TOKEN=$(curl -s -H 'Content-Type: application/json' -d '{"username": "'${DOCKER_IO_USER}'", "password": "'${DOCKER_IO_PASSWORD}'"}' https://hub.docker.com/v2/users/login/ | sed -e 's@.*token":"\([^"]*\)".*@\1@g')
     curl -L -X DELETE -H "Authorization: JWT $JWT_TOKEN" https://hub.docker.com/v2/repositories/podcastserver/$COMPONENT/tags/$CI_COMMIT_REF_SLUG/
   }
 
