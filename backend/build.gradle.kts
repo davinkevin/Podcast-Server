@@ -19,6 +19,7 @@ plugins {
 	id("com.google.cloud.tools.jib") version "3.3.1"
 	id("de.jansauer.printcoverage") version "2.0.0"
 	id("org.jetbrains.kotlinx.kover") version "0.6.1"
+	id("org.graalvm.buildtools.native") version "0.9.18"
 
 	kotlin("jvm") version "1.7.21"
 	kotlin("plugin.spring") version "1.7.21"
