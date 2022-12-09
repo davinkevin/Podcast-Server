@@ -2,11 +2,62 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ingress.yaml
+  - podcast-server
+  - minio
+
+patches:
+  - path: certs/add-tls.yaml
+    target:
+      kind: Ingress
+      version: v1
+      group: networking.k8s.io
+
+configMapGenerator:
+  - name: ingress
+    literals:
+      - podcast=podcast.k8s.local
+      - minio=minio.podcast.k8s.local
 
 secretGenerator:
   - name: certificates-k8s-local
     files:
-      - tls.crt
-      - tls.key
+      - certs/tls.crt
+      - certs/tls.key
     type: kubernetes.io/tls
+
+replacements:
+  - source:
+      kind: Secret
+    targets:
+      - select:
+          kind: Ingress
+        fieldPaths:
+          - spec.tls.0.secretName
+        options:
+          create: true
+  - source:
+      kind: ConfigMap
+      name: ingress
+      fieldPath: data.podcast
+    targets:
+      - select:
+          kind: Ingress
+          name: podcast-server
+        fieldPaths:
+          - spec.rules.0.host
+          - spec.tls.0.hosts.0
+        options:
+          create: true
+  - source:
+      kind: ConfigMap
+      name: ingress
+      fieldPath: data.minio
+    targets:
+      - select:
+          kind: Ingress
+          name: minio-console
+        fieldPaths:
+          - spec.rules.0.host
+          - spec.tls.0.hosts.0
+        options:
+          create: true

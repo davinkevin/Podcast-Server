@@ -6,4 +6,4 @@ resources:
 
 components:
   - ../../base/components/database
-  - ../../base/components/storage
+  - ../../base/components/storage/embedded
