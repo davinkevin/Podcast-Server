@@ -79,6 +79,7 @@ data class PageItem(
 data class ItemForCreation(
         val title: String,
         val url: String?,
+        val guid: String,
 
         val pubDate: OffsetDateTime,
         val downloadDate: OffsetDateTime?,

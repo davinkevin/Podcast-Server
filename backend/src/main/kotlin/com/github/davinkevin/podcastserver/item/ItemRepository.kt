@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.item
 
+import com.github.davinkevin.podcastserver.database.Keys
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.tables.records.CoverRecord
 import com.github.davinkevin.podcastserver.entity.Status
@@ -204,44 +205,50 @@ class ItemRepository(private val query: DSLContext) {
             val id = v.id
             val item = v.itemForCreation
 
-            val coverId = value(UUID.randomUUID()).cast(UUID::class.java)
-            val itemNotExist =
-                notExists(
-                    selectOne()
-                    .from(ITEM)
-                    .where(ITEM.URL.eq(item.url))
-                        .and(ITEM.PODCAST_ID.eq(item.podcastId)))
+            val similarItemCondition = (ITEM.URL.eq(item.url).or(ITEM.GUID.eq(item.guid)))
+                  .and(ITEM.PODCAST_ID.eq(item.podcastId))
 
-            val selectFromItem = select(
+            val coverId = value(UUID.randomUUID()).cast(UUID::class.java)
+            val itemDoesNotExist = notExists(selectOne().from(ITEM).where(similarItemCondition))
+
+            val providedItemIsValid = value(item.cover?.height).isNotNull
+                .and(value(item.cover?.width).isNotNull)
+                .and(value(item.cover?.url).isNotNull)
+
+            val coverFromCreation = select(
                 coverId,
                 value(item.cover?.height),
                 value(item.cover?.width),
                 value(item.cover?.url?.toASCIIString())
             )
-                .where(itemNotExist)
-                .and(
-                    value(item.cover?.height).isNotNull
-                    .and(value(item.cover?.width).isNotNull)
-                    .and(value(item.cover?.url).isNotNull)
-                )
+                .where(itemDoesNotExist)
+                .and(providedItemIsValid)
 
-            val selectFromPodcast = select(coverId, COVER.HEIGHT, COVER.WIDTH, COVER.URL)
+            val coverFromParentPodcast = select(coverId, COVER.HEIGHT, COVER.WIDTH, COVER.URL)
                 .from(PODCAST.innerJoin(COVER).on(PODCAST.COVER_ID.eq(COVER.ID)))
-                .where(itemNotExist)
+                .where(itemDoesNotExist)
                 .and(PODCAST.ID.eq(item.podcastId))
+                .and(not(providedItemIsValid))
+
+            val coverFromOriginalItem = select(COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL)
+                .from(COVER.innerJoin(ITEM).on(COVER.ID.eq(ITEM.COVER_ID)))
+                .where(similarItemCondition)
 
             val coverCreation: CommonTableExpression<CoverRecord> = name("COVER_CREATION").`as`(
                 insertInto(COVER, COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL).select(
-                    selectFromItem.unionAll(selectFromPodcast)
+                    coverFromCreation
+                        .unionAll(coverFromParentPodcast)
+                        .unionAll(coverFromOriginalItem)
                 )
-                    .onConflictDoNothing()
+                    .onConflict(COVER.ID).doUpdate()
+                    .set(COVER.ID, excluded(COVER.ID))
                     .returning(COVER.ID)
             )
 
             query.with(coverCreation)
                 .insertInto(
                     ITEM,
-                    ITEM.ID, ITEM.TITLE, ITEM.URL,
+                    ITEM.ID, ITEM.TITLE, ITEM.URL, ITEM.GUID,
                     ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
                     ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.FILE_NAME, ITEM.STATUS,
                     ITEM.PODCAST_ID, ITEM.COVER_ID
@@ -251,6 +258,7 @@ class ItemRepository(private val query: DSLContext) {
                         value(id),
                         value(item.title),
                         value(item.url),
+                        value(item.guid),
                         value(item.pubDate),
                         value(item.downloadDate),
                         value(item.creationDate),
@@ -263,8 +271,13 @@ class ItemRepository(private val query: DSLContext) {
                         coverCreation.field(COVER.ID)
                     )
                         .from(coverCreation)
+                        .where(selectCount().from(ITEM).where(
+                            ITEM.URL.eq(item.url).and(ITEM.PODCAST_ID.eq(item.podcastId))
+                        ).asField<Int>().eq(0))
                 )
-                .onConflictDoNothing()
+                .onConflictOnConstraint(Keys.ITEM_WITH_GUID_IS_UNIQUE_IN_PODCAST)
+                .doUpdate()
+                .set(ITEM.URL, item.url)
         }
 
         Flux.from(query.batch(queries))

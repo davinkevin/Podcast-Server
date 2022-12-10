@@ -54,6 +54,7 @@ class RSSUpdater(
                     description = elem.getChildText("description"),
                     cover = cover.orNull(),
                     url = urlOf(elem),
+                    guid = elem.getChildText("guid"),
 
                     length = elem.enclosure().getAttributeValue("length")?.toLong(),
                     mimeType = mimeTypeOf(elem)

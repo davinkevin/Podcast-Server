@@ -107,6 +107,7 @@ class UpdateService(
 private fun ItemFromUpdate.toCreation(podcastId: UUID) = ItemForCreation(
     title = title!!,
     url = url.toASCIIString(),
+    guid = this.guidOrUrl(),
 
     pubDate = pubDate?.toOffsetDateTime() ?: now(),
     downloadDate = null,

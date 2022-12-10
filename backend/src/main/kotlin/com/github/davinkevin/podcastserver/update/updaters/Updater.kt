@@ -51,9 +51,13 @@ data class ItemFromUpdate(
         val length: Long? = null,
         val mimeType: String,
         val url: URI,
+        val guid: String? = null,
         val description: String?,
-        val cover: Cover?
+        val cover: Cover?,
 ) {
+
+    fun guidOrUrl(): String = guid ?: url.toASCIIString()
+
     data class Cover(val width: Int, val height: Int, val url: URI)
 }
 

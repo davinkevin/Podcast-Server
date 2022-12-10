@@ -47,7 +47,7 @@ class ItemServiceTest(
 ) {
 
     @MockBean private lateinit var repository: ItemRepository
-    @MockBean private lateinit var p: PodcastServerParameters
+    @Suppress("unused") @MockBean private lateinit var p: PodcastServerParameters
     @MockBean private lateinit var fileService: FileStorageService
     @MockBean private lateinit var idm: ItemDownloadManager
     @MockBean private lateinit var podcastRepository: PodcastRepository
@@ -398,6 +398,7 @@ class ItemServiceTest(
             val itemToCreate = ItemForCreation(
                     title = "title",
                     url = null,
+                    guid = Path("Podcast_Name_-_2020-01-02_-_title.mp3").toString(),
 
                     pubDate = ZonedDateTime.of(LocalDateTime.of(2020, 1, 2, 0, 0), ZoneId.systemDefault())
                             .toOffsetDateTime(),

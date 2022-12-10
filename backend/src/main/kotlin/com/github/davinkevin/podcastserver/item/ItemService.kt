@@ -86,6 +86,7 @@ class ItemService(
                 ItemForCreation(
                     title = title,
                     url = null,
+                    guid = filename.fileName.toString(),
 
                     pubDate = pubDate.toOffsetDateTime(),
                     downloadDate = OffsetDateTime.now(clock),
