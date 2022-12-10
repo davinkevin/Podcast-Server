@@ -4,6 +4,7 @@ set -euo pipefail
 
 function cleanup {
   docker stop db-for-code-generation > /dev/null
+  k3d cluster delete podcast-server
 }
 
 echo "Creation of folders mounted inside the container, for file storage"
@@ -26,6 +27,8 @@ docker run --rm -d \
            -p $DATABASE_PORT:5432 \
            --name db-for-code-generation \
            postgres:12.3-alpine > /dev/null
+
+k3d cluster create podcast-server --port 80:80@loadbalancer --port 443:443@loadbalancer
 
 trap cleanup EXIT
 
