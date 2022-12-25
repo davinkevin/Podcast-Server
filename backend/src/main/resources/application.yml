@@ -3,6 +3,8 @@
 ##############################
 
 spring:
+ main:
+  banner-mode: off
  codec:
   max-in-memory-size: 500MB
 
