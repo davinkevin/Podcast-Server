@@ -2,9 +2,12 @@ package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.database.Keys
 import com.github.davinkevin.podcastserver.database.Tables.*
+import com.github.davinkevin.podcastserver.database.enums.ItemStatus
+import com.github.davinkevin.podcastserver.database.enums.ItemStatus.*
 import com.github.davinkevin.podcastserver.database.tables.records.CoverRecord
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.entity.Status.*
+import com.github.davinkevin.podcastserver.entity.fromDb
+import com.github.davinkevin.podcastserver.entity.toDb
 import org.jooq.*
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
@@ -26,9 +29,9 @@ class ItemRepository(private val query: DSLContext) {
 
     private val log = LoggerFactory.getLogger(ItemRepository::class.java)
 
-    fun findById(id: UUID) = Mono.defer { findById(listOf(id)).toMono() }
+    fun findById(id: UUID): Mono<Item> = Mono.defer { findById(listOf(id)).toMono() }
 
-    fun findById(ids: List<UUID>) = Flux.defer {
+    fun findById(ids: List<UUID>): Flux<Item> = Flux.defer {
         Flux.from(query
             .select(ITEM.ID, ITEM.TITLE, ITEM.URL,
                 ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
@@ -47,7 +50,7 @@ class ItemRepository(private val query: DSLContext) {
     }
 
 
-    fun findAllToDelete(date: OffsetDateTime) = Flux.defer {
+    fun findAllToDelete(date: OffsetDateTime): Flux<DeleteItemRequest> = Flux.defer {
         Flux.from(query
             .select(ITEM.ID, ITEM.FILE_NAME, PODCAST.TITLE)
             .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
@@ -59,7 +62,7 @@ class ItemRepository(private val query: DSLContext) {
             .map { DeleteItemRequest(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
     }
 
-    fun deleteById(id: UUID) = Mono.defer {
+    fun deleteById(id: UUID): Mono<DeleteItemRequest> = Mono.defer {
         val removeFromPlaylist = query
             .delete(WATCH_LIST_ITEMS)
             .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(id))
@@ -174,7 +177,7 @@ class ItemRepository(private val query: DSLContext) {
                    ) -> Item(
                 id, title, url,
                 pubDate, downloadDate, creationDate,
-                description, mimeType, length, fileName, status,
+                description, mimeType, length, fileName, status.fromDb(),
 
                 Item.Podcast(podcastId, podcastTitle, podcastUrl),
                 Item.Cover(coverId, URI(coverUrl), coverWidth, coverHeight)
@@ -266,7 +269,7 @@ class ItemRepository(private val query: DSLContext) {
                         value(item.mimeType),
                         value(item.length),
                         value(item.fileName),
-                        value(item.status),
+                        value(item.status.toDb()),
                         value(item.podcastId),
                         coverCreation.field(COVER.ID)
                     )
@@ -313,13 +316,13 @@ class ItemRepository(private val query: DSLContext) {
     }
 }
 
-private fun toItem(it: Record18<UUID, String, String, OffsetDateTime, OffsetDateTime, OffsetDateTime, String, String, Long, Path, Status, UUID, String, String, UUID, String, Int, Int>): Item {
+private fun toItem(it: Record18<UUID, String, String, OffsetDateTime, OffsetDateTime, OffsetDateTime, String, String, Long, Path, ItemStatus, UUID, String, String, UUID, String, Int, Int>): Item {
     val c = Item.Cover(it[COVER.ID], URI(it[COVER.URL]), it[COVER.WIDTH], it[COVER.HEIGHT])
     val p = Item.Podcast(it[PODCAST.ID], it[PODCAST.TITLE], it[PODCAST.URL])
     return Item(
         it[ITEM.ID], it[ITEM.TITLE], it[ITEM.URL],
         it[ITEM.PUB_DATE], it[ITEM.DOWNLOAD_DATE], it[ITEM.CREATION_DATE],
-        it[ITEM.DESCRIPTION], it[ITEM.MIME_TYPE], it[ITEM.LENGTH], it[ITEM.FILE_NAME], it[ITEM.STATUS],
+        it[ITEM.DESCRIPTION], it[ITEM.MIME_TYPE], it[ITEM.LENGTH], it[ITEM.FILE_NAME], it[ITEM.STATUS].fromDb(),
         p, c
     )
 }

@@ -2,10 +2,12 @@ package com.github.davinkevin.podcastserver.download
 
 import com.github.davinkevin.podcastserver.database.Tables.DOWNLOADING_ITEM
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
+import com.github.davinkevin.podcastserver.database.enums.ItemStatus.*
 import com.github.davinkevin.podcastserver.database.enums.DownloadingState
+import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.database.tables.Item
-import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.entity.Status.*
+import com.github.davinkevin.podcastserver.entity.fromDb
+import com.github.davinkevin.podcastserver.entity.toDb
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem.Cover
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem.Podcast
@@ -187,7 +189,7 @@ class DownloadRepository(private val query: DSLContext) {
             .then()
     }
 
-    fun stopItem(id: UUID) = Mono.defer {
+    fun stopItem(id: UUID): Mono<Int> = Mono.defer {
         query
             .update(ITEM)
             .set(ITEM.STATUS, STOPPED)
@@ -198,7 +200,7 @@ class DownloadRepository(private val query: DSLContext) {
     fun updateDownloadItem(item: DownloadingItem): Mono<Int> = Mono.defer {
         query
             .update(ITEM)
-            .set(ITEM.STATUS, item.status)
+            .set(ITEM.STATUS, item.status.toDb())
             .set(ITEM.NUMBER_OF_FAIL, item.numberOfFail)
             .where(ITEM.ID.eq(item.id))
             .toMono()
@@ -218,13 +220,13 @@ class DownloadRepository(private val query: DSLContext) {
 }
 
 private fun toDownloadingItem(
-    it: Record9<UUID, String, Status, String, Int, UUID, String, UUID, String>,
+    it: Record9<UUID, String, ItemStatus, String, Int, UUID, String, UUID, String>,
     base: Item = DOWNLOADING_ITEM.item()
 ): DownloadingItem {
     return DownloadingItem(
         id = it[base.ID],
         title = it[base.TITLE],
-        status = it[base.STATUS],
+        status = it[base.STATUS].fromDb(),
         url = URI(it[base.URL]),
         numberOfFail = it[base.NUMBER_OF_FAIL],
         progression = 0,

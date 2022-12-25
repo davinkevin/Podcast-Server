@@ -154,7 +154,7 @@ class YoutubeDlServiceTest(
             captor.firstValue.onProgressUpdate(1f, 2)
 
             /* Then */
-            assertThat(isCalled).isTrue()
+            assertThat(isCalled).isTrue
         }
 
 

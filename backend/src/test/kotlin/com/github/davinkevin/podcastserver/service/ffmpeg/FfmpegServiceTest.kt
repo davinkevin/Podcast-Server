@@ -68,7 +68,7 @@ class FfmpegServiceTest {
         assertThat(
                 executorBuilderCaptor.value.build()
                         .any { it.contains("ffmpeg-list-") && it.endsWith(".txt") }
-        ).isTrue()
+        ).isTrue
     }
 
     @Test

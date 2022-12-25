@@ -74,7 +74,7 @@ class ProcessServiceTest {
         val returnCode = processService.waitFor(process)
 
         /* Then */
-        assertThat(returnCode.isFailure).isTrue()
+        assertThat(returnCode.isFailure).isTrue
         verify(process).waitFor()
     }
 }

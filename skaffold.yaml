@@ -15,7 +15,7 @@ build:
     - image: podcastserver/backend-base-image
   - image: podcastserver/init-db
     docker:
-      dockerfile: ./database/Dockerfile
+      dockerfile: ./backend-lib-database/src/main/docker/Dockerfile
   - image: podcastserver/storage
     context: storage/
   - image: podcastserver/ui-v1

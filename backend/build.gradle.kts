@@ -1,21 +1,14 @@
-import nu.studer.gradle.jooq.JooqEdition.OSS
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.internal.deprecation.DeprecatableConfiguration
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import org.jooq.meta.jaxb.ForcedType
-import org.jooq.meta.jaxb.Logging.INFO
-import java.time.OffsetDateTime
-import java.time.format.DateTimeFormatter
-import nu.studer.gradle.jooq.JooqGenerate
-import org.flywaydb.gradle.task.FlywayMigrateTask
+import com.gitlab.davinkevin.podcastserver.database.*
+import com.gitlab.davinkevin.podcastserver.dockerimages.*
 
 plugins {
 	id("org.springframework.boot") version "3.0.1"
 	id("io.spring.dependency-management") version "1.1.0"
 
 	id("com.gorylenko.gradle-git-properties") version "2.4.1"
-	id("org.flywaydb.flyway") version "9.8.3"
-	id("nu.studer.jooq") version "8.0"
 	id("com.google.cloud.tools.jib") version "3.3.1"
 	id("de.jansauer.printcoverage") version "2.0.0"
 	id("org.jetbrains.kotlinx.kover") version "0.6.1"
@@ -24,19 +17,14 @@ plugins {
 	kotlin("jvm") version "1.7.22"
 	kotlin("plugin.spring") version "1.7.22"
 	jacoco
+
+	id("build-plugin-database")
+	id("build-plugin-docker-images")
 }
 
 group = "com.github.davinkevin.podcastserver"
 version = "2022.12.0"
 java.sourceCompatibility = JavaVersion.VERSION_17
-
-apply(from = "gradle/profile-default.gradle.kts")
-apply(from = "gradle/profile-ci.gradle.kts")
-apply(from = "gradle/profile-skaffold.gradle.kts")
-
-@Suppress("UNCHECKED_CAST")
-val db = (project.extra["databaseParameters"] as Map<String, String>)
-	.let(::DatabaseConfiguration)
 
 repositories {
 	mavenCentral()
@@ -62,8 +50,7 @@ dependencies {
 	implementation("org.springframework:spring-r2dbc")
 	implementation("org.postgresql:postgresql")
 	runtimeOnly("org.postgresql:r2dbc-postgresql")
-	jooqGenerator("org.postgresql:postgresql:" + dependencyManagement.importedProperties["postgresql.version"])
-	jooqGenerator("jakarta.xml.bind:jakarta.xml.bind-api:3.0.1")
+	implementation(project(":backend-lib-database"))
 
 	implementation("org.jdom:jdom2:2.0.6.1")
 	implementation("org.jsoup:jsoup:1.15.3")
@@ -96,87 +83,10 @@ configure<com.gorylenko.GitPropertiesPluginExtension> {
 	customProperty("git.build.user.name", "none")
 }
 
-tasks.register<Sync>("copyMigrations") {
-	from("${project.rootDir}/database/migrations/")
-	include("*.sql")
-	into(db.sqlFiles)
-	outputs.cacheIf { true }
-}
-
 normalization {
 	runtimeClasspath {
 		ignore("git.properties")
 	}
-}
-
-flyway {
-	url = db.jdbc()
-	user = db.user
-	password = db.password
-	locations = arrayOf("filesystem:${db.sqlFiles}")
-}
-
-tasks.register<FlywayMigrateTask>("flywayMigrateForJOOQ") {
-	dependsOn("copyMigrations")
-}
-
-jooq {
-	version.set(dependencyManagement.importedProperties["jooq.version"].toString())
-	edition.set(OSS)
-
-	configurations {
-		create("main") {
-			jooqConfiguration.apply {
-				logging = INFO
-				jdbc.apply {
-					driver = "org.postgresql.Driver"
-					url = db.jdbc()
-					user = db.user
-					password = db.password
-				}
-
-				generator.apply {
-					name = "org.jooq.codegen.DefaultGenerator"
-					database.apply {
-						name = "org.jooq.meta.postgres.PostgresDatabase"
-						inputSchema = "public"
-						forcedTypes = listOf(
-							ForcedType()
-								.withUserType("com.github.davinkevin.podcastserver.entity.Status")
-								.withConverter("com.github.davinkevin.podcastserver.database.StatusConverter")
-								.withIncludeExpression("""ITEM\.STATUS"""),
-							ForcedType()
-								.withUserType("java.nio.file.Path")
-								.withConverter("com.github.davinkevin.podcastserver.database.PathConverter")
-								.withIncludeExpression("""ITEM\.FILE_NAME""")
-						)
-						isIncludeTables = true
-						isIncludePackages = false
-						isIncludeUDTs = true
-						isIncludeSequences = true
-						isIncludePrimaryKeys = true
-						isIncludeUniqueKeys = true
-						isIncludeForeignKeys = true
-					}
-
-					target.apply {
-						packageName = "com.github.davinkevin.podcastserver.database"
-						directory = "${project.buildDir}/generated/jooq"
-					}
-				}
-			}
-		}
-	}
-}
-
-tasks.named<JooqGenerate>("generateJooq") {
-	inputs.dir(file("../database/migrations"))
-		.withPropertyName("migrations")
-		.withPathSensitivity(PathSensitivity.RELATIVE)
-
-	allInputsDeclared.set(true)
-
-	dependsOn("flywayMigrateForJOOQ")
 }
 
 tasks.withType<KotlinCompile> {
@@ -193,15 +103,18 @@ jacoco {
 	toolVersion = "0.8.7"
 }
 
-tasks.register<FlywayMigrateTask>("flywaySetupDbForTests") { dependsOn("copyMigrations") }
 tasks.test {
+
 	useJUnitPlatform()
+
 	systemProperty("user.timezone", "UTC")
-	systemProperty("spring.r2dbc.url", db.r2dbc())
-	systemProperty("spring.r2dbc.username", db.user)
-	systemProperty("spring.r2dbc.password", db.password)
+	project.extensions.getByType<DatabaseConfiguration>().apply {
+		systemProperty("spring.r2dbc.url", r2dbc())
+		systemProperty("spring.r2dbc.username", user)
+		systemProperty("spring.r2dbc.password", password)
+		dependsOn(migrateDbTask)
+	}
 	jvmArgs = listOf("--add-opens", "java.base/java.time=ALL-UNNAMED")
-	dependsOn(tasks.named("flywaySetupDbForTests"))
 	finalizedBy(tasks.jacocoTestReport)
 	testLogging {
 		exceptionFormat = TestExceptionFormat.FULL
@@ -231,21 +144,13 @@ tasks.printCoverage {
 }
 
 jib {
-	val imageTags: Set<String>? by project.extra
-	val ciTags = imageTags?.toList() ?: emptyList()
-	val providedTag = project.findProperty("tag")?.toString()
-	val jibTags = when {
-		ciTags.isNotEmpty() -> ciTags
-		providedTag != null -> listOf(providedTag)
-		else -> listOf(OffsetDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd-HHmmssSSS"))!!)
-	}
+	val jibTags = project.extensions.getByType<DockerImagesConfiguration>().tags.toList()
 
 	val (firstTag) = jibTags
 	val others = jibTags.drop(1)
-	val baseImageTag =  firstTag
 
 	from {
-		image = "podcastserver/backend-base-image:${baseImageTag}"
+		image = "podcastserver/backend-base-image:$firstTag"
 	}
 	to {
 		image = "podcastserver/backend:${firstTag}"
@@ -277,17 +182,4 @@ tasks.register("downloadDependencies") {
 
 dependencyManagement {
 	applyMavenExclusions(false)
-}
-
-data class DatabaseConfiguration(val url: String, val user: String, val password: String, val sqlFiles: String) {
-
-	constructor(map: Map<String, String>): this(
-		url = map["url"]!!,
-		user = map["user"]!!,
-		password = map["password"]!!,
-		sqlFiles = map["sqlFiles"]!!,
-	)
-
-	fun jdbc() = "jdbc:$url"
-	fun r2dbc() = "r2dbc:$url"
 }

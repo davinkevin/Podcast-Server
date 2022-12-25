@@ -6,6 +6,7 @@ node_modules
 logs
 target
 .gradle
+build
 yarn-error.log
 
 # Front End in AngularJS :
@@ -25,10 +26,10 @@ Backend/build
 Backend/lan.dk.podcastserver.*
 Backend/etc
 backend-lib-youtubedl/build
-
+backend-lib-database/src/main/java/
+backend-lib-database/build/
 
 /lan.dk.podcastserver.entity.Item/
 /backend/buildSrc/build/
 /backend/buildSrc/gradle/wrapper/
 /documentation/dist/
-/build/

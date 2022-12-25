@@ -3,7 +3,9 @@ package com.github.davinkevin.podcastserver.download
 import com.github.davinkevin.podcastserver.JooqR2DBCTest
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.DownloadingState
+import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.entity.toDb
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.r2dbc
 import org.assertj.core.api.Assertions.assertThat
@@ -139,10 +141,10 @@ class DownloadRepositoryTest(
 
                         insertInto(i)
                             .columns(i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
-                            .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, Status.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
-                            .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, Status.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
-                            .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, Status.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
-                            .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, Status.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
+                            .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                            .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                            .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                            .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
                     )
                         .r2dbc()
                         .execute()
@@ -226,10 +228,10 @@ class DownloadRepositoryTest(
 
                         insertInto(i)
                             .columns(i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
-                            .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, Status.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
-                            .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, Status.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
-                            .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, Status.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
-                            .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, Status.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
+                            .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                            .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                            .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                            .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
                     )
                         .r2dbc()
                         .execute()
@@ -363,10 +365,10 @@ class DownloadRepositoryTest(
 
                 insertInto(i)
                     .columns(i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
-                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, Status.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
-                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, Status.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
-                    .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, Status.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
-                    .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, Status.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
+                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                    .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                    .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
             )
                 .r2dbc()
                 .execute()
@@ -601,10 +603,10 @@ class DownloadRepositoryTest(
                     .values(podcastId, "desc", true, OffsetDateTime.now(fixedDate), "sign", "Podcast-Title", "Youtube", "https://www.youtube.com/channel/UCx83f-KzDd3o1QK2AdJIftg", coverId),
 
                 insertInto(i, i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
-                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, Status.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
-                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, Status.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
-                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 20, Status.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
-                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, Status.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
+                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
 
             )
                 .r2dbc()
@@ -845,10 +847,10 @@ class DownloadRepositoryTest(
 
                 insertInto(i)
                     .columns(i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
-                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, Status.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
-                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, Status.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
-                    .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, Status.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
-                    .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, Status.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
+                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                    .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                    .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
             )
                 .r2dbc()
                 .execute()
@@ -1027,10 +1029,10 @@ class DownloadRepositoryTest(
 
                 insertInto(i)
                     .columns(i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
-                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, Status.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
-                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, Status.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
-                    .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, Status.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
-                    .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, Status.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
+                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                    .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                    .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
             )
                 .r2dbc()
                 .execute()
@@ -1210,10 +1212,10 @@ class DownloadRepositoryTest(
                     .values(itemCoverId4, 100, 100, "https://foo.bac.com/item/cover.jpg"),
 
                 insertInto(i, i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
-                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, Status.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
-                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, Status.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
-                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 20, Status.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
-                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, Status.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
+                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
             )
                 .r2dbc()
                 .execute()
@@ -1229,7 +1231,7 @@ class DownloadRepositoryTest(
                 .expectNext(1)
                 .verifyComplete()
 
-            val numberOfStoppedItems = query.selectCount().from(ITEM).where(ITEM.STATUS.eq(Status.STOPPED))
+            val numberOfStoppedItems = query.selectCount().from(ITEM).where(ITEM.STATUS.eq(ItemStatus.STOPPED))
                 .r2dbc().fetchOne(count())
 
             assertThat(numberOfStoppedItems).isEqualTo(1)
@@ -1249,12 +1251,12 @@ class DownloadRepositoryTest(
 
             val notStoppedItems = query
                 .selectFrom(ITEM)
-                .where(ITEM.STATUS.notEqual(Status.STOPPED))
+                .where(ITEM.STATUS.notEqual(ItemStatus.STOPPED))
                 .r2dbc()
                 .fetch()
 
             assertThat(notStoppedItems).hasSize(3)
-            assertThat(notStoppedItems.map { it[ITEM.STATUS] }).containsOnly(Status.NOT_DOWNLOADED)
+            assertThat(notStoppedItems.map { it[ITEM.STATUS] }).containsOnly(ItemStatus.NOT_DOWNLOADED)
         }
 
         @AfterAll
@@ -1309,10 +1311,10 @@ class DownloadRepositoryTest(
                     .values(itemCoverId4, 100, 100, "https://foo.bac.com/item/cover.jpg"),
 
                 insertInto(i, i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
-                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, Status.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
-                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 6, Status.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
-                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 6, Status.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
-                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 6, Status.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
+                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 6, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 6, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 6, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
             )
                 .r2dbc()
                 .execute()
@@ -1343,9 +1345,9 @@ class DownloadRepositoryTest(
                 .verifyComplete()
 
             val item = query.selectFrom(i).where(i.ID.eq(downloadingItem.id)).r2dbc().fetchOne() ?: error("item not found")
-            assertThat(item[ITEM.STATUS]).isEqualTo(status)
+            assertThat(item[ITEM.STATUS]).isEqualTo(status.toDb())
             val others = query.selectFrom(i).where(i.ID.notEqual(downloadingItem.id)).r2dbc().fetch()
-            assertThat(others.map { it[i.STATUS] }).containsOnly(Status.NOT_DOWNLOADED)
+            assertThat(others.map { it[i.STATUS] }).containsOnly(ItemStatus.NOT_DOWNLOADED)
         }
 
         @ParameterizedTest(name = "with fails x{0}")
@@ -1417,10 +1419,10 @@ class DownloadRepositoryTest(
                     .values(itemCoverId4, 100, 100, "https://foo.bac.com/item/cover.jpg"),
 
                 insertInto(i, i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
-                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, Status.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
-                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 6, Status.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
-                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 6, Status.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
-                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 6, Status.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
+                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 6, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 6, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 6, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
             )
                 .r2dbc()
                 .execute()
@@ -1444,7 +1446,7 @@ class DownloadRepositoryTest(
                 .verifyComplete()
 
             val item = query.selectFrom(i).where(i.ID.eq(itemId1)).r2dbc().fetchOne() ?: error("item not found")
-            assertThat(item[i.STATUS]).isEqualTo(Status.FINISH)
+            assertThat(item[i.STATUS]).isEqualTo(ItemStatus.FINISH)
             assertThat(item[i.LENGTH]).isEqualTo(100L)
             assertThat(item[i.MIME_TYPE]).isEqualTo("video/avi")
             assertThat(item[i.FILE_NAME]).isEqualTo(Path("filename.mp4"))
@@ -1530,10 +1532,10 @@ class DownloadRepositoryTest(
                     .values(itemCoverId4, 100, 100, "https://foo.bac.com/item/cover.jpg"),
 
                 insertInto(i, i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
-                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, Status.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
-                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, Status.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
-                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 20, Status.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
-                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, Status.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
+                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
 
                 insertInto(DOWNLOADING_ITEM)
                     .columns(DOWNLOADING_ITEM.ITEM_ID, DOWNLOADING_ITEM.POSITION)
@@ -1571,7 +1573,7 @@ class DownloadRepositoryTest(
                 .map { it[DOWNLOADING_ITEM.ITEM_ID] to it[DOWNLOADING_ITEM.POSITION] }
             assertThat(items).contains(itemId2 to 2)
             val status = query.selectFrom(i).where(i.ID.eq(itemId1)).r2dbc().fetchOne(i.STATUS)
-            assertThat(status).isEqualTo(Status.STOPPED)
+            assertThat(status).isEqualTo(ItemStatus.STOPPED)
         }
     }
 
@@ -1616,10 +1618,10 @@ class DownloadRepositoryTest(
                     .values(podcastId, "desc", true, OffsetDateTime.now(fixedDate), "sign", "Podcast-Title", "Youtube", "https://www.youtube.com/channel/UCx83f-KzDd3o1QK2AdJIftg", coverId),
 
                 insertInto(i, i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
-                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, Status.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
-                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, Status.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
-                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 20, Status.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
-                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, Status.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
+                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
 
             )
                 .r2dbc()
@@ -1766,10 +1768,10 @@ class DownloadRepositoryTest(
                     .values(podcastId, "desc", true, OffsetDateTime.now(fixedDate), "sign", "Podcast-Title", "Youtube", "https://www.youtube.com/channel/UCx83f-KzDd3o1QK2AdJIftg", coverId),
 
                 insertInto(i, i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
-                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, Status.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
-                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, Status.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
-                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 20, Status.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
-                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, Status.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
+                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
 
             )
                 .r2dbc()

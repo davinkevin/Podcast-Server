@@ -26,7 +26,11 @@ buildCache {
     }
 }
 
-include("backend")
+include("backend-lib-database")
 include("backend-lib-youtubedl")
+include("backend")
 include("frontend-angular")
 include("frontend-angularjs")
+
+includeBuild("build-logic/build-plugin-database") { name = "build-plugin-database" }
+includeBuild("build-logic/build-plugin-docker-images") { name = "build-plugin-docker-images" }

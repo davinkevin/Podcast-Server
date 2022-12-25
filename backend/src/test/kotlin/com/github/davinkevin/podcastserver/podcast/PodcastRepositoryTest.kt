@@ -3,7 +3,7 @@ package com.github.davinkevin.podcastserver.podcast
 import com.github.davinkevin.podcastserver.JooqR2DBCTest
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.database.Tables.*
-import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.r2dbc
 import com.github.davinkevin.podcastserver.tag.Tag
 import org.assertj.core.api.Assertions.assertThat
@@ -58,8 +58,8 @@ class PodcastRepositoryTest(
                             .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
                             .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100),
                     insertInto(PODCAST, PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.COVER_ID, PODCAST.HAS_TO_BE_DELETED, PODCAST.TYPE, PODCAST.LAST_UPDATE)
-                            .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "AppLoad", "http://fake.url.com/appload.rss", fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), false, "RSS", OffsetDateTime.now().minusDays(15))
-                            .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/geekinc.rss", fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), true, "Youtube", OffsetDateTime.now().minusDays(30)),
+                            .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "AppLoad", "http://fake.url.com/appload.rss", fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), false, "RSS", now().minusDays(15))
+                            .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/geekinc.rss", fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), true, "Youtube", now().minusDays(30)),
                     insertInto(TAG, TAG.ID, TAG.NAME)
                             .values(fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "French Spin")
                             .values(fromString("df801a7a-5630-4442-8b83-0cb36ae94981"), "Geek")
@@ -151,7 +151,7 @@ class PodcastRepositoryTest(
                         assertThat(it.id).isEqualTo(fromString("0311361c-cc97-48ab-b02a-0bd19eec8a45"))
                         assertThat(it.title).isEqualTo("Without tags")
                         assertThat(it.url).isEqualTo("http://fake.url.com/notags.rss")
-                        assertThat(it.hasToBeDeleted).isTrue()
+                        assertThat(it.hasToBeDeleted).isTrue
                         assertThat(it.type).isEqualTo("Youtube")
                         assertThat(it.lastUpdate).isBetween(currentNow.minusDays(46), currentNow.minusDays(44))
                         assertThat(it.tags).hasSize(0)
@@ -161,7 +161,7 @@ class PodcastRepositoryTest(
                         assertThat(it.id).isEqualTo(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"))
                         assertThat(it.title).isEqualTo("AppLoad")
                         assertThat(it.url).isEqualTo("http://fake.url.com/appload.rss")
-                        assertThat(it.hasToBeDeleted).isFalse()
+                        assertThat(it.hasToBeDeleted).isFalse
                         assertThat(it.type).isEqualTo("RSS")
                         assertThat(it.lastUpdate).isBetween(currentNow.minusDays(16), currentNow.minusDays(14))
                         assertThat(it.tags).hasSize(1)
@@ -172,7 +172,7 @@ class PodcastRepositoryTest(
                         assertThat(it.id).isEqualTo(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"))
                         assertThat(it.title).isEqualTo("Geek Inc HD")
                         assertThat(it.url).isEqualTo("http://fake.url.com/geekinc.rss")
-                        assertThat(it.hasToBeDeleted).isTrue()
+                        assertThat(it.hasToBeDeleted).isTrue
                         assertThat(it.type).isEqualTo("Youtube")
                         assertThat(it.lastUpdate).isBetween(currentNow.minusDays(31), currentNow.minusDays(29))
                         assertThat(it.tags).hasSize(2)
@@ -197,13 +197,13 @@ class PodcastRepositoryTest(
                             .values(fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), "AppLoad", null, "RSS", false)
                             .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Geek Inc HD", "http://fake.url.com/rss", "YOUTUBE", true),
                     insertInto(ITEM, ITEM.ID, ITEM.TITLE, ITEM.URL, ITEM.GUID, ITEM.FILE_NAME, ITEM.PODCAST_ID, ITEM.STATUS, ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE, ITEM.NUMBER_OF_FAIL, ITEM.COVER_ID, ITEM.DESCRIPTION, ITEM.MIME_TYPE)
-                            .values(fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), "Appload 1", "http://fakeurl.com/appload.1.mp3", "http://fakeurl.com/appload.1.mp3", Path("appload.1.mp3"), fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), Status.FINISH, now().minusDays(15), now().minusDays(15), null, 0, fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "desc", "audio/mp3")
-                            .values(fromString("817a4626-6fd2-457e-8d27-69ea5acdc828"), "Appload 2", "http://fakeurl.com/appload.2.mp3", "http://fakeurl.com/appload.2.mp3", Path("appload.2.mp3"), fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), null, now().minusDays(30), null, null, 0, fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "desc", "audio/mp3")
-                            .values(fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), "Appload 3", "http://fakeurl.com/appload.3.mp3", "http://fakeurl.com/appload.3.mp3", Path("appload.3.mp3"), fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), Status.NOT_DOWNLOADED, now(), null, null, 0, fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "desc", "audio/mp3")
-                            .values(fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"), "Geek INC 123", "http://fakeurl.com/geekinc.123.mp3", "http://fakeurl.com/geekinc.123.mp3", Path("geekinc.123.mp3"), fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), Status.DELETED, now().minusYears(1), now(), now().minusMonths(2), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "video/mp4")
-                            .values(fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), "Geek INC 124", "http://fakeurl.com/geekinc.124.mp3", "http://fakeurl.com/geekinc.124.mp3", Path("geekinc.124.mp3"), fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), Status.FINISH, now().minusDays(15), now().minusDays(15), now().minusMonths(2), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "video/mp4")
-                            .values(fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 122", "http://fakeurl.com/geekinc.122.mp3", "http://fakeurl.com/geekinc.122.mp3", Path("geekinc.122.mp3"), fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), Status.FAILED, now().minusDays(1), null, now().minusWeeks(2), 3, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "video/mp4")
-                            .values(fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 126", "http://fakeurl.com/geekinc.126.mp3", "http://fakeurl.com/geekinc.126.mp3", Path("geekinc.126.mp3"), fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), Status.FAILED, now().minusDays(1), null, now().minusWeeks(1), 7, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "video/mp4"),
+                            .values(fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), "Appload 1", "http://fakeurl.com/appload.1.mp3", "http://fakeurl.com/appload.1.mp3", Path("appload.1.mp3"), fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), ItemStatus.FINISH, now().minusDays(15), now().minusDays(15), null, 0, fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "desc", "audio/mp3")
+                            .values(fromString("817a4626-6fd2-457e-8d27-69ea5acdc828"), "Appload 2", "http://fakeurl.com/appload.2.mp3", "http://fakeurl.com/appload.2.mp3", Path("appload.2.mp3"), fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), ItemStatus.NOT_DOWNLOADED, now().minusDays(30), null, null, 0, fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "desc", "audio/mp3")
+                            .values(fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), "Appload 3", "http://fakeurl.com/appload.3.mp3", "http://fakeurl.com/appload.3.mp3", Path("appload.3.mp3"), fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), ItemStatus.NOT_DOWNLOADED, now(), null, null, 0, fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "desc", "audio/mp3")
+                            .values(fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"), "Geek INC 123", "http://fakeurl.com/geekinc.123.mp3", "http://fakeurl.com/geekinc.123.mp3", Path("geekinc.123.mp3"), fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), ItemStatus.DELETED, now().minusYears(1), now(), now().minusMonths(2), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "video/mp4")
+                            .values(fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), "Geek INC 124", "http://fakeurl.com/geekinc.124.mp3", "http://fakeurl.com/geekinc.124.mp3", Path("geekinc.124.mp3"), fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), ItemStatus.FINISH, now().minusDays(15), now().minusDays(15), now().minusMonths(2), 0, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "video/mp4")
+                            .values(fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 122", "http://fakeurl.com/geekinc.122.mp3", "http://fakeurl.com/geekinc.122.mp3", Path("geekinc.122.mp3"), fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), ItemStatus.FAILED, now().minusDays(1), null, now().minusWeeks(2), 3, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "video/mp4")
+                            .values(fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 126", "http://fakeurl.com/geekinc.126.mp3", "http://fakeurl.com/geekinc.126.mp3", Path("geekinc.126.mp3"), fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), ItemStatus.FAILED, now().minusDays(1), null, now().minusWeeks(1), 7, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "video/mp4"),
                     insertInto(TAG, TAG.ID, TAG.NAME)
                             .values(fromString("eb355a23-e030-4966-b75a-b70881a8bd08"), "French Spin")
                             .values(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "Studio Knowhere"),
@@ -382,7 +382,7 @@ class PodcastRepositoryTest(
                         .assertNext {
                             assertThat(it.title).isEqualTo("a podcast")
                             assertThat(it.url).isEqualTo("http://foo.bar.com/feed.rss")
-                            assertThat(it.hasToBeDeleted).isTrue()
+                            assertThat(it.hasToBeDeleted).isTrue
                             assertThat(it.type).isEqualTo("Rss")
                             assertThat(it.tags.map(Tag::id)).containsExactlyInAnyOrder(tag1.id, tag2.id, tag3.id)
                             assertThat(it.cover.id).isEqualTo(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"))
@@ -412,7 +412,7 @@ class PodcastRepositoryTest(
                         .assertNext {
                             assertThat(it.title).isEqualTo("a podcast")
                             assertThat(it.url).isEqualTo("http://foo.bar.com/feed.rss")
-                            assertThat(it.hasToBeDeleted).isTrue()
+                            assertThat(it.hasToBeDeleted).isTrue
                             assertThat(it.type).isEqualTo("Rss")
                             assertThat(it.tags.map(Tag::id)).isEmpty()
                             assertThat(it.cover.id).isEqualTo(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"))
