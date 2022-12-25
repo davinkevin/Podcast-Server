@@ -1,10 +1,10 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
 import org.mockito.kotlin.*
-import com.sapher.youtubedl.DownloadProgressCallback
-import com.sapher.youtubedl.YoutubeDL
-import com.sapher.youtubedl.YoutubeDLRequest
-import com.sapher.youtubedl.YoutubeDLResponse
+import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
+import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDL
+import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLRequest
+import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach

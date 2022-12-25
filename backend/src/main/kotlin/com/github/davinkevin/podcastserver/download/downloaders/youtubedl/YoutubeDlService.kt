@@ -1,9 +1,9 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
-import com.sapher.youtubedl.DownloadProgressCallback
-import com.sapher.youtubedl.YoutubeDL
-import com.sapher.youtubedl.YoutubeDLRequest
-import com.sapher.youtubedl.YoutubeDLResponse
+import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
+import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDL
+import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLRequest
+import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLResponse
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path

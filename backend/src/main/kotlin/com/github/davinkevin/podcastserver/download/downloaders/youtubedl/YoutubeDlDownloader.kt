@@ -6,7 +6,7 @@ import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInforma
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
-import com.sapher.youtubedl.DownloadProgressCallback
+import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.time.Clock

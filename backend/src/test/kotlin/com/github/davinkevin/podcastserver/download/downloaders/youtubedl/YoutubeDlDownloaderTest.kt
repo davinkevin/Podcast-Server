@@ -8,8 +8,8 @@ import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
-import com.sapher.youtubedl.DownloadProgressCallback
-import com.sapher.youtubedl.YoutubeDLResponse
+import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
+import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.BeforeEach

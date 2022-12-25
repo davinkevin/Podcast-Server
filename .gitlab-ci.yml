@@ -50,6 +50,7 @@ variables:
   - &changes_backend_files
     changes:
     - backend/**/*
+    - backend-lib-youtubedl/**/*
     - database/**/*
 
 .storage_files:
@@ -122,7 +123,7 @@ stages:
   extends: [ .only-on-backend-changes ]
   image: openjdk:17-slim
   script:
-    - ./gradlew $GRADLE_OPTS :backend:downloadDependencies
+    - ./gradlew $GRADLE_OPTS :backend:downloadDependencies :backend-lib-youtubedl:downloadDependencies
   cache:
     key:
       files:

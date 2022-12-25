@@ -27,5 +27,6 @@ buildCache {
 }
 
 include("backend")
+include("backend-lib-youtubedl")
 include("frontend-angular")
 include("frontend-angularjs")

@@ -40,7 +40,6 @@ val db = (project.extra["databaseParameters"] as Map<String, String>)
 
 repositories {
 	mavenCentral()
-	maven { url = uri("https://jitpack.io") }
 }
 
 "jooq-and-r2dbc-compatibility-for-spring-boot-3".apply {
@@ -68,7 +67,8 @@ dependencies {
 
 	implementation("org.jdom:jdom2:2.0.6.1")
 	implementation("org.jsoup:jsoup:1.15.3")
-	implementation("com.github.pedroviniv:youtubedl-java:ef7110605d23eaaae4796312163bcf84c7099311")
+
+	implementation(project(":backend-lib-youtubedl"))
 	implementation("net.bramp.ffmpeg:ffmpeg:0.7.0")
 
 	implementation("io.r2dbc:r2dbc-pool")

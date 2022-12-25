@@ -24,7 +24,7 @@ Backend/src/main/**/application.yml
 Backend/build
 Backend/lan.dk.podcastserver.*
 Backend/etc
-
+backend-lib-youtubedl/build
 
 
 /lan.dk.podcastserver.entity.Item/
