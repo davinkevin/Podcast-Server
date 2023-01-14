@@ -1,6 +1,24 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2023.1.0
+
+### Features
+
+- **backend:** Add native gradle plugin to enable processAOT by default ([1a857b3](1a857b384599eaee1d52049af487cc118697d733))
+- **backend:** Use guid for deduplication of items for RSS ([c089094](c0890945393eca7e6dc637d6c2205b6c2c61cbe7) - [#185](https://gitlab.com/davinkevin/Podcast-Server/-/issues/185))
+- **backend:** Remove the banner.txt causing problem during compile or run ([2cc38a2](2cc38a2b90cbb58eec087093945791e3c23a04a4))
+- **backend:** Upgrade backend to Spring Boot 3.0.1 ([744efc5](744efc51bd693600a4d94bee81096b5e14056c4c))
+- **backend:** Internalise the youtube-dl library ([833aac4](833aac4241807e001c6b684d4b4fc2e3e736914a))
+- **backend:** Externalize all logic into external plugin ([1f7e78b](1f7e78b05d467f7538928f84efb4ae35f52f6716) - [#179](https://gitlab.com/davinkevin/Podcast-Server/-/issues/179))
+- **database:** Upgrade flyway to version 9.8.3 ([2d680c8](2d680c818f4cb91b97d5ae0e206c2aaef749fe91))
+- **distribution:** Ingress is available as a component ([af7a0ca](af7a0ca28da49b355e5d74ad2d713c116df6d3cf) - [#184](https://gitlab.com/davinkevin/Podcast-Server/-/issues/184))
+- **storage:** Upgrade minio version to RELEASE.2022-12-02T19-19-22Z ([09a9e40](09a9e405e488f2947551a4a53a65a1ce90ced38d) - [#183](https://gitlab.com/davinkevin/Podcast-Server/-/issues/183))
+
+### Bug Fixes
+
+- **ci:** Edit command for auto cleanup in docker-hub ([79a22f7](79a22f7e98a1ff2a622d466a94a7cab3afd2e8d7))
+
 ## 2022.12.0
 
 ### Features
