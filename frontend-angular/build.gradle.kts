@@ -2,11 +2,11 @@ import com.github.gradle.node.yarn.task.YarnTask
 
 plugins {
   base
-  id("com.github.node-gradle.node") version "3.1.1"
+  id("com.github.node-gradle.node") version "3.5.1"
 }
 
 group = "com.github.davinkevin.podcastserver"
-version = "2022.3.0"
+version = "2023.1.0"
 description = "frontend-angular"
 
 node {
