@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2023.2.0
+
+### Features
+
+- **backend:** Upgrade multiple libraries in backend ([b2ea5c5](b2ea5c542c8fcc710a7bfca3da12e420f5694b1d) - [#188](https://gitlab.com/davinkevin/Podcast-Server/-/issues/188))
+
 ## 2023.1.0
 
 ### Features
