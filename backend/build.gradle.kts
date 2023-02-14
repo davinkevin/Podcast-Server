@@ -10,16 +10,17 @@ plugins {
 
 	id("com.gorylenko.gradle-git-properties") version "2.4.1"
 	id("com.google.cloud.tools.jib") version "3.3.1"
-	id("de.jansauer.printcoverage") version "2.0.0"
 	id("org.jetbrains.kotlinx.kover") version "0.6.1"
 	id("org.graalvm.buildtools.native") version "0.9.19"
 
 	kotlin("jvm") version "1.7.22"
 	kotlin("plugin.spring") version "1.7.22"
+
 	jacoco
 
 	id("build-plugin-database")
 	id("build-plugin-docker-images")
+	id("build-plugin-print-coverage")
 }
 
 group = "com.github.davinkevin.podcastserver"
@@ -97,10 +98,6 @@ tasks.withType<KotlinCompile> {
 		)
 		jvmTarget = "17"
 	}
-}
-
-jacoco {
-	toolVersion = "0.8.7"
 }
 
 tasks.test {
