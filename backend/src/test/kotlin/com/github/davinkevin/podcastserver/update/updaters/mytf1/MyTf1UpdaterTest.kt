@@ -69,7 +69,7 @@ class MyTf1UpdaterTest(
         fun `with no items`(backend: WireMockServer) {
             /* Given */
             backend.stubFor(
-                    get("""/graphql/web?id=6708f510f2af7e75114ab3c4378142b2ce25cd636ff5a1ae11f47ce7ad9c4a91&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
+                    get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
                     .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.with-no-items.json")))
             )
             /* When */
@@ -82,7 +82,7 @@ class MyTf1UpdaterTest(
         @Test
         fun `with no type and all items`(backend: WireMockServer) {
             /* Given */
-            backend.stubFor(get("""/graphql/web?id=6708f510f2af7e75114ab3c4378142b2ce25cd636ff5a1ae11f47ce7ad9c4a91&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
+            backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
                     .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
             )
             whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
@@ -91,7 +91,7 @@ class MyTf1UpdaterTest(
             StepVerifier.create(updater.findItems(podcast))
                     /* Then */
                     .expectSubscription()
-                    .expectNextCount(50)
+                    .expectNextCount(100)
                     .verifyComplete()
         }
 
@@ -99,7 +99,7 @@ class MyTf1UpdaterTest(
         fun `with no type and no videos and all items`(backend: WireMockServer) {
             /* Given */
             val p = podcast.copy(url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"))
-            backend.stubFor(get("""/graphql/web?id=6708f510f2af7e75114ab3c4378142b2ce25cd636ff5a1ae11f47ce7ad9c4a91&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
+            backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
                     .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
             )
             whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
@@ -108,7 +108,7 @@ class MyTf1UpdaterTest(
             StepVerifier.create(updater.findItems(p))
                     /* Then */
                     .expectSubscription()
-                    .expectNextCount(50)
+                    .expectNextCount(100)
                     .verifyComplete()
         }
 
@@ -116,7 +116,7 @@ class MyTf1UpdaterTest(
         fun `with replay and all items`(backend: WireMockServer) {
             /* Given */
             val p = podcast.copy(url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/replay"))
-            backend.stubFor(get("""/graphql/web?id=6708f510f2af7e75114ab3c4378142b2ce25cd636ff5a1ae11f47ce7ad9c4a91&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22replay%22%5D%7D""")
+            backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22REPLAY%22%5D%7D""")
                     .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
             )
             whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
@@ -125,7 +125,7 @@ class MyTf1UpdaterTest(
             StepVerifier.create(updater.findItems(p))
                     /* Then */
                     .expectSubscription()
-                    .expectNextCount(50)
+                    .expectNextCount(100)
                     .verifyComplete()
         }
 
@@ -133,7 +133,7 @@ class MyTf1UpdaterTest(
         fun `with extract and all items`(backend: WireMockServer) {
             /* Given */
             val p = podcast.copy(url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/extract"))
-            backend.stubFor(get("""/graphql/web?id=6708f510f2af7e75114ab3c4378142b2ce25cd636ff5a1ae11f47ce7ad9c4a91&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22extract%22%5D%7D""")
+            backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22EXTRACT%22%5D%7D""")
                     .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
             )
             whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
@@ -142,7 +142,7 @@ class MyTf1UpdaterTest(
             StepVerifier.create(updater.findItems(p))
                     /* Then */
                     .expectSubscription()
-                    .expectNextCount(50)
+                    .expectNextCount(100)
                     .verifyComplete()
         }
 
@@ -150,7 +150,7 @@ class MyTf1UpdaterTest(
         fun `with bonus and all items`(backend: WireMockServer) {
             /* Given */
             val p = podcast.copy(url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/bonus"))
-            backend.stubFor(get("""/graphql/web?id=6708f510f2af7e75114ab3c4378142b2ce25cd636ff5a1ae11f47ce7ad9c4a91&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22bonus%22%5D%7D""")
+            backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22BONUS%22%5D%7D""")
                     .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
             )
             whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
@@ -159,14 +159,14 @@ class MyTf1UpdaterTest(
             StepVerifier.create(updater.findItems(p))
                     /* Then */
                     .expectSubscription()
-                    .expectNextCount(50)
+                    .expectNextCount(100)
                     .verifyComplete()
         }
 
         @Test
         fun `and check first item content`(backend: WireMockServer) {
             /* Given */
-            backend.stubFor(get("""/graphql/web?id=6708f510f2af7e75114ab3c4378142b2ce25cd636ff5a1ae11f47ce7ad9c4a91&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
+            backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
                     .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
             )
             whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
@@ -176,14 +176,12 @@ class MyTf1UpdaterTest(
                     /* Then */
                     .expectSubscription()
                     .assertNext {
-                        assertThat(it.title).isEqualTo("Le meilleur de la semaine du 15 juin 2019")
+                        assertThat(it.title).isEqualTo("Réforme des retraites : nouvelle journée hallucinante à l’Assemblée")
 
-                        assertThat(it.description).contains("""QUOTIDIEN, présenté par Yann BARTHES avec son équipe de journalistes et de chroniqueurs, revient pour une saison 3 sur TMC.""")
-                        assertThat(it.description).contains("""Le Talk-show d’actu et de culture, produit par Bangumi, continue de décrypter toutes les images qui inondent l’époque avec une formule enrichie et une équipe de reporters et d'humoristes élargie.""")
-                        assertThat(it.description).contains("""Superstars internationales, invités d’actualité, nouveaux visages français, reportages à l’étranger et dans les régions, analyses, lives, humour, tous les ingrédients qui font le succès de QUOTIDIEN sont au rendez-vous du lundi au vendredi à 19h20 sur TMC.""")
+                        assertThat(it.description).contains("""Après une première semaine de débats chaotique, explosive et houleuse, on espérait un retour au calme dans l’hémicycle ce lundi pour la seconde semaine de débat sur la réforme des retraites. Il n’en a rien été. On en parle avec Sophie Dupont.""")
 
-                        assertThat(it.pubDate).isEqualTo(ZonedDateTime.of(2019, 6, 15, 9, 52, 44, 0, ZoneId.of("UTC")))
-                        assertThat(it.url).isEqualTo(URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/meilleur-de-semaine-15-juin-2019.html"))
+                        assertThat(it.pubDate).isEqualTo(ZonedDateTime.of(2023, 2, 13, 19, 28, 0, 0, ZoneId.of("UTC")))
+                        assertThat(it.url).isEqualTo(URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/reforme-des-retraites-nouvelle-journee-hallucinante-a-lassemblee-54055173.html"))
                         assertThat(it.cover!!.width).isEqualTo(100)
                         assertThat(it.cover!!.height).isEqualTo(200)
                         assertThat(it.cover!!.url).isEqualTo(URI("https://fake.url.com/img.png"))
@@ -213,7 +211,7 @@ class MyTf1UpdaterTest(
         fun `with no items`(backend: WireMockServer) {
             /* Given */
             backend.apply {
-                stubFor(get("""/graphql/web?id=6708f510f2af7e75114ab3c4378142b2ce25cd636ff5a1ae11f47ce7ad9c4a91&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
+                stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
                         .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.with-no-items.json")))
                 )
             }
@@ -230,7 +228,7 @@ class MyTf1UpdaterTest(
         fun `with no type and all items`(backend: WireMockServer) {
             /* Given */
             backend.apply {
-                stubFor(get("""/graphql/web?id=6708f510f2af7e75114ab3c4378142b2ce25cd636ff5a1ae11f47ce7ad9c4a91&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
+                stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
                         .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
                 )
             }
@@ -238,7 +236,7 @@ class MyTf1UpdaterTest(
             StepVerifier.create(updater.signatureOf(podcast.url))
                     /* Then */
                     .expectSubscription()
-                    .expectNext("0d1b85d92442090ce4d7320f2176e8cf")
+                    .expectNext("e254efc2cd90286877d9d38f45b1d5fb")
                     .verifyComplete()
         }
 
@@ -247,14 +245,14 @@ class MyTf1UpdaterTest(
             /* Given */
             val p = podcast.copy(url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/replay"))
 
-            backend.stubFor(get("""/graphql/web?id=6708f510f2af7e75114ab3c4378142b2ce25cd636ff5a1ae11f47ce7ad9c4a91&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22replay%22%5D%7D""")
+            backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22REPLAY%22%5D%7D""")
                     .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
             )
             /* When */
             StepVerifier.create(updater.signatureOf(p.url))
                     /* Then */
                     .expectSubscription()
-                    .expectNext("0d1b85d92442090ce4d7320f2176e8cf")
+                    .expectNext("e254efc2cd90286877d9d38f45b1d5fb")
                     .verifyComplete()
         }
 
@@ -264,7 +262,7 @@ class MyTf1UpdaterTest(
             val p = podcast.copy(url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/extract"))
 
             backend.apply {
-                stubFor(get("""/graphql/web?id=6708f510f2af7e75114ab3c4378142b2ce25cd636ff5a1ae11f47ce7ad9c4a91&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22extract%22%5D%7D""")
+                stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22EXTRACT%22%5D%7D""")
                         .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
                 )
             }
@@ -272,7 +270,7 @@ class MyTf1UpdaterTest(
             StepVerifier.create(updater.signatureOf(p.url))
                     /* Then */
                     .expectSubscription()
-                    .expectNext("0d1b85d92442090ce4d7320f2176e8cf")
+                    .expectNext("e254efc2cd90286877d9d38f45b1d5fb")
                     .verifyComplete()
         }
 
@@ -282,7 +280,7 @@ class MyTf1UpdaterTest(
             val p = podcast.copy(url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes/videos/bonus"))
 
             backend.apply {
-                stubFor(get("""/graphql/web?id=6708f510f2af7e75114ab3c4378142b2ce25cd636ff5a1ae11f47ce7ad9c4a91&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22bonus%22%5D%7D""")
+                stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22BONUS%22%5D%7D""")
                         .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
                 )
             }
@@ -290,7 +288,7 @@ class MyTf1UpdaterTest(
             StepVerifier.create(updater.signatureOf(p.url))
                     /* Then */
                     .expectSubscription()
-                    .expectNext("0d1b85d92442090ce4d7320f2176e8cf")
+                    .expectNext("e254efc2cd90286877d9d38f45b1d5fb")
                     .verifyComplete()
         }
 

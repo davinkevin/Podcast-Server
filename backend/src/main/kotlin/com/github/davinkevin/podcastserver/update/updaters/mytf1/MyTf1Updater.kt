@@ -19,6 +19,7 @@ import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.ZonedDateTime
 import com.github.davinkevin.podcastserver.service.image.ImageService
+import java.util.*
 
 /**
  * Created by kevin on 11/03/2020
@@ -51,7 +52,7 @@ class MyTf1Updater(
                 .fetchCoverUpdateInformationOrOption(video.bestCover())
                 .map {
                     ItemFromUpdate(
-                            title = video.title,
+                            title = video.decoration.label,
                             description = video.decoration.description,
                             pubDate = video.date,
                             url = URI("$baseVideoUrl/${video.slug}.html"),
@@ -73,7 +74,7 @@ class MyTf1Updater(
                 .retrieve()
                 .bodyToMono<TF1GraphQLResult>()
                 .flatMapIterable { it.data.programBySlug.videos.items }
-                .map { it.streamId }
+                .map { it.url }
                 .sort()
                 .reduce { t, u -> """$t, $u""" }
                 .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
@@ -114,7 +115,7 @@ class MyTf1Updater(
     private fun extractTypeFromUrl(url: String): Set<String>? {
         val end = url.substringAfterLast("/")
         if (end in allowedTypes)
-            return setOf(end)
+            return setOf(end.uppercase(Locale.getDefault()))
 
         return null
     }
@@ -129,7 +130,7 @@ class MyTf1Updater(
     companion object {
         private const val graphqlEndpoints = "/graphql/web"
         private val allowedTypes = setOf("replay", "extract", "bonus")
-        private const val searchQueryId = "6708f510f2af7e75114ab3c4378142b2ce25cd636ff5a1ae11f47ce7ad9c4a91"
+        private const val searchQueryId = "87a97a3"
 
         private val defaultQuerySort = TF1GraphqlQuery.Sort(type = "DATE", order = "DESC")
 
@@ -156,11 +157,10 @@ private class TF1GraphQLResult(
     class ProgramBySlug(val videos: Videos)
     class Videos(val total: Int, val items: List<Video>)
     class Video(
-            val streamId: String,
+            val url: String,
             val slug: String,
-            val title: String,
             val date: ZonedDateTime,
-            val decoration: Decoration
+            val decoration: Decoration,
     ) {
         fun bestCover(): URI? {
             return decoration
@@ -171,7 +171,7 @@ private class TF1GraphQLResult(
                     .firstOrNull()
         }
     }
-    class Decoration(val description: String, val images: Set<Images>)
+    class Decoration(val description: String, val images: Set<Images>, val label: String)
     class Images(val type: String, val sources: List<SrcSet>)
     class SrcSet(val url: String)
 }
