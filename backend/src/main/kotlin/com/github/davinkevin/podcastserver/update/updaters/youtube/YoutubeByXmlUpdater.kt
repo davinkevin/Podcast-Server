@@ -111,16 +111,13 @@ class YoutubeByXmlUpdater(
                 .bodyToMono<String>()
                 .map { Jsoup.parse(it, "https://www.youtube.com") }
                 .flatMap { Mono.justOrEmpty(it.select("meta[itemprop=channelId]").firstOrNull()) }
-                .map { "channel_id" to it.attr("content") }
+                .map { "channel_id" to it!!.attr("content") }
     }
 
     override fun type() = type
     override fun compatibility(url: String): Int = youtubeCompatibility(url)
 
     companion object {
-        private const val PLAYLIST_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?playlist_id=%s"
-        private const val CHANNEL_RSS_BASE = "https://www.youtube.com/feeds/videos.xml?channel_id=%s"
-        private const val URL_PAGE_BASE = "https://www.youtube.com/watch?v=%s"
         private val MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")
     }
 }
