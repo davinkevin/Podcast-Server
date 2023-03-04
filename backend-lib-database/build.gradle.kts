@@ -13,7 +13,7 @@ plugins {
 }
 
 group = "com.gitlab.davinkevin.podcastserver.database"
-version = "2023.01.0"
+version = "2023.3.0"
 
 repositories {
     mavenCentral()

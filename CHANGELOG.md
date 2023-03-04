@@ -1,6 +1,23 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2023.3.0
+
+### Features
+
+- **backend:** Upgrade to spring boot 3.0.3 ([588a8c7](588a8c7ac45d27c3594f81bd4523620a0f00bd0a) - [#191](https://gitlab.com/davinkevin/Podcast-Server/-/issues/191))
+- **backend:** Upgrade to spring boot 3.0.4 ([b48e333](b48e333a893591aeaed2cd760e9bfd064e33d88d) - [#192](https://gitlab.com/davinkevin/Podcast-Server/-/issues/192))
+- **build:** Upgrade to gradle 8.0 ([61d2ace](61d2ace8c1f2039238c240619371c1d5630f5dba) - [#189](https://gitlab.com/davinkevin/Podcast-Server/-/issues/189))
+- **build:** Provide a compatible implementation for coverage plugin ([3642f68](3642f68611989397a0bc24cd788a501fc827cae9) - [#189](https://gitlab.com/davinkevin/Podcast-Server/-/issues/189))
+
+### Bug Fixes
+
+- **mytf1:** Supports evolutions made in mytf1 graphql API ([578c9bd](578c9bd213fdb9776cf1686bae127c771dfd69b4) - [#190](https://gitlab.com/davinkevin/Podcast-Server/-/issues/190))
+
+### Refactor
+
+- **backend:** Remove useless variables from youtube updater ([1af279f](1af279ff8d37cfe49a8ce09963aeeb048e49848d))
+
 ## 2023.2.0
 
 ### Features
