@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.gitlab.davinkevin.podcastserver.printcoverage"
-version = "unspecified"
+version = "2023.3.0"
 
 repositories {
     mavenCentral()
