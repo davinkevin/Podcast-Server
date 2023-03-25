@@ -3,7 +3,7 @@ plugins {
     kotlin("jvm") version "1.7.22"
 }
 
-group = "com.gitlab.davinkevin.podcastserver"
+group = "com.gitlab.davinkevin.podcastserver.database"
 version = "2023.3.0"
 
 repositories {
