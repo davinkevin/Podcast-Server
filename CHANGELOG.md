@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2023.4.0
+
+### Features
+
+- **backend:** Upgrade to spring boot 3.0.5 ([53330e9](53330e998fab8ba8a318e664c9e1ac25a3033013))
+- **storage:** Upgrade minio component to version minio/minio:RELEASE.2022-12-02T19-19-22Z ([cef7c87](cef7c87f577ee121fa97698611ac3008949f8ea5))
+
+### Bug Fixes
+
+- **distribution:** Support custom bucket entry for ingress ([474a4b7](474a4b77a35266e090d551a7317f06e1b495289e))
+
 ## 2023.3.0
 
 ### Features
