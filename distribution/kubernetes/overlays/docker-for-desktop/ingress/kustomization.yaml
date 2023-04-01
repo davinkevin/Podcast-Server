@@ -1,5 +1,5 @@
-apiVersion: kustomize.config.k8s.io/v1beta1
-kind: Kustomization
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
 
 resources:
   - podcast-server
@@ -17,6 +17,7 @@ configMapGenerator:
     literals:
       - podcast=podcast.k8s.local
       - minio=minio.podcast.k8s.local
+      - bucket=dev-podcasts
 
 secretGenerator:
   - name: certificates-k8s-local
@@ -28,6 +29,8 @@ secretGenerator:
 replacements:
   - source:
       kind: Secret
+      name: certificates-k8s-local
+      fieldPath: metadata.name
     targets:
       - select:
           kind: Ingress
@@ -51,6 +54,19 @@ replacements:
   - source:
       kind: ConfigMap
       name: ingress
+      fieldPath: data.bucket
+    targets:
+      - select:
+          kind: Ingress
+          name: podcast-server
+        fieldPaths:
+          - spec.rules.0.http.paths.2.path
+        options:
+          delimiter: "/"
+          index: 1
+  - source:
+      kind: ConfigMap
+      name: ingress
       fieldPath: data.minio
     targets:
       - select:
@@ -61,3 +77,5 @@ replacements:
           - spec.tls.0.hosts.0
         options:
           create: true
+
+
