@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2023.5.0
+
+### Features
+
+- **backend:** Upgrade Spring to v3.0.6 ([b5fb350](b5fb3502f9436d38421515ac650819338ab02d8b))
+
 ## 2023.4.0
 
 ### Features

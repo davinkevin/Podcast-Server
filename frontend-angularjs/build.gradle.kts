@@ -7,7 +7,7 @@ plugins {
 }
 
 group = "com.github.davinkevin.podcastserver"
-version = "2023.4.0"
+version = "2023.5.0"
 description = "frontend-angularjs"
 
 node {
