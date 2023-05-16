@@ -1,30 +1,33 @@
 rootProject.name = "Podcast-Server"
 
-val buildCacheUsernameProperty = "BUILD_CACHE__PODCAST_SERVER__USERNAME"
-val buildCachePasswordProperty = "BUILD_CACHE__PODCAST_SERVER__PASSWORD"
-
-val cacheUsername = System.getenv(buildCacheUsernameProperty)
-        ?: System.getProperty(buildCacheUsernameProperty)
-        ?: error("$buildCacheUsernameProperty is not defined")
-val cachePassword = System.getenv(buildCachePasswordProperty)
-        ?: System.getProperty(buildCachePasswordProperty)
-        ?: error("$buildCachePasswordProperty is not defined")
+plugins {
+    id("com.gradle.enterprise") version("3.13.2")
+    id("com.gradle.common-custom-user-data-gradle-plugin") version "1.10"
+}
 
 val isCI = System.getenv("CI") == "true"
-
 buildCache {
     local { isEnabled = !isCI }
+    remote(gradleEnterprise.buildCache) { isPush = isCI }
+}
 
-    remote<HttpBuildCache> {
-        credentials {
-            username = cacheUsername
-            password = cachePassword
+gradleEnterprise {
+    server = "https://gradle-enterprise.davinkevin.fr"
+    buildScan {
+        publishAlways()
+        capture {
+            isTaskInputFiles = true
+            isUploadInBackground = !isCI
         }
-        url = uri("https://build-cache.ci.davinkevin.fr/cache/")
-        isPush = isCI
-        isEnabled = true
+        if(isCI) {
+            tag(System.getenv("CI_COMMIT_BRANCH"))
+            value("Pipeline", System.getenv("CI_PIPELINE_ID"))
+            value("Job Image", System.getenv("CI_JOB_IMAGE"))
+            link("Source", "https://gitlab.com/davinkevin/Podcast-Server/tree/${System.getenv("CI_COMMIT_BRANCH")}")
+        }
     }
 }
+
 
 include("backend-lib-database")
 include("backend-lib-youtubedl")
