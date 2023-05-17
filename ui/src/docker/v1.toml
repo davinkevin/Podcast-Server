@@ -1,0 +1,15 @@
+[general]
+
+host = "::"
+port = 8080
+root = "/podcast-server"
+log-level = "info"
+
+page-fallback = "/podcast-server/index.html"
+cache-control-headers = true
+compression = true
+security-headers = true
+directory-listing = false
+redirect-trailing-slash = true
+compression-static = true
+ignore-hidden-files = true

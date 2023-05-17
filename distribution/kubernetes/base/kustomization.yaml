@@ -3,7 +3,8 @@ kind: Kustomization
 
 resources:
   - backend.yaml
-  - ui.yaml
+  - ui-v1.yaml
+  - ui-v2.yaml
 
 configMapGenerator:
   - name: podcast-server

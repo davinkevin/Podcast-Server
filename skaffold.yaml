@@ -18,8 +18,19 @@ build:
       dockerfile: ./backend-lib-database/src/main/docker/Dockerfile
   - image: podcastserver/storage
     context: storage/
-  - image: podcastserver/ui-v1
-    context: frontend-angularjs/target/
+  - image: podcastserver/ui
+    custom:
+      buildCommand: |
+        set -euo pipefail
+        sh ui/compile.sh
+        docker build -f ui/target/docker/Dockerfile ui/target/docker/ -t $IMAGE
+        if $PUSH_IMAGE; then
+            docker push $IMAGE
+        fi
+      dependencies:
+        paths:
+          - frontend-angularjs/target/dist
+          - frontend-angular/dist
 deploy:
   kustomize:
     paths:

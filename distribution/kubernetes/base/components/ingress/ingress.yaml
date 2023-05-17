@@ -29,9 +29,16 @@ spec:
                 port:
                   number: 9000
           - pathType: Prefix
+            path: /v2
+            backend:
+              service:
+                name: ui-v2
+                port:
+                  name: http
+          - pathType: Prefix
             path: /
             backend:
               service:
                 name: ui-v1
                 port:
-                  number: 80
+                  name: http

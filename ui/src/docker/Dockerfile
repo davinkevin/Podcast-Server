@@ -1,5 +1,4 @@
-FROM nginx:latest
-# Author: DAVIN Kevin davin.kevin@gmail.com
+FROM joseluisq/static-web-server:2.15.0
 
-COPY podcast-server /var/www/podcast-server
-COPY default.conf /etc/nginx/conf.d/default.conf
+COPY podcast-server /podcast-server
+COPY v1.toml v2.toml /

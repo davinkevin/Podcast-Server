@@ -1,0 +1,54 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ui-v2
+  labels:
+    app: podcast-server
+    module: frontend
+    version: v2
+spec:
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+      protocol: TCP
+  selector:
+    app: podcast-server
+    module: frontend
+    version: v2
+    serving: "true"
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ui-v2
+spec:
+  selector:
+    matchLabels:
+      app: podcast-server
+      module: frontend
+      version: v2
+      serving: "true"
+  template:
+    metadata:
+      labels:
+        app: podcast-server
+        module: frontend
+        version: v2
+        serving: "true"
+    spec:
+      containers:
+        - image: podcastserver/ui:latest
+          imagePullPolicy: IfNotPresent
+          name: ui
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: SERVER_CONFIG_FILE
+              value: /v2.toml
