@@ -33,7 +33,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 90
       containers:
-        - image: postgres:12.3-alpine
+        - image: postgres:15.3-alpine
           imagePullPolicy: IfNotPresent
           name: database
           env:
@@ -95,7 +95,7 @@ spec:
           containers:
             - name: database-backup
               imagePullPolicy: IfNotPresent
-              image: postgres:12.3-alpine
+              image: postgres:15.3-alpine
               env:
                 - name: PGPASSWORD
                   valueFrom:

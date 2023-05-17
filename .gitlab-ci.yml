@@ -175,7 +175,7 @@ stages:
   image: openjdk:17-bullseye
   needs: [⬇ backend]
   services:
-    - postgres:12.3-alpine
+    - postgres:15.3-alpine
   variables:
     POSTGRES_USER: pg-user
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
@@ -295,7 +295,7 @@ stages:
   image: openjdk:17-slim
   needs: [👷 backend-base-image]
   services:
-    - postgres:12.3-alpine
+    - postgres:15.3-alpine
   variables:
     POSTGRES_USER: pg-user
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
