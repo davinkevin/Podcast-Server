@@ -4,7 +4,7 @@ workflow:
     - if: $CI_COMMIT_BRANCH
 
 variables:
-  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Duser.name=gitlab-ci-runner-podcast-server"
+  GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Duser.name=davin.kevin+gitlab-ci-runner-podcast-server"
   GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle
   YARN_CACHE_FOLDER: $CI_PROJECT_DIR/.yarn
 

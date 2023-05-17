@@ -33,3 +33,4 @@ backend-lib-database/build/
 /backend/buildSrc/build/
 /backend/buildSrc/gradle/wrapper/
 /documentation/dist/
+/gradle.properties
