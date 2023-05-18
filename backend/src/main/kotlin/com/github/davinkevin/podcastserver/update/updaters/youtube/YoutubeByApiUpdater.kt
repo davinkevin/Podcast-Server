@@ -105,9 +105,9 @@ class YoutubeByApiUpdater(
                 .retrieve()
                 .bodyToMono<String>()
                 .map { Jsoup.parse(it, "https://www.youtube.com") }
-                .flatMap { it.select("meta[itemprop=channelId]").firstOrNull().toMono() }
+                .flatMap { it.select("meta[itemprop=identifier]").firstOrNull().toMono() }
                 .map { it.attr("content") }
-                .map { transformChannelIdToPlaylistId(it) }
+                .map(::transformChannelIdToPlaylistId)
                 .switchIfEmpty { RuntimeException("channel id not found").toMono() }
     }
 

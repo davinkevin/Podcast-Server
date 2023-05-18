@@ -110,7 +110,7 @@ class YoutubeByXmlUpdater(
                 .retrieve()
                 .bodyToMono<String>()
                 .map { Jsoup.parse(it, "https://www.youtube.com") }
-                .flatMap { Mono.justOrEmpty(it.select("meta[itemprop=channelId]").firstOrNull()) }
+                .flatMap { Mono.justOrEmpty(it.select("meta[itemprop=identifier]").firstOrNull()) }
                 .map { "channel_id" to it!!.attr("content") }
     }
 

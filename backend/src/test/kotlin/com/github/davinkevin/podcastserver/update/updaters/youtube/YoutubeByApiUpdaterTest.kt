@@ -115,7 +115,11 @@ class YoutubeByApiUpdaterTest(
         @Test
         fun `and handle error on playlist id searching`(backend: WireMockServer) {
             /* Given */
-            val podcast = PodcastToUpdate(url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign")
+            val podcast = PodcastToUpdate(
+                url = URI("https://www.youtube.com/user/joueurdugrenier"),
+                id = UUID.randomUUID(),
+                signature = "noSign"
+            )
 
             backend.apply {
                 stubFor(get("/user/joueurdugrenier")
