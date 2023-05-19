@@ -26,7 +26,7 @@ docker run --rm -d \
            -e POSTGRES_DB=$DATABASE_NAME \
            -p $DATABASE_PORT:5432 \
            --name db-for-code-generation \
-           postgres:15.1-alpine > /dev/null
+           postgres:15.3-alpine > /dev/null
 
 k3d cluster create podcast-server --port 80:80@loadbalancer --port 443:443@loadbalancer
 
