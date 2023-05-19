@@ -5,16 +5,16 @@ import com.gitlab.davinkevin.podcastserver.database.*
 import com.gitlab.davinkevin.podcastserver.dockerimages.*
 
 plugins {
-	id("org.springframework.boot") version "3.0.6"
+	id("org.springframework.boot") version "3.1.0"
 	id("io.spring.dependency-management") version "1.1.0"
 
 	id("com.gorylenko.gradle-git-properties") version "2.4.1"
-	id("com.google.cloud.tools.jib") version "3.3.1"
-	id("org.jetbrains.kotlinx.kover") version "0.6.1"
-	id("org.graalvm.buildtools.native") version "0.9.20"
+	id("com.google.cloud.tools.jib") version "3.3.2"
+	id("org.jetbrains.kotlinx.kover") version "0.7.0"
+	id("org.graalvm.buildtools.native") version "0.9.22"
 
-	kotlin("jvm") version "1.7.22"
-	kotlin("plugin.spring") version "1.7.22"
+	kotlin("jvm") version "1.8.21"
+	kotlin("plugin.spring") version "1.8.21"
 
 	jacoco
 
@@ -29,13 +29,6 @@ java.sourceCompatibility = JavaVersion.VERSION_17
 
 repositories {
 	mavenCentral()
-}
-
-"jooq-and-r2dbc-compatibility-for-spring-boot-3".apply {
-	extra["r2dbc-spi.version"] = "0.9.1.RELEASE"
-	extra["r2dbc-proxy.version"] = "0.9.1.RELEASE"
-	extra["r2dbc-pool.version"] = "0.9.2.RELEASE"
-	extra["r2dbc-postgresql.version"] = "0.9.2.RELEASE"
 }
 
 dependencies {
@@ -62,18 +55,17 @@ dependencies {
 	implementation("io.r2dbc:r2dbc-pool")
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
-	implementation(platform("software.amazon.awssdk:bom:2.17.100"))
+	implementation(platform("software.amazon.awssdk:bom:2.20.67"))
 	implementation("software.amazon.awssdk:s3")
 	implementation("software.amazon.awssdk:netty-nio-client")
 
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.mockito.kotlin:mockito-kotlin:2.2.11")
-	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:2.10.0")
+	testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
+	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:2.37.0")
 	testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.0")
-	testImplementation("org.awaitility:awaitility:3.1.6")
+	testImplementation("org.awaitility:awaitility:4.2.0")
 
 }
 

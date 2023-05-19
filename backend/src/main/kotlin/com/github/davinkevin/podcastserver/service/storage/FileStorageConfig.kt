@@ -40,21 +40,16 @@ class FileStorageConfig {
             .region(Region.AWS_GLOBAL)
             .build()
 
-        val preSigner = S3Presigner.builder()
+        val preSignerBuilder = S3Presigner.builder()
             .region(Region.AWS_GLOBAL)
             .credentialsProvider { s3Credentials }
             .endpointOverride(properties.url)
-            .build()
+            .serviceConfiguration(s3conf)
 
-        val externalPreSigner: (URI) -> S3Presigner = { preSigner }
-        val requestSpecificPreSigner: (URI) -> S3Presigner = { S3Presigner.builder()
-            .region(Region.AWS_GLOBAL)
-            .credentialsProvider { s3Credentials }
-            .endpointOverride(it)
-            .build()
-        }
+        val externalPreSigner: (URI) -> S3Presigner = { preSignerBuilder.build() }
+        val requestSpecificPreSigner: (URI) -> S3Presigner = { preSignerBuilder.endpointOverride(it).build() }
 
-        val preSignerBuilder = if (properties.isInternal) requestSpecificPreSigner else externalPreSigner
+        val preSigner = if (properties.isInternal) requestSpecificPreSigner else externalPreSigner
 
         val wcb = webClientBuilder
             .clone()
@@ -63,7 +58,7 @@ class FileStorageConfig {
         return FileStorageService(
             wcb = wcb,
             bucket = bucketClient,
-            preSignerBuilder = preSignerBuilder,
+            preSignerBuilder = preSigner,
             properties = properties,
         )
     }

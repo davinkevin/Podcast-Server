@@ -316,7 +316,6 @@ class DownloadRepositoryTest(
                     }
                 }
             }
-
         }
 
     }
@@ -1406,6 +1405,10 @@ class DownloadRepositoryTest(
             val threeDayAgo = OffsetDateTime.now(fixedDate).minusDays(3)
 
             query.batch(
+                truncate(ITEM).cascade(),
+                truncate(PODCAST).cascade(),
+                truncate(COVER).cascade(),
+
                 insertInto(COVER, COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL)
                     .values(coverId, 100, 100, "https://foo.bac.com/cover.jpg"),
 

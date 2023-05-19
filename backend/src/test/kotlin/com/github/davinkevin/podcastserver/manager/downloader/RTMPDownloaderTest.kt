@@ -17,6 +17,7 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
 import reactor.core.publisher.Mono
@@ -102,14 +103,20 @@ class RTMPDownloaderTest {
         @Nested
         @DisplayName("should failed ")
         inner class ShouldFailed {
-            //
+
             @Test
             fun immediately_when_process_start() {
                 /* Given */
                 val pb = mock<ProcessBuilder>()
                 whenever(pb.directory(File("/tmp"))).then { pb }
                 whenever(pb.redirectErrorStream(true)).then { pb }
-                whenever(processService.newProcessBuilder(anyVararg())).then { pb }
+                whenever(processService.newProcessBuilder(
+                    eq("/usr/local/bin/rtmpdump"),
+                    eq("-r"),
+                    eq(item.url.toASCIIString()),
+                    eq("-o"),
+                    any<String>(),
+                )).then { pb }
                 whenever(processService.start(any())).then { throw RuntimeException("Error occur during shell execution")}
                 whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
 
@@ -127,7 +134,13 @@ class RTMPDownloaderTest {
                 val pb = mock<ProcessBuilder>()
                 whenever(pb.directory(File("/tmp"))).then { pb }
                 whenever(pb.redirectErrorStream(true)).then { pb }
-                whenever(processService.newProcessBuilder(anyVararg())).then { pb }
+                whenever(processService.newProcessBuilder(
+                    eq("/usr/local/bin/rtmpdump"),
+                    eq("-r"),
+                    eq(item.url.toASCIIString()),
+                    eq("-o"),
+                    any<String>(),
+                )).then { pb }
                 whenever(processService.start(any())).then { p }
                 whenever(processService.pidOf(p)).then { throw RuntimeException("Error during pid fetching") }
                 whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
@@ -152,13 +165,17 @@ class RTMPDownloaderTest {
             @BeforeEach
             fun beforeEach() {
                 var fileToCreate = ""
+                Mockito.reset(processService, p, pb)
+
                 whenever(pb.directory(File("/tmp"))).then { pb }
                 whenever(pb.redirectErrorStream(true)).then { pb }
-                whenever(processService.newProcessBuilder(anyVararg())).then {
-                    assertThat(it.arguments[0]).isEqualTo("/usr/local/bin/rtmpdump")
-                    assertThat(it.arguments[1]).isEqualTo("-r")
-                    assertThat(it.arguments[2]).isEqualTo(item.url.toASCIIString())
-                    assertThat(it.arguments[3]).isEqualTo("-o")
+                whenever(processService.newProcessBuilder(
+                    eq("/usr/local/bin/rtmpdump"),
+                    eq("-r"),
+                    eq(item.url.toASCIIString()),
+                    eq("-o"),
+                    any<String>(),
+                )).then {
                     fileToCreate = it.arguments[4]!! as String
                     pb
                 }

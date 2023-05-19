@@ -11,6 +11,8 @@ import com.github.davinkevin.podcastserver.podcast.DeletePodcastRequest
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.common.ConsoleNotifier
+import com.github.tomakehurst.wiremock.common.Slf4jNotifier
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
@@ -33,6 +35,7 @@ import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.DigestUtils
 import org.springframework.web.reactive.function.client.WebClient
+import reactor.core.publisher.Hooks
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
@@ -67,7 +70,10 @@ class FileStorageServiceTest(
     @JvmField
     @RegisterExtension
     val s3Backend: WireMockExtension = WireMockExtension.newInstance()
-        .options(wireMockConfig().port(s3MockBackendPort))
+        .options(wireMockConfig()
+            .port(s3MockBackendPort)
+//            .notifier(ConsoleNotifier(true))
+        )
         .build()
 
     @Nested
@@ -496,6 +502,7 @@ class FileStorageServiceTest(
         @Test
         fun `with item in it`() {
             /* Given */
+            Hooks.onOperatorDebug()
             s3Backend.apply {
                 stubFor(get("/data?prefix=origin").willReturn(okXml("""
                     <?xml version="1.0" encoding="UTF-8"?>
@@ -511,10 +518,10 @@ class FileStorageServiceTest(
                     </ListBucketResult>
                 """.trimIndent())))
                 stubFor(put("/data/destination/first.mp3")
-                    .withHeader("x-amz-copy-source", equalTo("/data/origin/first.mp3"))
+                    .withHeader("x-amz-copy-source", equalTo("data/origin/first.mp3"))
                     .willReturn(ok()))
                 stubFor(put("/data/destination/second.mp3")
-                    .withHeader("x-amz-copy-source", equalTo("/data/origin/second.mp3"))
+                    .withHeader("x-amz-copy-source", equalTo("data/origin/second.mp3"))
                     .willReturn(ok()))
                 stubFor(delete("/data/origin/first.mp3").willReturn(ok()))
                 stubFor(delete("/data/origin/second.mp3").willReturn(ok()))
@@ -645,7 +652,7 @@ class FileStorageServiceTest(
         )
 
         @Test
-        fun `with domain from request`() {
+        fun `with domain from user request`() {
             /* Given */
             val onDemandFileStorageService = FileStorageConfig().fileStorageService(
                 WebClient.builder(),
@@ -654,7 +661,7 @@ class FileStorageServiceTest(
 
             /* When */
             val uri = onDemandFileStorageService.toExternalUrl(
-                FileDescriptor("foo", Path("bar")),
+                FileDescriptor("bar", Path("zoo")),
                 URI.create("https://request.local/")
             )
 
@@ -663,7 +670,7 @@ class FileStorageServiceTest(
         }
 
         @Test
-        fun `with domain from storage`() {
+        fun `with domain from external storage system`() {
             /* Given */
             val onDemandFileStorageService = FileStorageConfig().fileStorageService(
                 WebClient.builder(),
@@ -672,7 +679,7 @@ class FileStorageServiceTest(
 
             /* When */
             val uri = onDemandFileStorageService.toExternalUrl(
-                FileDescriptor("foo", Path("bar")),
+                FileDescriptor("bar", Path("zoo")),
                 URI.create("https://request.local/")
             )
 
