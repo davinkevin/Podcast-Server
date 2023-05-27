@@ -1,37 +1,39 @@
-apiVersion: skaffold/v2beta28
+apiVersion: skaffold/v4beta5
 kind: Config
 build:
   artifacts:
-  - image: podcastserver/backend-base-image
-    docker:
-      dockerfile: backend/src/main/base-image/Dockerfile
-  - image: podcastserver/backend
-    jib:
-      project: backend
-      args:
-      - -Pskaffold=true
-      fromImage: podcastserver/backend-base-image
-    requires:
     - image: podcastserver/backend-base-image
-  - image: podcastserver/init-db
-    docker:
-      dockerfile: ./backend-lib-database/src/main/docker/Dockerfile
-  - image: podcastserver/storage
-    context: storage/
-  - image: podcastserver/ui
-    custom:
-      buildCommand: |
-        set -euo pipefail
-        sh ui/compile.sh
-        docker build -f ui/target/docker/Dockerfile ui/target/docker/ -t $IMAGE
-        if $PUSH_IMAGE; then
-            docker push $IMAGE
-        fi
-      dependencies:
-        paths:
-          - frontend-angularjs/target/dist
-          - frontend-angular/dist
-deploy:
+      docker:
+        dockerfile: backend/src/main/base-image/Dockerfile
+    - image: podcastserver/backend
+      jib:
+        project: backend
+        args:
+          - -Pskaffold=true
+        fromImage: podcastserver/backend-base-image
+      requires:
+        - image: podcastserver/backend-base-image
+    - image: podcastserver/init-db
+      docker:
+        dockerfile: ./backend-lib-database/src/main/docker/Dockerfile
+    - image: podcastserver/storage
+      context: storage/
+    - image: podcastserver/ui
+      custom:
+        buildCommand: |
+          set -euo pipefail
+          sh ui/compile.sh
+          docker build -f ui/target/docker/Dockerfile ui/target/docker/ -t $IMAGE
+          if $PUSH_IMAGE; then
+              docker push $IMAGE
+          fi
+        dependencies:
+          paths:
+            - frontend-angularjs/target/dist
+            - frontend-angular/dist
+manifests:
   kustomize:
     paths:
-    - distribution/kubernetes/overlays/docker-for-desktop/
+      - distribution/kubernetes/overlays/docker-for-desktop/
+deploy:
+  kubectl: {}
