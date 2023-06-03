@@ -96,6 +96,14 @@ tasks.test {
 
 	useJUnitPlatform()
 
+	predictiveSelection {
+		val env = System.getenv()
+		val isEnabledByEnv = env["PREDICTIVE_TEST_SELECTION_ENABLED"].toBoolean()
+		val isEnabledOnFeatureBranch = env["CI"].toBoolean() && env["CI_COMMIT_REF_NAME"] != env["CI_DEFAULT_BRANCH"]
+
+		enabled.set(isEnabledByEnv || isEnabledOnFeatureBranch)
+	}
+
 	systemProperty("user.timezone", "UTC")
 	project.extensions.getByType<DatabaseConfiguration>().apply {
 		systemProperty("spring.r2dbc.url", r2dbc())
