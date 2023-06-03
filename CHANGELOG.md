@@ -1,6 +1,23 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2023.6.0
+
+### Features
+
+- **backend:** Upgrade to spring boot 3.1.0 ([8010f9d](8010f9d8b3e538551cddda551c83b6fafa0ec4ac) - [#199](https://gitlab.com/davinkevin/Podcast-Server/-/issues/199))
+- **database:** Migrate CI and components to PG 15.3 ([a78e688](a78e688b03d999c46e954711b26ef0c7b4057f47))
+- **dev:** Add gradle enterprise for better dev analysis ([0aff1f4](0aff1f4e39a054f06e98585b3f414ad75551062c) - [#196](https://gitlab.com/davinkevin/Podcast-Server/-/issues/196))
+- **dev:** Use different user for connection to GE ([abe5eb6](abe5eb6bec620f7a90b767964f45544cc4e1a672))
+- **dev:** Provide taskfile to automate execution of reccuring tasks ([2f21114](2f211140d927c0fac1a0038d41d4241c5b70137d) - [#202](https://gitlab.com/davinkevin/Podcast-Server/-/issues/202))
+- **dev:** Upgrade skaffold configuration ([313e3e7](313e3e721453ba276af900a0c50674569540a69b))
+- **frontend:** Move to Static Web Server instead of nginx for frontend hosting ([23d6f2d](23d6f2d01b9e03275289c96ff940d4b37364868d) - [#194](https://gitlab.com/davinkevin/Podcast-Server/-/issues/194))
+
+### Bug Fixes
+
+- **dev:** Update local kustomization for skaffold env ([b122d5c](b122d5c7a6066701b9d8adfe55e55811064c1722))
+- **youtube:** Use identifier instead of channelId ([107c011](107c011c594e1fc307a6a6a5796b767b553c8d71) - [#197](https://gitlab.com/davinkevin/Podcast-Server/-/issues/197))
+
 ## 2023.5.0
 
 ### Features
