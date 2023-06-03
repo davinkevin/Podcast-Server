@@ -1,9 +1,10 @@
 rootProject.name = "Podcast-Server"
 
 plugins {
-    id("com.gradle.enterprise") version("3.13.2")
-    id("com.gradle.common-custom-user-data-gradle-plugin") version "1.10"
+    id("com.gradle.enterprise") version("3.13.3")
+    id("com.gradle.common-custom-user-data-gradle-plugin") version "1.11"
 }
+
 val env: Map<String, String> = System.getenv()
 val isCI = env["CI"].toBoolean()
 val hasGE = env["GRADLE_ENTERPRISE_ENABLED"].toBoolean()
