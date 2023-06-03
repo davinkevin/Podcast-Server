@@ -20,10 +20,11 @@ gradleEnterprise {
             isUploadInBackground = !isCI
         }
         if(isCI) {
-            tag(System.getenv("CI_COMMIT_BRANCH"))
+            val tagOrBranch = System.getenv("CI_COMMIT_TAG") ?: System.getenv("CI_COMMIT_BRANCH")
+            tag(tagOrBranch)
             value("Pipeline", System.getenv("CI_PIPELINE_ID"))
             value("Job Image", System.getenv("CI_JOB_IMAGE"))
-            link("Source", "https://gitlab.com/davinkevin/Podcast-Server/tree/${System.getenv("CI_COMMIT_BRANCH")}")
+            link("Source", "https://gitlab.com/davinkevin/Podcast-Server/tree/${tagOrBranch}")
         }
     }
 }
