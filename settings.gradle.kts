@@ -4,17 +4,22 @@ plugins {
     id("com.gradle.enterprise") version("3.13.2")
     id("com.gradle.common-custom-user-data-gradle-plugin") version "1.10"
 }
+val env: Map<String, String> = System.getenv()
+val isCI = env["CI"].toBoolean()
+val hasGE = env["GRADLE_ENTERPRISE_ENABLED"].toBoolean()
 
-val isCI = System.getenv("CI").toBoolean()
 buildCache {
     local { isEnabled = !isCI }
-    remote(gradleEnterprise.buildCache) { isPush = isCI }
+    remote(gradleEnterprise.buildCache) {
+        isEnabled = isCI || hasGE
+        isPush = isCI
+    }
 }
 
 gradleEnterprise {
-    server = "https://gradle-enterprise.davinkevin.fr"
+    server = env["GRADLE_ENTERPRISE_SERVER"]
     buildScan {
-        publishAlways()
+        publishAlwaysIf( hasGE || isCI )
         capture {
             isTaskInputFiles = true
             isUploadInBackground = !isCI
