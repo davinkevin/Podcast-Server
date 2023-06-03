@@ -38,6 +38,20 @@ tasks:
         cmd: docker logs -f db-for-code-generation 2>&1 | grep -m 1 "database system is ready to accept connections" > /dev/null
       - skaffold dev --status-check=false
 
+  database:start:
+    env:
+      DATABASE_PASSWORD: nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
+      DATABASE_USERNAME: podcast-server-user
+      DATABASE_NAME: podcast-server
+    cmds:
+      - docker run --rm
+        -e POSTGRES_USER=$DATABASE_USERNAME
+        -e POSTGRES_PASSWORD=$DATABASE_PASSWORD
+        -e POSTGRES_DB=$DATABASE_NAME
+        -p 5432:5432
+        --name db-for-local-dev
+        postgres:15.3-alpine
+
   release:
     env:
       CURRENT_VERSION: 2023.6.0
