@@ -5,7 +5,7 @@ plugins {
     id("com.gradle.common-custom-user-data-gradle-plugin") version "1.10"
 }
 
-val isCI = System.getenv("CI") == "true"
+val isCI = System.getenv("CI").toBoolean()
 buildCache {
     local { isEnabled = !isCI }
     remote(gradleEnterprise.buildCache) { isPush = isCI }
@@ -20,11 +20,10 @@ gradleEnterprise {
             isUploadInBackground = !isCI
         }
         if(isCI) {
-            val tagOrBranch = System.getenv("CI_COMMIT_TAG") ?: System.getenv("CI_COMMIT_BRANCH")
-            tag(tagOrBranch)
+            tag(System.getenv("CI_COMMIT_REF_NAME"))
             value("Pipeline", System.getenv("CI_PIPELINE_ID"))
             value("Job Image", System.getenv("CI_JOB_IMAGE"))
-            link("Source", "https://gitlab.com/davinkevin/Podcast-Server/tree/${tagOrBranch}")
+            link("Source", "https://gitlab.com/davinkevin/Podcast-Server/tree/${System.getenv("CI_COMMIT_REF_NAME")}")
         }
     }
 }
