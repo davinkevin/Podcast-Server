@@ -40,8 +40,8 @@ tasks:
 
   release:
     env:
-      CURRENT_VERSION: 2023.5.0
-      NEW_VERSION: 2023.6.0
+      CURRENT_VERSION: 2023.6.0
+      NEW_VERSION: 2023.6.1
     cmds:
       - sd $CURRENT_VERSION $NEW_VERSION 
            backend/build.gradle.kts

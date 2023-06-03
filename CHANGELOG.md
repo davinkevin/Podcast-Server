@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2023.6.1
+
+### Bug Fixes
+
+- **pipeline:** Cover case when tag and not a branch ([fe494d2](fe494d2903de89368cfc808a08778ef49dc21dba))
+
 ## 2023.6.0
 
 ### Features
