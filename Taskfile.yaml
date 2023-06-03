@@ -37,3 +37,25 @@ tasks:
       - silent: true
         cmd: docker logs -f db-for-code-generation 2>&1 | grep -m 1 "database system is ready to accept connections" > /dev/null
       - skaffold dev --status-check=false
+
+  release:
+    env:
+      CURRENT_VERSION: 2023.5.0
+      NEW_VERSION: 2023.6.0
+    cmds:
+      - sd $CURRENT_VERSION $NEW_VERSION 
+           backend/build.gradle.kts
+           backend-lib-database/build.gradle.kts 
+           backend-lib-youtubedl/build.gradle.kts
+           build-logic/build-plugin-database/build.gradle.kts
+           build-logic/build-plugin-docker-images/build.gradle.kts
+           build-logic/build-plugin-print-coverage/build.gradle.kts
+           frontend-angular/build.gradle.kts
+           frontend-angular/package.json
+           frontend-angularjs/build.gradle.kts
+           frontend-angularjs/npm-shrinkwrap.json
+           frontend-angularjs/package.json
+      - git cliff -t $NEW_VERSION > CHANGELOG.md
+      - git add .
+      - 'git ci -m "chore(release): release version $NEW_VERSION"'
+      - 'git tag $NEW_VERSION -m "chore(release): release version $NEW_VERSION"'
