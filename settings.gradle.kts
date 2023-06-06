@@ -18,7 +18,7 @@ buildCache {
 }
 
 gradleEnterprise {
-    server = env["GRADLE_ENTERPRISE_SERVER"]
+    server = env["GRADLE_ENTERPRISE_SERVER"] ?: "https://no.ge.local"
     buildScan {
         publishAlwaysIf( hasGE || isCI )
         capture {
