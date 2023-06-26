@@ -34,3 +34,4 @@ backend-lib-database/build/
 /backend/buildSrc/gradle/wrapper/
 /documentation/dist/
 /gradle.properties
+/.env.local
