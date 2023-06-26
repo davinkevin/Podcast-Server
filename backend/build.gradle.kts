@@ -3,6 +3,7 @@ import org.gradle.internal.deprecation.DeprecatableConfiguration
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.gitlab.davinkevin.podcastserver.database.*
 import com.gitlab.davinkevin.podcastserver.dockerimages.*
+import com.gradle.enterprise.gradleplugin.testretry.retry
 
 plugins {
 	id("org.springframework.boot") version "3.1.1"
@@ -93,14 +94,20 @@ tasks.withType<KotlinCompile> {
 }
 
 tasks.test {
-
 	useJUnitPlatform()
 
-	predictiveSelection {
-		val env = System.getenv()
-		val isEnabledByEnv = env["PREDICTIVE_TEST_SELECTION_ENABLED"].toBoolean()
-		val isEnabledOnFeatureBranch = env["CI"].toBoolean() && env["CI_COMMIT_REF_NAME"] != env["CI_DEFAULT_BRANCH"]
+	val env = System.getenv()
+	val isEnabledByEnv = env["PREDICTIVE_TEST_SELECTION_ENABLED"].toBoolean()
+	val isCI = env["CI"].toBoolean()
+	val isEnabledOnFeatureBranch = isCI && env["CI_COMMIT_REF_NAME"] != env["CI_DEFAULT_BRANCH"]
 
+	retry {
+		if (isCI) {
+			maxRetries.set(3)
+			failOnPassedAfterRetry.set(true)
+		}
+	}
+	predictiveSelection {
 		enabled.set(isEnabledByEnv || isEnabledOnFeatureBranch)
 	}
 
@@ -112,7 +119,9 @@ tasks.test {
 		dependsOn(migrateDbTask)
 	}
 	jvmArgs = listOf("--add-opens", "java.base/java.time=ALL-UNNAMED")
+
 	finalizedBy(tasks.jacocoTestReport)
+
 	testLogging {
 		exceptionFormat = TestExceptionFormat.FULL
 	}
