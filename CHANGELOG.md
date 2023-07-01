@@ -1,6 +1,19 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2023.7.0
+
+### Features
+
+- **backend:** Remove youtube-dl installation from base-image ([c27d863](c27d863c5d774b033147f81da95b909375db7038))
+- **backend:** Upgrade spring boot to version v3.1.1 ([d2516bc](d2516bc905e44655ddd43d115278bd92e624903a))
+- **dev:** Upgrade gradle-enterprise plugin to v3.13.3 and ccud 1.11 ([e05f3e5](e05f3e553284b653776f3cc7c3e8b01d75aa43cd))
+- **front:** Move to SWS 2.19 ([0249f13](0249f13a893012dedafc85b8fd8778a02ddca53a))
+- **frontend:** Upgrade static-web-server to v2.17.0 ([16a2502](16a25023f7d64a20535c8f0a22ac763a8e4db4fb))
+- **release:** Change variable for gradle-enterprise tag usage ([0f98e96](0f98e9650f5cc8e22aea47aaaf522705d934b1c9))
+- **storage:** Upgrade minio to RELEASE.2023-06-02T23-17-26Z ([47a4630](47a463080dbad6cd4bc0dccfe38c43fe7cb11c17))
+- **storage:** Upgrade minio to RELEASE.2023-06-29T05-12-28Z ([6bbed74](6bbed748367c7e4d05c2e92efb4b4afb09339d66))
+
 ## 2023.6.1
 
 ### Bug Fixes
