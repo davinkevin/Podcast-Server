@@ -7,7 +7,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 RUN mkdir /opt/ffmpeg && \
-    curl -qsSL https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-amd64-static.tar.xz | tar xJv -C /opt/ffmpeg --strip-components 1
+    curl -qsSL https://www.johnvansickle.com/ffmpeg/old-releases/ffmpeg-5.1.1-amd64-static.tar.xz | tar xJv -C /opt/ffmpeg --strip-components 1
 
 RUN mkdir /opt/yt-dl && \
     curl -qsSL https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /opt/yt-dl/yt-dlp && \
