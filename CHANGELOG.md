@@ -1,6 +1,18 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2023.8.0
+
+### Features
+
+- **backend:** Upgrade spring boot to v3.1.2 and related libraries ([54dcf2e](54dcf2e85b277fc4d29736f73a63b378db583f22) - [#207](https://gitlab.com/davinkevin/Podcast-Server/-/issues/207))
+- **storage:** Upgrade minio to RELEASE.2023-07-21T21-12-44Z ([85267d3](85267d31d159e4552038508c1692186fd6fe1efd))
+- **ui:** Upgrade server to 2.20.1 ([8778f48](8778f48dcbb095365f14fc5e7481ce8847982d43))
+
+### Bug Fixes
+
+- **backend:** Downgrade ffmpeg to version 5.1.1 ([8cc2cda](8cc2cdaf765ffe4a1c271d5081dc996227101d27))
+
 ## 2023.7.0
 
 ### Features
