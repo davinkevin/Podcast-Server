@@ -73,3 +73,27 @@ tasks:
       - git add .
       - 'git ci -m "chore(release): release version $NEW_VERSION"'
       - 'git tag $NEW_VERSION -m "chore(release): release version $NEW_VERSION"'
+
+  release:publish:
+    env:
+      PROJECT_ID: 13640563
+      CI_SERVER_URL: https://gitlab.com
+      CI_COMMIT_TAG:
+        sh: git describe --abbrev=0
+    cmds:
+      - docker pull podcastserver/ui:$CI_COMMIT_TAG
+      - docker pull podcastserver/backend:$CI_COMMIT_TAG
+      - docker pull podcastserver/init-db:$CI_COMMIT_TAG
+      - docker pull podcastserver/storage:$CI_COMMIT_TAG
+      - UI_SHA=$(docker image inspect podcastserver/ui:$CI_COMMIT_TAG --format '{{ "{{" }} index (split (index .RepoDigests 0) ":") 1 {{ "}}" }}') &&
+        BACKEND_SHA=$(docker image inspect podcastserver/backend:$CI_COMMIT_TAG --format '{{ "{{" }} index (split (index .RepoDigests 0) ":") 1 {{ "}}" }}') &&
+        INIT_DB_SHA=$(docker image inspect podcastserver/init-db:$CI_COMMIT_TAG --format '{{ "{{" }} index (split (index .RepoDigests 0) ":") 1 {{ "}}" }}') &&
+        STORAGE_SHA=$(docker image inspect podcastserver/storage:$CI_COMMIT_TAG --format '{{ "{{" }} index (split (index .RepoDigests 0) ":") 1 {{ "}}" }}') &&
+        release-cli --project-id=$PROJECT_ID create
+          --name $CI_COMMIT_TAG
+          --description "$(git-cliff -l --strip all | tail -n +3)"
+          --tag-name "$CI_COMMIT_TAG" --ref "$CI_COMMIT_TAG"
+          --assets-link "{\"name\":\"ui\",\"url\":\"https://hub.docker.com/layers/podcastserver/ui/$CI_COMMIT_TAG/images/sha256-$UI_SHA\",\"link_type\":\"image\"}"
+          --assets-link "{\"name\":\"backend\",\"url\":\"https://hub.docker.com/layers/podcastserver/backend/$CI_COMMIT_TAG/images/sha256-$BACKEND_SHA\",\"link_type\":\"image\"}"
+          --assets-link "{\"name\":\"init-db\",\"url\":\"https://hub.docker.com/layers/podcastserver/init-db/$CI_COMMIT_TAG/images/sha256-$INIT_DB_SHA\",\"link_type\":\"image\"}"
+          --assets-link "{\"name\":\"storage\",\"url\":\"https://hub.docker.com/layers/podcastserver/storage/$CI_COMMIT_TAG/images/sha256-$STORAGE_SHA\",\"link_type\":\"image\"}"
