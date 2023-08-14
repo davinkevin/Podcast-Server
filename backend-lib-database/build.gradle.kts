@@ -27,8 +27,8 @@ dependencies {
 }
 
 jooq {
-    version.set("3.18.5")
-    edition.set(OSS)
+    version = "3.18.5"
+    edition = OSS
 
     configurations {
         create("main") {
@@ -88,7 +88,7 @@ tasks.named<JooqGenerate>("generateJooq") {
 		.withPropertyName("migrations")
 		.withPathSensitivity(PathSensitivity.RELATIVE)
 
-	allInputsDeclared.set(false)
+	allInputsDeclared = false
     outputs.cacheIf { false }
 
 	dependsOn("flywayMigrate")
