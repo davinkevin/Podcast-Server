@@ -201,6 +201,30 @@ stages:
       - backend/build
   retry: 2
 
+🧪 database:
+  stage: 🧪 test
+  extends: [ .only-on-backend-changes ]
+  image: openjdk:17-bullseye
+  needs: [⬇ backend]
+  services:
+    - postgres:15.3-alpine
+  variables:
+    POSTGRES_USER: pg-user
+    POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
+    POSTGRES_DB: podcast-server-db
+  script:
+    - ./gradlew $GRADLE_OPTS backend-lib-database:generateJooq
+    - git diff || true
+    - git diff-index --quiet HEAD -- || exit 8
+  cache:
+    key:
+      files:
+        - backend/build.gradle.kts
+      prefix: "backend"
+    policy: pull
+    paths:
+      - .gradle/
+
 🧪 ui-v2:
   stage: 🧪 test
   extends: [ .only-on-frontend-changes ]
