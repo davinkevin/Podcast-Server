@@ -26,7 +26,6 @@ Backend/build
 Backend/lan.dk.podcastserver.*
 Backend/etc
 backend-lib-youtubedl/build
-backend-lib-database/src/main/java/
 backend-lib-database/build/
 
 /lan.dk.podcastserver.entity.Item/

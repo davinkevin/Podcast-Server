@@ -32,6 +32,7 @@ jooq {
 
     configurations {
         create("main") {
+            generateSchemaSourceOnCompilation = false
             jooqConfiguration.apply {
                 logging = INFO
                 jdbc.apply {

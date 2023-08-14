@@ -182,7 +182,7 @@ stages:
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
     POSTGRES_DB: podcast-server-db
   script:
-    - ./gradlew $GRADLE_OPTS :backend:test
+    - ./gradlew $GRADLE_OPTS backend-lib-database:flywayMigrate :backend:test
     - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
   artifacts:
     paths:
