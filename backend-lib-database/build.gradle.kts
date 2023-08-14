@@ -7,8 +7,8 @@ import com.gitlab.davinkevin.podcastserver.database.*
 
 plugins {
     id("java")
-    id("org.flywaydb.flyway") version "9.8.3"
-    id("nu.studer.jooq") version "8.0"
+    id("org.flywaydb.flyway") version "9.21.1"
+    id("nu.studer.jooq") version "8.2.1"
     id("build-plugin-database")
 }
 
@@ -22,12 +22,12 @@ repositories {
 val db = project.extensions.getByType<DatabaseConfiguration>()
 
 dependencies {
-    jooqGenerator("org.postgresql:postgresql:42.5.1")
-    compileOnly("org.postgresql:postgresql:42.5.1")
+    jooqGenerator("org.postgresql:postgresql:42.6.0")
+    compileOnly("org.postgresql:postgresql:42.6.0")
 }
 
 jooq {
-    version.set("3.17.10")
+    version.set("3.18.5")
     edition.set(OSS)
 
     configurations {

@@ -1,4 +1,4 @@
-FROM flyway/flyway:9.8.3 AS flyway-base
+FROM flyway/flyway:9.21.1 AS flyway-base
 
 RUN find drivers -iname *.jar | grep -v postgresql | xargs rm && \
     rm -rf lib/enterprise lib/pro licenses/ README.txt flyway* \
