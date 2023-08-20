@@ -28,13 +28,6 @@ class DatabasePlugin: Plugin<Project> {
                 migrateDbTask = flywayMigrate,
             )
 
-            env["SKAFFOLD"].toBoolean() -> DatabaseConfiguration(
-                url = "postgresql://postgres:${env["DATABASE_PORT"]}/${env["DATABASE_NAME"]}",
-                user = env["DATABASE_USERNAME"]!!,
-                password = env["DATABASE_PASSWORD"]!!,
-                migrateDbTask = flywayMigrate,
-            )
-
             else -> DatabaseConfiguration(
                 url = "postgresql://postgres:5432/podcast-server",
                 user = env["PG_ALTERNATE_USER"] ?: "podcast-server-user",

@@ -12,10 +12,6 @@ tasks:
     dir: ~/Workspace/gitlab.com/davinkevin/Podcast-Server
     env:
       SKAFFOLD: true
-      DATABASE_PASSWORD: nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
-      DATABASE_USERNAME: podcast-server-user
-      DATABASE_NAME: podcast-server-code-generation
-      DATABASE_PORT: '{{randInt 1025 9999}}'
     deps:
       - task: k3d:cluster:create
     cmds:
@@ -24,18 +20,6 @@ tasks:
                  /tmp/podcast-server/database/backup/
                  /tmp/podcast-server/database/init/
                  /tmp/podcast-server/database/data/
-      - echo database port is $DATABASE_PORT
-      - cmd: docker run --rm -d
-          -e POSTGRES_USER=$DATABASE_USERNAME
-          -e POSTGRES_PASSWORD=$DATABASE_PASSWORD
-          -e POSTGRES_DB=$DATABASE_NAME
-          -p $DATABASE_PORT:5432
-          --name db-for-code-generation
-          postgres:15.3-alpine > /dev/null
-        silent: true
-      - defer: docker stop db-for-code-generation > /dev/null
-      - silent: true
-        cmd: docker logs -f db-for-code-generation 2>&1 | grep -m 1 "database system is ready to accept connections" > /dev/null
       - skaffold dev --status-check=false
 
   database:start:
