@@ -7,7 +7,8 @@ Podcast-Server
 
 **Docker images** : [![Backend](https://badgen.net/badge/docker/backend/blue?icon=docker)](https://hub.docker.com/r/podcastserver/backend) [![UI](https://badgen.net/badge/docker/ui/blue?icon=docker)](https://hub.docker.com/r/podcastserver/ui) [![File-System](https://badgen.net/badge/docker/file-system/blue?icon=docker)](https://hub.docker.com/r/podcastserver/file-system) [![Init-db](https://badgen.net/badge/docker/init-db/blue?icon=docker)](https://hub.docker.com/r/podcastserver/init-db)
 
-Application design to be your Podcast local proxy in your lan network.
+Application designed to be your Podcast local proxy in your LAN network. This projects is able to transform many source 
+into an RSS feed which can be consumed from the web UI or from your favorite podcast app.
 
 It also works on many sources like Youtube, Dailymotion, CanalPlus… Check this 
 http://davinkevin.github.io/Podcast-Server/ and enjoy !
