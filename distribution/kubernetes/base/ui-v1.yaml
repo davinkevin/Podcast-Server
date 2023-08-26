@@ -49,6 +49,3 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
-          env:
-            - name: SERVER_CONFIG_FILE
-              value: /v1.toml

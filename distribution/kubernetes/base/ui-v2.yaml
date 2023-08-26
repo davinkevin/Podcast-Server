@@ -50,5 +50,5 @@ spec:
               containerPort: 8080
               protocol: TCP
           env:
-            - name: SERVER_CONFIG_FILE
-              value: /v2.toml
+            - name: PAGE_FALLBACK
+              value: "/podcast-server/v2/index.html"
