@@ -28,6 +28,13 @@ The application is available in [docker images](https://hub.docker.com/r/podcast
 
 To see how to install the application, follow the [install documentation](https://gitlab.com/davinkevin/Podcast-Server/-/blob/master/documentation/modules/ROOT/pages/installation/)
 
+## Support
+
+Big thanks to all OpenSource program offering to the project licenses for wonderful tools!
+
+<img src="https://download.davinkevin.fr/project/podcast-server/jetbrains-logo.png" alt="Jetbrains" width="150"/>
+<img src="https://download.davinkevin.fr/project/podcast-server/yourkit-logo.png" alt="Jetbrains" width="200"/>
+
 ## License
 
 Copyright 2023 DAVIN KEVIN
