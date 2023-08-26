@@ -1,28 +1,30 @@
 Podcast-Server
 ==============
 
-Back-end : [![Codacy Badge](https://app.codacy.com/project/badge/Grade/1cf045bbebc94d8fb99c19a53f794ad6)](https://www.codacy.com/manual/davin-kevin/Podcast-Server?utm_source=gitlab.com&amp;utm_medium=referral&amp;utm_content=davinkevin/Podcast-Server&amp;utm_campaign=Badge_Grade) [![codecov](https://codecov.io/gl/davinkevin/Podcast-Server/branch/master/graph/badge.svg)](https://codecov.io/gl/davinkevin/Podcast-Server)
+**Back-end** : [![Codacy Badge](https://app.codacy.com/project/badge/Grade/1cf045bbebc94d8fb99c19a53f794ad6)](https://www.codacy.com/manual/davin-kevin/Podcast-Server?utm_source=gitlab.com&amp;utm_medium=referral&amp;utm_content=davinkevin/Podcast-Server&amp;utm_campaign=Badge_Grade) [![codecov](https://codecov.io/gl/davinkevin/Podcast-Server/branch/master/graph/badge.svg)](https://codecov.io/gl/davinkevin/Podcast-Server)
 
-Front-end : [![Code Climate](https://codeclimate.com/github/davinkevin/Podcast-Server/badges/gpa.svg)](https://codeclimate.com/github/davinkevin/Podcast-Server)
+**Front-end** : [![Code Climate](https://codeclimate.com/github/davinkevin/Podcast-Server/badges/gpa.svg)](https://codeclimate.com/github/davinkevin/Podcast-Server)
 
-Docker images : [![Backend](https://badgen.net/badge/docker/backend/blue?icon=docker)](https://hub.docker.com/r/podcastserver/backend) [![UI](https://badgen.net/badge/docker/ui/blue?icon=docker)](https://hub.docker.com/r/podcastserver/ui) [![File-System](https://badgen.net/badge/docker/file-system/blue?icon=docker)](https://hub.docker.com/r/podcastserver/file-system) [![Init-db](https://badgen.net/badge/docker/init-db/blue?icon=docker)](https://hub.docker.com/r/podcastserver/init-db)
+**Docker images** : [![Backend](https://badgen.net/badge/docker/backend/blue?icon=docker)](https://hub.docker.com/r/podcastserver/backend) [![UI](https://badgen.net/badge/docker/ui/blue?icon=docker)](https://hub.docker.com/r/podcastserver/ui) [![File-System](https://badgen.net/badge/docker/file-system/blue?icon=docker)](https://hub.docker.com/r/podcastserver/file-system) [![Init-db](https://badgen.net/badge/docker/init-db/blue?icon=docker)](https://hub.docker.com/r/podcastserver/init-db)
 
 Application design to be your Podcast local proxy in your lan network.
 
-It also works on many sources like Youtube, Dailymotion, CanalPlus… Check this http://davinkevin.github.io/Podcast-Server/ and enjoy !
+It also works on many sources like Youtube, Dailymotion, CanalPlus… Check this 
+http://davinkevin.github.io/Podcast-Server/ and enjoy !
 
 The application is available in [docker images](https://hub.docker.com/r/podcastserver/), see docker links above.
 
-## Development 
+## Local Development 
 
-### Start components with Skaffold:
+**Requirements**: 
+* [k3d](https://k3d.io/v5.6.0/)
+* [Taskfile](https://taskfile.dev/)
+* [Skaffold](https://skaffold.dev/)
+* [mkcert](https://mkcert.dev)
 
-**Requirement**: Having a kubernetes ingress available in your `docker-for-desktop` install ([procject-contour](https://projectcontour.io/getting-started/))
+**Start**
 
-* Set up your kubernetes context to `docker-for-desktop`
-* Start every components: `./dev.sh`
-* Access the application on `https://localhost/` and/or define a name alias in your `/etc/hosts` file
-* (optional) if you want to rebuild the frontend (ui-v1) on change, execute `./mvnw -f frontend-angularjs/pom.xml frontend:gulp@skaffold-watch` in another terminal
+* `task skaffold:dev` 
 
 ## Install 
 
