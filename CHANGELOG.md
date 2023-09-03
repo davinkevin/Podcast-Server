@@ -1,6 +1,38 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2023.9.0
+
+### Features
+
+- **backend:** Upgrade minio to version RELEASE.2023-07-21T21-12-44Z ([b3e84e0](b3e84e024c580b9c6d69be96043f37c5879a6351) - [#208](https://gitlab.com/davinkevin/Podcast-Server/-/issues/208))
+- **backend:** Upgrade SWS to version 2.20.2 ([ec9d166](ec9d16626a1e4baa25741012c770ab88ca0523a4) - [#208](https://gitlab.com/davinkevin/Podcast-Server/-/issues/208))
+- **backend:** Upgrade to spring v3.1.3 ([32607e8](32607e80a1c0835a5080fba4a266163993caf649))
+- **backend:** Upgrade to minio RELEASE.2023-08-23T10-07-06Z ([46f081e](46f081e8b320c47553db9030a062c33d7d7fa0bd))
+- **backend:** Upgrade spring dependency management to v1.1.3 ([b20cc38](b20cc380301eed5e86538fc3ff44b7f3c758a421))
+- **backend:** Upgrade minio to version RELEASE.2023-08-31T15-31-16Z ([abb5908](abb5908e60a2ee30336d3e46cb766c075b1720c9))
+- **database:** Upgrade libraries related to database ([5d70058](5d70058c8855f03313948d6d71ae6b0f4a7a2930) - [#200](https://gitlab.com/davinkevin/Podcast-Server/-/issues/200))
+- **database:** Add generated classes instead of generating them on every build ([8ed6dee](8ed6dee75396d2ff7892825e7bf61dff9e2f1200) - [#200](https://gitlab.com/davinkevin/Podcast-Server/-/issues/200))
+- **database:** Add a check to verify if ([a47075d](a47075d7d39daef79aeedf58fb0c9368c57e19a5) - [#200](https://gitlab.com/davinkevin/Podcast-Server/-/issues/200))
+- **frontend:** Upgrade SWS to v2.21.0 ([ecacdc2](ecacdc2ac7296667cad2ee77e82f0d25bda83123))
+- **frontend:** Upgrade SWS to 2.21.1 ([f6474ac](f6474ac6abba6319efbe23470cfbde9caf6d987b))
+- **frontend:** Unify configuration for SWS between v1 and v2 ([1bf320c](1bf320c15610d50d29ef3f1e8dd64ce0ad0b5947))
+
+### Bug Fixes
+
+- **backend:** Revert heredoc syntaxt not supported by kaniko ([21ac959](21ac959ec53b350d1ab2552241d976b2c15da418))
+- **database:** Keep jackson libs for flyway lib in init-db ([e234406](e2344066ff11f5822eae37718d0da2fa2c7ab51e) - [#210](https://gitlab.com/davinkevin/Podcast-Server/-/issues/210))
+- **skaffold:** Watch ui folder for frontend components ([636b465](636b465733128e8a768f4f560515372d110039d4))
+
+### Refactor
+
+- **backend:** Use simpler syntaxt for RUN in backend base-image ([810b687](810b68723954dccd8f9165d17528698babf82eab))
+- **database:** Use new `=` syntax in gradle file for database lib ([1400a97](1400a9780185226cb8b1edb2baec99f22015a1e5))
+
+### Documentation
+
+- **readme:** Add detail about local development ([6dfd995](6dfd9959d1fa2156f7e4c2949d5413ac05b1ba00))
+
 ## 2023.8.0
 
 ### Features
