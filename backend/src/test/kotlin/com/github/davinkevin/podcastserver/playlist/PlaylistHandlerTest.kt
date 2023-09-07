@@ -42,6 +42,31 @@ class PlaylistHandlerTest (
     @DisplayName("should save")
     inner class ShouldSave {
 
+        val item = PlaylistWithItems.Item(
+            id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
+            title = "a title",
+            description = "a desc",
+            mimeType = "audio/mp3",
+            fileName = Path("file.mp3"),
+            length = 10L,
+            pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
+            podcast = PlaylistWithItems.Item.Podcast(
+                id = UUID.fromString("3ba6411c-8fb9-4e24-afb1-adbad9a023e0"),
+                title = "a podcast"
+            ),
+            cover = PlaylistWithItems.Item.Cover(
+                id = UUID.fromString("0882344b-fcaf-4332-9ab8-47e78921f929"),
+                width = 123,
+                height = 456,
+                url = URI("https://foo.com/bar/podcast/image.png")
+            )
+        )
+        val playlist = PlaylistWithItems(
+            id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
+            name = "foo",
+            items = listOf(item)
+        )
+
         @Test
         fun `with a name`() {
             /* Given */
@@ -62,6 +87,97 @@ class PlaylistHandlerTest (
                             "id":"9706ba78-2df2-4b37-a573-04367dc6f0ea",
                             "name":"foo",
                             "items":[]
+                        }""")
+                    }
+        }
+
+        @Test
+        fun `with 1 item`() {
+            /* Given */
+            whenever(service.save("foo"))
+                .thenReturn(playlist.toMono())
+
+            /* When */
+            rest
+                .post()
+                .uri("/api/v1/playlists")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue("""{"name":"${playlist.name}"}""")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .assertThatJson {
+                    isEqualTo("""{
+                            "id":"9706ba78-2df2-4b37-a573-04367dc6f0ea",
+                            "name":"foo",
+                            "items":[{
+                                "id": "c42d2a59-46e6-4c1d-b0fb-2b47d389b370",
+                                "title": "a title",
+                                "proxyURL": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a_title.mp3",
+                                "description": "a desc",
+                                "mimeType": "audio/mp3",
+                                "podcast": {
+                                  "id": "3ba6411c-8fb9-4e24-afb1-adbad9a023e0",
+                                  "title": "a podcast"
+                                },
+                                "cover": {
+                                  "id": "0882344b-fcaf-4332-9ab8-47e78921f929",
+                                  "width": 123,
+                                  "height": 456,
+                                  "url": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png"
+                                }
+                              }]
+                        }""")
+                }
+        }
+
+        @Test
+        fun `with 1 item without cover extension`() {
+            /* Given */
+            val playlistWithItemWithoutCoverExtension = playlist.copy(
+                items = listOf(
+                    item.copy(
+                        cover = item.cover.copy(
+                            url = URI("https://foo.com/bar/podcast/image")
+                        )
+                    )
+                )
+            )
+            whenever(service.save("foo"))
+                .thenReturn(playlistWithItemWithoutCoverExtension.toMono())
+
+            /* When */
+            rest
+                    .post()
+                    .uri("/api/v1/playlists")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue("""{"name":"${playlist.name}"}""")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo("""{
+                            "id":"9706ba78-2df2-4b37-a573-04367dc6f0ea",
+                            "name":"foo",
+                            "items":[{
+                                "id": "c42d2a59-46e6-4c1d-b0fb-2b47d389b370",
+                                "title": "a title",
+                                "proxyURL": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a_title.mp3",
+                                "description": "a desc",
+                                "mimeType": "audio/mp3",
+                                "podcast": {
+                                  "id": "3ba6411c-8fb9-4e24-afb1-adbad9a023e0",
+                                  "title": "a podcast"
+                                },
+                                "cover": {
+                                  "id": "0882344b-fcaf-4332-9ab8-47e78921f929",
+                                  "width": 123,
+                                  "height": 456,
+                                  "url": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.jpg"
+                                }
+                              }]
                         }""")
                     }
         }
@@ -317,33 +433,34 @@ class PlaylistHandlerTest (
         @DisplayName("as rss")
         inner class AsRss {
 
+            val item = PlaylistWithItems.Item(
+                id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
+                title = "a title",
+                description = "a desc",
+                mimeType = "audio/mp3",
+                fileName = Path("file.mp3"),
+                length = 10L,
+                pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
+                podcast = PlaylistWithItems.Item.Podcast(
+                    id = UUID.fromString("3ba6411c-8fb9-4e24-afb1-adbad9a023e0"),
+                    title = "a podcast"
+                ),
+                cover = PlaylistWithItems.Item.Cover(
+                    id = UUID.fromString("0882344b-fcaf-4332-9ab8-47e78921f929"),
+                    width = 123,
+                    height = 456,
+                    url = URI("https://foo.com/bar/podcast/image.png")
+                )
+            )
+            val playlist = PlaylistWithItems(
+                id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
+                name = "foo",
+                items = listOf(item)
+            )
+
             @Test
             fun `with 1 item`() {
                 /* Given */
-                val item = PlaylistWithItems.Item(
-                        id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
-                        title = "a title",
-                        description = "a desc",
-                        mimeType = "audio/mp3",
-                        fileName = Path("file.mp3"),
-                        length = 10L,
-                        pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
-                        podcast = PlaylistWithItems.Item.Podcast(
-                                id = UUID.fromString("3ba6411c-8fb9-4e24-afb1-adbad9a023e0"),
-                                title = "a podcast"
-                        ),
-                        cover = PlaylistWithItems.Item.Cover(
-                                id = UUID.fromString("0882344b-fcaf-4332-9ab8-47e78921f929"),
-                                width = 123,
-                                height = 456,
-                                url = URI("https://foo.com/bar/podcast/image.png")
-                        )
-                )
-                val playlist = PlaylistWithItems(
-                        id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
-                        name = "foo",
-                        items = listOf(item)
-                )
                 whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
 
                 /* When */
@@ -380,6 +497,57 @@ class PlaylistHandlerTest (
                             </rss>
                         """.trimIndent())
             }
+
+            @Test
+            fun `with 1 item without cover extention`() {
+                /* Given */
+                val playlistWithItemWithoutCoverExtension = playlist.copy(
+                    items = listOf(
+                        item.copy(
+                            cover = item.cover.copy(
+                                url = URI("https://foo.com/bar/podcast/image")
+                            )
+                        )
+                    )
+                )
+                whenever(service.findById(playlistWithItemWithoutCoverExtension.id))
+                    .thenReturn(playlistWithItemWithoutCoverExtension.toMono())
+
+                /* When */
+                rest
+                    .get()
+                    .uri("/api/v1/playlists/{id}/rss", playlist.id)
+                    .header("Host", "foo.com")
+                    .header("X-Forwarded-Proto", "https")
+                    .exchange()
+                    /* Then */
+                    .expectHeader()
+                    .contentType(MediaType.APPLICATION_XML)
+                    .expectStatus().isOk
+                    .expectBody()
+                    .xml("""
+                            <?xml version="1.0" encoding="UTF-8"?>
+                            <rss xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd">
+                              <channel>
+                                <title>foo</title>
+                                <link>https://foo.com/api/v1/playlists/9706ba78-2df2-4b37-a573-04367dc6f0ea/rss</link>
+                                <item>
+                                  <title>a title</title>
+                                  <description>a desc</description>
+                                  <pubDate>Sun, 27 Oct 2019 10:10:10 GMT</pubDate>
+                                  <itunes:explicit>No</itunes:explicit>
+                                  <itunes:subtitle>a title</itunes:subtitle>
+                                  <itunes:summary>a desc</itunes:summary>
+                                  <guid>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a_title.mp3</guid>
+                                  <itunes:image>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.jpg</itunes:image>
+                                  <media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.jpg" />
+                                  <enclosure url="https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a_title.mp3" length="10" type="audio/mp3" />
+                                </item>
+                              </channel>
+                            </rss>
+                        """.trimIndent())
+            }
+
         }
 
     }
