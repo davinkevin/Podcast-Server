@@ -479,13 +479,18 @@ class PlaylistHandlerTest (
         @Test
         fun `from playlist`() {
             /* Given */
-            val playlist = PlaylistWithItems(id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), name = "foo", items = emptyList())
-            val itemId = UUID.randomUUID()
-            whenever(service.addToPlaylist(playlist.id, itemId)).thenReturn(playlist.toMono())
+            val playlist = PlaylistWithItems(
+                id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
+                name = "foo",
+                items = emptyList()
+            )
+            val itemId = UUID.fromString("dd5b4b49-7fd8-4d7b-a406-e8e451ef7792")
+            whenever(service.removeFromPlaylist(playlist.id, itemId))
+                .thenReturn(playlist.toMono())
 
             /* When */
             rest
-                    .post()
+                    .delete()
                     .uri("/api/v1/playlists/{id}/items/{itemId}", playlist.id, itemId)
                     .exchange()
                     /* Then */
