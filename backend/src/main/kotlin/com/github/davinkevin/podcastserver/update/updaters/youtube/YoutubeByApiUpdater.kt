@@ -7,7 +7,6 @@ import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Updater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByApiUpdater.Companion.URL_PAGE_BASE
-import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
 import org.springframework.util.DigestUtils
 import org.springframework.web.reactive.function.client.WebClient
@@ -20,7 +19,6 @@ import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 import java.util.*
-import java.util.concurrent.CopyOnWriteArrayList
 
 /**
  * Created by kevin on 13/09/2018
@@ -35,44 +33,25 @@ class YoutubeByApiUpdater(
     override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
         log.debug("find items of {}", podcast.url)
 
-        return findPlaylistId(podcast.url).flatMapMany { id ->
-            Flux.range(1, MAX_PAGE)
-                .flatMap ({ pageNumber -> Mono
-                    .deferContextual { Mono.just(it) }
-                    .flatMap { c -> Mono
-                        .justOrEmpty(c.getOrEmpty<List<String>>("pageTokens"))
-                        .filter { it.isNotEmpty() }
-                        .map { it[pageNumber-2] }
-                        .flatMap { nextPageToken -> fetchPageWithToken(id, nextPageToken) }
-                        .switchIfEmpty { fetchPageWithToken(id) }
-                        .doOnNext {
-                            c.getOrEmpty<CopyOnWriteArrayList<String>>("pageTokens")
-                                .get()
-                                .add(it.nextPageToken)
-                        }
-                    }
-                }, 1)
-                .takeUntil { it.nextPageToken.isEmpty() }
-                .flatMapIterable { it.items }
-                .map { it.toItem() }
-                .contextWrite { c ->
-                    log.debug("creation of cache")
-                    c.put("pageTokens", CopyOnWriteArrayList<YoutubeApiResponse>())
-                }
-        }
+        return findPlaylistId(podcast.url)
+            .flatMapMany { id -> fetchPageWithToken(id)
+                .expand { fetchPageWithToken(id, it.nextPageToken) }
+            }
+            .takeUntil { it.nextPageToken.isEmpty() }
+            .take(MAX_PAGE)
+            .flatMapIterable { it.items }
+            .map { it.toItem() }
     }
 
     override fun signatureOf(url: URI): Mono<String> {
         log.debug("signature of {}", url)
 
-        return findPlaylistId(url).flatMap { id ->
-            fetchPageWithToken(id)
-                .map { it.items }
-                .map { items -> items.joinToString { it.snippet.resourceId.videoId } }
-                .filter { it.isNotEmpty() }
-                .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
-                .switchIfEmpty { "".toMono() }
-        }
+        return findPlaylistId(url)
+            .flatMap { id -> fetchPageWithToken(id) }
+            .map { it.items.joinToString { i -> i.snippet.resourceId.videoId } }
+            .filter { it.isNotEmpty() }
+            .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
+            .switchIfEmpty { "".toMono() }
     }
 
     private fun fetchPageWithToken(id: String, pageToken: String = "") =
@@ -98,23 +77,6 @@ class YoutubeByApiUpdater(
         if (isPlaylist(url))
             return url.toASCIIString().substringAfter("list=").toMono()
 
-        // https://www.googleapis.com/youtube/v3/channels?key={YOUR_API_KEY}&forUsername={USER_NAME}&part=id
-        // https://www.googleapis.com/youtube/v3/channels?key=AIzaSyDE_M3rl-1LrZPwk9Hg6rFi5Ws3L0qrNCs&forUsername=joueurdugrenier&part=id
-        // {
-        //  "kind": "youtube#channelListResponse",
-        //  "etag": "V6f8V0AHAyAtwJCBr5pFW9Y08f8",
-        //  "pageInfo": {
-        //    "totalResults": 1,
-        //    "resultsPerPage": 5
-        //  },
-        //  "items": [
-        //    {
-        //      "kind": "youtube#channel",
-        //      "etag": "P_Oq-TaAXb4OaAd4_3j2jDMUwAw",
-        //      "id": "UC_yP2DpIgs5Y1uWC0T03Chw"
-        //    }
-        //  ]
-        //}
         val userName = url.path
             .substringAfterLast("/")
             .replace("@", "")
@@ -142,7 +104,7 @@ class YoutubeByApiUpdater(
     override fun compatibility(url: String): Int = youtubeCompatibility(url)
 
     companion object {
-        private const val MAX_PAGE = 10
+        private const val MAX_PAGE = 10L
         internal const val URL_PAGE_BASE = "https://www.youtube.com/watch?v=%s"
     }
 }
@@ -164,8 +126,8 @@ internal data class YoutubeApiItem(val snippet: Snippet) {
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 internal data class Snippet(val title: String, val resourceId: ResourceId, val description: String, val publishedAt: String, val thumbnails: Thumbnails = Thumbnails()) {
-    fun pubDate() = ZonedDateTime.parse(publishedAt, DateTimeFormatter.ISO_DATE_TIME)!!
-    fun cover() = this.thumbnails
+    fun pubDate(): ZonedDateTime = ZonedDateTime.parse(publishedAt, DateTimeFormatter.ISO_DATE_TIME)
+    fun cover() = thumbnails
         .betterThumbnail()
         .map { ItemFromUpdate.Cover(url = URI(it.url!!), width = it.width!!, height = it.height!!) }
         .orNull()
@@ -186,15 +148,7 @@ internal data class Thumbnails(
 ) {
 
     fun betterThumbnail(): Optional<Thumbnail> {
-        val v =  when {
-            maxres != null -> maxres
-            standard != null -> standard
-            high != null -> high
-            medium != null -> medium
-            byDefault != null -> byDefault
-            else -> null
-        }
-
+        val v = maxres ?: standard ?: high ?: medium ?: byDefault
         return Optional.ofNullable(v)
     }
 }

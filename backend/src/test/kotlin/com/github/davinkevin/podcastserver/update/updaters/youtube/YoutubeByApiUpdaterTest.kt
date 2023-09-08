@@ -23,6 +23,9 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import reactor.core.publisher.Flux
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
 import java.util.*
@@ -259,6 +262,35 @@ class YoutubeByApiUpdaterTest(
     class LocalTestConfiguration {
         @Bean fun remapGoogleApiToMock() = remapToMockServer("www.googleapis.com")
 
+    }
+
+    data class CompositeType(val idx: Int, val other: Int) {
+        companion object {
+            fun from(idx: Int): CompositeType {
+                val i = idx * idx
+                val other = i.toString().length
+
+                return CompositeType(i, other)
+            }
+        }
+    }
+    @Test
+    fun `should test`() {
+        /* Given */
+        val p = Mono.just(2)
+            .map { CompositeType(it, it.toString().length) }
+            .expand { CompositeType.from(it.idx).toMono() }
+            .map { it.other }
+            .take(4)
+        /* When */
+        StepVerifier.create(p)
+        /* Then */
+            .expectNext(1)
+            .expectNext(1)
+            .expectNext(2)
+            .expectNext(3)
+
+            .verifyComplete()
     }
 }
 
