@@ -49,8 +49,8 @@ class YoutubeByApiUpdaterTest(
             val podcast = PodcastToUpdate(UUID.randomUUID(), URI("https://www.youtube.com/user/joueurdugrenier"), "noSign")
 
             backend.apply {
-                stubFor(get("/user/joueurdugrenier")
-                        .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
+                stubFor(get("/youtube/v3/channels?key=key&forUsername=joueurdugrenier&part=id")
+                        .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.id.json"))))
 
                 stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
                         .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.json"))))
@@ -94,8 +94,8 @@ class YoutubeByApiUpdaterTest(
             val podcast = PodcastToUpdate(url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign")
 
             backend.apply {
-                stubFor(get("/user/joueurdugrenier")
-                        .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
+                stubFor(get("/youtube/v3/channels?key=key&forUsername=joueurdugrenier&part=id")
+                    .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.id.json"))))
 
                 stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
                         .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.json"))))
@@ -122,8 +122,8 @@ class YoutubeByApiUpdaterTest(
             )
 
             backend.apply {
-                stubFor(get("/user/joueurdugrenier")
-                        .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier-without-external-id.html"))))
+                stubFor(get("/youtube/v3/channels?key=key&forUsername=joueurdugrenier&part=id")
+                    .willReturn(okJson("""{ "items": [] }""")))
             }
 
             /* When */
@@ -138,16 +138,21 @@ class YoutubeByApiUpdaterTest(
         @Test
         fun `and returns empty if no result`(backend: WireMockServer) {
             /* Given */
-            val podcast = PodcastToUpdate(url = URI("https://www.youtube.com/user/androiddevelopers"), id = UUID.randomUUID(), signature = "noSign")
+            val podcast = PodcastToUpdate(url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign")
 
             backend.apply {
-                stubFor(get("/user/androiddevelopers")
-                        .willReturn(okJson(fileAsString("/remote/podcast/youtube/androiddevelopers.html"))))
+                stubFor(get("/youtube/v3/channels?key=key&forUsername=joueurdugrenier&part=id")
+                    .willReturn(okJson("""{ "items": [{ "kind": "youtube#channel", "etag": "P_Oq-TaAXb4OaAd4_3j2jDMUwAw", "id": "UC_yP2DpIgs5Y1uWC0T03Chw" }] }""")))
 
-                stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UUVHFbqXqoYvEWM1Ddxl0QDg&key=key")
-                        .willReturn(okJson(fileAsString("/remote/podcast/youtube/androiddevelopers.json"))))
+                stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
+                        .willReturn(okJson("""{
+                             "kind": "youtube#playlistItemListResponse",
+                             "etag": "mPrpS7Nrk6Ggi_P7VJ8-KsEOiIw/MREpXoOq5CSrGUjb1AQaTC451Tk",
+                             "pageInfo": { "totalResults": 87, "resultsPerPage": 50 },
+                             "items": []
+                            }
+                        """)))
             }
-
 
             /* When */
             StepVerifier.create(updater.findItems(podcast))
@@ -197,9 +202,9 @@ class YoutubeByApiUpdaterTest(
             val podcast = PodcastToUpdate(url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign")
 
             backend.apply {
-                stubFor(get("/user/joueurdugrenier")
-                        .withHeader("User-Agent", equalTo("curl/7.64.1"))
-                        .willReturn(ok(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
+                stubFor(get("/youtube/v3/channels?key=key&forUsername=joueurdugrenier&part=id")
+                    .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.id.json"))))
+
                 stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
                         .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.json"))))
             }
@@ -220,9 +225,8 @@ class YoutubeByApiUpdaterTest(
             val podcast = PodcastToUpdate(url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign")
 
             backend.apply {
-                stubFor(get("/user/joueurdugrenier")
-                        .withHeader("User-Agent", equalTo("curl/7.64.1"))
-                        .willReturn(ok(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
+                stubFor(get("/youtube/v3/channels?key=key&forUsername=joueurdugrenier&part=id")
+                    .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.id.json"))))
                 stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
                         .willReturn(notFound()))
             }
@@ -253,7 +257,6 @@ class YoutubeByApiUpdaterTest(
             WebClientConfig::class
     )
     class LocalTestConfiguration {
-        @Bean fun remapYoutubeToMock() = remapToMockServer("www.youtube.com")
         @Bean fun remapGoogleApiToMock() = remapToMockServer("www.googleapis.com")
 
     }

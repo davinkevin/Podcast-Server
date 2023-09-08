@@ -41,7 +41,6 @@ class YoutubeUpdaterConfig {
 
         return YoutubeByApiUpdater(
                 key = key,
-                youtubeClient = youtubeClient,
                 googleApiClient = builder.clone().baseUrl("https://www.googleapis.com").build()
         )
     }

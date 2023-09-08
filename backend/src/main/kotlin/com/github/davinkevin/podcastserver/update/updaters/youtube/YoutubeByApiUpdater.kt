@@ -26,9 +26,8 @@ import java.util.concurrent.CopyOnWriteArrayList
  * Created by kevin on 13/09/2018
  */
 class YoutubeByApiUpdater(
-        private val key: String,
-        private val youtubeClient: WebClient,
-        private val googleApiClient: WebClient
+    private val key: String,
+    private val googleApiClient: WebClient
 ): Updater {
 
     private val log = LoggerFactory.getLogger(YoutubeByApiUpdater::class.java)
@@ -38,28 +37,28 @@ class YoutubeByApiUpdater(
 
         return findPlaylistId(podcast.url).flatMapMany { id ->
             Flux.range(1, MAX_PAGE)
-                    .flatMap ({ pageNumber -> Mono
-                            .deferContextual { Mono.just(it) }
-                            .flatMap { c -> Mono
-                                    .justOrEmpty(c.getOrEmpty<List<String>>("pageTokens"))
-                                    .filter { it.isNotEmpty() }
-                                    .map { it[pageNumber-2] }
-                                    .flatMap { nextPageToken -> fetchPageWithToken(id, nextPageToken) }
-                                    .switchIfEmpty { fetchPageWithToken(id) }
-                                    .doOnNext {
-                                        c.getOrEmpty<CopyOnWriteArrayList<String>>("pageTokens")
-                                                .get()
-                                                .add(it.nextPageToken)
-                                    }
-                            }
-                    }, 1)
-                    .takeUntil { it.nextPageToken.isEmpty() }
-                    .flatMapIterable { it.items }
-                    .map { it.toItem() }
-                    .contextWrite { c ->
-                        log.debug("creation of cache")
-                        c.put("pageTokens", CopyOnWriteArrayList<YoutubeApiResponse>())
+                .flatMap ({ pageNumber -> Mono
+                    .deferContextual { Mono.just(it) }
+                    .flatMap { c -> Mono
+                        .justOrEmpty(c.getOrEmpty<List<String>>("pageTokens"))
+                        .filter { it.isNotEmpty() }
+                        .map { it[pageNumber-2] }
+                        .flatMap { nextPageToken -> fetchPageWithToken(id, nextPageToken) }
+                        .switchIfEmpty { fetchPageWithToken(id) }
+                        .doOnNext {
+                            c.getOrEmpty<CopyOnWriteArrayList<String>>("pageTokens")
+                                .get()
+                                .add(it.nextPageToken)
+                        }
                     }
+                }, 1)
+                .takeUntil { it.nextPageToken.isEmpty() }
+                .flatMapIterable { it.items }
+                .map { it.toItem() }
+                .contextWrite { c ->
+                    log.debug("creation of cache")
+                    c.put("pageTokens", CopyOnWriteArrayList<YoutubeApiResponse>())
+                }
         }
     }
 
@@ -68,52 +67,76 @@ class YoutubeByApiUpdater(
 
         return findPlaylistId(url).flatMap { id ->
             fetchPageWithToken(id)
-                    .map { it.items }
-                    .map { items -> items.joinToString { it.snippet.resourceId.videoId } }
-                    .filter { it.isNotEmpty() }
-                    .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
-                    .switchIfEmpty { "".toMono() }
+                .map { it.items }
+                .map { items -> items.joinToString { it.snippet.resourceId.videoId } }
+                .filter { it.isNotEmpty() }
+                .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
+                .switchIfEmpty { "".toMono() }
         }
     }
 
     private fun fetchPageWithToken(id: String, pageToken: String = "") =
-            googleApiClient
-                    .get()
-                    .uri { it.path("/youtube/v3/playlistItems")
-                            .queryParam("part", "snippet")
-                            .queryParam("maxResults", 50)
-                            .queryParam("playlistId", id)
-                            .queryParam("key", key)
-                            .apply {
-                                if (pageToken.isNotEmpty()) {
-                                    this.queryParam("pageToken", pageToken)
-                                }
-                            }
-                            .build()
+        googleApiClient
+            .get()
+            .uri { it.path("/youtube/v3/playlistItems")
+                .queryParam("part", "snippet")
+                .queryParam("maxResults", 50)
+                .queryParam("playlistId", id)
+                .queryParam("key", key)
+                .apply {
+                    if (pageToken.isNotEmpty()) {
+                        this.queryParam("pageToken", pageToken)
                     }
-                    .retrieve()
-                    .bodyToMono<YoutubeApiResponse>()
-                    .onErrorResume { YoutubeApiResponse(emptyList()).toMono() }
+                }
+                .build()
+            }
+            .retrieve()
+            .bodyToMono<YoutubeApiResponse>()
+            .onErrorResume { YoutubeApiResponse(emptyList()).toMono() }
 
     private fun findPlaylistId(url: URI): Mono<String> {
         if (isPlaylist(url))
             return url.toASCIIString().substringAfter("list=").toMono()
 
-        return youtubeClient
-                .get()
-                .uri(url)
-                .retrieve()
-                .bodyToMono<String>()
-                .map { Jsoup.parse(it, "https://www.youtube.com") }
-                .flatMap { it.select("meta[itemprop=identifier]").firstOrNull().toMono() }
-                .map { it.attr("content") }
-                .map(::transformChannelIdToPlaylistId)
-                .switchIfEmpty { RuntimeException("channel id not found").toMono() }
+        // https://www.googleapis.com/youtube/v3/channels?key={YOUR_API_KEY}&forUsername={USER_NAME}&part=id
+        // https://www.googleapis.com/youtube/v3/channels?key=AIzaSyDE_M3rl-1LrZPwk9Hg6rFi5Ws3L0qrNCs&forUsername=joueurdugrenier&part=id
+        // {
+        //  "kind": "youtube#channelListResponse",
+        //  "etag": "V6f8V0AHAyAtwJCBr5pFW9Y08f8",
+        //  "pageInfo": {
+        //    "totalResults": 1,
+        //    "resultsPerPage": 5
+        //  },
+        //  "items": [
+        //    {
+        //      "kind": "youtube#channel",
+        //      "etag": "P_Oq-TaAXb4OaAd4_3j2jDMUwAw",
+        //      "id": "UC_yP2DpIgs5Y1uWC0T03Chw"
+        //    }
+        //  ]
+        //}
+        val userName = url.path
+            .substringAfterLast("/")
+            .replace("@", "")
+
+        return googleApiClient
+            .get()
+            .uri {it.path("/youtube/v3/channels")
+                .queryParam("key", key)
+                .queryParam("forUsername", userName)
+                .queryParam("part", "id")
+                .build()
+            }
+            .retrieve()
+            .bodyToMono<ChannelDetailsPage>()
+            .flatMap { it.items.firstOrNull()?.id.toMono() }
+            .map(::transformChannelIdToPlaylistId)
+            .switchIfEmpty { RuntimeException("channel id not found").toMono() }
     }
 
     private fun transformChannelIdToPlaylistId(channelId: String) =
-            if (channelId.startsWith("UC")) channelId.replaceFirst("UC".toRegex(), "UU")
-            else channelId
+        if (channelId.startsWith("UC")) channelId.replaceFirst("UC".toRegex(), "UU")
+        else channelId
 
     override fun type() = type
     override fun compatibility(url: String): Int = youtubeCompatibility(url)
@@ -130,12 +153,12 @@ internal data class YoutubeApiResponse(val items: List<YoutubeApiItem>, val next
 @JsonIgnoreProperties(ignoreUnknown = true)
 internal data class YoutubeApiItem(val snippet: Snippet) {
     fun toItem() = ItemFromUpdate(
-            title = snippet.title,
-            description = snippet.description,
-            pubDate = snippet.pubDate(),
-            url = URI(snippet.resourceId.url()),
-            cover = snippet.cover(),
-            mimeType = "video/webm"
+        title = snippet.title,
+        description = snippet.description,
+        pubDate = snippet.pubDate(),
+        url = URI(snippet.resourceId.url()),
+        cover = snippet.cover(),
+        mimeType = "video/webm"
     )
 }
 
@@ -143,9 +166,9 @@ internal data class YoutubeApiItem(val snippet: Snippet) {
 internal data class Snippet(val title: String, val resourceId: ResourceId, val description: String, val publishedAt: String, val thumbnails: Thumbnails = Thumbnails()) {
     fun pubDate() = ZonedDateTime.parse(publishedAt, DateTimeFormatter.ISO_DATE_TIME)!!
     fun cover() = this.thumbnails
-            .betterThumbnail()
-            .map { ItemFromUpdate.Cover(url = URI(it.url!!), width = it.width!!, height = it.height!!) }
-            .orNull()
+        .betterThumbnail()
+        .map { ItemFromUpdate.Cover(url = URI(it.url!!), width = it.width!!, height = it.height!!) }
+        .orNull()
 }
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -155,11 +178,11 @@ internal data class ResourceId(var videoId: String) {
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 internal data class Thumbnails(
-        val maxres: Thumbnail? = null,
-        val standard: Thumbnail? = null,
-        val high: Thumbnail? = null,
-        val medium: Thumbnail? = null,
-        @field:JsonProperty("default") val byDefault: Thumbnail? = null
+    val maxres: Thumbnail? = null,
+    val standard: Thumbnail? = null,
+    val high: Thumbnail? = null,
+    val medium: Thumbnail? = null,
+    @field:JsonProperty("default") val byDefault: Thumbnail? = null
 ) {
 
     fun betterThumbnail(): Optional<Thumbnail> {
@@ -178,3 +201,8 @@ internal data class Thumbnails(
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 internal data class Thumbnail(var url: String? = null, var width: Int? = null, var height: Int? = null)
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+internal data class ChannelDetailsPage(var items: List<ChannelDetails>) {
+    internal data class ChannelDetails(var kind: String, var etag: String, var id: String)
+}
