@@ -138,6 +138,8 @@ stages:
   stage: ⬇ download
   extends: [ .only-on-frontend-changes ]
   image: gradle:jdk17
+  before_script:
+    - apt update && apt install bzip2
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angularjs:downloadDependencies
   cache:
