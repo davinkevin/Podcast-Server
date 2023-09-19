@@ -12,7 +12,7 @@ EOF
 
 COPY backend-lib-database/src/main/migrations/*.sql /flyway/sql/
 
-FROM gcr.io/distroless/java17-debian11:latest as base-image
+FROM gcr.io/distroless/java17-debian12:latest as base-image
 
 COPY --from=flyway-base /flyway/ /database/
 WORKDIR /database/
