@@ -17,7 +17,7 @@ RUN echo "install dependencies" && \
   echo "Print content of downloader folder" && \
   tree /opt/
 
-FROM openjdk:17-slim as base-image
+FROM bellsoft/liberica-openjdk-debian:17 as base-image
 
 COPY --from=downloader /opt/ /opt/
 
@@ -33,4 +33,4 @@ RUN echo "install runtime dependencies" && \
   echo "print version of built in tools" && \
   ffmpeg -version | head -n 1 && \
   yt-dlp --version && \
-  rtmpdump --help 2>&1 | head -n 1
+  rtmpdump --help 2>&1 | head -n 1 &&
