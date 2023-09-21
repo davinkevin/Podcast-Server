@@ -1,9 +1,10 @@
+import com.gitlab.davinkevin.podcastserver.database.DatabaseConfiguration
+import com.gitlab.davinkevin.podcastserver.dockerimages.DockerImagesConfiguration
+import com.gradle.enterprise.gradleplugin.testretry.retry
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.internal.deprecation.DeprecatableConfiguration
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-import com.gitlab.davinkevin.podcastserver.database.*
-import com.gitlab.davinkevin.podcastserver.dockerimages.*
-import com.gradle.enterprise.gradleplugin.testretry.retry
 
 plugins {
 	id("org.springframework.boot") version "3.1.4"
@@ -14,8 +15,8 @@ plugins {
 	id("org.jetbrains.kotlinx.kover") version "0.7.3"
 	id("org.graalvm.buildtools.native") version "0.9.27"
 
-	kotlin("jvm") version "1.8.22"
-	kotlin("plugin.spring") version "1.8.22"
+	kotlin("jvm") version "1.9.10"
+	kotlin("plugin.spring") version "1.9.10"
 
 	jacoco
 
@@ -26,7 +27,23 @@ plugins {
 
 group = "com.github.davinkevin.podcastserver"
 version = "2023.9.0"
-java.sourceCompatibility = JavaVersion.VERSION_17
+
+java {
+	sourceCompatibility = JavaVersion.VERSION_21
+	toolchain {
+		languageVersion = JavaLanguageVersion.of(21)
+	}
+}
+
+tasks.withType<KotlinCompile> {
+	compilerOptions {
+		freeCompilerArgs = listOf(
+			"-Xjsr305=strict",
+			"-Xallow-result-return-type",
+		)
+		jvmTarget = JVM_17
+	}
+}
 
 repositories {
 	mavenCentral()
@@ -80,16 +97,6 @@ configure<com.gorylenko.GitPropertiesPluginExtension> {
 normalization {
 	runtimeClasspath {
 		ignore("git.properties")
-	}
-}
-
-tasks.withType<KotlinCompile> {
-	kotlinOptions {
-		freeCompilerArgs = listOf(
-			"-Xjsr305=strict",
-			"-Xallow-result-return-type",
-		)
-		jvmTarget = "17"
 	}
 }
 

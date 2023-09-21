@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.web.reactive.function.server.router
+import kotlin.concurrent.thread
 
 /**
  * Created by kevin on 17/09/2019
@@ -51,6 +52,7 @@ class DownloadRouterConfig {
 class DownloadConfig {
     @Bean
     fun downloadExecutor(parameters: PodcastServerParameters) = ThreadPoolTaskExecutor().apply {
+        setThreadFactory(Thread::startVirtualThread)
         corePoolSize = parameters.concurrentDownload
         setThreadNamePrefix("Downloader-")
         initialize()
