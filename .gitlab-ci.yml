@@ -185,7 +185,6 @@ stages:
     POSTGRES_DB: podcast-server-db
   script:
     - ./gradlew $GRADLE_OPTS backend-lib-database:flywayMigrate :backend:test backend:koverLog backend:koverHtmlReport
-    - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
   artifacts:
     paths:
       - backend/build/reports/kover/html/**/*
