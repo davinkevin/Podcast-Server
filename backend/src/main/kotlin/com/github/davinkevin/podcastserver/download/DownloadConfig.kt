@@ -52,7 +52,6 @@ class DownloadRouterConfig {
 class DownloadConfig {
     @Bean
     fun downloadExecutor(parameters: PodcastServerParameters) = ThreadPoolTaskExecutor().apply {
-        setThreadFactory(Thread::startVirtualThread)
         corePoolSize = parameters.concurrentDownload
         setThreadNamePrefix("Downloader-")
         initialize()
