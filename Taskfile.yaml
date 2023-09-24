@@ -15,11 +15,6 @@ tasks:
     deps:
       - task: k3d:cluster:create
     cmds:
-      - echo "Creation of folders mounted inside the container, for file storage"
-      - mkdir -p /tmp/podcast-server/files/ 
-                 /tmp/podcast-server/database/backup/
-                 /tmp/podcast-server/database/init/
-                 /tmp/podcast-server/database/data/
       - skaffold dev --status-check=false
 
   database:start:
