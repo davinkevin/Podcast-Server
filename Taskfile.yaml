@@ -81,3 +81,14 @@ tasks:
           --assets-link "{\"name\":\"backend\",\"url\":\"https://hub.docker.com/layers/podcastserver/backend/$CI_COMMIT_TAG/images/sha256-$BACKEND_SHA\",\"link_type\":\"image\"}"
           --assets-link "{\"name\":\"init-db\",\"url\":\"https://hub.docker.com/layers/podcastserver/init-db/$CI_COMMIT_TAG/images/sha256-$INIT_DB_SHA\",\"link_type\":\"image\"}"
           --assets-link "{\"name\":\"storage\",\"url\":\"https://hub.docker.com/layers/podcastserver/storage/$CI_COMMIT_TAG/images/sha256-$STORAGE_SHA\",\"link_type\":\"image\"}"
+
+  push-to-github:
+    env:
+      GITLAB_DIRECTORY:
+        sh: mktemp -d
+    cmds:
+      - |
+        cd $GITLAB_DIRECTORY
+        git clone --bare git@gitlab.com:davinkevin/Podcast-Server.git
+        cd Podcast-Server.git
+        git push --mirror --repo git@github.com:davinkevin/Podcast-Server.git
