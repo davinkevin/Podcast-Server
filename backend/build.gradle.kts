@@ -18,11 +18,8 @@ plugins {
 	kotlin("jvm") version "1.9.10"
 	kotlin("plugin.spring") version "1.9.10"
 
-	jacoco
-
 	id("build-plugin-database")
 	id("build-plugin-docker-images")
-	id("build-plugin-print-coverage")
 }
 
 group = "com.github.davinkevin.podcastserver"
@@ -84,7 +81,6 @@ dependencies {
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:2.37.0")
 	testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.0")
 	testImplementation("org.awaitility:awaitility:4.2.0")
-
 }
 
 configure<com.gorylenko.GitPropertiesPluginExtension> {
@@ -127,33 +123,17 @@ tasks.test {
 	}
 	jvmArgs = listOf("--add-opens", "java.base/java.time=ALL-UNNAMED")
 
-	finalizedBy(tasks.jacocoTestReport)
-
 	testLogging {
 		exceptionFormat = TestExceptionFormat.FULL
 	}
 }
 
-tasks.jacocoTestReport {
-	reports {
-		html.required.value(true)
-		xml.required.value(true)
+koverReport {
+	filters {
+		excludes {
+			classes("org.springframework.*", "*__*")
+		}
 	}
-	executionData(layout.buildDirectory.file("jacoco/test.exec"))
-
-	dependsOn(tasks.test)
-	finalizedBy(tasks.printCoverage)
-}
-
-tasks.printCoverage {
-	dependsOn(tasks.jacocoTestReport)
-
-	outputs.upToDateWhen { true }
-	outputs.cacheIf { !System.getenv("CI_JOB_STAGE").contains("test") }
-
-	inputs.dir(file(layout.buildDirectory.dir("reports/jacoco")))
-		.withPropertyName("reports")
-		.withPathSensitivity(PathSensitivity.RELATIVE)
 }
 
 jib {

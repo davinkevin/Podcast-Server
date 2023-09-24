@@ -184,14 +184,14 @@ stages:
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
     POSTGRES_DB: podcast-server-db
   script:
-    - ./gradlew $GRADLE_OPTS backend-lib-database:flywayMigrate :backend:test
+    - ./gradlew $GRADLE_OPTS backend-lib-database:flywayMigrate :backend:test backend:koverLog backend:koverHtmlReport
     - bash <(curl -s https://codecov.io/bash) -t $CODECOV_TOKEN
   artifacts:
     paths:
-      - backend/build/reports/jacoco/test/html/**/*
+      - backend/build/reports/kover/html/**/*
     reports:
       junit: backend/build/test-results/test/TEST-*.xml
-  coverage: '/^Coverage:\s(\d+\.\d+%)/'
+  coverage: '/^application line coverage:\s(\d+\.\d+%)/'
   cache:
     key:
       files:

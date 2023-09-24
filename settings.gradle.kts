@@ -44,4 +44,3 @@ include("frontend-angularjs")
 
 includeBuild("build-logic/build-plugin-database") { name = "build-plugin-database" }
 includeBuild("build-logic/build-plugin-docker-images") { name = "build-plugin-docker-images" }
-includeBuild("build-logic/build-plugin-print-coverage") { name = "build-plugin-print-coverage" }
