@@ -1,6 +1,34 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2023.10.0
+
+### Features
+
+- **backend:** Upgrade to liberica-debian based on java 17 ([8bf79ca](8bf79ca8e1de28af743be9dde8b48950777e2a91))
+- **backend:** Upgrade to spring v3.1.4 ([7eec6f4](7eec6f467e65637d2242f0a848cc7376afae7909))
+- **backend:** Upgrade to minio RELEASE.2023-09-27T15-22-50Z ([f762610](f76261087e415d3a0a6f95ab43cf5e6ed4bb42aa))
+- **coverage:** Remove codecov because based on irelevant jacoco results ([c12602b](c12602b6a6619d5e9a6d3614d278a7efa90ebeef) - [#217](https://gitlab.com/davinkevin/Podcast-Server/-/issues/217))
+- **init-db:** Upgrade to debian12 java images ([b2a210a](b2a210a9ff91db51997aed96d3a7d0d40c3c8709))
+- **java:** Upgrade backend to JVM 21 ([79dc4a1](79dc4a1a4810cfb66ec53408035842e627006fac) - [#215](https://gitlab.com/davinkevin/Podcast-Server/-/issues/215))
+- **test:** Move to kover for better kotlin coverage management ([613684a](613684a88dc4dbf24e339a7a443f2197ae4c757a) - [#217](https://gitlab.com/davinkevin/Podcast-Server/-/issues/217))
+- **ui:** Move to SWS v2.22.0 ([c060fd7](c060fd7e83301ce7ff4cc2a4ed4271ade1d9948c))
+- **youtube:** Use google api to extract playlist id instead of html parsing ([fd32132](fd32132143e855cb9e38b11721395168c5edd413))
+
+### Bug Fixes
+
+- **backend:** Remove download from virtual thread executor ([e13d1f6](e13d1f6ff5a617d88a67560d9688e5fbfb3aac5d))
+- **playlist:** Fix test about item removal from playlist ([550fa01](550fa015c656c686a8aea96402e2babdd31878e8))
+- **youtube:** Support new channel format based on @handle ([405085c](405085c09c880bf0841033c25a36af1c05816a5a) - [#218](https://gitlab.com/davinkevin/Podcast-Server/-/issues/218))
+
+### Refactor
+
+- **youtube:** Simplification of the call to the reactor API for youtube updated ([98e689a](98e689ac56900b467cd413d31078d888a7a3b6c0))
+
+### Testing
+
+- **playlist:** Expand testing for handler ([bb3a5ce](bb3a5ce621d4d724a3a18668d19e6066a8f12a5f))
+
 ## 2023.9.0
 
 ### Features
