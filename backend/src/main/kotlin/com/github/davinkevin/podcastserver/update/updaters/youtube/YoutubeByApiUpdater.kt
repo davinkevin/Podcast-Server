@@ -7,6 +7,7 @@ import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Updater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByApiUpdater.Companion.URL_PAGE_BASE
+import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
 import org.springframework.util.DigestUtils
 import org.springframework.web.reactive.function.client.WebClient
@@ -25,7 +26,8 @@ import java.util.*
  */
 class YoutubeByApiUpdater(
     private val key: String,
-    private val googleApiClient: WebClient
+    private val youtube: WebClient,
+    private val googleApi: WebClient,
 ): Updater {
 
     private val log = LoggerFactory.getLogger(YoutubeByApiUpdater::class.java)
@@ -55,7 +57,7 @@ class YoutubeByApiUpdater(
     }
 
     private fun fetchPageWithToken(id: String, pageToken: String = "") =
-        googleApiClient
+        googleApi
             .get()
             .uri { it.path("/youtube/v3/playlistItems")
                 .queryParam("part", "snippet")
@@ -74,26 +76,48 @@ class YoutubeByApiUpdater(
             .onErrorResume { YoutubeApiResponse(emptyList()).toMono() }
 
     private fun findPlaylistId(url: URI): Mono<String> {
-        if (isPlaylist(url))
-            return url.toASCIIString().substringAfter("list=").toMono()
+        val channelId = when {
+            isPlaylist(url) -> findPlaylistIdFromPlaylistUrl(url)
+            isHandle(url) -> findPlaylistIdUsingHtmlPage(url)
+            else -> findPlaylistIdFromUserName(url)
+        }
 
-        val userName = url.path
-            .substringAfterLast("/")
-            .replace("@", "")
+        return channelId
+            .map(::transformChannelIdToPlaylistId)
+            .switchIfEmpty { RuntimeException("channel id not found").toMono() }
+    }
 
-        return googleApiClient
+    private fun findPlaylistIdUsingHtmlPage(url: URI): Mono<String> {
+        return youtube
             .get()
-            .uri {it.path("/youtube/v3/channels")
-                .queryParam("key", key)
-                .queryParam("forUsername", userName)
-                .queryParam("part", "id")
-                .build()
+            .uri(url)
+            .retrieve()
+            .bodyToMono<String>()
+            .map { Jsoup.parse(it, "https://www.youtube.com") }
+            .flatMap { it.select("meta[itemprop=identifier]").firstOrNull().toMono() }
+            .map { it.attr("content") }
+    }
+
+    private fun findPlaylistIdFromPlaylistUrl(url: URI): Mono<String> {
+        return url.toASCIIString().substringAfter("list=").toMono()
+    }
+
+    private fun findPlaylistIdFromUserName(url: URI): Mono<String> {
+        val username = url.path.substringAfterLast("/")
+
+        return googleApi
+            .get()
+            .uri {
+                it.path("/youtube/v3/channels")
+                    .queryParam("key", key)
+                    .queryParam("forUsername", username)
+                    .queryParam("part", "id")
+                    .build()
             }
             .retrieve()
             .bodyToMono<ChannelDetailsPage>()
             .flatMap { it.items.firstOrNull()?.id.toMono() }
-            .map(::transformChannelIdToPlaylistId)
-            .switchIfEmpty { RuntimeException("channel id not found").toMono() }
+
     }
 
     private fun transformChannelIdToPlaylistId(channelId: String) =
@@ -157,6 +181,6 @@ internal data class Thumbnails(
 internal data class Thumbnail(var url: String? = null, var width: Int? = null, var height: Int? = null)
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-internal data class ChannelDetailsPage(var items: List<ChannelDetails>) {
+internal data class ChannelDetailsPage(var items: List<ChannelDetails> = emptyList()) {
     internal data class ChannelDetails(var kind: String, var etag: String, var id: String)
 }

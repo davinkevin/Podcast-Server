@@ -10,6 +10,7 @@ import java.net.URI
 internal const val PLAYLIST_URL_PART = "playlist?list="
 
 internal fun isPlaylist(url: URI) = url.toASCIIString().contains(PLAYLIST_URL_PART)
+internal fun isHandle(url: URI) = url.toASCIIString().matches(".*/@.*$".toRegex())
 
 internal val type = Type("Youtube", "Youtube")
 internal fun youtubeCompatibility(url: String) = when {
