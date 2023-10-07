@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
-import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -10,16 +9,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
-import reactor.test.StepVerifier
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -71,7 +67,7 @@ class PlaylistHandlerTest (
         fun `with a name`() {
             /* Given */
             val playlist = PlaylistWithItems(id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), name = "foo", items = emptyList())
-            whenever(service.save("foo")).thenReturn(playlist.toMono())
+            whenever(service.create("foo")).thenReturn(playlist.toMono())
             /* When */
             rest
                     .post()
@@ -94,7 +90,7 @@ class PlaylistHandlerTest (
         @Test
         fun `with 1 item`() {
             /* Given */
-            whenever(service.save("foo"))
+            whenever(service.create("foo"))
                 .thenReturn(playlist.toMono())
 
             /* When */
@@ -144,7 +140,7 @@ class PlaylistHandlerTest (
                     )
                 )
             )
-            whenever(service.save("foo"))
+            whenever(service.create("foo"))
                 .thenReturn(playlistWithItemWithoutCoverExtension.toMono())
 
             /* When */

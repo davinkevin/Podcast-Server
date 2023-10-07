@@ -2,9 +2,9 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.database.Tables.*
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.switchIfEmpty
 import reactor.kotlin.core.publisher.toMono
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
@@ -17,14 +17,26 @@ class PlaylistRepository(
 
     fun findAll(): Flux<Playlist> = Flux.defer {
         Flux.from(query
-                .select(PLAYLIST.ID, PLAYLIST.NAME)
+                .select(
+                    PLAYLIST.ID, PLAYLIST.NAME,
+                    COVER.ID, COVER.WIDTH, COVER.HEIGHT, COVER.URL,
+                )
                 .from(PLAYLIST)
+                    .innerJoin(COVER)
+                    .on(COVER.ID.eq(PLAYLIST.COVER_ID))
                 .orderBy(PLAYLIST.NAME)
         )
                 .map { Playlist(
                         id = it[PLAYLIST.ID],
-                        name = it[PLAYLIST.NAME]
-                ) }
+                        name = it[PLAYLIST.NAME],
+                        cover = Playlist.Cover(
+                            id = it[COVER.ID],
+                            height = it[COVER.HEIGHT],
+                            width = it[COVER.WIDTH],
+                            url = URI.create(it[COVER.URL]),
+                        )
+                    )
+                }
     }
 
     fun findById(id: UUID): Mono<PlaylistWithItems> = Mono.defer {
@@ -66,38 +78,61 @@ class PlaylistRepository(
                 .collectList()
 
         val playlist = query
-                .select(PLAYLIST.ID, PLAYLIST.NAME)
-                .from(PLAYLIST)
-                .where(PLAYLIST.ID.eq(id))
-                .toMono()
+            .select(
+                PLAYLIST.ID, PLAYLIST.NAME,
+                COVER.ID, COVER.WIDTH, COVER.HEIGHT, COVER.URL,
+            )
+            .from(PLAYLIST)
+            .innerJoin(COVER)
+                .on(COVER.ID.eq(PLAYLIST.COVER_ID))
+            .where(PLAYLIST.ID.eq(id))
+            .toMono()
 
         Mono.zip(playlist, items)
                 .map { (pl, items) -> PlaylistWithItems(
                         id = pl[PLAYLIST.ID],
                         name = pl[PLAYLIST.NAME],
-                        items = items
+                        cover = PlaylistWithItems.Cover(
+                            id = pl[COVER.ID],
+                            height = pl[COVER.HEIGHT],
+                            width = pl[COVER.WIDTH],
+                            url = URI.create(pl[COVER.URL]),
+                        ),
+                        items = items,
                 ) }
     }
 
-    fun save(name: String): Mono<PlaylistWithItems> = Mono.defer {
+    fun create(playlist: PlaylistForCreate): Mono<PlaylistWithItems> = Mono.defer {
         val id = UUID.randomUUID()
+        val coverId = UUID.randomUUID()
 
         query
-                .insertInto(PLAYLIST)
-                .set(PLAYLIST.ID, id)
-                .set(PLAYLIST.NAME, name)
-                .onConflictDoNothing()
-                .toMono()
-                .filter { it == 1 }
-                .map { PlaylistWithItems(id, name, emptyList()) }
-                .switchIfEmpty {
-                    query
-                            .select(PLAYLIST.ID)
-                            .from(PLAYLIST)
-                            .where(PLAYLIST.NAME.eq(name))
-                            .toMono()
-                            .flatMap { findById(it[PLAYLIST.ID]) }
-                }
+            .with(name("COVER_CREATION").`as`(
+                insertInto(COVER)
+                    .set(COVER.ID, coverId)
+                    .set(COVER.URL, playlist.cover.url.toASCIIString())
+                    .set(COVER.WIDTH, playlist.cover.width)
+                    .set(COVER.HEIGHT, playlist.cover.height)
+                    .returning(COVER.ID)
+            ))
+            .insertInto(PLAYLIST)
+            .set(PLAYLIST.ID, id)
+            .set(PLAYLIST.NAME, playlist.name)
+            .set(PLAYLIST.COVER_ID, coverId)
+            .returning(PLAYLIST.ID)
+            .toMono()
+            .map {PlaylistWithItems(
+                    id = id,
+                    name = playlist.name,
+                    cover = PlaylistWithItems.Cover(
+                        id = coverId,
+                        url = playlist.cover.url,
+                        height = playlist.cover.height,
+                        width = playlist.cover.width,
+                    ),
+                    items = emptyList()
+                )
+            }
 
     }
 

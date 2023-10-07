@@ -3,7 +3,6 @@ package com.github.davinkevin.podcastserver.playlist
 import com.github.davinkevin.podcastserver.JooqR2DBCTest
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
-import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.r2dbc
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
@@ -13,7 +12,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import reactor.test.StepVerifier
 import java.net.URI
@@ -223,7 +221,7 @@ class PlaylistRepositoryTest(
         fun `with a name`() {
             /* Given */
             /* When */
-            StepVerifier.create(repository.save("foo"))
+            StepVerifier.create(repository.create("foo"))
                     /* Then */
                     .expectSubscription()
                     .assertNext {
@@ -241,7 +239,7 @@ class PlaylistRepositoryTest(
         fun `with an already existing name`() {
             /* Given */
             /* When */
-            StepVerifier.create(repository.save("Humour Playlist"))
+            StepVerifier.create(repository.create("Humour Playlist"))
                     /* Then */
                     .expectSubscription()
                     .assertNext {

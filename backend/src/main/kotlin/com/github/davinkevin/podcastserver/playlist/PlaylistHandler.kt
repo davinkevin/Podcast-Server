@@ -25,14 +25,15 @@ class PlaylistHandler(
         private val playlistService: PlaylistService
 ) {
 
-    fun save(r: ServerRequest): Mono<ServerResponse> {
+    fun create(r: ServerRequest): Mono<ServerResponse> {
         return r
-                .bodyToMono<SavePlaylist>()
-                .flatMap { playlistService.save(it.name) }
+                .bodyToMono<PlaylistToSaveHAL>()
+                .flatMap { playlistService.create(it.name, it.cover.url) }
                 .map { PlaylistWithItemsHAL(
                         id = it.id,
                         name = it.name,
-                        items = it.items.map(PlaylistWithItems.Item::toHAL)
+                        cover = it.cover.toCoverHAL(),
+                        items = it.items.map(PlaylistWithItems.Item::toHAL),
                 ) }
                 .flatMap { ok().bodyValue(it) }
 
@@ -54,8 +55,10 @@ class PlaylistHandler(
                 .map { PlaylistWithItemsHAL(
                         id = it.id,
                         name = it.name,
-                        items = it.items.map(PlaylistWithItems.Item::toHAL)
-                ) }
+                        cover = it.cover.toCoverHAL(),
+                        items = it.items.map(PlaylistWithItems.Item::toHAL),
+                    )
+                }
                 .flatMap { ok().bodyValue(it) }
     }
 
@@ -91,8 +94,10 @@ class PlaylistHandler(
                 .map { PlaylistWithItemsHAL(
                         id = it.id,
                         name = it.name,
+                        cover = it.cover.toCoverHAL(),
                         items = it.items.map(PlaylistWithItems.Item::toHAL)
-                ) }
+                    )
+                }
                 .flatMap { ok().bodyValue(it) }
     }
 
@@ -105,19 +110,25 @@ class PlaylistHandler(
                 .map { PlaylistWithItemsHAL(
                         id = it.id,
                         name = it.name,
+                        cover = it.cover.toCoverHAL(),
                         items = it.items.map(PlaylistWithItems.Item::toHAL)
-                ) }
+                    )
+                }
                 .flatMap { ok().bodyValue(it) }
     }
 
 }
 
-private class SavePlaylist(val name: String)
+private class PlaylistToSaveHAL(val name: String, val cover: Cover) {
+    data class Cover(val url: URI)
+}
 
 private class FindAllPlaylistHAL(val content: Collection<PlaylistHAL>)
 private class PlaylistHAL(val id: UUID, val name: String)
 
-private class PlaylistWithItemsHAL(val id: UUID, val name: String, val items: Collection<Item>) {
+private class PlaylistWithItemsHAL(val id: UUID, val name: String, val cover: Cover, val items: Collection<Item>) {
+    data class Cover (val id: UUID, val width: Int, val height: Int, val url: URI)
+
     data class Item(
             val id: UUID,
             val title: String,
@@ -133,6 +144,12 @@ private class PlaylistWithItemsHAL(val id: UUID, val name: String, val items: Co
         data class Cover (val id: UUID, val width: Int, val height: Int, val url: URI)
     }
 }
+private fun PlaylistWithItems.Cover.toCoverHAL() = PlaylistWithItemsHAL.Cover (
+    id = this.id,
+    width = this.width,
+    height = this.height,
+    url = this.url,
+)
 
 private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
     val coverExtension = cover.url.extension().ifBlank { "jpg" }
@@ -182,12 +199,30 @@ private fun PlaylistWithItems.toRss(host: URI): Element {
             .build(true)
             .toUriString()
 
+    val coverUrl = cover.url.toASCIIString()
+
     val items = this.items.map { toRssItem(it, host) }
 
     val channel = Element("channel").apply {
         addContent(Element("title").addContent(Text(this@toRss.name)))
         addContent(Element("link").addContent(Text(url)))
         addContent(items)
+
+        val itunesImage = Element(
+            "image",
+            Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")
+        ).apply {
+            addContent(Text(coverUrl))
+        }
+
+        val image = Element("image").apply {
+            addContent(Element("height").addContent(cover.height.toString()))
+            addContent(Element("url").addContent(coverUrl))
+            addContent(Element("width").addContent(cover.width.toString()))
+        }
+
+        addContent(image)
+        addContent(itunesImage)
     }
 
     return Element("rss").apply {

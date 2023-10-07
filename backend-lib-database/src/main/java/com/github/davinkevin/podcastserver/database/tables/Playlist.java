@@ -15,11 +15,11 @@ import java.util.function.Function;
 
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function2;
+import org.jooq.Function3;
 import org.jooq.Name;
 import org.jooq.Record;
 import org.jooq.Records;
-import org.jooq.Row2;
+import org.jooq.Row3;
 import org.jooq.Schema;
 import org.jooq.SelectField;
 import org.jooq.Table;
@@ -61,6 +61,11 @@ public class Playlist extends TableImpl<PlaylistRecord> {
      * The column <code>public.playlist.name</code>.
      */
     public final TableField<PlaylistRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(255), this, "");
+
+    /**
+     * The column <code>public.playlist.cover_id</code>.
+     */
+    public final TableField<PlaylistRecord, UUID> COVER_ID = createField(DSL.name("cover_id"), SQLDataType.UUID.nullable(false), this, "");
 
     private Playlist(Name alias, Table<PlaylistRecord> aliased) {
         this(alias, aliased, null);
@@ -111,6 +116,23 @@ public class Playlist extends TableImpl<PlaylistRecord> {
     }
 
     @Override
+    public List<ForeignKey<PlaylistRecord, ?>> getReferences() {
+        return Arrays.asList(Keys.PLAYLIST__PLAYLIST_COVER_ID_FK);
+    }
+
+    private transient Cover _cover;
+
+    /**
+     * Get the implicit join path to the <code>public.cover</code> table.
+     */
+    public Cover cover() {
+        if (_cover == null)
+            _cover = new Cover(this, Keys.PLAYLIST__PLAYLIST_COVER_ID_FK);
+
+        return _cover;
+    }
+
+    @Override
     public Playlist as(String alias) {
         return new Playlist(DSL.name(alias), this);
     }
@@ -150,18 +172,18 @@ public class Playlist extends TableImpl<PlaylistRecord> {
     }
 
     // -------------------------------------------------------------------------
-    // Row2 type methods
+    // Row3 type methods
     // -------------------------------------------------------------------------
 
     @Override
-    public Row2<UUID, String> fieldsRow() {
-        return (Row2) super.fieldsRow();
+    public Row3<UUID, String, UUID> fieldsRow() {
+        return (Row3) super.fieldsRow();
     }
 
     /**
      * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
      */
-    public <U> SelectField<U> mapping(Function2<? super UUID, ? super String, ? extends U> from) {
+    public <U> SelectField<U> mapping(Function3<? super UUID, ? super String, ? super UUID, ? extends U> from) {
         return convertFrom(Records.mapping(from));
     }
 
@@ -169,7 +191,7 @@ public class Playlist extends TableImpl<PlaylistRecord> {
      * Convenience mapping calling {@link SelectField#convertFrom(Class,
      * Function)}.
      */
-    public <U> SelectField<U> mapping(Class<U> toType, Function2<? super UUID, ? super String, ? extends U> from) {
+    public <U> SelectField<U> mapping(Class<U> toType, Function3<? super UUID, ? super String, ? super UUID, ? extends U> from) {
         return convertFrom(toType, Records.mapping(from));
     }
 }

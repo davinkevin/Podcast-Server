@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import java.net.URI
 import java.nio.file.Path
 import java.time.OffsetDateTime
@@ -8,9 +9,16 @@ import java.util.*
 /**
  * Created by kevin on 2019-07-01
  */
-data class Playlist(val id: UUID, val name: String)
+data class Playlist(val id: UUID, val name: String, val cover: Cover) {
+    data class Cover(val id: UUID, val url: URI, val height: Int, val width: Int)
+}
 
-data class PlaylistWithItems(val id: UUID, val name: String, val items: Collection<Item>) {
+data class PlaylistForCreate(val name: String, val cover: CoverForCreation)
+
+
+data class PlaylistWithItems(val id: UUID, val name: String, val cover: Cover, val items: Collection<Item>) {
+
+    data class Cover(val id: UUID, val url: URI, val height: Int, val width: Int)
 
     data class Item(
         val id: UUID,

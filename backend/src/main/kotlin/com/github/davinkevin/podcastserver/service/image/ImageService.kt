@@ -1,5 +1,7 @@
 package com.github.davinkevin.podcastserver.service.image
 
+import com.github.davinkevin.podcastserver.cover.CoverForCreation
+import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
@@ -29,5 +31,15 @@ class ImageService (private val wcb: WebClient.Builder ) {
 }
 
 data class CoverInformation(val width: Int, val height: Int, val url: URI)
+val defaultCoverInformation = CoverInformation(
+    height = 600,
+    url = URI.create("https://placehold.co/600x600?text=No+Cover"),
+    width = 600,
+)
 
 private fun InputStream.toBufferedImage() = ImageIO.read(ImageIO.createImageInputStream(this))!!
+fun CoverInformation.toCoverForCreation() = CoverForCreation(
+    height = this.height,
+    width = this.width,
+    url = this.url
+)

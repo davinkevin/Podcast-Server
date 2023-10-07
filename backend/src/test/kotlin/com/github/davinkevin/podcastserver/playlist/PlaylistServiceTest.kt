@@ -101,10 +101,10 @@ class PlaylistServiceTest(
             /* Given */
             val id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
             val playlist = PlaylistWithItems(id = id, name = "foo", items = emptyList())
-            whenever(repository.save("foo")).thenReturn(playlist.toMono())
+            whenever(repository.create("foo")).thenReturn(playlist.toMono())
 
             /* When */
-            StepVerifier.create(repository.save("foo"))
+            StepVerifier.create(repository.create("foo"))
                     /* Then */
                     .expectSubscription()
                     .expectNext(playlist)

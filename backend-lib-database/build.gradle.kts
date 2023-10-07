@@ -64,7 +64,9 @@ jooq {
                         isIncludePrimaryKeys = true
                         isIncludeUniqueKeys = true
                         isIncludeForeignKeys = true
+
                     }
+
 
                     target.apply {
                         packageName = "com.github.davinkevin.podcastserver.database"

@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -15,7 +16,7 @@ class PlaylistRoutingConfig {
     fun watchlistRouter(playlist: PlaylistHandler) = router {
         "/api/v1/playlists".nest {
             GET("", playlist::findAll)
-            POST("", playlist::save)
+            POST("", playlist::create)
             GET("{id}", playlist::findById)
             DELETE("{id}", playlist::deleteById)
             GET("{id}/rss", playlist::rss)
@@ -33,6 +34,7 @@ class PlaylistRoutingConfig {
         PlaylistRoutingConfig::class,
         PlaylistHandler::class,
         PlaylistService::class,
-        PlaylistRepository::class
+        PlaylistRepository::class,
+        ImageServiceConfig::class,
 )
 class PlaylistConfig
