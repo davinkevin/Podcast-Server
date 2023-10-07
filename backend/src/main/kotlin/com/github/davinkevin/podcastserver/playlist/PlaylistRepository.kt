@@ -17,13 +17,13 @@ class PlaylistRepository(
 
     fun findAll(): Flux<Playlist> = Flux.defer {
         Flux.from(query
-                .select(WATCH_LIST.ID, WATCH_LIST.NAME)
-                .from(WATCH_LIST)
-                .orderBy(WATCH_LIST.NAME)
+                .select(PLAYLIST.ID, PLAYLIST.NAME)
+                .from(PLAYLIST)
+                .orderBy(PLAYLIST.NAME)
         )
                 .map { Playlist(
-                        id = it[WATCH_LIST.ID],
-                        name = it[WATCH_LIST.NAME]
+                        id = it[PLAYLIST.ID],
+                        name = it[PLAYLIST.NAME]
                 ) }
     }
 
@@ -37,12 +37,12 @@ class PlaylistRepository(
                                 PODCAST.ID, PODCAST.TITLE,
                                 COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                         .from(
-                                WATCH_LIST_ITEMS
-                                        .innerJoin(ITEM).on(WATCH_LIST_ITEMS.ITEMS_ID.eq(ITEM.ID))
+                                PLAYLIST_ITEMS
+                                        .innerJoin(ITEM).on(PLAYLIST_ITEMS.ITEMS_ID.eq(ITEM.ID))
                                         .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
                                         .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
                         )
-                        .where(WATCH_LIST_ITEMS.WATCH_LISTS_ID.eq(id))
+                        .where(PLAYLIST_ITEMS.PLAYLISTS_ID.eq(id))
         )
                 .map { PlaylistWithItems.Item(
                         id = it[ITEM.ID],
@@ -66,15 +66,15 @@ class PlaylistRepository(
                 .collectList()
 
         val playlist = query
-                .select(WATCH_LIST.ID, WATCH_LIST.NAME)
-                .from(WATCH_LIST)
-                .where(WATCH_LIST.ID.eq(id))
+                .select(PLAYLIST.ID, PLAYLIST.NAME)
+                .from(PLAYLIST)
+                .where(PLAYLIST.ID.eq(id))
                 .toMono()
 
         Mono.zip(playlist, items)
                 .map { (pl, items) -> PlaylistWithItems(
-                        id = pl[WATCH_LIST.ID],
-                        name = pl[WATCH_LIST.NAME],
+                        id = pl[PLAYLIST.ID],
+                        name = pl[PLAYLIST.NAME],
                         items = items
                 ) }
     }
@@ -83,29 +83,29 @@ class PlaylistRepository(
         val id = UUID.randomUUID()
 
         query
-                .insertInto(WATCH_LIST)
-                .set(WATCH_LIST.ID, id)
-                .set(WATCH_LIST.NAME, name)
+                .insertInto(PLAYLIST)
+                .set(PLAYLIST.ID, id)
+                .set(PLAYLIST.NAME, name)
                 .onConflictDoNothing()
                 .toMono()
                 .filter { it == 1 }
                 .map { PlaylistWithItems(id, name, emptyList()) }
                 .switchIfEmpty {
                     query
-                            .select(WATCH_LIST.ID)
-                            .from(WATCH_LIST)
-                            .where(WATCH_LIST.NAME.eq(name))
+                            .select(PLAYLIST.ID)
+                            .from(PLAYLIST)
+                            .where(PLAYLIST.NAME.eq(name))
                             .toMono()
-                            .flatMap { findById(it[WATCH_LIST.ID]) }
+                            .flatMap { findById(it[PLAYLIST.ID]) }
                 }
 
     }
 
     fun addToPlaylist(playlistId: UUID, itemId: UUID): Mono<PlaylistWithItems> = Mono.defer {
         query
-                .insertInto(WATCH_LIST_ITEMS)
-                .set(WATCH_LIST_ITEMS.WATCH_LISTS_ID, playlistId)
-                .set(WATCH_LIST_ITEMS.ITEMS_ID, itemId)
+                .insertInto(PLAYLIST_ITEMS)
+                .set(PLAYLIST_ITEMS.PLAYLISTS_ID, playlistId)
+                .set(PLAYLIST_ITEMS.ITEMS_ID, itemId)
                 .onConflictDoNothing()
                 .toMono()
                 .then(findById(playlistId))
@@ -113,21 +113,21 @@ class PlaylistRepository(
 
     fun removeFromPlaylist(playlistId: UUID, itemId: UUID): Mono<PlaylistWithItems> = Mono.defer {
         query
-                .deleteFrom(WATCH_LIST_ITEMS)
-                .where(WATCH_LIST_ITEMS.WATCH_LISTS_ID.eq(playlistId))
-                .and(WATCH_LIST_ITEMS.ITEMS_ID.eq(itemId))
+                .deleteFrom(PLAYLIST_ITEMS)
+                .where(PLAYLIST_ITEMS.PLAYLISTS_ID.eq(playlistId))
+                .and(PLAYLIST_ITEMS.ITEMS_ID.eq(itemId))
                 .toMono()
                 .then(findById(playlistId))
     }
 
     fun deleteById(id: UUID): Mono<Void> = Mono.defer {
         query
-                .deleteFrom(WATCH_LIST_ITEMS)
-                .where(WATCH_LIST_ITEMS.WATCH_LISTS_ID.eq(id))
+                .deleteFrom(PLAYLIST_ITEMS)
+                .where(PLAYLIST_ITEMS.PLAYLISTS_ID.eq(id))
                 .toMono()
                 .then(query
-                        .deleteFrom(WATCH_LIST)
-                        .where(WATCH_LIST.ID.eq(id))
+                        .deleteFrom(PLAYLIST)
+                        .where(PLAYLIST.ID.eq(id))
                         .toMono()
                 )
                 .then()

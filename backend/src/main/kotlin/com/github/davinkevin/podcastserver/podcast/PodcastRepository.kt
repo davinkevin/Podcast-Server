@@ -179,8 +179,8 @@ class PodcastRepository(private val query: DSLContext) {
 
     fun deleteById(id: UUID): Mono<DeletePodcastRequest> = Mono.defer {
         val removeItemFromPlaylist = query
-            .delete(WATCH_LIST_ITEMS)
-            .where(WATCH_LIST_ITEMS.ITEMS_ID.`in`(query
+            .delete(PLAYLIST_ITEMS)
+            .where(PLAYLIST_ITEMS.ITEMS_ID.`in`(query
                 .select(ITEM.ID)
                 .from(ITEM)
                 .where(ITEM.PODCAST_ID.eq(id)))

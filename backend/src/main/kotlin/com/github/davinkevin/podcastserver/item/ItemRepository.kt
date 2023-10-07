@@ -57,15 +57,15 @@ class ItemRepository(private val query: DSLContext) {
             .where(ITEM.DOWNLOAD_DATE.lessOrEqual(date))
             .and(ITEM.STATUS.eq(FINISH))
             .and(PODCAST.HAS_TO_BE_DELETED.isTrue)
-            .and(ITEM.ID.notIn(query.select(WATCH_LIST_ITEMS.ITEMS_ID).from(WATCH_LIST_ITEMS)))
+            .and(ITEM.ID.notIn(query.select(PLAYLIST_ITEMS.ITEMS_ID).from(PLAYLIST_ITEMS)))
         )
             .map { DeleteItemRequest(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
     }
 
     fun deleteById(id: UUID): Mono<DeleteItemRequest> = Mono.defer {
         val removeFromPlaylist = query
-            .delete(WATCH_LIST_ITEMS)
-            .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(id))
+            .delete(PLAYLIST_ITEMS)
+            .where(PLAYLIST_ITEMS.ITEMS_ID.eq(id))
             .toMono()
 
         val delete = query
@@ -304,13 +304,13 @@ class ItemRepository(private val query: DSLContext) {
     fun findPlaylistsContainingItem(itemId: UUID): Flux<ItemPlaylist> = Flux.defer {
         Flux.from(
             query
-                .select(WATCH_LIST.ID, WATCH_LIST.NAME)
-                .from(WATCH_LIST
-                    .innerJoin(WATCH_LIST_ITEMS)
-                    .on(WATCH_LIST.ID.eq(WATCH_LIST_ITEMS.WATCH_LISTS_ID))
+                .select(PLAYLIST.ID, PLAYLIST.NAME)
+                .from(PLAYLIST
+                    .innerJoin(PLAYLIST_ITEMS)
+                    .on(PLAYLIST.ID.eq(PLAYLIST_ITEMS.PLAYLISTS_ID))
                 )
-                .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(itemId))
-                .orderBy(WATCH_LIST.ID)
+                .where(PLAYLIST_ITEMS.ITEMS_ID.eq(itemId))
+                .orderBy(PLAYLIST.ID)
         )
             .map { (id, name) -> ItemPlaylist(id, name) }
     }

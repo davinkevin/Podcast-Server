@@ -81,7 +81,7 @@ flyway {
 	user = db.user
 	password = db.password
 	locations = arrayOf("filesystem:$projectDir/src/main/migrations/")
-
+    cleanDisabled = false
 }
 
 tasks.named<JooqGenerate>("generateJooq") {

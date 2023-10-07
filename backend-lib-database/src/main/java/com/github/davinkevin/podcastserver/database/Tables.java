@@ -8,11 +8,11 @@ import com.github.davinkevin.podcastserver.database.tables.Cover;
 import com.github.davinkevin.podcastserver.database.tables.DownloadingItem;
 import com.github.davinkevin.podcastserver.database.tables.FlywaySchemaHistory;
 import com.github.davinkevin.podcastserver.database.tables.Item;
+import com.github.davinkevin.podcastserver.database.tables.Playlist;
+import com.github.davinkevin.podcastserver.database.tables.PlaylistItems;
 import com.github.davinkevin.podcastserver.database.tables.Podcast;
 import com.github.davinkevin.podcastserver.database.tables.PodcastTags;
 import com.github.davinkevin.podcastserver.database.tables.Tag;
-import com.github.davinkevin.podcastserver.database.tables.WatchList;
-import com.github.davinkevin.podcastserver.database.tables.WatchListItems;
 
 
 /**
@@ -42,6 +42,16 @@ public class Tables {
     public static final Item ITEM = Item.ITEM;
 
     /**
+     * The table <code>public.playlist</code>.
+     */
+    public static final Playlist PLAYLIST = Playlist.PLAYLIST;
+
+    /**
+     * The table <code>public.playlist_items</code>.
+     */
+    public static final PlaylistItems PLAYLIST_ITEMS = PlaylistItems.PLAYLIST_ITEMS;
+
+    /**
      * The table <code>public.podcast</code>.
      */
     public static final Podcast PODCAST = Podcast.PODCAST;
@@ -55,14 +65,4 @@ public class Tables {
      * The table <code>public.tag</code>.
      */
     public static final Tag TAG = Tag.TAG;
-
-    /**
-     * The table <code>public.watch_list</code>.
-     */
-    public static final WatchList WATCH_LIST = WatchList.WATCH_LIST;
-
-    /**
-     * The table <code>public.watch_list_items</code>.
-     */
-    public static final WatchListItems WATCH_LIST_ITEMS = WatchListItems.WATCH_LIST_ITEMS;
 }
