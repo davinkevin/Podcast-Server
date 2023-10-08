@@ -79,12 +79,17 @@ class YoutubeByApiUpdater(
         val channelId = when {
             isPlaylist(url) -> findPlaylistIdFromPlaylistUrl(url)
             isHandle(url) -> findPlaylistIdUsingHtmlPage(url)
+            isChannel(url) -> findChannelIdFromUrl(url)
             else -> findPlaylistIdFromUserName(url)
         }
 
         return channelId
             .map(::transformChannelIdToPlaylistId)
             .switchIfEmpty { RuntimeException("channel id not found").toMono() }
+    }
+
+    private fun findPlaylistIdFromPlaylistUrl(url: URI): Mono<String> {
+        return url.toASCIIString().substringAfter("list=").toMono()
     }
 
     private fun findPlaylistIdUsingHtmlPage(url: URI): Mono<String> {
@@ -98,8 +103,8 @@ class YoutubeByApiUpdater(
             .map { it.attr("content") }
     }
 
-    private fun findPlaylistIdFromPlaylistUrl(url: URI): Mono<String> {
-        return url.toASCIIString().substringAfter("list=").toMono()
+    private fun findChannelIdFromUrl(url: URI): Mono<String> {
+        return url.toASCIIString().substringAfterLast("/").toMono()
     }
 
     private fun findPlaylistIdFromUserName(url: URI): Mono<String> {
