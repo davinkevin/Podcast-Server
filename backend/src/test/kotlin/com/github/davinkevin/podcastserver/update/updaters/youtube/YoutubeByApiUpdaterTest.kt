@@ -116,6 +116,27 @@ class YoutubeByApiUpdaterTest(
         }
 
         @Test
+        fun `from channel`(backend: WireMockServer) {
+            /* Given */
+            val podcast = PodcastToUpdate(UUID.randomUUID(), URI("https://www.youtube.com/channel/UC_yP2DpIgs5Y1uWC0T03Chw"), "noSign")
+
+            backend.apply {
+                stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
+                    .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.json"))))
+
+                stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key&pageToken=CDIQAA")
+                    .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.2.json"))))
+            }
+
+            /* When */
+            StepVerifier.create(updater.findItems(podcast))
+                .expectSubscription()
+                /* Then */
+                .expectNextCount(91)
+                .verifyComplete()
+        }
+
+        @Test
         fun `and handle error on items`(backend: WireMockServer) {
             /* Given */
             val podcast = PodcastToUpdate(url = URI("https://www.youtube.com/user/joueurdugrenier"), id = UUID.randomUUID(), signature = "noSign")
