@@ -1,5 +1,10 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import com.github.davinkevin.podcastserver.cover.CoverForCreation
+import com.github.davinkevin.podcastserver.service.image.CoverInformation
+import com.github.davinkevin.podcastserver.service.image.ImageService
+import com.github.davinkevin.podcastserver.service.image.defaultCoverInformation
+import com.github.davinkevin.podcastserver.service.image.toCoverForCreation
 import org.mockito.kotlin.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -13,6 +18,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
+import java.net.URI
 import java.util.*
 
 /**
@@ -25,13 +31,45 @@ class PlaylistServiceTest(
 ) {
 
     @MockBean private lateinit var repository: PlaylistRepository
+    @MockBean private lateinit var image: ImageService
 
     @Nested
     @DisplayName("should find all")
     inner class ShouldFindAll {
 
+        private val playlist1 = Playlist(
+            id = UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"),
+            name = "one",
+            cover = Playlist.Cover(
+                id = UUID.fromString("ee731587-5c14-49ea-b2cb-a1f24b99710c"),
+                url = URI.create("https://placeholder.io/600x600"),
+                width = 600,
+                height = 600,
+            )
+        )
+        private val playlist2 = Playlist(
+            id = UUID.fromString("98bcfe02-a1a3-484a-a4a7-24295e84f7ec"),
+            name = "two",
+            cover = Playlist.Cover(
+                id = UUID.fromString("e994a9c7-ad1a-41e3-b8db-b2b40b79dd13"),
+                url = URI.create("https://placeholder.io/600x600"),
+                width = 600,
+                height = 600,
+            )
+        )
+        private val playlist3 = Playlist(
+            id = UUID.fromString("7eafc295-bae6-426d-986e-edf03889a682"),
+            name = "three",
+            cover = Playlist.Cover(
+                id = UUID.fromString("11aa9c87-cc2a-49e4-97cc-f3c0f5b59f20"),
+                url = URI.create("https://placeholder.io/600x600"),
+                width = 600,
+                height = 600,
+            )
+        )
+
         @Test
-        fun `with no watch list`() {
+        fun `with no playlist`() {
             /* Given */
             whenever(repository.findAll()).thenReturn(Flux.empty())
             /* When */
@@ -42,20 +80,16 @@ class PlaylistServiceTest(
         }
 
         @Test
-        fun `with watch lists in results`() {
+        fun `with 3 playlists in results`() {
             /* Given */
-            whenever(repository.findAll()).thenReturn(Flux.just(
-                    Playlist(UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"), "first"),
-                    Playlist(UUID.fromString("6e15b195-7a1f-43e8-bc06-bf88b7f865f8"), "second"),
-                    Playlist(UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"), "third")
-            ))
+            whenever(repository.findAll()).thenReturn(Flux.just(playlist1, playlist2, playlist3))
             /* When */
             StepVerifier.create(service.findAll())
                     /* Then */
                     .expectSubscription()
-                    .expectNext(Playlist(UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"), "first"))
-                    .expectNext(Playlist(UUID.fromString("6e15b195-7a1f-43e8-bc06-bf88b7f865f8"), "second"))
-                    .expectNext(Playlist(UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"), "third"))
+                    .expectNext(playlist1)
+                    .expectNext(playlist2)
+                    .expectNext(playlist3)
                     .verifyComplete()
         }
     }
@@ -63,6 +97,17 @@ class PlaylistServiceTest(
     @Nested
     @DisplayName("should find by Id")
     inner class ShouldFindById {
+
+        private val playlist = Playlist(
+            id = UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"),
+            name = "one",
+            cover = Playlist.Cover(
+                id = UUID.fromString("ee731587-5c14-49ea-b2cb-a1f24b99710c"),
+                url = URI.create("https://placeholder.io/600x600"),
+                width = 600,
+                height = 600,
+            )
+        )
 
         @Test
         fun `with no playlist`() {
@@ -79,12 +124,11 @@ class PlaylistServiceTest(
         @Test
         fun `with one playlist`() {
             /* Given */
-            val id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
-            val playlist = PlaylistWithItems(id = id, name = "foo", items = emptyList())
-            whenever(repository.findById(id)).thenReturn(playlist.toMono())
+            whenever(repository.findById(playlist.id))
+                .thenReturn(playlist.toMono())
 
             /* When */
-            StepVerifier.create(service.findById(id))
+            StepVerifier.create(service.findById(playlist.id))
                     /* Then */
                     .expectSubscription()
                     .expectNext(playlist)
@@ -96,20 +140,64 @@ class PlaylistServiceTest(
     @DisplayName("should save")
     inner class ShouldSave {
 
+        private val id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
+        private val playlistToReturn = Playlist(
+            id = id,
+            name = "foo",
+            cover = Playlist.Cover(
+                id = UUID.fromString("ee731587-5c14-49ea-b2cb-a1f24b99710c"),
+                url = URI.create("https://placeholder.io/600x600"),
+                width = 600,
+                height = 600,
+            )
+        )
+
+        private val coverInformation = CoverInformation(
+            height = 1600,
+            url = URI.create("https://placeholder.io/600x600"),
+            width = 1600,
+        )
+
+        private val playlistToCreateInDatabase =  PlaylistForDatabaseCreation(
+            name = "foo",
+            cover = coverInformation.toCoverForCreation()
+        )
+
+        private val playlistReceived = PlaylistForCreationV2(
+            name = "foo",
+            coverUrl = URI.create("https://placeholder.io/600x600")
+        )
+
         @Test
-        fun `with a name`() {
+        fun `with existing cover`() {
             /* Given */
-            val id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
-            val playlist = PlaylistWithItems(id = id, name = "foo", items = emptyList())
-            whenever(repository.create("foo")).thenReturn(playlist.toMono())
+            whenever(image.fetchCoverInformation(playlistReceived.coverUrl)).thenReturn(coverInformation.toMono())
+            whenever(repository.create(playlistToCreateInDatabase)).thenReturn(playlistToReturn.toMono())
 
             /* When */
-            StepVerifier.create(repository.create("foo"))
+            StepVerifier.create(service.create(playlistReceived))
                     /* Then */
                     .expectSubscription()
-                    .expectNext(playlist)
+                    .expectNext(playlistToReturn)
                     .verifyComplete()
         }
+
+        @Test
+        fun `with no cover`() {
+            /* Given */
+            whenever(image.fetchCoverInformation(playlistReceived.coverUrl))
+                .thenReturn(Mono.empty())
+            whenever(repository.create(playlistToCreateInDatabase.copy(cover = defaultCoverInformation.toCoverForCreation())))
+                .thenReturn(playlistToReturn.toMono())
+
+            /* When */
+            StepVerifier.create(service.create(playlistReceived))
+                /* Then */
+                .expectSubscription()
+                .expectNext(playlistToReturn)
+                .verifyComplete()
+        }
+
 
     }
 

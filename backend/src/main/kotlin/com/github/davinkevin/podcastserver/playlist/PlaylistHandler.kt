@@ -1,14 +1,6 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.java.net.extension
-import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
-import org.jdom2.Document
-import org.jdom2.Element
-import org.jdom2.Namespace
-import org.jdom2.Text
-import org.jdom2.output.Format
-import org.jdom2.output.XMLOutputter
-import org.springframework.http.MediaType
 import org.springframework.web.reactive.function.server.ServerRequest
 import org.springframework.web.reactive.function.server.ServerResponse
 import org.springframework.web.reactive.function.server.ServerResponse.noContent
@@ -17,72 +9,53 @@ import org.springframework.web.reactive.function.server.bodyToMono
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import java.net.URI
-import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.io.path.extension
 
 class PlaylistHandler(
-        private val playlistService: PlaylistService
+    private val playlistService: PlaylistService
 ) {
+
+    private val defaultCoverUrl = URI.create("https://placeholder.io/600x600")
 
     fun create(r: ServerRequest): Mono<ServerResponse> {
         return r
-                .bodyToMono<PlaylistToSaveHAL>()
-                .flatMap { playlistService.create(it.name, it.cover.url) }
-                .map { PlaylistWithItemsHAL(
-                        id = it.id,
-                        name = it.name,
-                        cover = it.cover.toCoverHAL(),
-                        items = it.items.map(PlaylistWithItems.Item::toHAL),
-                ) }
-                .flatMap { ok().bodyValue(it) }
+            .bodyToMono<PlaylistToSaveHAL>()
+            .map { PlaylistForCreationV2(it.name, it.cover?.url ?: defaultCoverUrl) }
+            .flatMap(playlistService::create)
+            .map { PlaylistHAL(id = it.id, name = it.name) }
+            .flatMap { ok().bodyValue(it) }
 
     }
 
     fun findAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> =
-            playlistService
-                    .findAll()
-                    .map { PlaylistHAL(it.id, it.name) }
-                    .collectList()
-                    .map { FindAllPlaylistHAL(it) }
-                    .flatMap { ok().bodyValue(it) }
+        playlistService
+            .findAll()
+            .map { PlaylistHAL(it.id, it.name) }
+            .collectList()
+            .map { FindAllPlaylistHAL(it) }
+            .flatMap { ok().bodyValue(it) }
 
     fun findById(r: ServerRequest): Mono<ServerResponse> {
         val id = UUID.fromString(r.pathVariable("id"))
 
         return playlistService
-                .findById(id)
-                .map { PlaylistWithItemsHAL(
-                        id = it.id,
-                        name = it.name,
-                        cover = it.cover.toCoverHAL(),
-                        items = it.items.map(PlaylistWithItems.Item::toHAL),
-                    )
-                }
-                .flatMap { ok().bodyValue(it) }
+            .findById(id)
+            .map { PlaylistHAL(
+                id = it.id,
+                name = it.name,
+//                items = it.items.map(PlaylistWithItems.Item::toHAL),
+            )
+            }
+            .flatMap { ok().bodyValue(it) }
     }
 
     fun deleteById(r: ServerRequest): Mono<ServerResponse> {
         val id = UUID.fromString(r.pathVariable("id"))
 
         return playlistService
-                .deleteById(id)
-                .then(noContent().build())
-    }
-
-    fun rss(r: ServerRequest): Mono<ServerResponse> {
-        val host = r.extractHost()
-        val id = UUID.fromString(r.pathVariable("id"))
-
-        return playlistService
-                .findById(id)
-                .map { it.toRss(host) }
-                .map { XMLOutputter(Format.getPrettyFormat()).outputString(Document(it)) }
-                .flatMap { ok()
-                        .contentType(MediaType.APPLICATION_XML)
-                        .bodyValue(it)
-                }
-
+            .deleteById(id)
+            .then(noContent().build())
     }
 
     fun addToPlaylist(r: ServerRequest): Mono<ServerResponse> {
@@ -90,15 +63,14 @@ class PlaylistHandler(
         val itemId = UUID.fromString(r.pathVariable("itemId"))
 
         return playlistService
-                .addToPlaylist(playlistId, itemId)
-                .map { PlaylistWithItemsHAL(
-                        id = it.id,
-                        name = it.name,
-                        cover = it.cover.toCoverHAL(),
-                        items = it.items.map(PlaylistWithItems.Item::toHAL)
-                    )
-                }
-                .flatMap { ok().bodyValue(it) }
+            .addToPlaylist(playlistId, itemId)
+            .map { PlaylistWithItemsHAL(
+                id = it.id,
+                name = it.name,
+                items = it.items.map(PlaylistWithItems.Item::toHAL)
+            )
+            }
+            .flatMap { ok().bodyValue(it) }
     }
 
     fun removeFromPlaylist(r: ServerRequest): Mono<ServerResponse> {
@@ -106,174 +78,79 @@ class PlaylistHandler(
         val itemId = UUID.fromString(r.pathVariable("itemId"))
 
         return playlistService
-                .removeFromPlaylist(playlistId, itemId)
-                .map { PlaylistWithItemsHAL(
-                        id = it.id,
-                        name = it.name,
-                        cover = it.cover.toCoverHAL(),
-                        items = it.items.map(PlaylistWithItems.Item::toHAL)
-                    )
-                }
-                .flatMap { ok().bodyValue(it) }
+            .removeFromPlaylist(playlistId, itemId)
+            .map { PlaylistWithItemsHAL(
+                id = it.id,
+                name = it.name,
+                items = it.items.map(PlaylistWithItems.Item::toHAL)
+            )
+            }
+            .flatMap { ok().bodyValue(it) }
     }
 
 }
 
-private class PlaylistToSaveHAL(val name: String, val cover: Cover) {
+private class PlaylistToSaveHAL(val name: String, val cover: Cover?) {
     data class Cover(val url: URI)
 }
 
 private class FindAllPlaylistHAL(val content: Collection<PlaylistHAL>)
-private class PlaylistHAL(val id: UUID, val name: String)
+private class PlaylistHAL(val id: UUID, val name: String) {
+    data class Cover (val id: UUID, val width: Int, val height: Int, val url: URI)
+}
 
-private class PlaylistWithItemsHAL(val id: UUID, val name: String, val cover: Cover, val items: Collection<Item>) {
+private class PlaylistWithItemsHAL(val id: UUID, val name: String, val items: Collection<Item>) {
     data class Cover (val id: UUID, val width: Int, val height: Int, val url: URI)
 
     data class Item(
-            val id: UUID,
-            val title: String,
+        val id: UUID,
+        val title: String,
 
-            val proxyURL: URI,
-            val description: String?,
-            val mimeType: String,
+        val proxyURL: URI,
+        val description: String?,
+        val mimeType: String,
 
-            val podcast: Podcast,
-            val cover: Cover) {
+        val podcast: Podcast,
+        val cover: Cover) {
 
         data class Podcast(val id: UUID, val title: String)
         data class Cover (val id: UUID, val width: Int, val height: Int, val url: URI)
     }
 }
-private fun PlaylistWithItems.Cover.toCoverHAL() = PlaylistWithItemsHAL.Cover (
-    id = this.id,
-    width = this.width,
-    height = this.height,
-    url = this.url,
-)
 
 private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
     val coverExtension = cover.url.extension().ifBlank { "jpg" }
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
-            .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), "cover.$coverExtension")
-            .build(true)
-            .toUri()
+        .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), "cover.$coverExtension")
+        .build(true)
+        .toUri()
 
     val extension = this.fileName?.extension?.let { ".$it" } ?: ""
     val fileName = title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
 
     val itemUrl = UriComponentsBuilder.fromPath("/")
-            .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), fileName)
-            .build(true)
-            .toUri()
+        .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), fileName)
+        .build(true)
+        .toUri()
 
     return PlaylistWithItemsHAL.Item(
-            id = id,
-            title = title,
-            proxyURL = itemUrl,
+        id = id,
+        title = title,
+        proxyURL = itemUrl,
 
-            description = description,
-            mimeType = mimeType,
+        description = description,
+        mimeType = mimeType,
 
-            podcast = PlaylistWithItemsHAL.Item.Podcast(
-                    id = podcast.id,
-                    title = podcast.title
-            ),
-            cover = PlaylistWithItemsHAL.Item.Cover(
-                    id = cover.id,
-                    height = cover.height,
-                    width = cover.width,
-                    url = coverUrl
-            )
+        podcast = PlaylistWithItemsHAL.Item.Podcast(
+            id = podcast.id,
+            title = podcast.title
+        ),
+        cover = PlaylistWithItemsHAL.Item.Cover(
+            id = cover.id,
+            height = cover.height,
+            width = cover.width,
+            url = coverUrl
+        )
     )
-}
-
-private val itunesNS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")
-private val mediaNS = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")
-
-private fun PlaylistWithItems.toRss(host: URI): Element {
-
-    val url = UriComponentsBuilder
-            .fromUri(host)
-            .pathSegment("api", "v1", "playlists", this.id.toString(), "rss")
-            .build(true)
-            .toUriString()
-
-    val coverUrl = cover.url.toASCIIString()
-
-    val items = this.items.map { toRssItem(it, host) }
-
-    val channel = Element("channel").apply {
-        addContent(Element("title").addContent(Text(this@toRss.name)))
-        addContent(Element("link").addContent(Text(url)))
-        addContent(items)
-
-        val itunesImage = Element(
-            "image",
-            Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")
-        ).apply {
-            addContent(Text(coverUrl))
-        }
-
-        val image = Element("image").apply {
-            addContent(Element("height").addContent(cover.height.toString()))
-            addContent(Element("url").addContent(coverUrl))
-            addContent(Element("width").addContent(cover.width.toString()))
-        }
-
-        addContent(image)
-        addContent(itunesImage)
-    }
-
-    return Element("rss").apply {
-        addContent(channel)
-        addNamespaceDeclaration(itunesNS)
-    }
-}
-
-private fun toRssItem(item: PlaylistWithItems.Item, host: URI): Element {
-    val coverExtension = item.cover.url.extension().ifBlank { "jpg" }
-
-    val coverUrl = UriComponentsBuilder.fromUri(host)
-            .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$coverExtension")
-            .build(true)
-            .toUriString()
-
-    val itunesItemThumbnail = Element("image", itunesNS).setContent(Text(coverUrl))
-    val thumbnail = Element("thumbnail", mediaNS).setAttribute("url", coverUrl)
-
-    val extension = item.fileName?.extension?.let { ".$it" } ?: ""
-    val title = item.title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
-
-    val proxyURL = UriComponentsBuilder
-            .fromUri(host)
-            .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), title)
-            .build(true)
-            .toUriString()
-
-    val itemEnclosure = Element("enclosure").apply {
-        setAttribute("url", proxyURL)
-
-        if(item.length != null) {
-            setAttribute("length", item.length.toString())
-        }
-
-        if(item.mimeType.isNotEmpty()) {
-            setAttribute("type", item.mimeType)
-        }
-    }
-
-    return Element("item").apply {
-        addContent(Element("title").addContent(Text(item.title)))
-        addContent(Element("description").addContent(Text(item.description)))
-        addContent(Element("pubDate").addContent(Text(item.pubDate!!.format(DateTimeFormatter.RFC_1123_DATE_TIME))))
-        addContent(Element("explicit", itunesNS).addContent(Text("No")))
-        addContent(Element("subtitle", itunesNS).addContent(Text(item.title)))
-        addContent(Element("summary", itunesNS).addContent(Text(item.description)))
-        addContent(Element("guid").addContent(Text(proxyURL)))
-        addContent(itunesItemThumbnail)
-        addContent(thumbnail)
-        addContent(itemEnclosure)
-    }
-
 }

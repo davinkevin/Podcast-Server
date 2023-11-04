@@ -36,7 +36,7 @@ class PlaylistHandlerTest (
 
     @Nested
     @DisplayName("should save")
-    inner class ShouldSave {
+    inner class ShouldCreate {
 
         val item = PlaylistWithItems.Item(
             id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
@@ -64,10 +64,13 @@ class PlaylistHandlerTest (
         )
 
         @Test
-        fun `with a name`() {
+        fun `with a name and no cover`() {
             /* Given */
             val playlist = PlaylistWithItems(id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), name = "foo", items = emptyList())
-            whenever(service.create("foo")).thenReturn(playlist.toMono())
+            val playlistName = "foo"
+            val playlistCover = URI.create("https://placeholder.io/600x600")
+            TODO()
+//            whenever(service.create(playlistName, playlistCover)).thenReturn(playlist.toMono())
             /* When */
             rest
                     .post()
@@ -90,8 +93,9 @@ class PlaylistHandlerTest (
         @Test
         fun `with 1 item`() {
             /* Given */
-            whenever(service.create("foo"))
-                .thenReturn(playlist.toMono())
+            TODO()
+//            whenever(service.create("foo", URI.create("https://placeholder.io/600x600")))
+//                .thenReturn(playlist.toMono())
 
             /* When */
             rest
@@ -140,8 +144,9 @@ class PlaylistHandlerTest (
                     )
                 )
             )
-            whenever(service.create("foo"))
-                .thenReturn(playlistWithItemWithoutCoverExtension.toMono())
+            TODO()
+//            whenever(service.create("foo", URI.create("https://placeholder.io/600x600")))
+//                .thenReturn(playlistWithItemWithoutCoverExtension.toMono())
 
             /* When */
             rest
@@ -204,9 +209,36 @@ class PlaylistHandlerTest (
         fun `with watch lists in results`() {
             /* Given */
             whenever(service.findAll()).thenReturn(Flux.just(
-                    Playlist(UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"), "first"),
-                    Playlist(UUID.fromString("6e15b195-7a1f-43e8-bc06-bf88b7f865f8"), "second"),
-                    Playlist(UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"), "third")
+                /* ...data = */ Playlist(
+                        id = UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"),
+                        name = "first",
+                        cover = Playlist.Cover(
+                            id = UUID.fromString("ee731587-5c14-49ea-b2cb-a1f24b99710c"),
+                            url = URI.create("https://placeholder.io/600x600"),
+                            width = 600,
+                            height = 600,
+                        )
+                    ),
+                    Playlist(
+                        id = UUID.fromString("6e15b195-7a1f-43e8-bc06-bf88b7f865f8"),
+                        name = "second",
+                        cover = Playlist.Cover(
+                            id = UUID.fromString("8d92ceca-68d0-4c5e-b26b-f336aebe851d"),
+                            url = URI.create("https://placeholder.io/600x600"),
+                            width = 600,
+                            height = 600,
+                        )
+                    ),
+                    Playlist(
+                        id = UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"),
+                        name = "third",
+                        cover = Playlist.Cover(
+                            id = UUID.fromString("00c7c189-a25e-46e5-a8d5-c6a9798ba098"),
+                            url = URI.create("https://placeholder.io/600x600"),
+                            width = 600,
+                            height = 600,
+                        )
+                    )
             ))
 
             /* When */
@@ -241,23 +273,24 @@ class PlaylistHandlerTest (
             @Test
             fun `with no items`() {
                 /* Given */
-                val playlist = PlaylistWithItems(id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), name = "foo", items = emptyList())
-                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
-                /* When */
-                rest
-                        .get()
-                        .uri("/api/v1/playlists/{id}", playlist.id)
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody()
-                        .assertThatJson {
-                            isEqualTo("""{
-                                "id":"9706ba78-2df2-4b37-a573-04367dc6f0ea",
-                                "name":"foo",
-                                "items":[]
-                            }""")
-                        }
+                TODO()
+//                val playlist = Playlist(id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), name = "foo")
+//                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
+//                /* When */
+//                rest
+//                        .get()
+//                        .uri("/api/v1/playlists/{id}", playlist.id)
+//                        .exchange()
+//                        /* Then */
+//                        .expectStatus().isOk
+//                        .expectBody()
+//                        .assertThatJson {
+//                            isEqualTo("""{
+//                                "id":"9706ba78-2df2-4b37-a573-04367dc6f0ea",
+//                                "name":"foo",
+//                                "items":[]
+//                            }""")
+//                        }
             }
 
             @Test
@@ -288,7 +321,7 @@ class PlaylistHandlerTest (
                                 )
                         )
                 )
-                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
+//                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
                 /* When */
                 rest
                         .get()
@@ -371,7 +404,7 @@ class PlaylistHandlerTest (
                                 )
                         )
                 )
-                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
+//                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
                 /* When */
                 rest
                         .get()
@@ -457,7 +490,7 @@ class PlaylistHandlerTest (
             @Test
             fun `with 1 item`() {
                 /* Given */
-                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
+//                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
 
                 /* When */
                 rest
@@ -506,8 +539,8 @@ class PlaylistHandlerTest (
                         )
                     )
                 )
-                whenever(service.findById(playlistWithItemWithoutCoverExtension.id))
-                    .thenReturn(playlistWithItemWithoutCoverExtension.toMono())
+//                whenever(service.findById(playlistWithItemWithoutCoverExtension.id))
+//                    .thenReturn(playlistWithItemWithoutCoverExtension.toMono())
 
                 /* When */
                 rest

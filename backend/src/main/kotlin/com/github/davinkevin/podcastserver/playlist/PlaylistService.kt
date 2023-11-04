@@ -16,12 +16,12 @@ class PlaylistService(
 ) {
 
     fun findAll(): Flux<Playlist> = repository.findAll()
-    fun findById(id: UUID): Mono<PlaylistWithItems> = repository.findById(id)
-    fun create(name: String, coverUri: URI): Mono<PlaylistWithItems> {
-        return image.fetchCoverInformation(coverUri)
+    fun findById(id: UUID): Mono<Playlist> = repository.findById(id)
+    fun create(playlist: PlaylistForCreationV2): Mono<Playlist> {
+        return image.fetchCoverInformation(playlist.coverUrl)
             .switchIfEmpty { defaultCoverInformation.toMono() }
             .map { it.toCoverForCreation() }
-            .flatMap { repository.create(PlaylistForCreate(name, it)) }
+            .flatMap { repository.create(PlaylistForDatabaseCreation(playlist.name, it)) }
     }
     fun deleteById(id: UUID): Mono<Void> = repository.deleteById(id)
 

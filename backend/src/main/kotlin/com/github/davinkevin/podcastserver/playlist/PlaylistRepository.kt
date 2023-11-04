@@ -1,13 +1,11 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.database.Tables.*
 import org.jooq.DSLContext
-import org.jooq.impl.DSL.*
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
 import java.net.URI
 import java.util.*
 
@@ -39,7 +37,7 @@ class PlaylistRepository(
                 }
     }
 
-    fun findById(id: UUID): Mono<PlaylistWithItems> = Mono.defer {
+    fun findById(id: UUID): Mono<Playlist> = Mono.defer {
         val items = Flux.from(
                 query
                         .select(ITEM.ID, ITEM.TITLE, ITEM.URL,
@@ -47,6 +45,7 @@ class PlaylistRepository(
                                 ITEM.FILE_NAME, ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.PUB_DATE,
 
                                 PODCAST.ID, PODCAST.TITLE,
+
                                 COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                         .from(
                                 PLAYLIST_ITEMS
@@ -88,71 +87,63 @@ class PlaylistRepository(
             .where(PLAYLIST.ID.eq(id))
             .toMono()
 
-        Mono.zip(playlist, items)
-                .map { (pl, items) -> PlaylistWithItems(
-                        id = pl[PLAYLIST.ID],
-                        name = pl[PLAYLIST.NAME],
-                        cover = PlaylistWithItems.Cover(
-                            id = pl[COVER.ID],
-                            height = pl[COVER.HEIGHT],
-                            width = pl[COVER.WIDTH],
-                            url = URI.create(pl[COVER.URL]),
-                        ),
-                        items = items,
-                ) }
+//        Mono.zip(playlist, items)
+//                .map { (pl, items) -> PlaylistWithItems(
+//                        id = pl[PLAYLIST.ID],
+//                        name = pl[PLAYLIST.NAME],
+//                        items = items,
+//                ) }
+        TODO()
     }
 
-    fun create(playlist: PlaylistForCreate): Mono<PlaylistWithItems> = Mono.defer {
-        val id = UUID.randomUUID()
-        val coverId = UUID.randomUUID()
-
-        query
-            .with(name("COVER_CREATION").`as`(
-                insertInto(COVER)
-                    .set(COVER.ID, coverId)
-                    .set(COVER.URL, playlist.cover.url.toASCIIString())
-                    .set(COVER.WIDTH, playlist.cover.width)
-                    .set(COVER.HEIGHT, playlist.cover.height)
-                    .returning(COVER.ID)
-            ))
-            .insertInto(PLAYLIST)
-            .set(PLAYLIST.ID, id)
-            .set(PLAYLIST.NAME, playlist.name)
-            .set(PLAYLIST.COVER_ID, coverId)
-            .returning(PLAYLIST.ID)
-            .toMono()
-            .map {PlaylistWithItems(
-                    id = id,
-                    name = playlist.name,
-                    cover = PlaylistWithItems.Cover(
-                        id = coverId,
-                        url = playlist.cover.url,
-                        height = playlist.cover.height,
-                        width = playlist.cover.width,
-                    ),
-                    items = emptyList()
-                )
-            }
+    fun create(playlist: PlaylistForDatabaseCreation): Mono<Playlist> = Mono.defer {
+        TODO()
+//        val id = UUID.randomUUID()
+//        val coverId = UUID.randomUUID()
+//
+//        query
+//            .with(name("COVER_CREATION").`as`(
+//                insertInto(COVER)
+//                    .set(COVER.ID, coverId)
+//                    .set(COVER.URL, playlist.cover.url.toASCIIString())
+//                    .set(COVER.WIDTH, playlist.cover.width)
+//                    .set(COVER.HEIGHT, playlist.cover.height)
+//                    .returning(COVER.ID)
+//            ))
+//            .insertInto(PLAYLIST)
+//            .set(PLAYLIST.ID, id)
+//            .set(PLAYLIST.NAME, playlist.name)
+//            .set(PLAYLIST.COVER_ID, coverId)
+//            .returning(PLAYLIST.ID)
+//            .toMono()
+//            .map {PlaylistWithItems(
+//                    id = id,
+//                    name = playlist.name,
+//                    items = emptyList()
+//                )
+//            }
 
     }
 
     fun addToPlaylist(playlistId: UUID, itemId: UUID): Mono<PlaylistWithItems> = Mono.defer {
-        query
-                .insertInto(PLAYLIST_ITEMS)
-                .set(PLAYLIST_ITEMS.PLAYLISTS_ID, playlistId)
-                .set(PLAYLIST_ITEMS.ITEMS_ID, itemId)
-                .onConflictDoNothing()
-                .toMono()
-                .then(findById(playlistId))
+        TODO()
+//        query
+//                .insertInto(PLAYLIST_ITEMS)
+//                .set(PLAYLIST_ITEMS.PLAYLISTS_ID, playlistId)
+//                .set(PLAYLIST_ITEMS.ITEMS_ID, itemId)
+//                .onConflictDoNothing()
+//                .toMono()
+//                .then(findById(playlistId))
     }
 
     fun removeFromPlaylist(playlistId: UUID, itemId: UUID): Mono<PlaylistWithItems> = Mono.defer {
-        query
-                .deleteFrom(PLAYLIST_ITEMS)
-                .where(PLAYLIST_ITEMS.PLAYLISTS_ID.eq(playlistId))
-                .and(PLAYLIST_ITEMS.ITEMS_ID.eq(itemId))
-                .toMono()
-                .then(findById(playlistId))
+        TODO()
+//        query
+//                .deleteFrom(PLAYLIST_ITEMS)
+//                .where(PLAYLIST_ITEMS.PLAYLISTS_ID.eq(playlistId))
+//                .and(PLAYLIST_ITEMS.ITEMS_ID.eq(itemId))
+//                .toMono()
+//                .then(findById(playlistId))
     }
 
     fun deleteById(id: UUID): Mono<Void> = Mono.defer {
@@ -169,3 +160,4 @@ class PlaylistRepository(
     }
 
 }
+data class PlaylistForDatabaseCreation(val name: String, val cover: CoverForCreation)

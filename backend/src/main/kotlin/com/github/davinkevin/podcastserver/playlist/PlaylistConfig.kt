@@ -13,13 +13,13 @@ import org.springframework.web.reactive.function.server.router
 class PlaylistRoutingConfig {
 
     @Bean
-    fun watchlistRouter(playlist: PlaylistHandler) = router {
+    fun watchlistRouter(playlist: PlaylistHandler, xml: PlaylistXmlHandler) = router {
         "/api/v1/playlists".nest {
             GET("", playlist::findAll)
             POST("", playlist::create)
             GET("{id}", playlist::findById)
             DELETE("{id}", playlist::deleteById)
-            GET("{id}/rss", playlist::rss)
+            GET("{id}/rss", xml::rss)
             "{id}/items/{itemId}".nest {
                 POST("", playlist::addToPlaylist)
                 DELETE("", playlist::removeFromPlaylist)
@@ -33,6 +33,7 @@ class PlaylistRoutingConfig {
 @Import(
         PlaylistRoutingConfig::class,
         PlaylistHandler::class,
+        PlaylistXmlHandler::class,
         PlaylistService::class,
         PlaylistRepository::class,
         ImageServiceConfig::class,
