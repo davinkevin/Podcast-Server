@@ -1,6 +1,12 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2023.11.0
+
+### Bug Fixes
+
+- **youtube:** Add support of url with `/channel/<channel_id>` for compatibility ([3fa30a3](3fa30a355f4f974f7de71fcfe36f91dee872468a) - [#220](https://gitlab.com/davinkevin/Podcast-Server/-/issues/220))
+
 ## 2023.10.0
 
 ### Features
