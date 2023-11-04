@@ -144,6 +144,10 @@ jib {
 
 	from {
 		image = "podcastserver/backend-base-image:$firstTag"
+		auth {
+			username = System.getenv("DOCKER_IO_USER")
+			password = System.getenv("DOCKER_IO_PASSWORD")
+		}
 	}
 	to {
 		image = "podcastserver/backend:${firstTag}"
