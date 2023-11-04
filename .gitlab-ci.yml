@@ -26,6 +26,8 @@ variables:
 .container-scanning-with-trivy:
   variables:
     TRIVY_TIMEOUT: 10m
+    TRIVY_USERNAME: ${DOCKER_IO_USER}
+    TRIVY_PASSWORD: ${DOCKER_IO_PASSWORD}
   image:
     name: aquasec/trivy
     entrypoint: [""]
