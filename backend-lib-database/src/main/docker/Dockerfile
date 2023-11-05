@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.5.2
 
-FROM flyway/flyway:9.22.3 AS flyway-base
+FROM flyway/flyway:10.0.0 AS flyway-base
 
 RUN <<EOF
   set -e
