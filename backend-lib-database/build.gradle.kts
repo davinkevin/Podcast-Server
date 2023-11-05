@@ -7,7 +7,7 @@ import com.gitlab.davinkevin.podcastserver.database.*
 
 plugins {
     id("java")
-    id("org.flywaydb.flyway") version "9.21.1"
+    id("org.flywaydb.flyway") version "9.22.3"
     id("nu.studer.jooq") version "8.2.1"
     id("build-plugin-database")
 }
