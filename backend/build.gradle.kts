@@ -65,7 +65,7 @@ dependencies {
 	implementation("org.jsoup:jsoup:1.16.2")
 
 	implementation(project(":backend-lib-youtubedl"))
-	implementation("net.bramp.ffmpeg:ffmpeg:0.7.0")
+	implementation("net.bramp.ffmpeg:ffmpeg:0.8.0")
 
 	implementation("io.r2dbc:r2dbc-pool")
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
