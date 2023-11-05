@@ -181,7 +181,7 @@ stages:
   image: gradle:jdk17
   needs: [⬇ backend]
   services:
-    - postgres:15.3-alpine
+    - postgres:15.4-alpine
   variables:
     POSTGRES_USER: pg-user
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
@@ -211,7 +211,7 @@ stages:
   image: gradle:jdk17
   needs: [⬇ backend]
   services:
-    - postgres:15.3-alpine
+    - postgres:15.4-alpine
   variables:
     POSTGRES_USER: pg-user
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
@@ -324,7 +324,7 @@ stages:
   image: gradle:jdk17
   needs: [👷 backend-base-image]
   services:
-    - postgres:15.3-alpine
+    - postgres:15.4-alpine
   variables:
     POSTGRES_USER: pg-user
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
