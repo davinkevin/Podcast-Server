@@ -79,7 +79,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.mockito.kotlin:mockito-kotlin:4.1.0")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:2.37.0")
-	testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.0")
+	testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:2.35.1")
 	testImplementation("org.awaitility:awaitility:4.2.0")
 }
 
