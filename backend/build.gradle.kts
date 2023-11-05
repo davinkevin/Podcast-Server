@@ -62,7 +62,7 @@ dependencies {
 	implementation(project(":backend-lib-database"))
 
 	implementation("org.jdom:jdom2:2.0.6.1")
-	implementation("org.jsoup:jsoup:1.15.3")
+	implementation("org.jsoup:jsoup:1.16.2")
 
 	implementation(project(":backend-lib-youtubedl"))
 	implementation("net.bramp.ffmpeg:ffmpeg:0.7.0")
