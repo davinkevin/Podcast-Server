@@ -71,6 +71,30 @@ class YoutubeByApiUpdaterTest(
         }
 
         @Test
+        fun `from handle using c notation`(backend: WireMockServer) {
+            /* Given */
+            val podcast = PodcastToUpdate(UUID.randomUUID(), URI("https://www.youtube.com/c/joueurdugrenier"), "noSign")
+
+            backend.apply {
+                stubFor(get("/c/joueurdugrenier")
+                    .willReturn(ok(fileAsString("/remote/podcast/youtube/joueurdugrenier.html"))))
+
+                stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key")
+                        .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.json"))))
+
+                stubFor(get("/youtube/v3/playlistItems?part=snippet&maxResults=50&playlistId=UU_yP2DpIgs5Y1uWC0T03Chw&key=key&pageToken=CDIQAA")
+                        .willReturn(okJson(fileAsString("/remote/podcast/youtube/joueurdugrenier.2.json"))))
+            }
+
+            /* When */
+            StepVerifier.create(updater.findItems(podcast))
+                    .expectSubscription()
+                    /* Then */
+                    .expectNextCount(91)
+                    .verifyComplete()
+        }
+
+        @Test
         fun `from playlist`(backend: WireMockServer) {
             /* Given */
             val podcast = PodcastToUpdate(UUID.randomUUID(), URI("http://www.youtube.com/playlist?list=PL43OynbWaTMJf3TBZJ5A414D5f7UQ8kwL"), "noSign")
