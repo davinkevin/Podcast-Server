@@ -22,8 +22,8 @@ repositories {
 val db = project.extensions.getByType<DatabaseConfiguration>()
 
 dependencies {
-    jooqGenerator("org.postgresql:postgresql:42.6.0")
-    compileOnly("org.postgresql:postgresql:42.6.0")
+    jooqGenerator("org.postgresql:postgresql:42.7.0")
+    compileOnly("org.postgresql:postgresql:42.7.0")
 }
 
 jooq {
