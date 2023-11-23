@@ -15,7 +15,7 @@ plugins {
 	id("org.jetbrains.kotlinx.kover") version "0.7.5"
 	id("org.graalvm.buildtools.native") version "0.9.28"
 
-	kotlin("jvm") version "1.9.20"
+	kotlin("jvm") version "1.9.21"
 	kotlin("plugin.spring") version "1.9.21"
 
 	id("build-plugin-database")
