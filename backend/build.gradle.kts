@@ -16,7 +16,7 @@ plugins {
 	id("org.graalvm.buildtools.native") version "0.9.28"
 
 	kotlin("jvm") version "1.9.20"
-	kotlin("plugin.spring") version "1.9.20"
+	kotlin("plugin.spring") version "1.9.21"
 
 	id("build-plugin-database")
 	id("build-plugin-docker-images")
