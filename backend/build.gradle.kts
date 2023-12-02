@@ -37,7 +37,7 @@ tasks.withType<KotlinCompile> {
 			"-Xjsr305=strict",
 			"-Xallow-result-return-type",
 		)
-		jvmTarget = JVM_17
+		jvmTarget = JvmTarget.JVM_21
 	}
 }
 
