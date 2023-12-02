@@ -3,7 +3,7 @@ import com.gitlab.davinkevin.podcastserver.dockerimages.DockerImagesConfiguratio
 import com.gradle.enterprise.gradleplugin.testretry.retry
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.internal.deprecation.DeprecatableConfiguration
-import org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -13,7 +13,6 @@ plugins {
 	id("com.gorylenko.gradle-git-properties") version "2.4.1"
 	id("com.google.cloud.tools.jib") version "3.4.0"
 	id("org.jetbrains.kotlinx.kover") version "0.7.5"
-	id("org.graalvm.buildtools.native") version "0.9.28"
 
 	kotlin("jvm") version "1.9.21"
 	kotlin("plugin.spring") version "1.9.21"
