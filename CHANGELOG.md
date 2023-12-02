@@ -1,6 +1,51 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2023.12.0
+
+### Bug Fixes
+
+- **backend:** Support url with `/c/` notation for youtube updater ([4c6755e](4c6755e2407714dbf2e356cc690ed97fb4b0aa72))
+- **database:** Downgrade to flyway 9.22.3 following incompatibility with gradle plugin system ([c2bb8c2](c2bb8c2ad74bc7af675e16efd06779dd44dcc72b) - [#222](https://gitlab.com/davinkevin/Podcast-Server/-/issues/222))
+- **deps:** Update dependency com.github.tomakehurst:wiremock-jre8-standalone to v2.35.1 ([d5c0ba1](d5c0ba1b5fd373759fbc4dd40f528c1d2758fdac))
+- **deps:** Update dependency com.fasterxml.jackson.core:jackson-databind to v2.15.3 ([062dd19](062dd19d19f445a7bff63385552c1f0c6c1af634))
+- **deps:** Update dependency org.jsoup:jsoup to v1.16.2 ([5e7b21f](5e7b21f741924c3e4d2179e6da38504e1432c703))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.15 ([9d3c69b](9d3c69ba8c6ad147866cafbc883286022f91b2d2))
+- **deps:** Update junit5 monorepo to v5.10.0 ([99c8bee](99c8bee88934363e36c5a5c991d364cec13469c9))
+- **deps:** Update dependency net.javacrumbs.json-unit:json-unit-assertj to v2.38.0 ([a1a2cf1](a1a2cf1d3ea5bd5681206d8603a5b0e38e9b1ea8))
+- **deps:** Update dependency net.bramp.ffmpeg:ffmpeg to v0.8.0 ([4969847](496984706f6a753c592d7394690e95c2851c3ad9))
+- **deps:** Update dependency org.mockito.kotlin:mockito-kotlin to v5 ([afb7911](afb79115d6b592c3a67f3ec9ecbb881298fed2d2))
+- **deps:** Update dependency net.javacrumbs.json-unit:json-unit-assertj to v3 ([7d65cf8](7d65cf80875d5b96e74696022474aa6e0f622ecf))
+- **deps:** Update dependency com.github.tomakehurst:wiremock-jre8-standalone to v3 ([dfdb905](dfdb905578ec869924ea4acf40d6dbf954ff6ada))
+- **deps:** Update junit5 monorepo to v5.10.1 ([f5a6ae9](f5a6ae9d861dcf8054abbe07547d7b31d8901af5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.16 ([9c7d49a](9c7d49aae64c70bc47973b213567db37f3f4ccfe))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.17 ([46df0f2](46df0f241e49f7f59aecbc54c1850f528bfbf9fe))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.18 ([9b28c15](9b28c1567347fe311beaa139764214dc9314b34a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.19 ([4c524b7](4c524b76acf56e85b3ffc74e6e65d485267118dc))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.20 ([812ed19](812ed19e2e32a151c3d184e09c75614847c9a14c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.21 ([c42489b](c42489b686798da21132b40477d6234289eae1d8))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.22 ([b6b0284](b6b02848cef1f9c92c704f6668dae80c3b98b369))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.23 ([7eb4a7b](7eb4a7b7b065713e79ea515feaf3b8edbb73b655))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.24 ([e198216](e198216d426b2e169e5312cce55fb09d101f9c48))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.25 ([1d45750](1d457508812bd1922cafcd7f5813558aea022c24))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.26 ([8507b67](8507b67e2743bdc66098f53508ef0a7ea95d47ab))
+- **deps:** Update dependency org.postgresql:postgresql to v42.7.0 ([fcde25d](fcde25d426ee38ecb006401f36a485651ab2f114))
+- **deps:** Update dependency com.fasterxml.jackson.core:jackson-databind to v2.16.0 ([74b4863](74b4863b412870a846120903c997e24e65a0fc96))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.27 ([512c8b1](512c8b1bc4e76f5c12a624012ae1a35661992c43))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.28 ([d58668d](d58668d8d66fd40bdace5ac3a0c643af4429af96))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.29 ([fd64322](fd64322fd1c17b3ca1043e1b79e8f9e03a0e3731))
+- **deps:** Update dependency org.jsoup:jsoup to v1.17.1 ([e7000f0](e7000f03438c7818cc06c109a2a23b971e0166cb))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.30 ([9a8dd4b](9a8dd4be849eee4fff3be236d90f9933d640bee4))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.31 ([8f55d3d](8f55d3d7ab2707e67da47f5636fdf558429d79ba))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.32 ([decfa74](decfa748c6b5be6c9006bb5a20bbc5b8a7855b1b))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.33 ([eeb4d5e](eeb4d5e298af12c6af490fda45484166774146d8))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.34 ([89a735e](89a735ea736b4ab38b017596dc93ad390c9c77df))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.35 ([875fd8c](875fd8c8b0620c8324a589b225b27f7a885110b0))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.36 ([b08acb5](b08acb5c45151cdcd2c28a68b116d8ad92f73c0b))
+- **deps:** Update dependency org.mockito.kotlin:mockito-kotlin to v5.2.0 ([82b169f](82b169f32bcd5ac77aa1f8e238561c91d2a7f2f8))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.37 ([717d441](717d4415fe21ec962ac0ab5091dbf881b90318b5))
+- **flyway:** Adjust image build following upgrade to v10.0.0 ([69f7301](69f7301362114cf6b1975fc99a77c28529eb2dff))
+
 ## 2023.11.0
 
 ### Bug Fixes
