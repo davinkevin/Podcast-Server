@@ -1,6 +1,9 @@
 import org.gradle.internal.deprecation.DeprecatableConfiguration
 
 plugins {
+    id("org.springframework.boot") version "3.2.0"
+    id("io.spring.dependency-management") version "1.1.4"
+
     id("java")
 }
 
@@ -12,10 +15,10 @@ repositories {
 }
 
 dependencies {
-    implementation("com.fasterxml.jackson.core:jackson-databind:2.16.0")
+    implementation("com.fasterxml.jackson.core:jackson-databind")
 
-    testImplementation("org.junit.jupiter:junit-jupiter-api:5.10.1")
-    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.10.1")
+    testImplementation("org.junit.jupiter:junit-jupiter-api")
+    testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
 }
 
 tasks.getByName<Test>("test") {

@@ -6,7 +6,11 @@ import nu.studer.gradle.jooq.*
 import com.gitlab.davinkevin.podcastserver.database.*
 
 plugins {
+    id("org.springframework.boot") version "3.2.0"
+    id("io.spring.dependency-management") version "1.1.4"
+
     id("java")
+
     id("org.flywaydb.flyway") version "9.22.3"
     id("nu.studer.jooq") version "8.2.1"
     id("build-plugin-database")
@@ -22,12 +26,12 @@ repositories {
 val db = project.extensions.getByType<DatabaseConfiguration>()
 
 dependencies {
-    jooqGenerator("org.postgresql:postgresql:42.7.0")
-    compileOnly("org.postgresql:postgresql:42.7.0")
+    jooqGenerator("org.postgresql:postgresql")
+    compileOnly("org.postgresql:postgresql")
 }
 
 jooq {
-    version = "3.18.6"
+    version = dependencyManagement.importedProperties["jooq.version"]
     edition = OSS
 
     configurations {
