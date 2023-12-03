@@ -5,13 +5,19 @@ import org.jooq.meta.jaxb.Logging.INFO
 import nu.studer.gradle.jooq.*
 import com.gitlab.davinkevin.podcastserver.database.*
 
+buildscript {
+    dependencies {
+        classpath("org.flywaydb:flyway-database-postgresql:10.1.0")
+    }
+}
+
 plugins {
     id("org.springframework.boot") version "3.2.0"
     id("io.spring.dependency-management") version "1.1.4"
 
     id("java")
 
-    id("org.flywaydb.flyway") version "9.22.3"
+    id("org.flywaydb.flyway") version "10.1.0"
     id("nu.studer.jooq") version "8.2.1"
     id("build-plugin-database")
 }
