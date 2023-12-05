@@ -33,7 +33,7 @@ spec:
     spec:
       terminationGracePeriodSeconds: 90
       containers:
-        - image: postgres:15.3-alpine
+        - image: postgres:16.1-alpine
           imagePullPolicy: IfNotPresent
           name: database
           env:

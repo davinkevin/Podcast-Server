@@ -29,7 +29,7 @@ tasks:
         -e POSTGRES_DB=$DATABASE_NAME
         -p 5432:5432
         --name db-for-local-dev
-        postgres:15.3-alpine
+        postgres:16.1-alpine
 
   release:
     env:
