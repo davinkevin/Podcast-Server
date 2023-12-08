@@ -17,7 +17,7 @@ plugins {
 
     id("java")
 
-    id("org.flywaydb.flyway") version "10.1.0"
+    id("org.flywaydb.flyway") version "10.2.0"
     id("nu.studer.jooq") version "8.2.1"
     id("build-plugin-database")
 }
