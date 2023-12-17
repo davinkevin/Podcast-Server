@@ -8,7 +8,7 @@ plugins {
 
 val env: Map<String, String> = System.getenv()
 val isCI = env["CI"].toBoolean()
-val hasGE = env["GRADLE_ENTERPRISE_ENABLED"].toBoolean()
+val hasGE = env["DEVELOCITY_ENABLED"].toBoolean()
 
 buildCache {
     local { isEnabled = !isCI }
@@ -19,7 +19,7 @@ buildCache {
 }
 
 gradleEnterprise {
-    server = env["GRADLE_ENTERPRISE_SERVER"] ?: "https://no.ge.local"
+    server = env["DEVELOCITY_SERVER"] ?: "https://no.ge.local"
     buildScan {
         publishAlwaysIf( hasGE || isCI )
         capture {
