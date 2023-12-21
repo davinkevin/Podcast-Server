@@ -86,3 +86,12 @@ tasks:
         git clone --bare git@gitlab.com:davinkevin/Podcast-Server.git
         cd Podcast-Server.git
         git push --mirror --repo git@github.com:davinkevin/Podcast-Server.git
+
+
+  update:flyway:
+    cmds:
+      - git fetch
+      - git rb origin/renovate/org.flywaydb-flyway-database-postgresql-10.x
+      - git rb origin/renovate/flyway-flyway-10.x
+      - git rb origin/renovate/org.flywaydb.flyway-10.x
+      - git rb origin/main
