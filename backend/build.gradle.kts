@@ -14,7 +14,7 @@ plugins {
 	id("com.google.cloud.tools.jib") version "3.4.0"
 	id("org.jetbrains.kotlinx.kover") version "0.7.5"
 
-	kotlin("jvm") version "1.9.21"
+	kotlin("jvm") version "1.9.22"
 	kotlin("plugin.spring") version "1.9.21"
 
 	id("build-plugin-database")
