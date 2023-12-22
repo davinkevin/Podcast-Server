@@ -91,6 +91,7 @@ tasks:
   update:flyway:
     cmds:
       - git fetch
+      - git co -B updates/all-flyway origin/main
       - git rb origin/renovate/org.flywaydb-flyway-database-postgresql-10.x
       - git rb origin/renovate/flyway-flyway-10.x
       - git rb origin/renovate/org.flywaydb.flyway-10.x
