@@ -1,0 +1,53 @@
+kind: GatewayClass
+apiVersion: gateway.networking.k8s.io/v1beta1
+metadata:
+  name: gateway
+spec:
+  controllerName: projectcontour.io/gateway-controller
+  parametersRef:
+    kind: ContourDeployment
+    group: projectcontour.io
+    name: gateway
+    namespace: projectcontour
+---
+kind: ContourDeployment
+apiVersion: projectcontour.io/v1alpha1
+metadata:
+  namespace: projectcontour
+  name: gateway
+spec:
+  contour:
+    deployment:
+      replicas: 1
+---
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: Gateway
+metadata:
+  name: gateway
+spec:
+  gatewayClassName: gateway
+  listeners:
+    - name: https
+      hostname: "*.k8s.local"
+      protocol: HTTPS
+      tls:
+        mode: Terminate
+        certificateRefs:
+          - name: dot-k8s-dot-local
+            kind: Secret
+      port: 443
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: ingress-http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: All
+    - name: ingress-https
+      protocol: projectcontour.io/https
+      port: 443
+      allowedRoutes:
+        namespaces:
+          from: All

@@ -1,0 +1,12 @@
+nameReference:
+  - kind: Secret
+    version: v1
+    fieldSpecs:
+      - apiVersion: gateway.networking.k8s.io/v1beta1
+        kind: Gateway
+        path: spec/listeners/tls/certificateRefs/name
+  - kind: Service
+    fieldSpecs:
+      - apiVersion: gateway.networking.k8s.io/v1beta1
+        kind: HTTPRoute
+        path: /spec/rules/backendRefs/name

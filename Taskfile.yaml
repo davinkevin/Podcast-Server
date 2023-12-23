@@ -6,7 +6,15 @@ tasks:
     status:
       - k3d cluster get podcast-server
     cmds:
-      - k3d cluster create podcast-server --port 80:80@loadbalancer --port 443:443@loadbalancer
+      - k3d cluster create podcast-server --port 80:80@loadbalancer --port 443:443@loadbalancer --k3s-arg "--disable=traefik@server:*"
+      - cmd: |
+          function install_contour() {
+            kubectl apply -k distribution/kubernetes/.infrastructure/contour/ --server-side=true
+          }
+          
+          set +e
+          install_contour
+          while [ $? -ne 0 ]; do install_contour; done
 
   skaffold:dev:
     dir: ~/Workspace/gitlab.com/davinkevin/Podcast-Server
