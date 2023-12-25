@@ -15,20 +15,15 @@ import java.time.OffsetDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
-import java.util.function.Function;
 
 import org.jooq.Check;
 import org.jooq.Converter;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
-import org.jooq.Function15;
 import org.jooq.Index;
 import org.jooq.Name;
 import org.jooq.Record;
-import org.jooq.Records;
-import org.jooq.Row15;
 import org.jooq.Schema;
-import org.jooq.SelectField;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -260,29 +255,5 @@ public class Item extends TableImpl<ItemRecord> {
     @Override
     public Item rename(Table<?> name) {
         return new Item(name.getQualifiedName(), null);
-    }
-
-    // -------------------------------------------------------------------------
-    // Row15 type methods
-    // -------------------------------------------------------------------------
-
-    @Override
-    public Row15<UUID, OffsetDateTime, String, OffsetDateTime, Path, Long, String, Integer, OffsetDateTime, String, String, UUID, UUID, String, ItemStatus> fieldsRow() {
-        return (Row15) super.fieldsRow();
-    }
-
-    /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Function)}.
-     */
-    public <U> SelectField<U> mapping(Function15<? super UUID, ? super OffsetDateTime, ? super String, ? super OffsetDateTime, ? super Path, ? super Long, ? super String, ? super Integer, ? super OffsetDateTime, ? super String, ? super String, ? super UUID, ? super UUID, ? super String, ? super ItemStatus, ? extends U> from) {
-        return convertFrom(Records.mapping(from));
-    }
-
-    /**
-     * Convenience mapping calling {@link SelectField#convertFrom(Class,
-     * Function)}.
-     */
-    public <U> SelectField<U> mapping(Class<U> toType, Function15<? super UUID, ? super OffsetDateTime, ? super String, ? super OffsetDateTime, ? super Path, ? super Long, ? super String, ? super Integer, ? super OffsetDateTime, ? super String, ? super String, ? super UUID, ? super UUID, ? super String, ? super ItemStatus, ? extends U> from) {
-        return convertFrom(toType, Records.mapping(from));
     }
 }
