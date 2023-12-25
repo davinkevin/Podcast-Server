@@ -1,4 +1,4 @@
-apiVersion: skaffold/v4beta6
+apiVersion: skaffold/v4beta8
 kind: Config
 build:
   artifacts:
@@ -35,6 +35,6 @@ build:
 manifests:
   kustomize:
     paths:
-      - distribution/kubernetes/overlays/docker-for-desktop/
+      - distribution/kubernetes/overlays/podcast.k8s.local/
 deploy:
   kubectl: {}
