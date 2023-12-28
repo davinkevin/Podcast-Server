@@ -1,0 +1,14 @@
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: HTTPRoute
+metadata:
+  name: backend
+spec:
+  rules:
+    - matches:
+        - path:
+            value: "/api"
+        - path:
+            value: "/actuator"
+      backendRefs:
+        - name: backend
+          port: 8080

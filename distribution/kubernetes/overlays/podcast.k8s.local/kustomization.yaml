@@ -8,7 +8,7 @@ resources:
 
 components:
   - ../../base/components/namespace
-  - ingress
+  - gateways
 
 patchesStrategicMerge:
   - volume.yaml

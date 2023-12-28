@@ -1,0 +1,38 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+components:
+  - ../../../base/components/gateway
+  - ../../../base/components/storage/embedded/gateway
+  - ../../../base/components/storage/embedded/gateway/console
+
+patches:
+  - patch: |-
+      apiVersion: gateway.networking.k8s.io/v1beta1
+      kind: HTTPRoute
+      metadata:
+        name: not-important
+      spec:
+        parentRefs:
+          - name: gateway
+        hostnames:
+          - podcast.k8s.local
+    target:
+      group: gateway.networking.k8s.io
+      version: v1beta1
+      kind: HTTPRoute
+  - patch: |-
+      apiVersion: gateway.networking.k8s.io/v1beta1
+      kind: HTTPRoute
+      metadata:
+        name: console
+      spec:
+        parentRefs:
+          - name: gateway
+        hostnames:
+          - minio.podcast.k8s.local
+    target:
+      group: gateway.networking.k8s.io
+      version: v1beta1
+      kind: HTTPRoute
+      name: console
