@@ -25,6 +25,15 @@ tasks:
     cmds:
       - skaffold dev --status-check=false
 
+  certificates:generate:
+    cmds:
+      - cmd: |
+          export PROJECT_DIR=$(pwd)
+          cd $(mktemp -d)
+          mkcert -cert-file=tls.crt -key-file=tls.key '*.k8s.local' '*.podcast.k8s.local' 'podcast.k8s.local'
+          cp tls.crt tls.key $PROJECT_DIR/distribution/kubernetes/.infrastructure/contour/
+          cp tls.crt tls.key $PROJECT_DIR/distribution/kubernetes/overlays/docker-for-desktop/ingress/certs/
+
   database:start:
     env:
       DATABASE_PASSWORD: nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa
