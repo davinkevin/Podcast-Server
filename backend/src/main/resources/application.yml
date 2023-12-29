@@ -7,6 +7,9 @@ spring:
   banner-mode: off
  codec:
   max-in-memory-size: 500MB
+ threads:
+  virtual:
+   enabled: false
 
 server:
  port: 8080

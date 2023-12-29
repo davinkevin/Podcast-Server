@@ -6,7 +6,9 @@ spring:
     url: jdbc:postgresql://postgres:5432/podcast-server
   main:
     banner-mode: "off"
-
+  threads:
+    virtual:
+      enabled: false
 server:
   error:
     include-message: always
