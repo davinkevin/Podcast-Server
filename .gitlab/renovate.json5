@@ -10,6 +10,11 @@
   ignorePaths: [
     "frontend-angular/**",
     "frontend-angularjs/**"
-  ]
+  ],
+  "packageRules": [{
+    matchPackageNames: ["software.amazon.awssdk:bom"],
+    "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+    automerge: true,
+  }]
 }
 
