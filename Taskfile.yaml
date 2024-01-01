@@ -50,8 +50,9 @@ tasks:
 
   release:
     env:
-      CURRENT_VERSION: 2023.11.0
-      NEW_VERSION: 2023.12.0
+      CURRENT_VERSION:
+        sh: jq .version -r frontend-angularjs/package.json
+      NEW_VERSION: "{{.CLI_ARGS}}"
     cmds:
       - sd $CURRENT_VERSION $NEW_VERSION 
            backend/build.gradle.kts

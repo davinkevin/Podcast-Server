@@ -22,7 +22,7 @@ plugins {
 }
 
 group = "com.github.davinkevin.podcastserver"
-version = "2023.12.0"
+version = "2024.1.0"
 
 java {
 	sourceCompatibility = JavaVersion.VERSION_21
