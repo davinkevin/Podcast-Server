@@ -3,6 +3,42 @@ All notable changes to this project will be documented in this file.
 
 ## 2023.12.0
 
+### Features
+
+- **backend:** Build with Java 21 as target for Kotlin code ([7ba671e](7ba671e9f7dec7e96428a7349a70c486e6d649a1))
+- **backend:** Migrate to flyway v10 for docker image and build scripts ([87c8cf6](87c8cf608ecfb329ec7d94f9fb27b306ee97c578) - [#224](https://gitlab.com/davinkevin/Podcast-Server/-/issues/224))
+- **backend:** Add support for virtualThread for backend ([4d0818a](4d0818ac9a8f94e6619bc8d5869703b0623d4e38) - [#225](https://gitlab.com/davinkevin/Podcast-Server/-/issues/225))
+- **gateway:** Add support for GatewayAPI in official manifests ([7da367a](7da367a7d7d0c24d2bbeadad572f3c4b584c160a) - [#214](https://gitlab.com/davinkevin/Podcast-Server/-/issues/214))
+
+### Bug Fixes
+
+- **deps:** Update dependency org.mockito.kotlin:mockito-kotlin to v5.2.1 ([35cbef9](35cbef91622d71262852a0a0683f339f6571a8c8))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.38 ([3b416c3](3b416c3339cfe9d29c9313193d5cf3a7e95f6b84))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.39 ([080fdcc](080fdcccaba6d9e1795bb1fd3afca665b00286fd))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.41 ([0c8898a](0c8898a6ba6ded8e3d06807c495b95ba0ea17029))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.42 ([85884c2](85884c2a07c62c5e84ca96377cce066fa0051bfd))
+- **deps:** Update dependency org.flywaydb:flyway-database-postgresql to v10.2.0 ([35c6f8a](35c6f8ad7ed092b61f49ed271b2723f72ecbb4f0))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.43 ([e0150a3](e0150a3e518b424cf7ca82fe3e50501f28dda79f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.44 ([4fbbccf](4fbbccf55e1ebdad27dd9dfa4f76722133b9aeb4))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.45 ([6b833ff](6b833fff465de664d45acd0fa047f43f67d169a8))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.21.46 ([6e9372b](6e9372b4cef4204b322247931bdaff9ba576e857))
+- **deps:** Update dependency org.flywaydb:flyway-database-postgresql to v10.3.0 ([ca1c6df](ca1c6df7f3d159270a456b2e6991b0604c37e89f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.0 ([ffaa340](ffaa340f17834408a6889a555f0f90064bda165c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.1 ([456de14](456de14de9bfdeba4fd943bffc642e893efa2b1d))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.2 ([c75f102](c75f1027771ca26bae48fc39c6a680b3b7dda38f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.3 ([f7b4426](f7b44265c988114b1744a32f1a59fe76fc48992c))
+- **deps:** Update dependency org.flywaydb:flyway-database-postgresql to v10.4.0 ([55ddf7f](55ddf7fbf1dad5b931dc2e1ff861a63b9cf3ec06))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.4 ([95743ce](95743ce4bdd540964c142d944534745c32ef6499))
+- **deps:** Update dependency org.flywaydb:flyway-database-postgresql to v10.4.1 ([30ebd47](30ebd473dd5b8c475b68ebe5284120785f69d19f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.5 ([b9595f1](b9595f1935171d4db03b76b5c73f5430b8945832))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.6 ([4cd4a3a](4cd4a3a75e6fba6502bb4149fbdd111cfd30d90f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.7 ([b781023](b7810232dd94d5a53012717253baee58bb7702f1))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.8 ([aae9818](aae9818b3fd08b34d81cf99ba41eab19b548ba3e))
+- **deps:** Update dependency org.jsoup:jsoup to v1.17.2 ([7eeb5f6](7eeb5f6249fcf4d85eaaa3b038949b77790cc40b))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.9 ([fa08aa0](fa08aa07871dc1b2ba911c8e639c395004d93b38))
+
+## 2023.12.0
+
 ### Bug Fixes
 
 - **backend:** Support url with `/c/` notation for youtube updater ([4c6755e](4c6755e2407714dbf2e356cc690ed97fb4b0aa72))
