@@ -15,6 +15,9 @@
     matchPackageNames: ["software.amazon.awssdk:bom"],
     "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
     automerge: true,
+  }, {
+    "packagePatterns": ["^minio"],
+    "versioning": "regex:^RELEASE\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})"
   }]
 }
 
