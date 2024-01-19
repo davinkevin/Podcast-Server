@@ -6,9 +6,11 @@ import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemPageRequest
 import com.github.davinkevin.podcastserver.item.ItemService
 import com.github.davinkevin.podcastserver.item.ItemSort
+import com.github.davinkevin.podcastserver.rss.Item as RssItem
+import com.github.davinkevin.podcastserver.rss.itunesNS
+import com.github.davinkevin.podcastserver.rss.mediaNS
 import org.jdom2.Document
 import org.jdom2.Element
-import org.jdom2.Namespace
 import org.jdom2.Text
 import org.jdom2.output.Format
 import org.jdom2.output.XMLOutputter
@@ -126,68 +128,23 @@ private class OpmlOutline(p: Podcast, host: URI) {
     }
 }
 
-
-private val itunesNS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")
-private val mediaNS = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")
-private val ITUNES_NAMESPACE = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")
-
-private fun toRssItem(item: Item, host: URI): Element {
-
-    val podcastUrlBuilder = UriComponentsBuilder.fromUri(host)
-        .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString())
-
-    val coverExtension = (Path(item.cover.url.path).extension.ifBlank { "jpg" })
-    val coverUrl = podcastUrlBuilder
-        .cloneBuilder()
-        .pathSegment("cover.$coverExtension")
-        .build(true)
-        .toUriString()
-
-    val itunesItemThumbnail = Element("image", itunesNS).setContent(Text(coverUrl))
-    val thumbnail = Element("thumbnail", mediaNS).setAttribute("url", coverUrl)
-
-    val proxyURL = podcastUrlBuilder
-        .cloneBuilder()
-        .pathSegment(item.slug())
-        .build(true)
-        .toUriString()
-
-    val itemEnclosure = Element("enclosure").apply {
-        setAttribute("url", proxyURL)
-
-        if(item.length != null) {
-            setAttribute("length", item.length.toString())
-        }
-
-        if(item.mimeType.isNotEmpty()) {
-            setAttribute("type", item.mimeType)
-        }
-    }
-
-    val guid = Element("guid").apply {
-        val uuidUrl = UriComponentsBuilder
-            .fromUri(host)
-            .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString())
-            .build(true)
-            .toUriString()
-
-        addContent(Text(uuidUrl))
-    }
-
-    return Element("item").apply {
-        addContent(Element("title").addContent(Text(item.title)))
-        addContent(Element("description").addContent(Text(item.description)))
-        addContent(Element("pubDate").addContent(Text(item.pubDate!!.format(DateTimeFormatter.RFC_1123_DATE_TIME))))
-        addContent(Element("explicit", itunesNS).addContent(Text("No")))
-        addContent(Element("subtitle", itunesNS).addContent(Text(item.title)))
-        addContent(Element("summary", itunesNS).addContent(Text(item.description)))
-        addContent(guid)
-        addContent(itunesItemThumbnail)
-        addContent(thumbnail)
-        addContent(itemEnclosure)
-    }
-
-}
+private fun toRssItem(item: Item, host: URI): Element = RssItem(
+    host = host,
+    podcast = RssItem.Podcast(item.podcast.id),
+    item = RssItem.Item(
+        id = item.id,
+        title = item.title,
+        mimeType = item.mimeType,
+        fileName = item.fileName,
+        pubDate = item.pubDate,
+        description = item.description,
+        length = item.length,
+    ),
+    cover = RssItem.Cover(
+        url = item.cover.url
+    )
+)
+    .toElement()
 
 private fun toRssChannel(podcast: Podcast, baseUrl: URI, callUrl: URI): Element {
     val url = UriComponentsBuilder.fromUri(callUrl).build(true).toUriString()
@@ -211,7 +168,7 @@ private fun toRssChannel(podcast: Podcast, baseUrl: URI, callUrl: URI): Element 
             addContent(Element("pubDate").addContent(d))
         }
 
-        val itunesImage = Element("image", ITUNES_NAMESPACE).apply { addContent(Text(coverUrl)) }
+        val itunesImage = Element("image", itunesNS).apply { addContent(Text(coverUrl)) }
 
         val image = Element("image").apply {
             addContent(Element("height").addContent(podcast.cover.height.toString()))

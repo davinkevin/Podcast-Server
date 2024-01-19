@@ -2,9 +2,10 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
+import com.github.davinkevin.podcastserver.rss.Item as RssItem
+import com.github.davinkevin.podcastserver.rss.itunesNS
 import org.jdom2.Document
 import org.jdom2.Element
-import org.jdom2.Namespace
 import org.jdom2.Text
 import org.jdom2.output.Format
 import org.jdom2.output.XMLOutputter
@@ -17,7 +18,6 @@ import org.springframework.web.reactive.function.server.bodyToMono
 import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import java.net.URI
-import java.time.format.DateTimeFormatter
 import java.util.*
 
 class PlaylistHandler(
@@ -167,9 +167,6 @@ private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
     )
 }
 
-private val itunesNS = Namespace.getNamespace("itunes", "http://www.itunes.com/dtds/podcast-1.0.dtd")
-private val mediaNS = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")
-
 private fun PlaylistWithItems.toRss(host: URI): Element {
 
     val url = UriComponentsBuilder
@@ -192,50 +189,20 @@ private fun PlaylistWithItems.toRss(host: URI): Element {
     }
 }
 
-private fun toRssItem(item: PlaylistWithItems.Item, host: URI): Element {
-    val coverExtension = item.cover.url.extension().ifBlank { "jpg" }
-
-    val itemUrlBuilder = UriComponentsBuilder.fromUri(host)
-        .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString())
-
-    val coverUrl = itemUrlBuilder
-        .cloneBuilder()
-        .pathSegment("cover.$coverExtension")
-        .build(true)
-        .toUriString()
-
-    val itunesItemThumbnail = Element("image", itunesNS).setContent(Text(coverUrl))
-    val thumbnail = Element("thumbnail", mediaNS).setAttribute("url", coverUrl)
-
-    val proxyURL = itemUrlBuilder
-        .cloneBuilder()
-        .pathSegment(item.slug())
-        .build(true)
-        .toUriString()
-
-    val itemEnclosure = Element("enclosure").apply {
-        setAttribute("url", proxyURL)
-
-        if(item.length != null) {
-            setAttribute("length", item.length.toString())
-        }
-
-        if(item.mimeType.isNotEmpty()) {
-            setAttribute("type", item.mimeType)
-        }
-    }
-
-    return Element("item").apply {
-        addContent(Element("title").addContent(Text(item.title)))
-        addContent(Element("description").addContent(Text(item.description)))
-        addContent(Element("pubDate").addContent(Text(item.pubDate!!.format(DateTimeFormatter.RFC_1123_DATE_TIME))))
-        addContent(Element("explicit", itunesNS).addContent(Text("No")))
-        addContent(Element("subtitle", itunesNS).addContent(Text(item.title)))
-        addContent(Element("summary", itunesNS).addContent(Text(item.description)))
-        addContent(Element("guid").addContent(Text(proxyURL)))
-        addContent(itunesItemThumbnail)
-        addContent(thumbnail)
-        addContent(itemEnclosure)
-    }
-
-}
+private fun toRssItem(item: PlaylistWithItems.Item, host: URI): Element = RssItem(
+    host = host,
+    podcast = RssItem.Podcast(item.podcast.id),
+    item = RssItem.Item(
+        id = item.id,
+        title = item.title,
+        mimeType = item.mimeType,
+        fileName = item.fileName,
+        pubDate = item.pubDate,
+        description = item.description,
+        length = item.length,
+    ),
+    cover = RssItem.Cover(
+        url = item.cover.url
+    )
+)
+    .toElement()

@@ -1,25 +1,21 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
-import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
-import reactor.test.StepVerifier
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -488,7 +484,7 @@ class PlaylistHandlerTest (
                                   <itunes:explicit>No</itunes:explicit>
                                   <itunes:subtitle>a title</itunes:subtitle>
                                   <itunes:summary>a desc</itunes:summary>
-                                  <guid>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3</guid>
+                                  <guid>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370</guid>
                                   <itunes:image>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png</itunes:image>
                                   <media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png" />
                                   <enclosure url="https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3" length="10" type="audio/mp3" />
@@ -538,7 +534,7 @@ class PlaylistHandlerTest (
                                   <itunes:explicit>No</itunes:explicit>
                                   <itunes:subtitle>a title</itunes:subtitle>
                                   <itunes:summary>a desc</itunes:summary>
-                                  <guid>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3</guid>
+                                  <guid>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370</guid>
                                   <itunes:image>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.jpg</itunes:image>
                                   <media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.jpg" />
                                   <enclosure url="https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3" length="10" type="audio/mp3" />
