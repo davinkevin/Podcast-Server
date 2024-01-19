@@ -133,18 +133,22 @@ private val ITUNES_NAMESPACE = Namespace.getNamespace("itunes", "http://www.itun
 
 private fun toRssItem(item: Item, host: URI): Element {
 
+    val podcastUrlBuilder = UriComponentsBuilder.fromUri(host)
+        .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString())
+
     val coverExtension = (Path(item.cover.url.path).extension.ifBlank { "jpg" })
-    val coverUrl = UriComponentsBuilder.fromUri(host)
-        .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$coverExtension")
+    val coverUrl = podcastUrlBuilder
+        .cloneBuilder()
+        .pathSegment("cover.$coverExtension")
         .build(true)
         .toUriString()
 
     val itunesItemThumbnail = Element("image", itunesNS).setContent(Text(coverUrl))
     val thumbnail = Element("thumbnail", mediaNS).setAttribute("url", coverUrl)
 
-    val proxyURL = UriComponentsBuilder
-        .fromUri(host)
-        .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), item.slug())
+    val proxyURL = podcastUrlBuilder
+        .cloneBuilder()
+        .pathSegment(item.slug())
         .build(true)
         .toUriString()
 

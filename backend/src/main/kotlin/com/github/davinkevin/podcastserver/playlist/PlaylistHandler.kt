@@ -195,19 +195,23 @@ private fun PlaylistWithItems.toRss(host: URI): Element {
 private fun toRssItem(item: PlaylistWithItems.Item, host: URI): Element {
     val coverExtension = item.cover.url.extension().ifBlank { "jpg" }
 
-    val coverUrl = UriComponentsBuilder.fromUri(host)
-            .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$coverExtension")
-            .build(true)
-            .toUriString()
+    val itemUrlBuilder = UriComponentsBuilder.fromUri(host)
+        .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString())
+
+    val coverUrl = itemUrlBuilder
+        .cloneBuilder()
+        .pathSegment("cover.$coverExtension")
+        .build(true)
+        .toUriString()
 
     val itunesItemThumbnail = Element("image", itunesNS).setContent(Text(coverUrl))
     val thumbnail = Element("thumbnail", mediaNS).setAttribute("url", coverUrl)
 
-    val proxyURL = UriComponentsBuilder
-            .fromUri(host)
-            .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), item.slug())
-            .build(true)
-            .toUriString()
+    val proxyURL = itemUrlBuilder
+        .cloneBuilder()
+        .pathSegment(item.slug())
+        .build(true)
+        .toUriString()
 
     val itemEnclosure = Element("enclosure").apply {
         setAttribute("url", proxyURL)
