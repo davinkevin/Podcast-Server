@@ -114,7 +114,7 @@ class PlaylistHandlerTest (
                             "items":[{
                                 "id": "c42d2a59-46e6-4c1d-b0fb-2b47d389b370",
                                 "title": "a title",
-                                "proxyURL": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a_title.mp3",
+                                "proxyURL": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
                                 "description": "a desc",
                                 "mimeType": "audio/mp3",
                                 "podcast": {
@@ -164,7 +164,7 @@ class PlaylistHandlerTest (
                             "items":[{
                                 "id": "c42d2a59-46e6-4c1d-b0fb-2b47d389b370",
                                 "title": "a title",
-                                "proxyURL": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a_title.mp3",
+                                "proxyURL": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
                                 "description": "a desc",
                                 "mimeType": "audio/mp3",
                                 "podcast": {
@@ -320,7 +320,7 @@ class PlaylistHandlerTest (
                                          "id":"3ba6411c-8fb9-4e24-afb1-adbad9a023e0",
                                          "title":"a podcast"
                                       },
-                                      "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a_title.mp3",
+                                      "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
                                       "title":"a title"
                                    }
                                 ]
@@ -403,7 +403,7 @@ class PlaylistHandlerTest (
                                          "id":"3ba6411c-8fb9-4e24-afb1-adbad9a023e0",
                                          "title":"a podcast"
                                       },
-                                      "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a_title.mp3",
+                                      "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
                                       "title":"a title"
                                    },
                                    {
@@ -420,7 +420,7 @@ class PlaylistHandlerTest (
                                          "id":"35d04720-1bc3-476b-b7b0-494a15adf45e",
                                          "title":"2 a podcast"
                                       },
-                                      "proxyURL":"/api/v1/podcasts/35d04720-1bc3-476b-b7b0-494a15adf45e/items/4b48996c-686f-4339-b94e-f9595094f2ea/2_a_title.mp3",
+                                      "proxyURL":"/api/v1/podcasts/35d04720-1bc3-476b-b7b0-494a15adf45e/items/4b48996c-686f-4339-b94e-f9595094f2ea/2-a-title.mp3",
                                       "title":"2 a title"
                                    }
                                 ]
@@ -488,10 +488,10 @@ class PlaylistHandlerTest (
                                   <itunes:explicit>No</itunes:explicit>
                                   <itunes:subtitle>a title</itunes:subtitle>
                                   <itunes:summary>a desc</itunes:summary>
-                                  <guid>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a_title.mp3</guid>
+                                  <guid>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3</guid>
                                   <itunes:image>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png</itunes:image>
                                   <media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png" />
-                                  <enclosure url="https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a_title.mp3" length="10" type="audio/mp3" />
+                                  <enclosure url="https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3" length="10" type="audio/mp3" />
                                 </item>
                               </channel>
                             </rss>
@@ -538,10 +538,10 @@ class PlaylistHandlerTest (
                                   <itunes:explicit>No</itunes:explicit>
                                   <itunes:subtitle>a title</itunes:subtitle>
                                   <itunes:summary>a desc</itunes:summary>
-                                  <guid>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a_title.mp3</guid>
+                                  <guid>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3</guid>
                                   <itunes:image>https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.jpg</itunes:image>
                                   <media:thumbnail xmlns:media="http://search.yahoo.com/mrss/" url="https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.jpg" />
-                                  <enclosure url="https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a_title.mp3" length="10" type="audio/mp3" />
+                                  <enclosure url="https://foo.com/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3" length="10" type="audio/mp3" />
                                 </item>
                               </channel>
                             </rss>
@@ -631,7 +631,7 @@ class PlaylistHandlerTest (
                                      "id":"3ba6411c-8fb9-4e24-afb1-adbad9a023e0",
                                      "title":"a podcast"
                                   },
-                                  "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a_title.mp3",
+                                  "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
                                   "title":"a title"
                                }
                             ]

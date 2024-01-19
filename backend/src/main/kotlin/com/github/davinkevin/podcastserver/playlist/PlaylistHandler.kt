@@ -19,7 +19,6 @@ import reactor.core.publisher.Mono
 import java.net.URI
 import java.time.format.DateTimeFormatter
 import java.util.*
-import kotlin.io.path.extension
 
 class PlaylistHandler(
         private val playlistService: PlaylistService
@@ -142,11 +141,8 @@ private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
             .build(true)
             .toUri()
 
-    val extension = this.fileName?.extension?.let { ".$it" } ?: ""
-    val fileName = title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
-
     val itemUrl = UriComponentsBuilder.fromPath("/")
-            .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), fileName)
+            .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), slug())
             .build(true)
             .toUri()
 
@@ -207,12 +203,9 @@ private fun toRssItem(item: PlaylistWithItems.Item, host: URI): Element {
     val itunesItemThumbnail = Element("image", itunesNS).setContent(Text(coverUrl))
     val thumbnail = Element("thumbnail", mediaNS).setAttribute("url", coverUrl)
 
-    val extension = item.fileName?.extension?.let { ".$it" } ?: ""
-    val title = item.title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
-
     val proxyURL = UriComponentsBuilder
             .fromUri(host)
-            .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), title)
+            .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), item.slug())
             .build(true)
             .toUriString()
 

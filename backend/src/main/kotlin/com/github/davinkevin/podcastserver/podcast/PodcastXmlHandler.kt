@@ -26,7 +26,6 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 import kotlin.io.path.Path
 import kotlin.io.path.extension
-import kotlin.io.path.nameWithoutExtension
 
 class PodcastXmlHandler(
     private val podcastService: PodcastService,
@@ -142,12 +141,10 @@ private fun toRssItem(item: Item, host: URI): Element {
 
     val itunesItemThumbnail = Element("image", itunesNS).setContent(Text(coverUrl))
     val thumbnail = Element("thumbnail", mediaNS).setAttribute("url", coverUrl)
-    val extension = item.fileName?.nameWithoutExtension ?: item.mimeType.substringAfter("/")
-    val title = item.title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + ".$extension"
 
     val proxyURL = UriComponentsBuilder
         .fromUri(host)
-        .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), title)
+        .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), item.slug())
         .build(true)
         .toUriString()
 

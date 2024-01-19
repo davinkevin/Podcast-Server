@@ -26,7 +26,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200/Foo_200.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200/foo-200.mp4" length="100" type="video/mp4" />
         </item>
     </channel>
 </rss>

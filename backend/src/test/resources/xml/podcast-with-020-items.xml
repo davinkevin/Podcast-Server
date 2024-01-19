@@ -26,7 +26,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200/Foo_200.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f200/foo-200.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 199</title>
@@ -38,7 +38,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f199</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f199/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f199/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f199/Foo_199.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f199/foo-199.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 198</title>
@@ -50,7 +50,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f198</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f198/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f198/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f198/Foo_198.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f198/foo-198.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 197</title>
@@ -62,7 +62,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f197</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f197/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f197/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f197/Foo_197.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f197/foo-197.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 196</title>
@@ -74,7 +74,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f196</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f196/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f196/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f196/Foo_196.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f196/foo-196.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 195</title>
@@ -86,7 +86,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f195</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f195/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f195/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f195/Foo_195.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f195/foo-195.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 194</title>
@@ -98,7 +98,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f194</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f194/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f194/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f194/Foo_194.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f194/foo-194.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 193</title>
@@ -110,7 +110,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f193</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f193/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f193/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f193/Foo_193.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f193/foo-193.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 192</title>
@@ -122,7 +122,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f192</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f192/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f192/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f192/Foo_192.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f192/foo-192.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 191</title>
@@ -134,7 +134,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f191</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f191/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f191/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f191/Foo_191.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f191/foo-191.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 190</title>
@@ -146,7 +146,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f190</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f190/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f190/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f190/Foo_190.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f190/foo-190.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 189</title>
@@ -158,7 +158,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f189</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f189/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f189/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f189/Foo_189.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f189/foo-189.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 188</title>
@@ -170,7 +170,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f188</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f188/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f188/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f188/Foo_188.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f188/foo-188.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 187</title>
@@ -182,7 +182,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f187</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f187/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f187/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f187/Foo_187.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f187/foo-187.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 186</title>
@@ -194,7 +194,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f186</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f186/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f186/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f186/Foo_186.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f186/foo-186.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 185</title>
@@ -206,7 +206,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f185</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f185/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f185/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f185/Foo_185.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f185/foo-185.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 184</title>
@@ -218,7 +218,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f184</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f184/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f184/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f184/Foo_184.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f184/foo-184.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 183</title>
@@ -230,7 +230,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f183</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f183/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f183/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f183/Foo_183.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f183/foo-183.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 182</title>
@@ -242,7 +242,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f182</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f182/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f182/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f182/Foo_182.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f182/foo-182.mp4" length="100" type="video/mp4" />
         </item>
         <item>
             <title>Foo 181</title>
@@ -254,7 +254,7 @@
             <guid>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f181</guid>
             <itunes:image>https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f181/cover.png</itunes:image>
             <media:thumbnail url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f181/cover.png" />
-            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f181/Foo_181.mp4" length="100" type="video/mp4" />
+            <enclosure url="https://localhost:8080/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f181/foo-181.mp4" length="100" type="video/mp4" />
         </item>
     </channel>
 </rss>

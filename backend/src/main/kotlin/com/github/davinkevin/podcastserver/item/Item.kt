@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.item
 
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.podcastserver.item.Sluggable
 import java.net.URI
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -18,7 +19,7 @@ data class DeleteItemRequest(val id: UUID, val fileName: Path, val podcastTitle:
 
 data class Item(
         val id: UUID,
-        val title: String,
+        override val title: String,
         val url: String?,
 
         val pubDate: OffsetDateTime?,
@@ -26,14 +27,15 @@ data class Item(
         val creationDate: OffsetDateTime?,
 
         val description: String?,
-        val mimeType: String,
+        override val mimeType: String,
         val length: Long?,
-        val fileName: Path?,
+        override val fileName: Path?,
         val status: Status,
 
         val podcast: Podcast,
         val cover: Cover
-) {
+): Sluggable {
+
     fun isDownloaded() = Status.FINISH == status && fileName != null
 
     data class Podcast(val id: UUID, val title: String, val url: String?)
