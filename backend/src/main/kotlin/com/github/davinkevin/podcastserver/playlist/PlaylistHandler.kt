@@ -2,11 +2,10 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
-import com.github.davinkevin.podcastserver.rss.Item as RssItem
+import com.github.davinkevin.podcastserver.rss.PlaylistChannel
 import com.github.davinkevin.podcastserver.rss.itunesNS
 import org.jdom2.Document
 import org.jdom2.Element
-import org.jdom2.Text
 import org.jdom2.output.Format
 import org.jdom2.output.XMLOutputter
 import org.springframework.http.MediaType
@@ -19,6 +18,7 @@ import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Mono
 import java.net.URI
 import java.util.*
+import com.github.davinkevin.podcastserver.rss.Item as RssItem
 
 class PlaylistHandler(
         private val playlistService: PlaylistService
@@ -168,20 +168,18 @@ private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
 }
 
 private fun PlaylistWithItems.toRss(host: URI): Element {
+    val channel = PlaylistChannel(
+        playlist = PlaylistChannel.Playlist(
+            id = id,
+            name = name
+        ),
+        host = host,
+    )
+        .toElement()
 
-    val url = UriComponentsBuilder
-            .fromUri(host)
-            .pathSegment("api", "v1", "playlists", this.id.toString(), "rss")
-            .build(true)
-            .toUriString()
-
-    val items = this.items.map { toRssItem(it, host) }
-
-    val channel = Element("channel").apply {
-        addContent(Element("title").addContent(Text(this@toRss.name)))
-        addContent(Element("link").addContent(Text(url)))
-        addContent(items)
-    }
+    this.items
+        .map { it.toRssItem(host) }
+        .apply(channel::addContent)
 
     return Element("rss").apply {
         addContent(channel)
@@ -189,20 +187,20 @@ private fun PlaylistWithItems.toRss(host: URI): Element {
     }
 }
 
-private fun toRssItem(item: PlaylistWithItems.Item, host: URI): Element = RssItem(
+private fun PlaylistWithItems.Item.toRssItem(host: URI): Element = RssItem(
     host = host,
-    podcast = RssItem.Podcast(item.podcast.id),
+    podcast = RssItem.Podcast(podcast.id),
     item = RssItem.Item(
-        id = item.id,
-        title = item.title,
-        mimeType = item.mimeType,
-        fileName = item.fileName,
-        pubDate = item.pubDate,
-        description = item.description,
-        length = item.length,
+        id = id,
+        title = title,
+        mimeType = mimeType,
+        fileName = fileName,
+        pubDate = pubDate,
+        description = description,
+        length = length,
     ),
     cover = RssItem.Cover(
-        url = item.cover.url
+        url = cover.url
     )
 )
     .toElement()
