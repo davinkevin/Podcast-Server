@@ -19,6 +19,7 @@ interface Sluggable {
             .replace("\\p{IsP}+".toRegex(), " ")
             .trim()
             .replace("\\s+".toRegex(), "-")
+            .replace("[^a-zA-Z0-9.-]".toRegex(), "_")
 
         return "$sluggedTitle.$extension"
     }
