@@ -1,6 +1,44 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2024.2.0
+
+### Bug Fixes
+
+- **backend:** Support specific characters in slug ([3def455](3def455f0e7e3b27c9eb3b05124afd0235c694b3) - [#227](https://gitlab.com/davinkevin/Podcast-Server/-/issues/227))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.10 ([7a8bb4c](7a8bb4cb7ddabbb9e26d0333972a59a94c79cf8b))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.11 ([0ec0718](0ec07182b7cd11ba896e6675fab4f4db2b2f176f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.12 ([2555793](2555793355834d09d15905a6997940c52f1760be))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.22.13 ([4da8778](4da877846fa1f97fc966fa05a1d63ca8d8a85695))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.0 ([0079233](007923348525dea68560dc4f7f14f1d1d0ee0907))
+- **deps:** Update dependency org.flywaydb:flyway-database-postgresql to v10.5.0 ([209105d](209105def7f65f2758d6a0a7515ef73e3a11c123))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.1 ([a7aa0cb](a7aa0cb5d0841dbe592d13cc43554cae2af86966))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.2 ([af0743a](af0743ad9f74c564d7a356992d1c314322f59555))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.3 ([0d4e8eb](0d4e8eb7c8d00d5c19fa87cf095eb787842c17c5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.4 ([1e1bbd9](1e1bbd996b5d6c996f6ffe95ca8f4d8b1a8b22b2))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.5 ([9f418a5](9f418a5c59677cd1ef4d8c536d0265dc2e6d125e))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.6 ([60a27a2](60a27a24bffdf88d79337454a4332572006b6efe))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.7 ([e43e7dd](e43e7ddc3e4757e6a88ab72a8bd707410f74d382))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.8 ([0a66471](0a66471cc0589467ecb73ea0842a9f282968857c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.12 ([3329aba](3329aba2c3e81247787e6ed73d381d7e32238fc8))
+- **deps:** Update dependency org.flywaydb:flyway-database-postgresql to v10.6.0 ([0f38d09](0f38d09c285053155bb99e923ee02f5187a8a31e))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.13 ([9122aae](9122aaedb2e76e142ac89a1a55dd45b690b56c1c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.14 ([22ddfc2](22ddfc2208a51154d3dab6c40912d46df9d9f77e))
+- **deps:** Update dependency org.flywaydb:flyway-database-postgresql to v10.7.0 ([c516931](c516931be5ba1d5b8597917d867525ec982c10b9))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.15 ([29d6c73](29d6c73ccf513caf38dbc15766e97badf0a0b454))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.16 ([3602fed](3602fed3f01177691a0ae6dedc238a8dc589fe8e))
+- **deps:** Update dependency net.javacrumbs.json-unit:json-unit-assertj to v3.2.4 ([017d6f0](017d6f09bea76706ad5273f04e0a25c3469bc84b))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.17 ([1f117fb](1f117fb10ea56c2d50d5b5196c3f4b5f0a573b8e))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.23.21 ([fb30c0e](fb30c0e764e06247bebf4dad0f611d381d00143d))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.0 ([1c0346f](1c0346fac380e4c91a8f5c58b6ea2c15bbd847f3))
+
+### Refactor
+
+- **rss:** Rss item generation is collocated ([d37ac23](d37ac235438779a6c63f4375387e3b5b37e49033))
+- **rss:** Extraction of all remaining rss structure for better separation & construction ([4cc4c1b](4cc4c1bff5d3a065cdd67f6fb29df3670d6e35ac))
+- **slug:** Collocate the notion of sluggable items ([fad7706](fad770656572f4366850e4ac9e138a35fc4980aa))
+- **url:** Collocate root url in rss entities ([2870535](28705357c516f466a209421d05b34851eb98be0f))
+
 ## 2024.1.0
 
 ### Features
