@@ -12,7 +12,7 @@ plugins {
 
 	id("com.gorylenko.gradle-git-properties") version "2.4.1"
 	id("com.google.cloud.tools.jib") version "3.4.0"
-	id("org.jetbrains.kotlinx.kover") version "0.7.5"
+	id("org.jetbrains.kotlinx.kover") version "0.7.6"
 
 	kotlin("jvm") version "1.9.22"
 	kotlin("plugin.spring") version "1.9.22"
