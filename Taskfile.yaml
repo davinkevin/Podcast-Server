@@ -77,22 +77,20 @@ tasks:
       CI_COMMIT_TAG:
         sh: git describe --abbrev=0
     cmds:
-      - docker pull podcastserver/ui:$CI_COMMIT_TAG
-      - docker pull podcastserver/backend:$CI_COMMIT_TAG
-      - docker pull podcastserver/init-db:$CI_COMMIT_TAG
-      - docker pull podcastserver/storage:$CI_COMMIT_TAG
-      - UI_SHA=$(docker image inspect podcastserver/ui:$CI_COMMIT_TAG --format '{{ "{{" }} index (split (index .RepoDigests 0) ":") 1 {{ "}}" }}') &&
-        BACKEND_SHA=$(docker image inspect podcastserver/backend:$CI_COMMIT_TAG --format '{{ "{{" }} index (split (index .RepoDigests 0) ":") 1 {{ "}}" }}') &&
-        INIT_DB_SHA=$(docker image inspect podcastserver/init-db:$CI_COMMIT_TAG --format '{{ "{{" }} index (split (index .RepoDigests 0) ":") 1 {{ "}}" }}') &&
-        STORAGE_SHA=$(docker image inspect podcastserver/storage:$CI_COMMIT_TAG --format '{{ "{{" }} index (split (index .RepoDigests 0) ":") 1 {{ "}}" }}') &&
-        release-cli --project-id=$PROJECT_ID create
-          --name $CI_COMMIT_TAG
-          --description "$(git-cliff -l --strip all | tail -n +3)"
-          --tag-name "$CI_COMMIT_TAG" --ref "$CI_COMMIT_TAG"
-          --assets-link "{\"name\":\"ui\",\"url\":\"https://hub.docker.com/layers/podcastserver/ui/$CI_COMMIT_TAG/images/sha256-$UI_SHA\",\"link_type\":\"image\"}"
-          --assets-link "{\"name\":\"backend\",\"url\":\"https://hub.docker.com/layers/podcastserver/backend/$CI_COMMIT_TAG/images/sha256-$BACKEND_SHA\",\"link_type\":\"image\"}"
-          --assets-link "{\"name\":\"init-db\",\"url\":\"https://hub.docker.com/layers/podcastserver/init-db/$CI_COMMIT_TAG/images/sha256-$INIT_DB_SHA\",\"link_type\":\"image\"}"
-          --assets-link "{\"name\":\"storage\",\"url\":\"https://hub.docker.com/layers/podcastserver/storage/$CI_COMMIT_TAG/images/sha256-$STORAGE_SHA\",\"link_type\":\"image\"}"
+      - cmd: |-
+          UI_SHA=$(crane digest podcastserver/ui:$CI_COMMIT_TAG)
+          BACKEND_SHA=$(crane digest podcastserver/backend:$CI_COMMIT_TAG)
+          INIT_DB_SHA=$(crane digest podcastserver/init-db:$CI_COMMIT_TAG)
+          STORAGE_SHA=$(crane digest podcastserver/storage:$CI_COMMIT_TAG)
+          
+          echo release-cli --project-id=$PROJECT_ID create \
+            --name $CI_COMMIT_TAG \
+            --tag-name "$CI_COMMIT_TAG" --ref "$CI_COMMIT_TAG" \
+            --assets-link "{\"name\":\"ui\",\"url\":\"https://hub.docker.com/layers/podcastserver/ui/$CI_COMMIT_TAG/images/sha256-${UI_SHA/sha256:/}\",\"link_type\":\"image\"}" \
+            --assets-link "{\"name\":\"backend\",\"url\":\"https://hub.docker.com/layers/podcastserver/backend/$CI_COMMIT_TAG/images/sha256-${BACKEND_SHA/sha256:/}\",\"link_type\":\"image\"}" \
+            --assets-link "{\"name\":\"init-db\",\"url\":\"https://hub.docker.com/layers/podcastserver/init-db/$CI_COMMIT_TAG/images/sha256-${INIT_DB_SHA/sha256:/}\",\"link_type\":\"image\"}" \
+            --assets-link "{\"name\":\"storage\",\"url\":\"https://hub.docker.com/layers/podcastserver/storage/$CI_COMMIT_TAG/images/sha256-${STORAGE_SHA/sha256:/}\",\"link_type\":\"image\"}" \
+            --description "$(git-cliff -l --strip all | tail -n +3)"
 
   push-to-github:
     env:
@@ -104,7 +102,6 @@ tasks:
         git clone --bare git@gitlab.com:davinkevin/Podcast-Server.git
         cd Podcast-Server.git
         git push --mirror --repo git@github.com:davinkevin/Podcast-Server.git
-
 
   update:flyway:
     cmds:
