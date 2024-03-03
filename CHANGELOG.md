@@ -1,6 +1,28 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2024.3.0
+
+### Bug Fixes
+
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.1 ([315a8b3](315a8b316863b3c34ae182e685b4805fec2293b7))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.2 ([c7ec4ac](c7ec4ac663f4cb072473193c40404e79a24835aa))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.3 ([77bff76](77bff76f4dbd44909971306e7d970fa2a9684459))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.4 ([5c2483d](5c2483d10374bbd3238fcb2d022ba83c87ac6592))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.5 ([7290c91](7290c91c7853fd4f74c4a5c58caf8d899dad737a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.6 ([146308e](146308e2e9870c813cb960f7550ef5781566925a))
+- **deps:** Update dependency net.javacrumbs.json-unit:json-unit-assertj to v3.2.5 ([5e55c89](5e55c89eed67d60ca68183f8d532ce141fa76f0f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.7 ([d0b04ab](d0b04ab4d8687835ef453bb6d7cf330209d75a40))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.8 ([5bd33a0](5bd33a001e4af901558af92e2f8483b29308d304))
+- **deps:** Update dependency net.javacrumbs.json-unit:json-unit-assertj to v3.2.7 ([b976518](b976518f934da4b2d444de22aab36b6600d833ae))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.9 ([fc50426](fc50426e1e026d9e46a1ea8febfb26e05b4826e5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.10 ([1c13183](1c13183ad1d10414734bc849b56310f5ea861fa0))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.11 ([707cdf8](707cdf81f9af36d2563db9926cc2c38fce2125fb))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.12 ([6c12e55](6c12e558e8e98cf64f536d81ba13fa8185b918d6))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.24.13 ([d3c5844](d3c5844a505e18681276ef4afa775dd96cf62ef6))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.0 ([eff20ca](eff20caeb652bbb48f16384d9137e35172c9d0a1))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.1 ([1800a0a](1800a0aebfd947910af7507999a12774ac858835))
+
 ## 2024.2.0
 
 ### Bug Fixes
