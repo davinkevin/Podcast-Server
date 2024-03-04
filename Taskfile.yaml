@@ -83,7 +83,7 @@ tasks:
           INIT_DB_SHA=$(crane digest podcastserver/init-db:$CI_COMMIT_TAG)
           STORAGE_SHA=$(crane digest podcastserver/storage:$CI_COMMIT_TAG)
           
-          echo release-cli --project-id=$PROJECT_ID create \
+          release-cli --project-id=$PROJECT_ID create \
             --name $CI_COMMIT_TAG \
             --tag-name "$CI_COMMIT_TAG" --ref "$CI_COMMIT_TAG" \
             --assets-link "{\"name\":\"ui\",\"url\":\"https://hub.docker.com/layers/podcastserver/ui/$CI_COMMIT_TAG/images/sha256-${UI_SHA/sha256:/}\",\"link_type\":\"image\"}" \
