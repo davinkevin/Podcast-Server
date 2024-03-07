@@ -7,7 +7,7 @@ import com.gitlab.davinkevin.podcastserver.database.*
 
 buildscript {
     dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:10.9.0")
+        classpath("org.flywaydb:flyway-database-postgresql:10.9.1")
     }
 }
 
@@ -17,7 +17,7 @@ plugins {
 
     id("java")
 
-    id("org.flywaydb.flyway") version "10.9.0"
+    id("org.flywaydb.flyway") version "10.9.1"
     id("nu.studer.jooq") version "9.0"
     id("build-plugin-database")
 }
