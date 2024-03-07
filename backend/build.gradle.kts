@@ -15,7 +15,7 @@ plugins {
 	id("org.jetbrains.kotlinx.kover") version "0.7.6"
 
 	kotlin("jvm") version "1.9.23"
-	kotlin("plugin.spring") version "1.9.22"
+	kotlin("plugin.spring") version "1.9.23"
 
 	id("build-plugin-database")
 	id("build-plugin-docker-images")
