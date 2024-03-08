@@ -23,6 +23,10 @@
     matchPackagePatterns: [".*flyway.*"],
     groupName: "all-flyway",
     groupSlug: "all-flyway"
+  }, {
+    matchPackagePatterns: ["^org.jetbrains.kotlin.*"],
+    groupName: "all-kotlin",
+    groupSlug: "all-kotlin"
   }]
 }
 
