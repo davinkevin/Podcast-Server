@@ -217,6 +217,14 @@ class DownloadRepository(private val query: DSLContext) {
             .where(ITEM.ID.eq(id))
             .toMono()
     }
+
+    fun resetToWaitingStateAllDownloadingItems(): Mono<Int> = Mono.defer {
+        query.
+          update(DOWNLOADING_ITEM)
+            .set(DOWNLOADING_ITEM.STATE, DownloadingState.WAITING)
+            .where(DOWNLOADING_ITEM.STATE.eq(DownloadingState.DOWNLOADING))
+            .toMono()
+    }
 }
 
 private fun toDownloadingItem(

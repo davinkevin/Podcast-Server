@@ -1842,4 +1842,192 @@ class DownloadRepositoryTest(
         }
 
     }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    @DisplayName("should reset all item in downloading state")
+    inner class ShouldResetAllItemInDownloadingState {
+
+        private val coverId = UUID.fromString("32ec6d44-b880-11ea-b3de-0242ac130004")
+        private val podcastId = UUID.fromString("32ec6d44-b880-11ea-b3de-0242ac130004")
+
+        private val itemId1 = UUID.fromString("13106eba-b89b-11ea-b3de-0242ac130004")
+        private val itemId2 = UUID.fromString("2ec458db-9ac8-4553-a5d0-ce5559f6e225")
+        private val itemId3 = UUID.fromString("3a52242b-9002-4615-b1cd-4fe1cb55f079")
+        private val itemId4 = UUID.fromString("4efb65e3-25cc-4944-8234-98082df21e84")
+
+        @BeforeAll
+        fun beforeAll() {
+            val now = OffsetDateTime.now(fixedDate)
+            val oneDayAgo = OffsetDateTime.now(fixedDate).minusDays(1)
+            val twoDayAgo = OffsetDateTime.now(fixedDate).minusDays(2)
+            val threeDayAgo = OffsetDateTime.now(fixedDate).minusDays(3)
+
+            val itemCoverId1 = UUID.fromString("e0010c64-b89a-11ea-b3de-0242ac130004")
+            val itemCoverId2 = UUID.fromString("5a75e2de-5393-4f5e-9707-e5e806ada10f")
+            val itemCoverId3 = UUID.fromString("4e9e654c-7c30-4ff5-826b-a39eb1f57e79")
+            val itemCoverId4 = UUID.fromString("bd567872-55da-4801-8d3e-4bf2e79c2b65")
+
+            query.batch(
+                truncate(ITEM).cascade(),
+                truncate(PODCAST).cascade(),
+                truncate(COVER).cascade(),
+
+                insertInto(COVER, COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL)
+                    .values(coverId, 100, 100, "https://foo.bac.com/cover.jpg")
+                    .values(itemCoverId1, 100, 100, "https://foo.bac.com/item/cover.jpg")
+                    .values(itemCoverId2, 100, 100, "https://foo.bac.com/item/cover.jpg")
+                    .values(itemCoverId3, 100, 100, "https://foo.bac.com/item/cover.jpg")
+                    .values(itemCoverId4, 100, 100, "https://foo.bac.com/item/cover.jpg"),
+
+                insertInto(p, p.ID, p.DESCRIPTION, p.HAS_TO_BE_DELETED, p.LAST_UPDATE, p.SIGNATURE, p.TITLE, p.TYPE, p.URL, p.COVER_ID)
+                    .values(podcastId, "desc", true, OffsetDateTime.now(fixedDate), "sign", "Podcast-Title", "Youtube", "https://www.youtube.com/channel/UCx83f-KzDd3o1QK2AdJIftg", coverId),
+
+                insertInto(i, i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
+                    .values(itemId1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 5, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                    .values(itemId2, oneDayAgo, oneDayAgo, oneDayAgo, "desc item 2", Path(""), 1, "video/mp4", 10, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                    .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
+                    .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
+
+            )
+                .r2dbc()
+                .execute()
+        }
+
+        @BeforeEach
+        fun beforeEach() {
+            query.batch(
+                truncate(DOWNLOADING_ITEM).cascade(),
+                insertInto(DOWNLOADING_ITEM)
+                    .columns(DOWNLOADING_ITEM.ITEM_ID, DOWNLOADING_ITEM.POSITION, DOWNLOADING_ITEM.STATE)
+                    .values(itemId1, 1, DownloadingState.WAITING)
+                    .values(itemId2, 2, DownloadingState.WAITING)
+                    .values(itemId3, 3, DownloadingState.WAITING)
+                    .values(itemId4, 4, DownloadingState.WAITING)
+            )
+                .r2dbc()
+                .execute()
+        }
+
+        @Test
+        fun `with 0 item in downloading state`() {
+            /* Given */
+            /* When */
+            StepVerifier.create(repo.resetToWaitingStateAllDownloadingItems())
+                /* Then */
+                .expectSubscription()
+                .expectNext(0)
+                .verifyComplete()
+
+            val items = query
+                .selectFrom(DOWNLOADING_ITEM)
+                .r2dbc().fetch()
+
+            assertThat(items.all { it.state == DownloadingState.WAITING }).isTrue()
+        }
+
+        @Test
+        fun `with 1 item in downloading state`() {
+            /* Given */
+            query.batch(
+                selectOne(),
+                update(DOWNLOADING_ITEM)
+                    .set(DOWNLOADING_ITEM.STATE, DownloadingState.DOWNLOADING)
+                    .where(DOWNLOADING_ITEM.POSITION.`in`(1))
+            )
+                .r2dbc()
+                .execute()
+
+            /* When */
+            StepVerifier.create(repo.resetToWaitingStateAllDownloadingItems())
+                /* Then */
+                .expectSubscription()
+                .expectNext(1)
+                .verifyComplete()
+
+            val items = query
+                .selectFrom(DOWNLOADING_ITEM)
+                .r2dbc().fetch()
+
+            assertThat(items.all { it.state == DownloadingState.WAITING }).isTrue()
+        }
+
+        @Test
+        fun `with 2 items in downloading state`() {
+            /* Given */
+            query.batch(
+                selectOne(),
+                update(DOWNLOADING_ITEM)
+                    .set(DOWNLOADING_ITEM.STATE, DownloadingState.DOWNLOADING)
+                    .where(DOWNLOADING_ITEM.POSITION.`in`(1, 2))
+            )
+                .r2dbc()
+                .execute()
+
+            /* When */
+            StepVerifier.create(repo.resetToWaitingStateAllDownloadingItems())
+                /* Then */
+                .expectSubscription()
+                .expectNext(2)
+                .verifyComplete()
+
+            val items = query
+                .selectFrom(DOWNLOADING_ITEM)
+                .r2dbc().fetch()
+
+            assertThat(items.all { it.state == DownloadingState.WAITING }).isTrue()
+        }
+
+        @Test
+        fun `with 3 items in downloading state`() {
+            /* Given */
+            query.batch(
+                selectOne(),
+                update(DOWNLOADING_ITEM)
+                    .set(DOWNLOADING_ITEM.STATE, DownloadingState.DOWNLOADING)
+                    .where(DOWNLOADING_ITEM.POSITION.`in`(1, 2, 3))
+            )
+                .r2dbc()
+                .execute()
+
+            /* When */
+            StepVerifier.create(repo.resetToWaitingStateAllDownloadingItems())
+                /* Then */
+                .expectSubscription()
+                .expectNext(3)
+                .verifyComplete()
+
+            val items = query
+                .selectFrom(DOWNLOADING_ITEM)
+                .r2dbc().fetch()
+
+            assertThat(items.all { it.state == DownloadingState.WAITING }).isTrue()
+        }
+
+        @Test
+        fun `with all items in downloading state`() {
+            /* Given */
+            query.batch(
+                selectOne(),
+                update(DOWNLOADING_ITEM)
+                    .set(DOWNLOADING_ITEM.STATE, DownloadingState.DOWNLOADING)
+            )
+                .r2dbc()
+                .execute()
+
+            /* When */
+            StepVerifier.create(repo.resetToWaitingStateAllDownloadingItems())
+                /* Then */
+                .expectSubscription()
+                .expectNext(4)
+                .verifyComplete()
+
+            val items = query
+                .selectFrom(DOWNLOADING_ITEM)
+                .r2dbc().fetch()
+
+            assertThat(items.all { it.state == DownloadingState.WAITING }).isTrue()
+        }
+
+    }
 }
