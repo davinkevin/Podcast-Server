@@ -1,6 +1,36 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2024.4.0
+
+### Features
+
+- **backend:** Install yt-dlp using pip to get all required deps ([921d947](921d9479ce2f3a68f5acbac55b925a8ade5f7ed2) - [#230](https://gitlab.com/davinkevin/Podcast-Server/-/issues/230))
+
+### Bug Fixes
+
+- **backend:** Reset download after unexpected restart ([25bb5df](25bb5df4fc1ebb8bc749fc4c14bbc8b1238150b7) - [#229](https://gitlab.com/davinkevin/Podcast-Server/-/issues/229))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.2 ([ea0c23c](ea0c23c2d242fb4905069d0d0d0e17e5dfbaa130))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.3 ([1913c9a](1913c9a8ac535d4c06cc80a3792395b788d762e0))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.4 ([8b45510](8b45510d64959c954399ff9fcce506de9b5aacff))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.5 ([c8702af](c8702afd45186a3699c8395c48f4cf80f6d1d10f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.6 ([9039213](903921332a450a9dac51f7ae2da989b6461ea1aa))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.7 ([f22afdb](f22afdbb64e8200e06832c5aeb96fb3c91b348dd))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.8 ([ca2577e](ca2577edae9be81435c6b4df154e8ec1bddc2aae))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.9 ([47ad686](47ad686b4682fff5961cb8498d715f4d2ec36449))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.10 ([070763c](070763cd143e259e8ec5fe69a9128774afca7c2a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.11 ([e2c428d](e2c428d8515a7165d4e2ec998ab5687e8ee3345f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.12 ([e32dbb7](e32dbb763b6764f989e9f065c97d6dde73312897))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.13 ([c0ed85d](c0ed85d25ae5140b7550930d7fa71a1eb90b65d6))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.14 ([782907b](782907b405410326d32a72d84503ac0062ae9556))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.15 ([1689d27](1689d2744181624a71cf9661572a4b2699044c64))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.16 ([5ca5cf3](5ca5cf31fa3c8410ce37a6598110dbb3f4dec355))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.17 ([c9d1952](c9d1952c0d2136bc2bb2d9aeb6b439d9fcead38d))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.18 ([cd61779](cd61779efb891d69effa3286131ebe30513e6f7c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.19 ([2664186](26641862fb98e78a3079179e5170e785f98184d0))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.21 ([1f4f15b](1f4f15bf1c6438197a621f6582da1e8746d221e1))
+- **france.tv:** Adjust support of france.tv platform ([09a084c](09a084c61e2e37bbfd78063abfbf25ca44aa114f) - [#230](https://gitlab.com/davinkevin/Podcast-Server/-/issues/230))
+
 ## 2024.3.0
 
 ### Bug Fixes
