@@ -1,12 +1,10 @@
 package com.github.davinkevin.podcastserver.update.updaters.francetv
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
-import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.remapToMockServer
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.assertj.core.api.Assertions.assertThat
@@ -34,7 +32,7 @@ private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC
 
 @ExtendWith(SpringExtension::class)
 class FranceTvUpdaterTest(
-        @Autowired private val updater: FranceTvUpdater
+    @Autowired private val updater: FranceTvUpdater
 ) {
 
     @TestConfiguration
@@ -47,9 +45,9 @@ class FranceTvUpdaterTest(
     }
 
     private val podcast = PodcastToUpdate(
-            id = UUID.randomUUID(),
-            url = URI("https://www.france.tv/france-3/secrets-d-histoire"),
-            signature = "old_signature"
+        id = UUID.randomUUID(),
+        url = URI("https://www.france.tv/france-3/secrets-d-histoire"),
+        signature = "old_signature"
     )
 
     @Nested
@@ -57,13 +55,9 @@ class FranceTvUpdaterTest(
     @ExtendWith(MockServer::class)
     inner class ShouldFindItems {
 
-        private fun WireMockServer.forV5(path: String, id: String = "", coverPath: String = "") {
+        private fun WireMockServer.forV6(path: String, coverPath: String = "") {
             stubFor(get(path)
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/videos/${path.substringAfterLast("/")}"))))
-
-            if(id.isEmpty()) return
-            stubFor(get("/v1/videos/$id?country_code=FR&device_type=desktop&browser=chrome")
-                    .willReturn(okJson(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/videos/$id.json"))))
+                .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/videos/${path.substringAfterLast("/")}"))))
 
             if (coverPath.isEmpty()) return
             stubFor(get(coverPath).willReturn(aResponse().withBodyFile("img/image.png")))
@@ -74,13 +68,13 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/toutes-les-videos/no-item.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/no-item.html"))))
             }
             /* When */
             StepVerifier.create(updater.findItems(podcast))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                /* Then */
+                .expectSubscription()
+                .verifyComplete()
         }
 
         @Test
@@ -88,13 +82,13 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/toutes-les-videos/all-unavailable.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/all-unavailable.html"))))
             }
             /* When */
             StepVerifier.create(updater.findItems(podcast))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                /* Then */
+                .expectSubscription()
+                .verifyComplete()
         }
 
         @Test
@@ -102,29 +96,28 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                        .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/toutes-les-videos/one-item.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/one-item.html"))))
 
-                forV5(
-                    path = "/france-3/secrets-d-histoire/secrets-d-histoire-saison-16/4228084-ragnar-le-viking-qui-a-terrorise-paris.html",
-                    id = "285f5fbe-7cee-4aaf-a661-cf5b91198576",
-                    coverPath = "/v1/assets/images/37/0f/7f/f8a323c4-faeb-4db8-a8d7-5932117dc7bf.jpg"
+                forV6(
+                    path = "/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html",
+                    coverPath = "/image/carre/1024/1024/q/4/c/1ae0e33f-phpg7tc4q.jpg"
                 )
             }
             /* When */
             StepVerifier.create(updater.findItems(podcast))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.title).isEqualTo("Secrets d'histoire - Ragnar, le viking qui a terrorisé Paris")
-                        assertThat(it.pubDate).isEqualTo(ZonedDateTime.of(2022, 10, 31, 21, 9, 0, 0, ZoneId.of("Europe/Paris")))
-                        assertThat(it.length).isNull()
-                        assertThat(it.url).isEqualTo(URI("https://www.france.tv/france-3/secrets-d-histoire/secrets-d-histoire-saison-16/4228084-ragnar-le-viking-qui-a-terrorise-paris.html"))
-                        assertThat(it.description).isEqualTo("Du IXe au XIe siècle, une vague de violence inouïe s'abat sur l'Europe tout entière. Les Vikings pillent et dévastent les monastères et les villages des royaumes qu'ils traversent. En quelques minutes, un havre de paix se transforme en une scène d'apocalypse. Comme ce jour où ils décident d'envahir Paris. Qui sont ces guerriers venus de Scandinavie ? Si leur réputation de barbares sanguinaires les précède, leur culture est nettement moins connue et bien plus raffinée que ce que l'on a longtemps pensé. Stéphane Bern se rend en Norvège, sur les rivages du Naeroyfjord, considéré comme l'un des plus beaux fjords au monde et classé au patrimoine mondial de l'Unesco. C'est ici, dans les pays scandinaves, que tout commence pour les Vikings, avec le plus célèbre de leurs chefs : Ragnar Lodbrok.")
-                        assertThat(it.cover!!.height).isEqualTo(300)
-                        assertThat(it.cover!!.width).isEqualTo(256)
-                        assertThat(it.cover!!.url).isEqualTo(URI("https://assets.webservices.francetelevisions.fr/v1/assets/images/37/0f/7f/f8a323c4-faeb-4db8-a8d7-5932117dc7bf.jpg"))
-                    }
-                    .verifyComplete()
+                /* Then */
+                .expectSubscription()
+                .assertNext {
+                    assertThat(it.title).isEqualTo("Marie-Madeleine : si près de Jésus...")
+                    assertThat(it.pubDate).isEqualTo(ZonedDateTime.of(2024, 3, 20, 21, 13, 0, 0, ZoneOffset.ofHours(1)))
+                    assertThat(it.length).isEqualTo(6881)
+                    assertThat(it.url).isEqualTo(URI("https://www.france.tv/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html"))
+                    assertThat(it.description).isEqualTo("Si la Bible regorge de personnages mystérieux et fascinants, Marie-Madeleine occupe une place à part parmi eux. Sa proximité avec Jésus éveille les passions et les polémiques les plus folles. Que représente Marie-Madeleine aux yeux et dans le cœur de Jésus ? Doit-on croire à un amour impossible, ou à des sentiments plus ardents ? Car il s'agit bien d'un \"mystère Marie-Madeleine\", qui tient tout d'abord aux différentes sources qui nous sont parvenues et qui ne s'accordent pas toujours sur la véritable identité, ni sur le rôle qu'a joué cette femme. Pour mieux la comprendre, Stéphane Bern foule la terre de Jérusalem, là où tout a commencé et ainsi tenter de déchiffrer les différents Évangiles.")
+                    assertThat(it.cover!!.height).isEqualTo(300)
+                    assertThat(it.cover!!.width).isEqualTo(256)
+                    assertThat(it.cover!!.url).isEqualTo(URI("https://www.france.tv/image/carre/1024/1024/q/4/c/1ae0e33f-phpg7tc4q.jpg"))
+                }
+                .verifyComplete()
         }
 
         @Test
@@ -132,51 +125,20 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/toutes-les-videos/one-item.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/one-item.html"))))
 
-                val name = "4228084-ragnar-le-viking-qui-a-terrorise-paris"
-                val id = "285f5fbe-7cee-4aaf-a661-cf5b91198576"
-                val coverPath = "/v1/assets/images/37/0f/7f/f8a323c4-faeb-4db8-a8d7-5932117dc7bf.jpg"
-
-                stubFor(get("/france-3/secrets-d-histoire/secrets-d-histoire-saison-16/$name.html")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/videos/$name.html"))))
-
-                stubFor(get("/v1/videos/$id?country_code=FR&device_type=desktop&browser=chrome")
-                    .willReturn(okJson(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/videos/$id.json"))))
-
-                stubFor(get(coverPath).willReturn(notFound()))
+                forV6(
+                    path = "/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html"
+                )
             }
             /* When */
             StepVerifier.create(updater.findItems(podcast))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.cover).isNull()
-                    }
-                    .verifyComplete()
-        }
-
-        @Test
-        fun `with error on api backend`(backend: WireMockServer) {
-            /* Given */
-            backend.apply {
-                stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/toutes-les-videos/one-item.html"))))
-
-                val name = "4228084-ragnar-le-viking-qui-a-terrorise-paris"
-                val id = "285f5fbe-7cee-4aaf-a661-cf5b91198576"
-
-                stubFor(get("/france-3/secrets-d-histoire/secrets-d-histoire-saison-16/$name.html")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/videos/$name.html"))))
-
-                stubFor(get("/v1/videos/$id?country_code=FR&device_type=desktop&browser=chrome")
-                    .willReturn(serverError()))
-            }
-            /* When */
-            StepVerifier.create(updater.findItems(podcast))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                /* Then */
+                .expectSubscription()
+                .assertNext {
+                    assertThat(it.cover).isNull()
+                }
+                .verifyComplete()
         }
 
         @Test
@@ -184,51 +146,26 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/toutes-les-videos/all.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/all.html"))))
 
-                forV5(
-                    path = "/france-3/secrets-d-histoire/secrets-d-histoire-saison-16/4228084-ragnar-le-viking-qui-a-terrorise-paris.html",
-                    id = "285f5fbe-7cee-4aaf-a661-cf5b91198576",
-                    coverPath = "/v1/assets/images/37/0f/7f/f8a323c4-faeb-4db8-a8d7-5932117dc7bf.jpg"
-                )
-                forV5(
-                    path = "/france-3/secrets-d-histoire/secrets-d-histoire-saison-16/4206502-rosa-bonheur-la-fee-des-animaux.html",
-                    id = "95358a72-5487-4009-962e-0d130ee9bbdb",
-                    coverPath = "/v1/assets/images/9a/a8/18/777c2929-be8e-4afa-91c5-8b8ee8150f65.jpg"
-                )
-                forV5(
-                    path = "/sport/les-jeux-olympiques/4211497-paris-2024-stephane-bern-livre-les-secrets-d-une-marche-historique.html",
-                    id = "86edd5a8-44bb-11ed-9829-c78752ac9b2b",
-                    coverPath = "/v1/assets/images/10/85/66/0e2d05b6-fff2-4923-89f8-1e8f7ba854eb.jpg"
-                )
-                forV5(
-                    path = "/france-3/secrets-d-histoire/4116544-la-reine-elizabeth-ii-et-sa-relation-a-la-france.html",
-                    id = "463e7292-3430-11ed-b4a9-c3ed945d3889",
-                    coverPath = "/v1/assets/images/9c/16/58/0040ec2a-b383-4376-95dc-fc3e66f86703.jpg"
-                )
-                forV5(
-                    path = "/france-3/secrets-d-histoire/4073119-medecin-il-a-essaye-de-sauver-lady-diana-le-soir-de-l-accident.html",
-                    id = "d8bff46a-2913-11ed-8457-f3708da52c87",
-                    coverPath = "/v1/assets/images/48/2f/7e/601b72ac-b05f-450a-9ce7-2def8e7c135c.jpg"
-                )
-                forV5(
-                    path = "/france-3/secrets-d-histoire/4073167-les-engagements-humanitaires-de-lady-di.html",
-                    id = "50eaca2c-291f-11ed-8b9b-19c64cfd8302",
-                    coverPath = "/v1/assets/images/79/b4/30/2e4bffbb-7306-4cb8-b3fa-82302abab38d.jpg"
-                )
-                forV5(
-                    path = "/france-3/secrets-d-histoire/secrets-d-histoire-saison-16/3786031-diana-cette-illustre-inconnue.html",
-                    id = "d16b46b5-792d-4327-8991-7242ab1279aa",
-                    coverPath = "/v1/assets/images/74/bf/23/38feea9d-3c0c-4509-a2ac-f56213532377.jpg"
-                )
+                forV6("/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html")
+                forV6("/france-3/secrets-d-histoire/3007545-l-incroyable-epopee-de-richard-coeur-de-lion.html")
+                forV6("/france-3/secrets-d-histoire/saison-18/5731266-philippe-v-les-demons-du-roi-d-espagne.html")
+                forV6("/france-3/secrets-d-histoire/2772025-louis-xv-et-la-bete-du-gevaudan.html")
+                forV6("/france-3/secrets-d-histoire/saison-18/5672001-au-danemark-le-roi-la-reine-et-le-seduisant-docteur.html")
+                forV6("/france-3/secrets-d-histoire/2759591-philippe-le-bel-et-l-etrange-affaire-des-templiers.html")
+                forV6("/france-3/secrets-d-histoire/saison-18/5587902-arthur-et-les-chevaliers-de-la-table-ronde.html")
+                forV6("/france-3/secrets-d-histoire/5475558-vatel-careme-escoffier-a-la-table-des-rois.html")
+                forV6("/france-3/secrets-d-histoire/secrets-d-histoire-saison-17/5403759-napoleon-iii-le-dernier-empereur-des-francais.html")
+                forV6("/sport/les-jeux-olympiques/4211497-paris-2024-stephane-bern-livre-les-secrets-d-une-marche-historique.html")
             }
 
             /* When */
             StepVerifier.create(updater.findItems(podcast))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(7)
-                    .verifyComplete()
+                /* Then */
+                .expectSubscription()
+                .expectNextCount(10)
+                .verifyComplete()
         }
     }
 
@@ -242,14 +179,14 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/toutes-les-videos/no-item.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/no-item.html"))))
             }
             /* When */
             StepVerifier.create(updater.signatureOf(podcast.url))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext { assertThat(it).isEqualTo("") }
-                    .verifyComplete()
+                /* Then */
+                .expectSubscription()
+                .assertNext { assertThat(it).isEqualTo("") }
+                .verifyComplete()
         }
 
         @Test
@@ -257,14 +194,14 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/toutes-les-videos/all-unavailable.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/all-unavailable.html"))))
             }
             /* When */
             StepVerifier.create(updater.signatureOf(podcast.url))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext { assertThat(it).isEqualTo("") }
-                    .verifyComplete()
+                /* Then */
+                .expectSubscription()
+                .assertNext { assertThat(it).isEqualTo("") }
+                .verifyComplete()
         }
 
         @Test
@@ -272,18 +209,18 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                        .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/toutes-les-videos/all.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/all.html"))))
             }
 
             /* When */
             StepVerifier.create(updater.signatureOf(podcast.url))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext { assertThat(it).isEqualTo("0f519fa4a84d305e1f297476b36935a3") }
-                    .verifyComplete()
+                /* Then */
+                .expectSubscription()
+                .assertNext { assertThat(it).isEqualTo("e40066f26d1ddb195fd89578b158abf3") }
+                .verifyComplete()
 
-            val hash = DigestUtils.md5DigestAsHex("/france-3/secrets-d-histoire/4073119-medecin-il-a-essaye-de-sauver-lady-diana-le-soir-de-l-accident.html-/france-3/secrets-d-histoire/4073167-les-engagements-humanitaires-de-lady-di.html-/france-3/secrets-d-histoire/4116544-la-reine-elizabeth-ii-et-sa-relation-a-la-france.html-/france-3/secrets-d-histoire/secrets-d-histoire-saison-16/3786031-diana-cette-illustre-inconnue.html-/france-3/secrets-d-histoire/secrets-d-histoire-saison-16/4206502-rosa-bonheur-la-fee-des-animaux.html-/france-3/secrets-d-histoire/secrets-d-histoire-saison-16/4228084-ragnar-le-viking-qui-a-terrorise-paris.html-/sport/les-jeux-olympiques/4211497-paris-2024-stephane-bern-livre-les-secrets-d-une-marche-historique.html".toByteArray())
-            assertThat(hash).isEqualTo("0f519fa4a84d305e1f297476b36935a3")
+            val hash = DigestUtils.md5DigestAsHex("/france-3/secrets-d-histoire/2759591-philippe-le-bel-et-l-etrange-affaire-des-templiers.html-/france-3/secrets-d-histoire/2772025-louis-xv-et-la-bete-du-gevaudan.html-/france-3/secrets-d-histoire/3007545-l-incroyable-epopee-de-richard-coeur-de-lion.html-/france-3/secrets-d-histoire/5475558-vatel-careme-escoffier-a-la-table-des-rois.html-/france-3/secrets-d-histoire/saison-18/5587902-arthur-et-les-chevaliers-de-la-table-ronde.html-/france-3/secrets-d-histoire/saison-18/5672001-au-danemark-le-roi-la-reine-et-le-seduisant-docteur.html-/france-3/secrets-d-histoire/saison-18/5731266-philippe-v-les-demons-du-roi-d-espagne.html-/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html-/france-3/secrets-d-histoire/secrets-d-histoire-saison-17/5403759-napoleon-iii-le-dernier-empereur-des-francais.html-/sport/les-jeux-olympiques/4211497-paris-2024-stephane-bern-livre-les-secrets-d-une-marche-historique.html".toByteArray())
+            assertThat(hash).isEqualTo("e40066f26d1ddb195fd89578b158abf3")
         }
 
         @Test
@@ -291,20 +228,20 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v5/secrets-d-histoire/toutes-les-videos/all.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/all.html"))))
             }
 
             val dualSign = Mono.zip(updater.signatureOf(podcast.url), updater.signatureOf(podcast.url))
 
             /* When */
             StepVerifier.create(dualSign)
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext { (first, second) ->
-                        assertThat(first).isEqualTo("0f519fa4a84d305e1f297476b36935a3")
-                        assertThat(second).isEqualTo("0f519fa4a84d305e1f297476b36935a3")
-                    }
-                    .verifyComplete()
+                /* Then */
+                .expectSubscription()
+                .assertNext { (first, second) ->
+                    assertThat(first).isEqualTo("e40066f26d1ddb195fd89578b158abf3")
+                    assertThat(second).isEqualTo("e40066f26d1ddb195fd89578b158abf3")
+                }
+                .verifyComplete()
         }
     }
 

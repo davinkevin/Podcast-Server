@@ -1,8 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters.francetv
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
@@ -22,12 +20,14 @@ import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.net.URI
 import java.time.Clock
-import java.time.OffsetDateTime
+import java.time.ZonedDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.time.Duration
+import kotlin.time.DurationUnit
 
 class FranceTvUpdater(
     private val franceTvClient: WebClient,
-    private val franceTvApi: WebClient,
     private val image: ImageService,
     private val mapper: ObjectMapper,
     private val clock: Clock
@@ -62,46 +62,34 @@ class FranceTvUpdater(
             .retrieve()
             .bodyToMono<String>()
             .map { Jsoup.parse(it, "https://www.france.tv/") }
-            .flatMap { document ->
-                val description = document.select("meta[property=og:description]").attr("content")
+            .map { document ->
+                val jsonldTag = document.select("script[type=application/ld+json]").firstOrNull()
+                    ?: error("""No <script type="application/ld+json"></script> found""")
 
-                val pageItems = document.select("script")
-                    .map { it.html() }
-                    .firstOrNull { "FTVPlayerVideos" in it }
-                    ?.substringAfterLast("FTVPlayerVideos = ")
-                    ?.trim(';')
-                    ?.let { mapper.readValue<Set<FranceTvPageItem>>(it) } ?: emptySet()
+                val jsonLd = mapper.readTree(jsonldTag.html())
+                val videoObject = jsonLd.firstOrNull { it.get("@type").asText() == "VideoObject" }
+                    ?: error("""No element of type VideoObject""")
 
-                pageItems
-                    .firstOrNull { it.contentId in pathUrl }
-                    ?.copy(description = description)
-                    ?.toMono() ?: Mono.empty()
-            }
-            .flatMap { pageItem ->
-                franceTvApi.get()
-                    .uri { it.path("v1/videos/${pageItem.videoId}")
-                        .queryParam("country_code", "FR")
-                        .queryParam("device_type", "desktop")
-                        .queryParam("browser", "chrome")
-                        .build()
-                    }
-                    .retrieve()
-                    .bodyToMono<FranceTvItemV2>()
-                    .map { it.copy(externalDescription = pageItem.description) }
-            }
-            .flatMap {
-                it.toMono().zipWith(image.fetchCoverInformationOrOption(it.coverUri()))
-            }
-            .map { (franceTvItem, cover) ->
-                ItemFromUpdate(
-                    title = franceTvItem.title(),
-                    description = franceTvItem.description(),
-                    pubDate = franceTvItem.pubDate(clock).toZonedDateTime(),
+                val pubDate = videoObject.get("uploadDate").asText()?.let { ZonedDateTime.parse(it, DateTimeFormatter.ISO_DATE_TIME) }
+                    ?: ZonedDateTime.now(clock)
+
+                val item = ItemFromUpdate(
+                    title = videoObject.get("name").asText().replaceFirst("Secrets d'Histoire ", ""),
+                    description = videoObject.get("description").asText(),
+                    length = Duration.parse(videoObject.get("duration").asText()).toLong(DurationUnit.SECONDS),
+                    pubDate = pubDate,
                     url = URI("https://www.france.tv$pathUrl"),
-                    cover = cover.orNull(),
+                    cover = null,
                     mimeType = "video/mp4"
                 )
+
+                val cover = videoObject.get("thumbnailUrl").firstOrNull()?.asText()
+                    ?.let(URI::create)
+
+                item to cover
             }
+            .flatMap { (item, cover) -> item.toMono().zipWith(image.fetchCoverInformationOrOption(cover)) }
+            .map { (item, cover) -> item.copy(cover = cover.orNull()) }
             .onErrorResume {
                 val message = "Error during fetch of $pathUrl"
                 log.error(message)
@@ -139,13 +127,9 @@ class FranceTvUpdater(
     private fun replayUrl(url: URI): String {
         return "${url.toASCIIString()}/toutes-les-videos/"
             .substringAfter("https://www.france.tv/")
-
     }
+
 }
-
-
-@JsonIgnoreProperties(ignoreUnknown = true)
-private data class FranceTvPageItem(val contentId: String, val videoId: String, val description: String = "")
 
 private fun ImageService.fetchCoverInformationOrOption(url: URI?): Mono<Optional<ItemFromUpdate.Cover>> {
     return Mono.justOrEmpty(url)
@@ -154,23 +138,3 @@ private fun ImageService.fetchCoverInformationOrOption(url: URI?): Mono<Optional
         .map { Optional.of(it) }
         .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
 }
-
-private data class FranceTvItemV2 (val meta: Meta? = null, val externalDescription: String?) {
-
-    fun title(): String {
-        if (meta?.additional_title != null) {
-            return """${meta.title!!} - ${meta.additional_title}"""
-        }
-        return meta?.title!!
-    }
-    fun description(): String = externalDescription ?: meta?.additional_title ?: ""
-    fun pubDate(clock: Clock): OffsetDateTime = meta?.broadcasted_at?.let(OffsetDateTime::parse) ?: OffsetDateTime.now(clock)
-    fun coverUri(): URI = meta?.image_url!!
-}
-
-data class Meta (
-    val title: String? = null,
-    val additional_title: String? = null,
-    val broadcasted_at: String? = null,
-    val image_url: URI? = null
-)

@@ -24,9 +24,8 @@ class FranceTvUpdaterConfig {
             clock: Clock
     ): FranceTvUpdater {
         val franceTvClient = wcb.clone().baseUrl("https://www.france.tv/").build()
-        val franceTvApi = wcb.clone().baseUrl("https://player.webservices.francetelevisions.fr").build()
 
-        return FranceTvUpdater(franceTvClient, franceTvApi, image, mapper, clock)
+        return FranceTvUpdater(franceTvClient, image, mapper, clock)
     }
 
 }

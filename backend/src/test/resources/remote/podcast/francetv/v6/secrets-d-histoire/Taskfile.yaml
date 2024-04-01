@@ -1,0 +1,32 @@
+version: 3
+
+env:
+  PAGE: "https://www.france.tv/france-3/secrets-d-histoire/"
+
+tasks:
+
+  generate:
+    desc: "Generate file structure"
+    silent: true
+    cmds:
+      - cmd: |-
+          function formatHtml() {
+            cat $1 | tidy -i -m -w 400 -ashtml -utf8 - | sponge $1 
+          }
+          
+          curl -qs $PAGE -o secrets-d-histoire.html
+          formatHtml secrets-d-histoire.html
+          
+          curl -qsL --create-dirs --output-dir toutes-les-videos -o all.html ${PAGE}toutes-les-videos/
+          formatHtml toutes-les-videos/all.html
+          
+          # cp toutes-les-videos/all.html toutes-les-videos/all-unavailable.html
+          # cp toutes-les-videos/all.html toutes-les-videos/no-item.html
+          # cp toutes-les-videos/all.html toutes-les-videos/one-item.html
+          
+          cat toutes-les-videos/all.html | rg "href=\".*/[0-9]+.*.html\"" | sd '.*href="([^"]*)".*' 'curl -qsLO --create-dirs --output-dir videos https://www.france.tv/$1' | bash
+          for f in $(fd . videos/)
+          do
+            formatHtml $f
+          done
+          cat toutes-les-videos/all.html | rg "href=\".*/[0-9]+.*.html\"" | sd '.*href="([^"]*)".*' '$1'
