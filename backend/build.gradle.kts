@@ -102,14 +102,16 @@ tasks.test {
 	val isCI = env["CI"].toBoolean()
 	val isEnabledOnFeatureBranch = isCI && env["CI_COMMIT_REF_NAME"] != env["CI_DEFAULT_BRANCH"]
 
-	retry {
-		if (isCI) {
-			maxRetries.set(3)
-			failOnPassedAfterRetry.set(true)
+	develocity {
+		testRetry {
+			if (isCI) {
+				maxRetries = 3
+				failOnPassedAfterRetry = true
+			}
 		}
-	}
-	predictiveSelection {
-		enabled.set(isEnabledByEnv || isEnabledOnFeatureBranch)
+		predictiveTestSelection {
+			enabled = isEnabledByEnv || isEnabledOnFeatureBranch
+		}
 	}
 
 	systemProperty("user.timezone", "UTC")
