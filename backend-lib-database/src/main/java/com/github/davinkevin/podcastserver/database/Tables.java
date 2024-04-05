@@ -18,7 +18,7 @@ import com.github.davinkevin.podcastserver.database.tables.WatchListItems;
 /**
  * Convenience access to all tables in public.
  */
-@SuppressWarnings({ "all", "unchecked", "rawtypes" })
+@SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
 
     /**
