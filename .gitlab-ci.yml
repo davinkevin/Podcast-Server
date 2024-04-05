@@ -124,7 +124,7 @@ stages:
 ⬇ backend:
   stage: ⬇ download
   extends: [ .only-on-backend-changes ]
-  image: gradle:jdk17
+  image: gradle:jdk21
   script:
     - ./gradlew $GRADLE_OPTS :backend:downloadDependencies :backend-lib-youtubedl:downloadDependencies :backend-lib-database:downloadDependencies
   cache:
@@ -139,7 +139,7 @@ stages:
 ⬇ ui-v1:
   stage: ⬇ download
   extends: [ .only-on-frontend-changes ]
-  image: gradle:jdk17
+  image: gradle:jdk21
   before_script:
     - apt update && apt install bzip2
   script:
@@ -160,7 +160,7 @@ stages:
 ⬇ ui-v2:
   stage: ⬇ download
   extends: [ .only-on-frontend-changes ]
-  image: gradle:jdk17
+  image: gradle:jdk21
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angular:downloadDependencies
   cache:
@@ -177,7 +177,7 @@ stages:
 🧪 backend:
   stage: 🧪 test
   extends: [ .only-on-backend-changes ]
-  image: gradle:jdk17
+  image: gradle:jdk21
   needs: [⬇ backend]
   services:
     - postgres:16.2-alpine
@@ -207,7 +207,7 @@ stages:
 🧪 database:
   stage: 🧪 test
   extends: [ .only-on-backend-changes ]
-  image: gradle:jdk17
+  image: gradle:jdk21
   needs: [⬇ backend]
   services:
     - postgres:16.2-alpine
@@ -231,7 +231,7 @@ stages:
 🧪 ui-v2:
   stage: 🧪 test
   extends: [ .only-on-frontend-changes ]
-  image: gradle:jdk17
+  image: gradle:jdk21
   needs: [⬇ ui-v2]
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angular:yarn_test
@@ -263,7 +263,7 @@ stages:
 👷 ui-v1:
   stage: 👷‍ build
   extends: [ .only-on-frontend-changes ]
-  image: gradle:jdk17
+  image: gradle:jdk21
   needs: [⬇ ui-v1]
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angularjs:build
@@ -287,7 +287,7 @@ stages:
 👷 ui-v2:
   stage: 👷‍ build
   extends: [ .only-on-frontend-changes ]
-  image: gradle:jdk17
+  image: gradle:jdk21
   needs: [⬇ ui-v2]
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angular:build
@@ -320,7 +320,7 @@ stages:
 🐳 backend:
   stage: 🐳 packaging
   extends: [ .only-on-backend-changes ]
-  image: gradle:jdk17
+  image: gradle:jdk21
   needs: [👷 backend-base-image]
   services:
     - postgres:16.2-alpine
