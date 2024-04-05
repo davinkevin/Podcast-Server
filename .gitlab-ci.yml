@@ -126,7 +126,7 @@ stages:
   extends: [ .only-on-backend-changes ]
   image: gradle:jdk17
   script:
-    - ./gradlew $GRADLE_OPTS :backend:downloadDependencies :backend-lib-youtubedl:downloadDependencies
+    - ./gradlew $GRADLE_OPTS :backend:downloadDependencies :backend-lib-youtubedl:downloadDependencies :backend-lib-database:downloadDependencies
   cache:
     key:
       files:

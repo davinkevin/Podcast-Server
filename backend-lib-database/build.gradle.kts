@@ -4,6 +4,7 @@ import org.jooq.meta.jaxb.LambdaConverter
 import org.jooq.meta.jaxb.Logging.INFO
 import nu.studer.gradle.jooq.*
 import com.gitlab.davinkevin.podcastserver.database.*
+import org.gradle.internal.deprecation.DeprecatableConfiguration
 
 buildscript {
     dependencies {
@@ -105,3 +106,22 @@ tasks.named<JooqGenerate>("generateJooq") {
 	dependsOn("flywayMigrate")
 }
 
+tasks.register("downloadDependencies") {
+    fun Configuration.isDeprecated(): Boolean = when (this) {
+        is DeprecatableConfiguration -> resolutionAlternatives.isNotEmpty()
+        else -> false
+    }
+    doLast {
+        val buildDeps = buildscript
+            .configurations
+            .onEach { it.incoming.artifactView { lenient(true) }.artifacts }
+            .sumOf { it.resolve().size }
+
+        val allDeps = configurations
+            .filter { it.isCanBeResolved && !it.isDeprecated() }
+            .onEach { it.incoming.artifactView { lenient(true) }.artifacts }
+            .sumOf { it.resolve().size }
+
+        println("Downloaded all dependencies: ${allDeps + buildDeps}")
+    }
+}
