@@ -15,13 +15,21 @@ server:
  port: 8080
 
 management:
-  endpoint:
+ endpoints:
+  web:
+   exposure:
+    include: ['health', 'info', 'env', 'configprops', 'prometheus', 'metrics']
+ endpoint:
     health:
      show-details: always
      group:
-      liveness.include:  ["r2dbc", "ping", "livenessState"]
-      readiness.include: ["ping", "readinessState"]
-  endpoints.web.exposure.include: ['health', 'info', 'env', 'configprops', 'prometheus', 'metrics']
+      liveness:
+       include:  ["r2dbc", "ping", "livenessState"]
+      readiness:
+       include: ["ping", "readinessState"]
+ metrics:
+  tags:
+   application: podcast-server
 
 ##############################
 #    Application Specific    #
