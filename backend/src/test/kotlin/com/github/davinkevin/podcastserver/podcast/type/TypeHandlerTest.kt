@@ -3,14 +3,12 @@ package com.github.davinkevin.podcastserver.podcast.type
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.update.updaters.Type
-import org.mockito.kotlin.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -18,9 +16,8 @@ import org.springframework.test.web.reactive.server.WebTestClient
 /**
  * Created by kevin on 2019-03-03
  */
-@WebFluxTest(controllers = [TypeHandler::class])
+@WebMvcTest(controllers = [TypeHandler::class])
 @Import(TypeRoutingConfig::class)
-@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
 class TypeHandlerTest(
     @Autowired val rest: WebTestClient
 ) {
