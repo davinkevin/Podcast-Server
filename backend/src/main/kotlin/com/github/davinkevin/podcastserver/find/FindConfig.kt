@@ -10,7 +10,7 @@ import com.github.davinkevin.podcastserver.find.finders.youtube.YoutubeFinderCon
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.web.reactive.function.server.router
+import org.springframework.web.servlet.function.router
 
 /**
  * Created by kevin on 2019-08-11

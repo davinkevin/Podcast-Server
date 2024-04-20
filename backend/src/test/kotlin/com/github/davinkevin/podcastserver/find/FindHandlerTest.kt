@@ -1,23 +1,19 @@
 package com.github.davinkevin.podcastserver.find
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
-import com.github.davinkevin.podcastserver.service.image.CoverInformation
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
-import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
-import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
-@WebFluxTest(controllers = [FindHandler::class])
+@WebMvcTest(controllers = [FindHandler::class])
 @Import(FindRoutingConfig::class)
 class FindHandlerTest(
     @Autowired val rest: WebTestClient
