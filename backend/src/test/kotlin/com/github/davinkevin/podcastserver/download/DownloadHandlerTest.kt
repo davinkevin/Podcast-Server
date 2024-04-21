@@ -12,8 +12,8 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -22,9 +22,9 @@ import reactor.core.publisher.Mono
 import java.net.URI
 import java.util.*
 
-@WebFluxTest(controllers = [DownloadHandler::class])
+@WebMvcTest(controllers = [DownloadHandler::class])
 @Import(DownloadRouterConfig::class)
-@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
+@ImportAutoConfiguration(ErrorMvcAutoConfiguration::class)
 class DownloadHandlerTest(
         @Autowired val rest: WebTestClient
 ) {
@@ -397,6 +397,7 @@ class DownloadHandlerTest(
     @Nested
     @DisplayName("should move in queue")
     inner class ShouldMoveInQueue {
+
         @Test
         fun `with success`() {
             /* Given */
