@@ -8,7 +8,9 @@ import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -18,9 +20,9 @@ import java.util.*
 /**
  * Created by kevin on 14/07/2020
  */
-@WebFluxTest(controllers = [UpdateHandler::class])
+@WebMvcTest(controllers = [UpdateHandler::class])
 @Import(UpdateRouterConfig::class)
-@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
+@ImportAutoConfiguration(ErrorMvcAutoConfiguration::class)
 class UpdateHandlerTest(
         @Autowired val rest: WebTestClient
 ) {

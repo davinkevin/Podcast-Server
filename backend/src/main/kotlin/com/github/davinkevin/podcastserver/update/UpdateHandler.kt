@@ -1,29 +1,29 @@
 package com.github.davinkevin.podcastserver.update
 
-import org.springframework.web.reactive.function.server.ServerRequest
-import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.ServerResponse.ok
-import reactor.core.publisher.Mono
+import org.springframework.web.servlet.function.ServerRequest
+import org.springframework.web.servlet.function.ServerResponse
+import org.springframework.web.servlet.function.paramOrNull
 import java.util.*
 
 class UpdateHandler(
         private val update: UpdateService
 ) {
 
-    fun updateAll(r: ServerRequest): Mono<ServerResponse> {
-        val force = r.queryParam("force").map { it!!.toBoolean() }.orElse(false)
-        val withDownload = r.queryParam("download").map { it!!.toBoolean() }.orElse(false)
+    fun updateAll(r: ServerRequest): ServerResponse {
+        val force = r.paramOrNull("force")?.toBoolean() ?: false
+        val withDownload = r.paramOrNull("download")?.toBoolean() ?: false
 
-        return update
-                .updateAll(force, withDownload)
-                .then(ok().build())
+        update.updateAll(force, withDownload).block()
+
+        return ServerResponse.ok().build()
     }
 
-    fun update(r: ServerRequest): Mono<ServerResponse> {
-        val id = UUID.fromString(r.pathVariable("podcastId"))
+    fun update(r: ServerRequest): ServerResponse {
+        val id = r.pathVariable("podcastId")
+            .let(UUID::fromString)
 
-        return update
-                .update(id)
-                .then(ok().build())
+        update.update(id).block()
+
+        return ServerResponse.ok().build()
     }
 }
