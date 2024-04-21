@@ -502,7 +502,6 @@ class FileStorageServiceTest(
         @Test
         fun `with item in it`() {
             /* Given */
-            Hooks.onOperatorDebug()
             s3Backend.apply {
                 stubFor(get("/data?prefix=origin").willReturn(okXml("""
                     <?xml version="1.0" encoding="UTF-8"?>

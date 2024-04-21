@@ -1,7 +1,6 @@
 ##############################
 #       Spring Config        #
 ##############################
-
 spring:
  main:
   banner-mode: off
@@ -35,3 +34,9 @@ management:
 
 podcastserver:
  max-update-parallels: 256
+
+logging:
+ level:
+  org:
+   apache:
+    catalina: off
