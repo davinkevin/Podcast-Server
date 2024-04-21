@@ -1,9 +1,8 @@
 package com.github.davinkevin.podcastserver.cover
 
-import org.springframework.web.reactive.function.server.ServerRequest
-import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.ServerResponse.ok
-import reactor.core.publisher.Mono
+import org.springframework.web.servlet.function.ServerRequest
+import org.springframework.web.servlet.function.ServerResponse
+import org.springframework.web.servlet.function.paramOrNull
 import java.time.Clock
 import java.time.OffsetDateTime
 
@@ -12,17 +11,15 @@ class CoverHandler(
         private val clock: Clock
 ) {
 
-    fun deleteOldCovers(r: ServerRequest): Mono<ServerResponse> {
-        val retentionNumberOfDays = r.queryParam("days")
-                .map { it.toLong() }
-                .orElse(365L)
+    fun deleteOldCovers(r: ServerRequest): ServerResponse {
+        val retentionNumberOfDays = r.paramOrNull("days")?.toLong() ?: 365L
 
         val date = OffsetDateTime.now(clock)
                 .minusDays(retentionNumberOfDays)
 
-        return cover
-                .deleteCoversInFileSystemOlderThan(date)
-                .then(ok().build())
+        cover.deleteCoversInFileSystemOlderThan(date).block()
+
+        return ServerResponse.ok().build()
     }
 
 }
