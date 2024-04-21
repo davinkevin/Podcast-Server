@@ -3,7 +3,7 @@ package com.github.davinkevin.podcastserver.messaging
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.web.reactive.function.server.router
+import org.springframework.web.servlet.function.router
 
 
 /**

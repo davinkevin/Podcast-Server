@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.messaging
 
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Sinks
 
 /**
@@ -12,6 +13,8 @@ class MessagingTemplate {
     fun sendWaitingQueue(value: List<DownloadingItem>) = messages.tryEmitNext(WaitingQueueMessage(value))
     fun sendItem(value: DownloadingItem) = messages.tryEmitNext(DownloadingItemMessage(value))
     fun isUpdating(value: Boolean) = messages.tryEmitNext(UpdateMessage(value))
+
+    fun messagesAsFlux(): Flux<Message<out Any>> = messages.asFlux()
 }
 
 sealed class Message<T>(val topic: String, val value: T)
