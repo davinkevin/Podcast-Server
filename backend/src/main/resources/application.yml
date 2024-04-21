@@ -9,7 +9,7 @@ spring:
   max-in-memory-size: 500MB
  threads:
   virtual:
-   enabled: false
+   enabled: true
 
 server:
  port: 8080
