@@ -58,7 +58,7 @@ public class Cover extends TableImpl<CoverRecord> {
     /**
      * The column <code>public.cover.url</code>.
      */
-    public final TableField<CoverRecord, String> URL = createField(DSL.name("url"), SQLDataType.VARCHAR(255).nullable(false).defaultValue(DSL.field(DSL.raw("'https://via.placeholder.com/200x200'::character varying"), SQLDataType.VARCHAR)), this, "");
+    public final TableField<CoverRecord, String> URL = createField(DSL.name("url"), SQLDataType.VARCHAR(65535).nullable(false).defaultValue(DSL.field(DSL.raw("'https://via.placeholder.com/200x200'::character varying"), SQLDataType.VARCHAR)), this, "");
 
     /**
      * The column <code>public.cover.width</code>.

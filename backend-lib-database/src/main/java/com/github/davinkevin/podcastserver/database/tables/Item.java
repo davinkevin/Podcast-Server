@@ -78,7 +78,7 @@ public class Item extends TableImpl<ItemRecord> {
     /**
      * The column <code>public.item.file_name</code>.
      */
-    public final TableField<ItemRecord, Path> FILE_NAME = createField(DSL.name("file_name"), SQLDataType.VARCHAR(255), this, "", Converter.ofNullable(String.class, Path.class, Path::of, Path::toString));
+    public final TableField<ItemRecord, Path> FILE_NAME = createField(DSL.name("file_name"), SQLDataType.VARCHAR(65535), this, "", Converter.ofNullable(String.class, Path.class, Path::of, Path::toString));
 
     /**
      * The column <code>public.item.length</code>.
@@ -103,7 +103,7 @@ public class Item extends TableImpl<ItemRecord> {
     /**
      * The column <code>public.item.title</code>.
      */
-    public final TableField<ItemRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.VARCHAR(254).nullable(false), this, "");
+    public final TableField<ItemRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.VARCHAR(65535).nullable(false), this, "");
 
     /**
      * The column <code>public.item.url</code>.

@@ -76,7 +76,7 @@ public class Podcast extends TableImpl<PodcastRecord> {
     /**
      * The column <code>public.podcast.title</code>.
      */
-    public final TableField<PodcastRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.VARCHAR(255), this, "");
+    public final TableField<PodcastRecord, String> TITLE = createField(DSL.name("title"), SQLDataType.VARCHAR(65535), this, "");
 
     /**
      * The column <code>public.podcast.type</code>.
