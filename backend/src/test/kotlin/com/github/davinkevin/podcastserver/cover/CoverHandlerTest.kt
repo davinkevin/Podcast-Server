@@ -1,15 +1,15 @@
 package com.github.davinkevin.podcastserver.cover
 
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.times
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
@@ -23,9 +23,9 @@ import java.time.ZoneOffset
 
 private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
-@WebFluxTest(controllers = [CoverHandler::class])
+@WebMvcTest(controllers = [CoverHandler::class])
 @Import(CoverRoutingConfig::class)
-@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
+@ImportAutoConfiguration(ErrorMvcAutoConfiguration::class)
 class CoverHandlerTest(
     @Autowired val rest: WebTestClient
 ) {

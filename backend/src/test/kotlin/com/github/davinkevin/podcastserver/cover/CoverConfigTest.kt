@@ -8,7 +8,7 @@ import org.mockito.kotlin.mock
 import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.context.annotation.Bean
-import org.springframework.web.reactive.function.server.RouterFunction
+import org.springframework.web.servlet.function.RouterFunction
 import java.time.Clock
 
 /**
