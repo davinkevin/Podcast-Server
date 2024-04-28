@@ -1,4 +1,4 @@
-FROM joseluisq/static-web-server:2.28.0
+FROM joseluisq/static-web-server:2.30.0
 
 COPY podcast-server /podcast-server
 COPY config.toml /
