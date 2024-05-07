@@ -35,27 +35,28 @@ fun ReactiveServerRequest.extractHost(): URI {
     return URI.create("$proto://$host$portAsString/")
 }
 
-fun ReactiveServerRequest.normalizedURI(): URI {
+fun ServerRequest.normalizedURI(): URI {
     return UriComponentsBuilder.fromUri(extractHost())
         .path(path())
-        .queryParams(queryParams())
+        .queryParams(params())
         .build(true)
         .toUri()
 }
 
 fun ServerRequest.extractHost(): URI {
-    val headers = this.headers()
+    val headers = headers()
     val uri = uri()
 
-    val host = headers.header("Host").firstOrNull()
-        ?: headers.header("X-Forwarded-Host").firstOrNull()
+    val host = headers.firstHeader("Host")
+        ?: headers.firstHeader("X-Forwarded-Host")
         ?: uri.host
 
-    val proto = headers.header("X-Forwarded-Proto").firstOrNull()
+    val proto = headers.firstHeader("X-Forwarded-Proto")
         ?: uri.scheme
 
-    val port = headers.header("X-Forwarded-Port").firstOrNull()?.toIntOrNull()
-        ?: (if (uri.port != -1) uri.port else null)
+    val port = headers.firstHeader("X-Forwarded-Port")
+        ?.toInt()
+        ?: uri.port.takeIf { it != -1 }
         ?: if (proto == "https") 443 else 80
 
     val portAsString = if(port in EMPTY_PORTS) "" else ":$port"

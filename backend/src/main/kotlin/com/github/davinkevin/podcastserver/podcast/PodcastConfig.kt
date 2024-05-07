@@ -4,14 +4,14 @@ import com.github.davinkevin.podcastserver.podcast.type.TypeConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.web.reactive.function.server.router
+import org.springframework.web.servlet.function.router
 
 /**
  * Created by kevin on 2019-02-15
  */
 @Configuration
 @Import(PodcastHandler::class, PodcastXmlHandler::class)
-class PodcastRoutingConfig {
+class  PodcastRoutingConfig {
 
     @Bean
     fun podcastRouter(podcast: PodcastHandler, xml: PodcastXmlHandler) = router {
@@ -26,15 +26,12 @@ class PodcastRoutingConfig {
             "{id}".nest {
                 GET("cover.{ext}", podcast::cover)
                 GET("rss", xml::rss)
-
                 DELETE("", podcast::delete)
-
                 "stats".nest {
                     GET("byPubDate", podcast::findStatByPodcastIdAndPubDate)
                     GET("byDownloadDate", podcast::findStatByPodcastIdAndDownloadDate)
                     GET("byCreationDate", podcast::findStatByPodcastIdAndCreationDate)
                 }
-
             }
 
             "stats".nest {
@@ -42,9 +39,9 @@ class PodcastRoutingConfig {
                 GET("byPubDate", podcast::findStatByTypeAndPubDate)
                 GET("byDownloadDate", podcast::findStatByTypeAndDownloadDate)
             }
-
         }
     }
+
 }
 
 @Configuration

@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.item.*
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
@@ -19,6 +20,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -30,9 +32,8 @@ import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 
-@WebFluxTest(controllers = [PodcastXmlHandler::class])
-@Import(PodcastRoutingConfig::class, PodcastHandler::class)
-@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
+@WebMvcTest(controllers = [PodcastXmlHandler::class])
+@Import(PodcastRoutingConfig::class, PodcastHandler::class, MockMvcRestExceptionConfiguration::class)
 class PodcastXmlHandlerTest(
     @Autowired val rest: WebTestClient
 ) {
@@ -498,7 +499,6 @@ class PodcastXmlHandlerTest(
             }
         }
 
-
         @Test
         fun `for podcast with amy parameters`() {
             /* Given */
@@ -522,6 +522,83 @@ class PodcastXmlHandlerTest(
                 .expectBody()
                 .xml(xml.trimIndent())
         }
+
+        @Test
+        fun `for podcast with port provided by X-Forwarded-Port`() {
+            /* Given */
+            val podcastId = podcastForItem.id
+            val page = ItemPageRequest(0, 50, ItemSort("DESC", "pubDate"))
+            val result = PageItem.of(emptyList(), 0, page)
+
+            whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
+                .thenReturn(result.toMono())
+            whenever(podcastService.findById(podcastId))
+                .thenReturn(podcast.toMono())
+
+            val xml = fileAsString("/xml/podcast-with-x-forwarded-port.xml")
+
+            /* When */
+            rest
+                .get()
+                .uri("https://localhost:8080/api/v1/podcasts/$podcastId/rss")
+                .header("X-Forwarded-Port", "1234")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .xml(xml.trimIndent())
+        }
+
+        @Test
+        fun `for podcast with port not defined and http`() {
+            /* Given */
+            val podcastId = podcastForItem.id
+            val page = ItemPageRequest(0, 50, ItemSort("DESC", "pubDate"))
+            val result = PageItem.of(emptyList(), 0, page)
+
+            whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
+                .thenReturn(result.toMono())
+            whenever(podcastService.findById(podcastId))
+                .thenReturn(podcast.toMono())
+
+            val xml = fileAsString("/xml/podcast-with-port-not-defined-and-http.xml")
+
+            /* When */
+            rest
+                .get()
+                .uri("http://localhost/api/v1/podcasts/$podcastId/rss")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .xml(xml.trimIndent())
+        }
+
+        @Test
+        fun `for podcast with port not defined and https`() {
+            /* Given */
+            val podcastId = podcastForItem.id
+            val page = ItemPageRequest(0, 50, ItemSort("DESC", "pubDate"))
+            val result = PageItem.of(emptyList(), 0, page)
+
+            whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
+                .thenReturn(result.toMono())
+            whenever(podcastService.findById(podcastId))
+                .thenReturn(podcast.toMono())
+
+            val xml = fileAsString("/xml/podcast-with-port-not-defined-and-https.xml")
+
+            /* When */
+            rest
+                .get()
+                .uri("https://localhost:443/api/v1/podcasts/$podcastId/rss")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .xml(xml.trimIndent())
+        }
+
     }
 }
 

@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
+import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
 import com.github.davinkevin.podcastserver.item.ItemService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -34,9 +36,8 @@ import kotlin.io.path.Path
 /**
  * Created by kevin on 2019-02-16
  */
-@WebFluxTest(controllers = [PodcastHandler::class])
-@Import(PodcastRoutingConfig::class, PodcastXmlHandler::class)
-@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
+@WebMvcTest(controllers = [PodcastHandler::class])
+@Import(PodcastRoutingConfig::class, PodcastXmlHandler::class, MockMvcRestExceptionConfiguration::class)
 class PodcastHandlerTest(
         @Autowired val rest: WebTestClient
 ) {
@@ -104,7 +105,7 @@ class PodcastHandlerTest(
     @DisplayName("should find all")
     inner class ShouldFindAll {
 
-        val podcast1 = Podcast(
+        private val podcast1 = Podcast(
                 id = UUID.fromString("ad16b2eb-657e-4064-b470-5b99397ce729"),
                 title = "Podcast first",
                 description = "desc",
@@ -121,7 +122,7 @@ class PodcastHandlerTest(
                         height = 200, width = 200
                 )
         )
-        val podcast2 = Podcast(
+        private val podcast2 = Podcast(
                 id = UUID.fromString("bd16b2eb-657e-4064-b470-5b99397ce729"),
                 title = "Podcast second",
                 description = "desc",
@@ -134,11 +135,11 @@ class PodcastHandlerTest(
 
                 cover = Cover(
                         id = UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea"),
-                        url = URI("https://external.domain.tld/2.png"),
+                        url = URI("https://external.domain.tld/2"),
                         height = 200, width = 200
                 )
         )
-        val podcast3 = Podcast(
+        private val podcast3 = Podcast(
                 id = UUID.fromString("cd16b2eb-657e-4064-b470-5b99397ce729"),
                 title = "Podcast third",
                 description = "desc",
@@ -183,7 +184,7 @@ class PodcastHandlerTest(
                                   "url": "https://foo.bar.com/app/1.rss"
                                 },
                                 {
-                                  "cover": { "height": 200, "id": "1e275238-4cbe-4abb-bbca-95a0e4ebbeea", "url": "/api/v1/podcasts/bd16b2eb-657e-4064-b470-5b99397ce729/cover.png", "width": 200 },
+                                  "cover": { "height": 200, "id": "1e275238-4cbe-4abb-bbca-95a0e4ebbeea", "url": "/api/v1/podcasts/bd16b2eb-657e-4064-b470-5b99397ce729/cover.jpg", "width": 200 },
                                   "hasToBeDeleted": true,
                                   "id": "bd16b2eb-657e-4064-b470-5b99397ce729",
                                   "lastUpdate": "2019-03-31T11:21:32.000000045+01:00",
@@ -222,8 +223,6 @@ class PodcastHandlerTest(
                     .expectBody()
                     .assertThatJson { isEqualTo("""{ "content": [] } """) }
         }
-
-
     }
 
     @Nested
@@ -360,6 +359,57 @@ class PodcastHandlerTest(
                     }
         }
 
+        @Test
+        fun `with no tags`() {
+            /* Given */
+            val uploadPodcast = Podcast(
+                id = UUID.fromString("dbb18cac-58bb-4d89-b9ec-afc9da00afc5"),
+                title = "foo",
+                description = "desc",
+                signature = "",
+                url = null,
+                hasToBeDeleted = true,
+                lastUpdate = OffsetDateTime.of(2019, 4, 9, 11, 12, 13, 0, ZoneOffset.ofHours(2)),
+                type = "upload",
+                tags = listOf(),
+                cover = Cover(UUID.fromString("d6d4033a-d499-4c09-8d3e-d74595ae0993"), URI("http://foo.bar.com/cover.png"), 1200, 600)
+            )
+            whenever(podcastService.save(any())).thenReturn(uploadPodcast.toMono())
+
+            /* When */
+            rest
+                .post()
+                .uri("/api/v1/podcasts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .bodyValue(""" {
+                        "title": "foo",
+                        "type": "upload",
+                        "cover": {
+                            "width": 1400, "height": 1200, "url": "http://foo.bar.com/cover.png"
+                        }
+                    }""")
+                /* Then */
+                .exchange()
+                .expectStatus().isOk
+                .expectBody()
+                .assertThatJson {
+                    isEqualTo(""" {
+                              "cover": {
+                                "height": 1200,
+                                "id": "d6d4033a-d499-4c09-8d3e-d74595ae0993",
+                                "url": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
+                                "width": 600
+                              },
+                              "hasToBeDeleted": true,
+                              "id": "dbb18cac-58bb-4d89-b9ec-afc9da00afc5",
+                              "lastUpdate": "2019-04-09T11:12:13+02:00",
+                              "tags": [],
+                              "title": "foo",
+                              "url": null,
+                              "type": "upload"
+                            } """)
+                }
+        }
 
 
     }
@@ -509,6 +559,49 @@ class PodcastHandlerTest(
 
         }
 
+        @Test
+        fun `a podcast without tags`() {
+            /* Given */
+            val podcastWithoutTags = p.copy(tags = emptyList())
+            whenever(podcastService.update(any())).thenReturn(podcastWithoutTags.toMono())
+            /* When */
+            rest
+                    .put()
+                    .uri("/api/v1/podcasts/${p.id}")
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .bodyValue(""" {
+                        "id": "dbb18cac-58bb-4d89-b9ec-afc9da00afc5",
+                        "title": "foo",
+                        "url": null,
+                        "hasToBeDeleted": true,
+                        "cover": {
+                            "width": 1400, "height": 1200, "url": "http://foo.bar.com/cover.png"
+                        }
+                    }""")
+                    /* Then */
+                    .exchange()
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo(""" {
+                              "cover": {
+                                "height": 1200,
+                                "id": "d6d4033a-d499-4c09-8d3e-d74595ae0993",
+                                "url": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
+                                "width": 600
+                              },
+                              "hasToBeDeleted": true,
+                              "id": "dbb18cac-58bb-4d89-b9ec-afc9da00afc5",
+                              "lastUpdate": "2019-04-09T11:12:13+02:00",
+                              "tags": [],
+                              "title": "foo",
+                              "type": "RSS",
+                              "url": "http://foo.bar.com/val.rss"
+                            } """)
+                    }
+
+        }
+
 
     }
 
@@ -589,6 +682,44 @@ class PodcastHandlerTest(
             inner class ByCreationDate {
 
                 @Test
+                fun `with default number of month`() {
+                    /* Given */
+                    val youtube = StatsPodcastType("YOUTUBE", setOf(
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-02"), 3),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6))
+                    )
+                    val rss = StatsPodcastType("YOUTUBE", setOf(
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-02-02"), 5),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-02-12"), 8),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-02-28"), 1))
+                    )
+                    whenever(podcastService.findStatByTypeAndCreationDate(1)).thenReturn(Flux.just(youtube, rss))
+                    /* When */
+                    rest.get()
+                            .uri { it.path("/api/v1/podcasts/stats/byCreationDate").build() }
+                            .exchange()
+                            /* Then */
+                            .expectStatus().isOk
+                            .expectBody()
+                            .assertThatJson { isEqualTo("""{
+                                       "content":[ {
+                                             "type":"YOUTUBE", "values":[
+                                                { "date":"2019-01-02", "numberOfItems":3 },
+                                                { "date":"2019-01-12", "numberOfItems":2 },
+                                                { "date":"2019-01-28", "numberOfItems":6 }
+                                             ]
+                                          }, {
+                                             "type":"YOUTUBE", "values":[
+                                                { "date":"2019-02-02", "numberOfItems":5 },
+                                                { "date":"2019-02-12", "numberOfItems":8 },
+                                                { "date":"2019-02-28", "numberOfItems":1 }
+                                             ]
+                                          } ]
+                                    }""") }
+                }
+
+                @Test
                 fun `with some data`() {
                     /* Given */
                     val youtube = StatsPodcastType("YOUTUBE", setOf(
@@ -652,6 +783,44 @@ class PodcastHandlerTest(
             inner class ByPubDate {
 
                 @Test
+                fun `with default number of month`() {
+                    /* Given */
+                    val youtube = StatsPodcastType("YOUTUBE", setOf(
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-02"), 3),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6))
+                    )
+                    val rss = StatsPodcastType("YOUTUBE", setOf(
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-02-02"), 5),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-02-12"), 8),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-02-28"), 1))
+                    )
+                    whenever(podcastService.findStatByTypeAndPubDate(1)).thenReturn(Flux.just(youtube, rss))
+                    /* When */
+                    rest.get()
+                            .uri { it.path("/api/v1/podcasts/stats/byPubDate").build() }
+                            .exchange()
+                            /* Then */
+                            .expectStatus().isOk
+                            .expectBody()
+                            .assertThatJson { isEqualTo("""{
+                                       "content":[ {
+                                             "type":"YOUTUBE", "values":[
+                                                { "date":"2019-01-02", "numberOfItems":3 },
+                                                { "date":"2019-01-12", "numberOfItems":2 },
+                                                { "date":"2019-01-28", "numberOfItems":6 }
+                                             ]
+                                          }, {
+                                             "type":"YOUTUBE", "values":[
+                                                { "date":"2019-02-02", "numberOfItems":5 },
+                                                { "date":"2019-02-12", "numberOfItems":8 },
+                                                { "date":"2019-02-28", "numberOfItems":1 }
+                                             ]
+                                          } ]
+                                    }""") }
+                }
+
+                @Test
                 fun `with some data`() {
                     /* Given */
                     val youtube = StatsPodcastType("YOUTUBE", setOf(
@@ -709,9 +878,48 @@ class PodcastHandlerTest(
                             .assertThatJson { isEqualTo(""" {"content":[]} """) }
                 }
             }
+
             @Nested
             @DisplayName("by download date")
             inner class ByDownloadDate {
+
+                @Test
+                fun `with default number of month`() {
+                    /* Given */
+                    val youtube = StatsPodcastType("YOUTUBE", setOf(
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-02"), 3),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6))
+                    )
+                    val rss = StatsPodcastType("YOUTUBE", setOf(
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-02-02"), 5),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-02-12"), 8),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-02-28"), 1))
+                    )
+                    whenever(podcastService.findStatByTypeAndDownloadDate(1)).thenReturn(Flux.just(youtube, rss))
+                    /* When */
+                    rest.get()
+                            .uri { it.path("/api/v1/podcasts/stats/byDownloadDate").build() }
+                            .exchange()
+                            /* Then */
+                            .expectStatus().isOk
+                            .expectBody()
+                            .assertThatJson { isEqualTo("""{
+                                       "content":[ {
+                                             "type":"YOUTUBE", "values":[
+                                                { "date":"2019-01-02", "numberOfItems":3 },
+                                                { "date":"2019-01-12", "numberOfItems":2 },
+                                                { "date":"2019-01-28", "numberOfItems":6 }
+                                             ]
+                                          }, {
+                                             "type":"YOUTUBE", "values":[
+                                                { "date":"2019-02-02", "numberOfItems":5 },
+                                                { "date":"2019-02-12", "numberOfItems":8 },
+                                                { "date":"2019-02-28", "numberOfItems":1 }
+                                             ]
+                                          } ]
+                                    }""") }
+                }
 
                 @Test
                 fun `with some data`() {
@@ -784,6 +992,29 @@ class PodcastHandlerTest(
             inner class ByPubDate {
 
                 @Test
+                fun `with default number of month`() {
+                    /* Given */
+                    val r = listOf(
+                        NumberOfItemByDateWrapper(LocalDate.parse("2019-01-02"), 3),
+                        NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
+                        NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
+                    )
+                    whenever(podcastService.findStatByPodcastIdAndPubDate(podcast.id, 1)).thenReturn(r.toFlux())
+                    /* When */
+                    rest.get()
+                        .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byPubDate").build() }
+                        .exchange()
+                        /* Then */
+                        .expectStatus().isOk
+                        .expectBody()
+                        .assertThatJson { isEqualTo(""" [
+                               { "date":"2019-01-02", "numberOfItems":3 },
+                               { "date":"2019-01-12", "numberOfItems":2 },
+                               { "date":"2019-01-28", "numberOfItems":6 }
+                        ] """) }
+                }
+
+                @Test
                 fun `with some data`() {
                     /* Given */
                     val r = listOf(
@@ -832,6 +1063,29 @@ class PodcastHandlerTest(
             inner class ByDownloadDate {
 
                 @Test
+                fun `with default number of month`() {
+                    /* Given */
+                    val r = listOf(
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-02"), 3),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
+                    )
+                    whenever(podcastService.findStatByPodcastIdAndDownloadDate(podcast.id, 1)).thenReturn(r.toFlux())
+                    /* When */
+                    rest.get()
+                            .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byDownloadDate").build() }
+                            .exchange()
+                            /* Then */
+                            .expectStatus().isOk
+                            .expectBody()
+                            .assertThatJson { isEqualTo(""" [
+                               { "date":"2019-01-02", "numberOfItems":3 },
+                               { "date":"2019-01-12", "numberOfItems":2 },
+                               { "date":"2019-01-28", "numberOfItems":6 }
+                        ] """) }
+                }
+
+                @Test
                 fun `with some data`() {
                     /* Given */
                     val r = listOf(
@@ -878,6 +1132,29 @@ class PodcastHandlerTest(
             @Nested
             @DisplayName("by creationDate")
             inner class ByCreationDate {
+
+                @Test
+                fun `with default number of month`() {
+                    /* Given */
+                    val r = listOf(
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-02"), 3),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
+                            NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
+                    )
+                    whenever(podcastService.findStatByPodcastIdAndCreationDate(podcast.id, 1)).thenReturn(r.toFlux())
+                    /* When */
+                    rest.get()
+                            .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byCreationDate").build() }
+                            .exchange()
+                            /* Then */
+                            .expectStatus().isOk
+                            .expectBody()
+                            .assertThatJson { isEqualTo(""" [
+                               { "date":"2019-01-02", "numberOfItems":3 },
+                               { "date":"2019-01-12", "numberOfItems":2 },
+                               { "date":"2019-01-28", "numberOfItems":6 }
+                        ] """) }
+                }
 
                 @Test
                 fun `with some data`() {

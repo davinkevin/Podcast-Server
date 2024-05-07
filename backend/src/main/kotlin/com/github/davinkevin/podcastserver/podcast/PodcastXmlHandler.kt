@@ -15,11 +15,10 @@ import org.jdom2.Element
 import org.jdom2.output.Format
 import org.jdom2.output.XMLOutputter
 import org.springframework.http.MediaType
-import org.springframework.web.reactive.function.server.ServerRequest
-import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.queryParamOrNull
+import org.springframework.web.servlet.function.ServerRequest
+import org.springframework.web.servlet.function.ServerResponse
+import org.springframework.web.servlet.function.paramOrNull
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.util.function.component1
 import reactor.kotlin.core.util.function.component2
 import java.net.URI
@@ -31,49 +30,54 @@ class PodcastXmlHandler(
     private val itemService: ItemService
 ) {
 
-    fun opml(r: ServerRequest): Mono<ServerResponse> {
+    fun opml(r: ServerRequest): ServerResponse {
         val host = r.extractHost()
-        return podcastService.findAll()
+
+        val podcasts = podcastService.findAll().collectList().block()!!
+
+        val outlines = podcasts
             .map { OpmlOutline(OpmlOutline.Podcast(it.id, it.title, it.description), host) }
-            .sort { first, second -> first.podcast.title.compareTo(second.podcast.title) }
-            .collectList()
-            .map { Opml(it).toElement() }
-            .map { XMLOutputter(Format.getPrettyFormat()).outputString(Document(it)) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_XML).bodyValue(it) }
+            .sortedBy { it.podcast.title }
+
+        val opml = Opml(outlines).toElement()
+
+        val xml = XMLOutputter(Format.getPrettyFormat()).outputString(Document(opml))
+
+        return ServerResponse.ok().contentType(MediaType.APPLICATION_XML).body(xml)
     }
 
-    fun rss(r: ServerRequest): Mono<ServerResponse> {
-        val baseUrl = r.extractHost()
+    fun rss(r: ServerRequest): ServerResponse {
+        val host = r.extractHost()
         val callUrl = r.normalizedURI()
         val podcastId = UUID.fromString(r.pathVariable("id"))
 
-        val queryLimit = r.queryParamOrNull("limit") ?: "true"
+        val queryLimit = r.paramOrNull("limit") ?: "true"
         val limit = queryLimit.toLimit()
         val itemPageable = ItemPageRequest(0, limit, ItemSort("DESC", "pubDate"))
 
-        val items = itemService.search(
-            q = "",
-            tags = listOf(),
-            status = listOf(),
-            page = itemPageable,
-            podcastId = podcastId
-        )
-            .flatMapMany { it.content.toFlux() }
-            .map { it.toRssItem(baseUrl) }
-            .collectList()
+        val (page, podcast) = Mono.zip(
+            itemService.search(
+                q = "",
+                tags = listOf(),
+                status = listOf(),
+                page = itemPageable,
+                podcastId = podcastId
+            ),
+            podcastService.findById(podcastId)
+        ).block()!!
 
-        val podcast = podcastService
-            .findById(podcastId)
-            .map { it.toRssChannel(callUrl) }
+        val items = page.content.map { it.toRssItem(host) }
+        val rss = podcast.toRssChannel(callUrl)
+            .addContent(items)
+            .let(::rootRss)
 
-        return Mono
-            .zip(items, podcast)
-            .map { (itemRss, podcastRss) -> podcastRss.addContent(itemRss) }
-            .map(::rootRss)
-            .map { XMLOutputter(Format.getPrettyFormat()).outputString(Document(it)) }
-            .flatMap { ServerResponse.ok().contentType(MediaType.APPLICATION_XML).bodyValue(it) }
+        val xml = XMLOutputter(Format.getPrettyFormat())
+            .outputString(Document(rss))
+
+        return ServerResponse.ok()
+            .contentType(MediaType.APPLICATION_XML)
+            .body(xml)
     }
-
 
 }
 
@@ -118,7 +122,7 @@ private fun String.toLimit(): Int {
 
     if (isBoolean.isFailure) return toInt()
 
-    return when (isBoolean.getOrDefault(true)) {
+    return when (isBoolean.getOrThrow()) {
         true -> defaultLimit
         false -> Int.MAX_VALUE
     }
