@@ -3,23 +3,26 @@ package com.github.davinkevin.podcastserver.item
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.java.net.extension
-import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
+import com.github.davinkevin.podcastserver.extension.serverRequest.*
 import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
+import jakarta.servlet.http.Part
 import org.slf4j.LoggerFactory
-import org.springframework.http.HttpStatus.NOT_FOUND
+import org.springframework.core.io.buffer.DataBuffer
+import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpStatus
 import org.springframework.http.codec.multipart.FilePart
-import org.springframework.stereotype.Component
-import org.springframework.web.reactive.function.BodyExtractors
-import org.springframework.web.reactive.function.server.ServerRequest
-import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.ServerResponse.*
 import org.springframework.web.server.ResponseStatusException
+import org.springframework.web.servlet.function.ServerRequest
+import org.springframework.web.servlet.function.ServerResponse
+import org.springframework.web.servlet.function.paramOrNull
 import org.springframework.web.util.UriComponentsBuilder
+import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.switchIfEmpty
+import reactor.core.scheduler.Schedulers
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
+import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Clock
 import java.time.OffsetDateTime
@@ -29,7 +32,6 @@ import kotlin.io.path.extension
 /**
  * Created by kevin on 2019-02-09
  */
-@Component
 class ItemHandler(
     private val itemService: ItemService,
     private val fileService: FileStorageService,
@@ -38,161 +40,168 @@ class ItemHandler(
 
     private var log = LoggerFactory.getLogger(ItemHandler::class.java)
 
-    fun clean(r: ServerRequest): Mono<ServerResponse> {
-        val retentionNumberOfDays = r.queryParam("days")
-                .map { it.toLong() }
-                .orElse(30L)
+    fun clean(r: ServerRequest): ServerResponse {
+        val retentionNumberOfDays = r.paramOrNull("days")?.toLong() ?: 30L
 
         val date = OffsetDateTime.now(clock)
-                .minusDays(retentionNumberOfDays)
+            .minusDays(retentionNumberOfDays)
 
-        return itemService
-                .deleteItemOlderThan(date)
-                .then(ok().build())
+        itemService.deleteItemOlderThan(date).block()
+
+        return ServerResponse.ok().build()
     }
 
-    fun reset(s: ServerRequest): Mono<ServerResponse> {
-        val id = UUID.fromString(s.pathVariable("id"))
+    fun reset(s: ServerRequest): ServerResponse {
+        val id = s.pathVariable("id").let(UUID::fromString)
 
-        return itemService.reset(id)
-                .map { it.toHAL() }
-                .flatMap { ok().bodyValue(it) }
+        val item = itemService.reset(id).block()!!
+
+        return ServerResponse.ok().body(item.toHAL())
     }
 
-    fun file(s: ServerRequest): Mono<ServerResponse> {
+    fun file(s: ServerRequest): ServerResponse {
         val host = s.extractHost()
-        val id = UUID.fromString(s.pathVariable("id"))
+        val id = s.pathVariable("id")
+            .let(UUID::fromString)
 
-        return itemService.findById(id)
-                .flatMap { item -> item
-                        .toMono()
-                        .filter { it.isDownloaded() }
-                        .map { fileService.toExternalUrl(FileDescriptor(it.podcast.title, it.fileName!!), host) }
-                        .switchIfEmpty { URI(item.url!!).toMono() }
-                }
-                .doOnNext { log.debug("Redirect content playable to {}", it)}
-                .flatMap { seeOther(it).build() }
-                .switchIfEmpty { ResponseStatusException(NOT_FOUND, "No item found for id $id").toMono() }
+        val item = itemService.findById(id).block()
+            ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "No item found for id $id")
+
+        val uri = findURIOf(item, host)
+
+        log.debug("Redirect content playable to {}", uri)
+
+        return ServerResponse.seeOther(uri).build()
     }
 
-    fun cover(s: ServerRequest): Mono<ServerResponse> {
+    fun cover(s: ServerRequest): ServerResponse {
         val host = s.extractHost()
-        val id = UUID.fromString(s.pathVariable("id"))
-        return itemService.findById(id)
-                .doOnNext { log.debug("the url of cover is ${it.cover.url}")}
-                .flatMap { item -> item
-                        .toMono()
-                        .flatMap { fileService.coverExists(it) }
-                        .map { FileDescriptor(item.podcast.title, it) }
-                        .map { fileService.toExternalUrl(it, host) }
-                        .switchIfEmpty { item.cover.url.toMono() }
-                }
-                .doOnNext { log.debug("Redirect cover to {}", it)}
-                .flatMap { seeOther(it).build() }
+        val id = s.pathVariable("id")
+            .let(UUID::fromString)
+
+        val item = itemService.findById(id).block()!!.also {
+            log.debug("the url of cover is {}", it.cover.url)
+        }
+        val coverUrl = findCoverURIOf(item, host)
+
+        log.debug("Redirect cover to {}", coverUrl)
+
+        return ServerResponse.seeOther(coverUrl).build()
     }
 
-    fun findById(s: ServerRequest): Mono<ServerResponse> {
-        val id = UUID.fromString(s.pathVariable("id"))
+    private fun findCoverURIOf(item: Item, host: URI): URI {
+        val coverPath = fileService.coverExists(item).block()
+            ?: return item.cover.url
 
-        return itemService.findById(id)
-                .map { it.toHAL() }
-                .flatMap { ok().bodyValue(it) }
+        val fileDescriptor = FileDescriptor(item.podcast.title, coverPath)
+
+        return fileService.toExternalUrl(fileDescriptor, host)
     }
 
-    fun search(r: ServerRequest): Mono<ServerResponse> {
+    fun findById(s: ServerRequest): ServerResponse {
+        val id = s.pathVariable("id")
+            .let(UUID::fromString)
+
+        val item = itemService.findById(id)
+            .block()!!
+            .toHAL()
+
+        return ServerResponse.ok().body(item)
+    }
+
+    fun search(r: ServerRequest): ServerResponse {
         val q: String = r.extractQuery()
         val tags = r.extractTags()
         val status = r.extractStatus()
         val itemPageable = r.toPageRequest()
 
-        return itemService.search(
-                q = q,
-                tags = tags,
-                status = status,
-                page = itemPageable,
-                podcastId = null
+        val result = itemService.search(
+            q = q,
+            tags = tags,
+            status = status,
+            page = itemPageable,
+            podcastId = null
         )
-                .map { it.toHAL() }
-                .flatMap { ok().bodyValue(it) }
+            .map { it.toHAL() }
+            .block()!!
+
+        return ServerResponse.ok().body(result)
     }
 
-    fun podcastItems(r: ServerRequest): Mono<ServerResponse> {
-        val podcastId = UUID.fromString(r.pathVariable("idPodcast"))
+    fun podcastItems(r: ServerRequest): ServerResponse {
+        val podcastId = r.pathVariable("idPodcast")
+            .let(UUID::fromString)
 
         val q: String = r.extractQuery()
         val tags = r.extractTags()
         val status = r.extractStatus()
         val itemPageable = r.toPageRequest()
 
-        return itemService.search(
-                q = q,
-                tags = tags,
-                status = status,
-                page = itemPageable,
-                podcastId = podcastId
+        val items = itemService.search(
+            q = q,
+            tags = tags,
+            status = status,
+            page = itemPageable,
+            podcastId = podcastId
         )
-                .map { it.toHAL() }
-                .flatMap { ok().bodyValue(it) }
+            .map { it.toHAL() }.block()!!
+
+        return ServerResponse.ok().body(items)
     }
 
-    private fun ServerRequest.toPageRequest(): ItemPageRequest {
-        val page = queryParam("page").map { it.toInt() }.orElse(0)
-        val size  = queryParam("size").map { it.toInt() }.orElse(12)
-        val (field, direction) = queryParam("sort").orElse("pubDate,DESC").split(",")
-
-        return ItemPageRequest(page, size, ItemSort(direction, field))
-    }
-
-    private fun ServerRequest.extractTags(): List<String> = queryParam("tags")
-            .filter { it.isNotEmpty() }
-            .map { it.split(",") }
-            .orElse(listOf())
-            .filter { it.isNotEmpty() }
-
-    private fun ServerRequest.extractStatus(): List<Status> = queryParam("status")
-            .filter { it.isNotEmpty() }
-            .map { it.split(",") }
-            .orElse(listOf())
-            .filter { it.isNotEmpty() }
-            .map { Status.of(it) }
-
-    private fun ServerRequest.extractQuery(): String = queryParam("q").orElse("")
-
-
-    fun upload(r: ServerRequest): Mono<ServerResponse> {
-        val podcastId = UUID.fromString(r.pathVariable("idPodcast"))
+    fun upload(r: ServerRequest): ServerResponse {
+        val podcastId = UUID.fromString(r.pathVariable("idPodcast")).also {
+            log.debug("uploading to podcast {}", it)
+        }
         val host = r.extractHost()
-        log.debug("uploading to podcast {}", podcastId)
 
+        val parts = r.multipartData().toSingleValueMap()
+        val file = parts["file"]
+            ?.let(::InternalFilePart)
+            ?.also { log.info("upload of file ${it.filename()}") }
+            ?: error("`file` field not available in upload request")
 
-        return r.body(BodyExtractors.toMultipartData())
-                .map { it.toSingleValueMap() }
-                .map { it["file"] as FilePart }
-                .doOnNext { log.info("upload of file ${it.filename()}") }
-                .flatMap { itemService.upload(podcastId, it) }
-                .map { it.toHAL() }
-                .flatMap { created(URI("${host}api/v1/items/${it.id}")).bodyValue(it) }
+        val item = itemService.upload(podcastId, file)
+            .block()!!
+            .toHAL()
+
+        return ServerResponse
+            .created(URI("${host}api/v1/items/${item.id}"))
+            .body(item)
     }
 
-    fun playlists(r: ServerRequest): Mono<ServerResponse> {
-        val itemId = UUID.fromString(r.pathVariable("id"))
+    fun playlists(r: ServerRequest): ServerResponse {
+        val itemId = r.pathVariable("id")
+            .let(UUID::fromString)
 
-        return itemService
-                .findPlaylistsContainingItem(itemId)
-                .map { PlaylistsHAL.PlaylistHAL(it.id, it.name) }
-                .collectList()
-                .map { PlaylistsHAL(it) }
-                .flatMap { ok().bodyValue(it) }
+        val playlists = itemService
+            .findPlaylistsContainingItem(itemId)
+            .collectList()
+            .block()!!
+
+        val response = playlists
+            .map { PlaylistsHAL.PlaylistHAL(it.id, it.name) }
+            .let(::PlaylistsHAL)
+
+        return ServerResponse.ok().body(response)
     }
 
-    fun delete(r: ServerRequest): Mono<ServerResponse> {
-        val itemId = UUID.fromString(r.pathVariable("id"))
+    fun delete(r: ServerRequest): ServerResponse {
+        val itemId = r.pathVariable("id").let(UUID::fromString)
 
-        return itemService
-                .deleteById(itemId)
-                .then(ok().build())
+        itemService.deleteById(itemId).block()
 
+        return ServerResponse.ok().build()
     }
+
+    private fun findURIOf(item: Item, host: URI): URI {
+        if (!item.isDownloaded()) return URI.create(item.url!!)
+
+        val descriptor = FileDescriptor(item.podcast.title, item.fileName!!)
+
+        return fileService.toExternalUrl(descriptor, host)
+    }
+
 }
 
 data class ItemHAL(
@@ -209,9 +218,9 @@ data class ItemHAL(
             val title = title.replace("[^a-zA-Z0-9.-]".toRegex(), "_") + extension
 
             return UriComponentsBuilder.fromPath("/")
-                    .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), title)
-                    .build(true)
-                    .toUri()
+                .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), title)
+                .build(true)
+                .toUri()
         }
 
     @JsonProperty("isDownloaded")
@@ -221,50 +230,71 @@ data class ItemHAL(
     data class Podcast(val id: UUID, val title: String, val url: String?)
 }
 
-
 private fun Item.toHAL(): ItemHAL {
 
     val extension = cover.url.extension().ifBlank { "jpg" }
 
     val coverUrl = UriComponentsBuilder.fromPath("/")
-            .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), "cover.$extension")
-            .build(true)
-            .toUri()
+        .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), "cover.$extension")
+        .build(true)
+        .toUri()
 
     return ItemHAL(
-            id = id, title = title, url = url,
-            pubDate = pubDate, downloadDate = downloadDate, creationDate = creationDate,
-            description = description, mimeType = mimeType, length = length, fileName = fileName, status = status,
+        id = id, title = title, url = url,
+        pubDate = pubDate, downloadDate = downloadDate, creationDate = creationDate,
+        description = description, mimeType = mimeType, length = length, fileName = fileName, status = status,
 
-            podcast = ItemHAL.Podcast(podcast.id, podcast.title, podcast.url),
-            cover = ItemHAL.Cover(cover.id, cover.width, cover.height, coverUrl)
+        podcast = ItemHAL.Podcast(podcast.id, podcast.title, podcast.url),
+        cover = ItemHAL.Cover(cover.id, cover.width, cover.height, coverUrl)
     )
 }
 
 data class PageItemHAL (
-        val content: Collection<ItemHAL>,
-        val empty: Boolean,
-        val first: Boolean,
-        val last: Boolean,
-        val number: Int,
-        val numberOfElements: Int,
-        val size: Int,
-        val totalElements: Int,
-        val totalPages: Int
+    val content: Collection<ItemHAL>,
+    val empty: Boolean,
+    val first: Boolean,
+    val last: Boolean,
+    val number: Int,
+    val numberOfElements: Int,
+    val size: Int,
+    val totalElements: Int,
+    val totalPages: Int
 )
 
 private fun PageItem.toHAL() = PageItemHAL(
-        content = content.map { it.toHAL() },
-        empty = empty,
-        first = first,
-        last = last,
-        number = number,
-        numberOfElements = numberOfElements,
-        size = size,
-        totalElements = totalElements,
-        totalPages = totalPages
+    content = content.map { it.toHAL() },
+    empty = empty,
+    first = first,
+    last = last,
+    number = number,
+    numberOfElements = numberOfElements,
+    size = size,
+    totalElements = totalElements,
+    totalPages = totalPages
 )
 
 data class PlaylistsHAL(val content: Collection<PlaylistHAL>) {
     data class PlaylistHAL(val id: UUID, val name: String)
+}
+
+data class InternalFilePart(val part: Part): FilePart {
+
+    override fun name(): String = part.submittedFileName
+
+    override fun headers(): HttpHeaders {
+        TODO("Not yet implemented")
+    }
+
+    override fun content(): Flux<DataBuffer> {
+        TODO("Not yet implemented")
+    }
+
+    override fun filename(): String = part.submittedFileName
+
+    override fun transferTo(dest: Path): Mono<Void> = Mono.defer<Void?> {
+        Files.copy(part.inputStream, dest)
+            .toMono()
+            .then()
+    }
+        .subscribeOn(Schedulers.parallel())
 }
