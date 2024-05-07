@@ -1,6 +1,42 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2024.5.0
+
+### Features
+
+- **develocity:** Migrate to develocity plugin ([58167fc](58167fc4ff63778bc3ac54edc63825bbc77b232c))
+
+### Bug Fixes
+
+- **backend:** Varchar length is increased to 65535 ([b8c6a5e](b8c6a5ef35ceb031bd621f4c116ad607b17c5b4a) - [#232](https://gitlab.com/davinkevin/Podcast-Server/-/issues/232))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.22 ([b4e8a65](b4e8a65405a8ce0dccebdce2a89bd6581fad8655))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.23 ([173ee14](173ee1446c88f889b443ae50ad5c63dfae0c177d))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.24 ([081ee1c](081ee1cf309325c4ccf7ce2cbcbb28957d332494))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.25 ([b162d36](b162d369906d17367f3b530c02e986e987561d92))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.26 ([c605754](c605754810685555c6673f2498dd3d6854f655e8))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.27 ([633b2d7](633b2d76924a3101d055891077ad972786b95e17))
+- **deps:** Update dependency org.mockito.kotlin:mockito-kotlin to v5.3.1 ([12fe4d1](12fe4d125f1c066c83a97f2abc2e1d3d75f9467e))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.28 ([1cf8751](1cf87511c7356bfe11715570473b7494d8022793))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.29 ([79ebbea](79ebbeae9a207c3f162235d8a88a95a1d8a657a8))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.30 ([a05900e](a05900e5a57419f451bb6f33bb2ee80aebc6bcb6))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.31 ([b369c44](b369c4438bce19493f3b17fee02372dc8fcf8c8c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.32 ([37fc524](37fc524f86d21327c4684f93cfe706082269c827))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.33 ([32bf37c](32bf37c8f7523397ad433ae31fb6b43fa061a9a7))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.34 ([71f0863](71f0863c4287006907f503fa3340ff765bb0ad23))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.35 ([a00bda5](a00bda5f289158e9b6e0d6992144644b713191d5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.36 ([d67007b](d67007bc8602a126edd27baa113966e38d189f76))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.37 ([1aff32c](1aff32c5588d3631ac8ff745946adfb30f4f72e4))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.38 ([26cc3c9](26cc3c9da1f8097246e4406adbdf85bd79bdcd92))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.39 ([3724c74](3724c74870b085daeaa38432aba0b4dbae060514))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.40 ([8831449](88314495e3522ace25608d2d7290439d14929daa))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.41 ([c285e09](c285e091f63475a97cd14bbf89da9f5cb0a0a519))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.42 ([4466cc9](4466cc97da1775c10d810927e17534b372eb33f6))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.43 ([bf43b10](bf43b1048a13de9422bb5572d2a93f74120924be))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.44 ([f58a4d6](f58a4d622666ec6f26379be4d1379fce5d9298f5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.45 ([6b1eb33](6b1eb33d3f67a8490c031454e82367c1e5b50835))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.46 ([bfffabc](bfffabcc698efde16c1bf7e00760ed5c3545087f))
+
 ## 2024.4.0
 
 ### Features
@@ -1199,13 +1235,6 @@ All notable changes to this project will be documented in this file.
 - **player.inline:** Add 'clear playlist' fucntionnality inside player-inline ([23b0d6e](23b0d6e4d9f7ef672ce387ef6daab182e27d4a57))
 - **player.inline:** Add playlist management in inline player ([d012eab](d012eab66a7871b0fdd089ad9a3159674d604600) - [#28](https://gitlab.com/davinkevin/Podcast-Server/-/issues/28))
 - **playlist:** Remove element from playlist ([f8b9b35](f8b9b35647e34ecb32a336d085e2f5fa9c23d699))
-- **playlist:** Add entity and repository playlist ([198c208](198c20877f46621d181c923ecd8da5c483aa8749))
-- **playlist:** Add method to add item to playlist ([422dd00](422dd007b44627e4a163b348abf08ae33f0ad8d6))
-- **playlist:** Add method to remove from playlist if item is deleted ([7ee0da7](7ee0da7a297825209ed7415ae10dbc1f6711965a))
-- **playlist:** Add business layer ([ddbf837](ddbf837e1521e8c30a09a07bd62ad12375d6b5ab))
-- **playlist:** Add controller layer ([0d7c503](0d7c503963bcf90268a1dcb961c3152fc74e2d5b))
-- **playlist:** Active lazy loading on item ([2556dcd](2556dcd0110fab2b80e286bd16a2acb501fe0ce0))
-- **playlist:** Add restriction when item is in playlist, prevent deletion ([47cea38](47cea385f20e880f97ff6b8f2b2b90f65838cbeb))
 - **playlist:** Add entity and repository playlist ([16f9c43](16f9c430da15a5dd9fba474a207fd0b8ea5f316e))
 - **playlist:** Add method to add item to playlist ([1c1a352](1c1a352b0765e916a5571664e6e52ff2ebcbd1bd))
 - **playlist:** Add method to remove from playlist if item is deleted ([92afd0e](92afd0e8d011c6f86355858c9c8e98fc052ce272))
@@ -1213,6 +1242,13 @@ All notable changes to this project will be documented in this file.
 - **playlist:** Add controller layer ([9504dfd](9504dfd37624d3df80c3160f6d72593728c59e47))
 - **playlist:** Active lazy loading on item ([7144a71](7144a71509e778ebccc82c91b5dbd0f43a0a34e0))
 - **playlist:** Add restriction when item is in playlist, prevent deletion ([27773e9](27773e9463260e0a32b406eb9b4dc0a401e6927f))
+- **playlist:** Add entity and repository playlist ([198c208](198c20877f46621d181c923ecd8da5c483aa8749))
+- **playlist:** Add method to add item to playlist ([422dd00](422dd007b44627e4a163b348abf08ae33f0ad8d6))
+- **playlist:** Add method to remove from playlist if item is deleted ([7ee0da7](7ee0da7a297825209ed7415ae10dbc1f6711965a))
+- **playlist:** Add business layer ([ddbf837](ddbf837e1521e8c30a09a07bd62ad12375d6b5ab))
+- **playlist:** Add controller layer ([0d7c503](0d7c503963bcf90268a1dcb961c3152fc74e2d5b))
+- **playlist:** Active lazy loading on item ([2556dcd](2556dcd0110fab2b80e286bd16a2acb501fe0ce0))
+- **playlist:** Add restriction when item is in playlist, prevent deletion ([47cea38](47cea385f20e880f97ff6b8f2b2b90f65838cbeb))
 - **podcast:** Deletion of podcast remove files from disk if necessary ([f708a5a](f708a5ae8b99a11771fc545235220e92f61204eb))
 - **podcast:** Move podcast folder when name change ([1c1d067](1c1d067f02e0f498f9e42189b7a269786e001d7c))
 - **podcast:** Add list of podcasts in new gui ([79db4fe](79db4fea96ef03d4f3999d243003dc50559f8b8d))
@@ -1463,8 +1499,8 @@ All notable changes to this project will be documented in this file.
 - **player:** Show the list of watchLists at load of player ([d050bcf](d050bcf766b9beabe99e6f961099db11d3d334a2))
 - **player-inline:** Design correction on vg-scrub-bar-current-time ([c0946b8](c0946b8a6c859a9eb419d94033a2538b76e192a5))
 - **player.inline:** Remove auto-repeat the whole playlist ([d34e851](d34e8511d61ddedff73c2bb75a89a07dd755ecc5))
-- **playlist:** Add empty Sets at init of item ([f88da4c](f88da4cdd17ec87a3d31132b574f43f1703b5dd5))
 - **playlist:** Add empty Sets at init of item ([35f0ec2](35f0ec22812e1396e2af1b9c97e01bdd3cef01a6))
+- **playlist:** Add empty Sets at init of item ([f88da4c](f88da4cdd17ec87a3d31132b574f43f1703b5dd5))
 - **pluzz:** Modification of pluzz updater ([68a2599](68a2599c542baad3112c61af04727614ed4164a9))
 - **pluzz:** Correct problem of subscription returning only one element instead of collection ([61af51d](61af51d92ef6916febd48790ab0b13c1a712a865))
 - **pluzz:** Correct format on pluzzItem title to avoid separator of... nothing ([292b41d](292b41dcec1564005d07381d72b06edc85849763))
@@ -1825,8 +1861,8 @@ All notable changes to this project will be documented in this file.
 - **player:** Refactor player module ([86b6987](86b698786e36a2eea2a5b4d27b5309b86015ddd8) - [#33](https://gitlab.com/davinkevin/Podcast-Server/-/issues/33))
 - **player:** Use decorator ([1cc1ac2](1cc1ac2e44e0d9dade1f6262701238aba52dde06))
 - **player:** Remove usage of lodash ([572eb2d](572eb2da48aa2dbb7d9df7453ce96482a4999cc8))
-- **player:** Remove usage of lodash ([4cf1c6a](4cf1c6a815d0da4df8e0d8a254b4a39f572e38a4))
 - **player:** Remove usage of lodash ([d4ca943](d4ca94300c8b6e637d58669c4bce34168793f9cf))
+- **player:** Remove usage of lodash ([4cf1c6a](4cf1c6a815d0da4df8e0d8a254b4a39f572e38a4))
 - **player-inline:** Refactor player-inline module ([a33b814](a33b8144dfb4b88ddb0e2bc44619a9478d164ee8) - [#33](https://gitlab.com/davinkevin/Podcast-Server/-/issues/33))
 - **player-inline:** Reduce use of two-way binding ([a50d7ab](a50d7ab40eaa3540530bd98d5994262beedc316b) - [#40](https://gitlab.com/davinkevin/Podcast-Server/-/issues/40))
 - **podcast:** Use immutable structure to search for podcast by url not null and update ([9254796](9254796392e0fd11df14e898cbf74216285692ce))
