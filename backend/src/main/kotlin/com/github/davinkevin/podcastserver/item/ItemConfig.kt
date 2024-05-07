@@ -4,7 +4,7 @@ import org.springframework.boot.CommandLineRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.web.reactive.function.server.router
+import org.springframework.web.servlet.function.router
 
 /**
  * Created by kevin on 2019-02-03
@@ -21,7 +21,7 @@ class ItemRoutingConfig {
         }
 
         "/api/v1/podcasts/{idPodcast}".nest {
-            GET("/items", item::podcastItems )
+            GET("/items", item::podcastItems)
             POST("/items/upload", item::upload)
             "/items/{id}".nest {
                 GET("", item::findById)
@@ -33,6 +33,7 @@ class ItemRoutingConfig {
             }
         }
     }
+
 }
 
 @Configuration

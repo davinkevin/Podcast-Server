@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.item
 import com.github.davinkevin.podcastserver.config.JacksonConfig
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
+import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
 import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.junit.jupiter.api.DisplayName
@@ -13,9 +14,7 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
@@ -39,14 +38,9 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.*
 import kotlin.io.path.Path
-import kotlin.io.path.name
 
-/**
- * Created by kevin on 2019-02-12
- */
-@WebFluxTest(controllers = [ItemHandler::class])
-@Import(ItemRoutingConfig::class, JacksonConfig::class)
-@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
+@WebMvcTest(controllers = [ItemHandler::class])
+@Import(ItemRoutingConfig::class, JacksonConfig::class, MockMvcRestExceptionConfiguration::class)
 class ItemHandlerTest(
     @Autowired val rest: WebTestClient,
     @Autowired val clock: Clock
@@ -56,31 +50,31 @@ class ItemHandlerTest(
     @MockBean private lateinit var fileService: FileStorageService
 
     val item = Item(
-            id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
-            title = "Foo",
-            url = "https://external.domain.tld/foo/bar.mp4",
+        id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
+        title = "Foo",
+        url = "https://external.domain.tld/foo/bar.mp4",
 
-            pubDate = now(),
-            downloadDate = now(),
-            creationDate = now(),
+        pubDate = now(),
+        downloadDate = now(),
+        creationDate = now(),
 
-            description = "desc",
-            mimeType = "audio/mp3",
-            length = 100,
-            fileName = null,
-            status = Status.NOT_DOWNLOADED,
+        description = "desc",
+        mimeType = "audio/mp3",
+        length = 100,
+        fileName = null,
+        status = Status.NOT_DOWNLOADED,
 
-            podcast = Item.Podcast(
-                    id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
-                    title = "Podcast Bar",
-                    url = "https://external.domain.tld/bar.rss"
-            ),
-            cover = Item.Cover(
-                    id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                    url = URI("https://external.domain.tld/foo/bar.png"),
-                    width = 200,
-                    height = 200
-            )
+        podcast = Item.Podcast(
+            id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
+            title = "Podcast Bar",
+            url = "https://external.domain.tld/bar.rss"
+        ),
+        cover = Item.Cover(
+            id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
+            url = URI("https://external.domain.tld/foo/bar.png"),
+            width = 200,
+            height = 200
+        )
     )
 
     @Nested
@@ -94,10 +88,10 @@ class ItemHandlerTest(
 
             /* When */
             rest.delete()
-                    .uri("/api/v1/items")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
+                .uri("/api/v1/items")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
         }
 
         @Test
@@ -107,10 +101,10 @@ class ItemHandlerTest(
 
             /* When */
             rest.delete()
-                    .uri("/api/v1/items?days=60")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
+                .uri("/api/v1/items?days=60")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
         }
     }
 
@@ -123,7 +117,7 @@ class ItemHandlerTest(
             /* Given */
             val host = URI.create("https://localhost:8080/")
             val itemDownloaded = item.copy(
-                    status = Status.FINISH, fileName = Path("file_to_download.mp4")
+                status = Status.FINISH, fileName = Path("file_to_download.mp4")
             )
             whenever(itemService.findById(item.id)).thenReturn(itemDownloaded.toMono())
             whenever(fileService.toExternalUrl(FileDescriptor(itemDownloaded.podcast.title, itemDownloaded.fileName!!), host))
@@ -131,13 +125,13 @@ class ItemHandlerTest(
 
             /* When */
             rest
-                    .get()
-                    .uri("https://localhost:8080/api/v1/podcasts/{idPodcast}/items/{id}/{file}", item.podcast.id, item.id, "download.mp4")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isSeeOther
-                    .expectHeader()
-                    .valueEquals("Location", "https://localhost:8080/data/Podcast%20Bar/file_to_download.mp4")
+                .get()
+                .uri("https://localhost:8080/api/v1/podcasts/{idPodcast}/items/{id}/{file}", item.podcast.id, item.id, "download.mp4")
+                .exchange()
+                /* Then */
+                .expectStatus().isSeeOther
+                .expectHeader()
+                .valueEquals("Location", "https://localhost:8080/data/Podcast%20Bar/file_to_download.mp4")
         }
 
         @Test
@@ -146,13 +140,13 @@ class ItemHandlerTest(
             whenever(itemService.findById(item.id)).thenReturn(item.toMono())
             /* When */
             rest
-                    .get()
-                    .uri("/api/v1/podcasts/{idPodcast}/items/{id}/{file}", item.podcast.id, item.id, "download.mp4")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isSeeOther
-                    .expectHeader()
-                    .valueEquals("Location", "https://external.domain.tld/foo/bar.mp4")
+                .get()
+                .uri("/api/v1/podcasts/{idPodcast}/items/{id}/{file}", item.podcast.id, item.id, "download.mp4")
+                .exchange()
+                /* Then */
+                .expectStatus().isSeeOther
+                .expectHeader()
+                .valueEquals("Location", "https://external.domain.tld/foo/bar.mp4")
         }
 
         @Test
@@ -161,16 +155,16 @@ class ItemHandlerTest(
             whenever(itemService.findById(item.id)).thenReturn(Mono.empty())
             /* When */
             rest
-                    .get()
-                    .uri("/api/v1/podcasts/{idPodcast}/items/{id}/{file}", item.podcast.id, item.id, "download.mp4")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isNotFound
-                    .expectBody()
-                    .assertThatJson {
-                        inPath("status").isEqualTo(404)
-                        inPath("message").isEqualTo("No item found for id ${item.id}")
-                    }
+                .get()
+                .uri("/api/v1/podcasts/{idPodcast}/items/{id}/{file}", item.podcast.id, item.id, "download.mp4")
+                .exchange()
+                /* Then */
+                .expectStatus().isNotFound
+                .expectBody()
+                .assertThatJson {
+                    inPath("status").isEqualTo(404)
+                    inPath("message").isEqualTo("No item found for id ${item.id}")
+                }
 
         }
     }
@@ -190,13 +184,13 @@ class ItemHandlerTest(
 
             /* When */
             rest
-                    .get()
-                    .uri("https://localhost:8080/api/v1/podcasts/{idPodcast}/items/{id}/cover.{ext}", item.podcast.id, item.id, "png")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isSeeOther
-                    .expectHeader()
-                    .valueEquals("Location", "https://localhost:8080/data/Podcast%20Bar/27184b1a-7642-4ffd-ac7e-14fb36f7f15c.png")
+                .get()
+                .uri("https://localhost:8080/api/v1/podcasts/{idPodcast}/items/{id}/cover.{ext}", item.podcast.id, item.id, "png")
+                .exchange()
+                /* Then */
+                .expectStatus().isSeeOther
+                .expectHeader()
+                .valueEquals("Location", "https://localhost:8080/data/Podcast%20Bar/27184b1a-7642-4ffd-ac7e-14fb36f7f15c.png")
         }
 
         @Test
@@ -207,13 +201,13 @@ class ItemHandlerTest(
 
             /* When */
             rest
-                    .get()
-                    .uri("https://localhost:8080/api/v1/podcasts/{idPodcast}/items/{id}/cover.{ext}", item.podcast.id, item.id, "png")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isSeeOther
-                    .expectHeader()
-                    .valueEquals("Location", "https://external.domain.tld/foo/bar.png")
+                .get()
+                .uri("https://localhost:8080/api/v1/podcasts/{idPodcast}/items/{id}/cover.{ext}", item.podcast.id, item.id, "png")
+                .exchange()
+                /* Then */
+                .expectStatus().isSeeOther
+                .expectHeader()
+                .valueEquals("Location", "https://external.domain.tld/foo/bar.png")
         }
     }
 
@@ -222,31 +216,31 @@ class ItemHandlerTest(
     inner class ShouldFindById {
 
         private val notDownloadedItem = Item(
-                id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
-                title = "Foo",
-                url = "https://external.domain.tld/foo/bar.mp4",
+            id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
+            title = "Foo",
+            url = "https://external.domain.tld/foo/bar.mp4",
 
-                pubDate = OffsetDateTime.parse("2019-02-01T13:14:15.000Z"),
-                downloadDate = null,
-                creationDate = OffsetDateTime.parse("2019-02-05T13:14:15.000Z"),
+            pubDate = OffsetDateTime.parse("2019-02-01T13:14:15.000Z"),
+            downloadDate = null,
+            creationDate = OffsetDateTime.parse("2019-02-05T13:14:15.000Z"),
 
-                description = "desc",
-                mimeType = "audio/mp3",
-                length = 100,
-                fileName = null,
-                status = Status.NOT_DOWNLOADED,
+            description = "desc",
+            mimeType = "audio/mp3",
+            length = 100,
+            fileName = null,
+            status = Status.NOT_DOWNLOADED,
 
-                podcast = Item.Podcast(
-                        id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
-                        title = "Podcast Bar",
-                        url = "https://external.domain.tld/bar.rss"
-                ),
-                cover = Item.Cover(
-                        id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                        url = URI("https://external.domain.tld/foo/bar.png"),
-                        width = 200,
-                        height = 200
-                )
+            podcast = Item.Podcast(
+                id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
+                title = "Podcast Bar",
+                url = "https://external.domain.tld/bar.rss"
+            ),
+            cover = Item.Cover(
+                id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
+                url = URI("https://external.domain.tld/foo/bar.png"),
+                width = 200,
+                height = 200
+            )
         )
 
         @Test
@@ -257,13 +251,13 @@ class ItemHandlerTest(
             whenever(itemService.findById(iid)).thenReturn(notDownloadedItem.toMono())
             /* When */
             rest.get()
-                    .uri("/api/v1/podcasts/{pid}/items/{iid}", pid, iid)
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
-                    .expectBody()
-                    .assertThatJson {
-                        isEqualTo(""" {
+                .uri("/api/v1/podcasts/{pid}/items/{iid}", pid, iid)
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .assertThatJson {
+                    isEqualTo(""" {
                            "cover":{
                               "height":200,
                               "id":"f4efe8db-7abf-4998-b15c-9fa2e06096a1",
@@ -290,29 +284,29 @@ class ItemHandlerTest(
                            "title":"Foo",
                            "url":"https://external.domain.tld/foo/bar.mp4"
                         } """)
-                    }
+                }
         }
 
         @Test
         fun `with downloaded item`() {
             /* Given */
             val downloadedItem = notDownloadedItem.copy(
-                    fileName = Path("foo.mp4"),
-                    mimeType = "video/mp4",
-                    status = Status.FINISH
+                fileName = Path("foo.mp4"),
+                mimeType = "video/mp4",
+                status = Status.FINISH
             )
             val pid = downloadedItem.podcast.id
             val iid = downloadedItem.id
             whenever(itemService.findById(iid)).thenReturn(downloadedItem.toMono())
             /* When */
             rest.get()
-                    .uri("/api/v1/podcasts/{pid}/items/{iid}", pid, iid)
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
-                    .expectBody()
-                    .assertThatJson {
-                        isEqualTo(""" {
+                .uri("/api/v1/podcasts/{pid}/items/{iid}", pid, iid)
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .assertThatJson {
+                    isEqualTo(""" {
                            "cover":{
                               "height":200,
                               "id":"f4efe8db-7abf-4998-b15c-9fa2e06096a1",
@@ -339,7 +333,7 @@ class ItemHandlerTest(
                            "title":"Foo",
                            "url":"https://external.domain.tld/foo/bar.mp4"
                         } """)
-                    }
+                }
         }
     }
 
@@ -348,31 +342,31 @@ class ItemHandlerTest(
     inner class ShouldReset {
 
         private val anItemToBeReseted = Item(
-                id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
-                title = "Foo",
-                url = "https://external.domain.tld/foo/bar.mp4",
+            id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
+            title = "Foo",
+            url = "https://external.domain.tld/foo/bar.mp4",
 
-                pubDate = OffsetDateTime.parse("2019-02-01T13:14:15.000Z"),
-                downloadDate = null,
-                creationDate = OffsetDateTime.parse("2019-02-05T13:14:15.000Z"),
+            pubDate = OffsetDateTime.parse("2019-02-01T13:14:15.000Z"),
+            downloadDate = null,
+            creationDate = OffsetDateTime.parse("2019-02-05T13:14:15.000Z"),
 
-                description = "desc",
-                mimeType = "audio/mp3",
-                length = 100,
-                fileName = null,
-                status = Status.NOT_DOWNLOADED,
+            description = "desc",
+            mimeType = "audio/mp3",
+            length = 100,
+            fileName = null,
+            status = Status.NOT_DOWNLOADED,
 
-                podcast = Item.Podcast(
-                        id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
-                        title = "Podcast Bar",
-                        url = "https://external.domain.tld/bar.rss"
-                ),
-                cover = Item.Cover(
-                        id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                        url = URI("https://external.domain.tld/foo/bar.png"),
-                        width = 200,
-                        height = 200
-                )
+            podcast = Item.Podcast(
+                id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
+                title = "Podcast Bar",
+                url = "https://external.domain.tld/bar.rss"
+            ),
+            cover = Item.Cover(
+                id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
+                url = URI("https://external.domain.tld/foo/bar.png"),
+                width = 200,
+                height = 200
+            )
         )
 
 
@@ -382,13 +376,13 @@ class ItemHandlerTest(
             whenever(itemService.reset(anItemToBeReseted.id)).thenReturn(anItemToBeReseted.toMono())
             /* When */
             rest.post()
-                    .uri("/api/v1/podcasts/${anItemToBeReseted.podcast.id}/items/${anItemToBeReseted.id}/reset")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
-                    .expectBody()
-                    .assertThatJson {
-                        isEqualTo(""" {
+                .uri("/api/v1/podcasts/${anItemToBeReseted.podcast.id}/items/${anItemToBeReseted.id}/reset")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .assertThatJson {
+                    isEqualTo(""" {
                            "cover":{
                               "height":200,
                               "id":"f4efe8db-7abf-4998-b15c-9fa2e06096a1",
@@ -415,7 +409,7 @@ class ItemHandlerTest(
                            "title":"Foo",
                            "url":"https://external.domain.tld/foo/bar.mp4"
                         } """)
-                    }
+                }
         }
     }
 
@@ -427,16 +421,16 @@ class ItemHandlerTest(
         @DisplayName("on parameters")
         inner class OnParameters {
 
-            val zeroResult = PageItem(
-                    content = listOf(),
-                    empty = true,
-                    first = true,
-                    last = true,
-                    number = 0,
-                    numberOfElements = 0,
-                    size = 0,
-                    totalElements = 0,
-                    totalPages = 0
+            private val zeroResult = PageItem(
+                content = listOf(),
+                empty = true,
+                first = true,
+                last = true,
+                number = 0,
+                numberOfElements = 0,
+                size = 0,
+                totalElements = 0,
+                totalPages = 0
             )
 
             @Test
@@ -446,12 +440,12 @@ class ItemHandlerTest(
                 whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -462,7 +456,7 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
 
             @Test
@@ -472,12 +466,12 @@ class ItemHandlerTest(
                 whenever(itemService.search("foo", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search?q=foo")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search?q=foo")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -488,7 +482,7 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
 
             @Test
@@ -498,12 +492,12 @@ class ItemHandlerTest(
                 whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("http://localhost:8080/api/v1/items/search?tags=")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("http://localhost:8080/api/v1/items/search?tags=")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -514,7 +508,7 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
 
             @Test
@@ -524,12 +518,12 @@ class ItemHandlerTest(
                 whenever(itemService.search("", listOf("foo"), emptyList(), request)).thenReturn(zeroResult.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search?tags=foo")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search?tags=foo")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -540,7 +534,7 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
 
             @Test
@@ -550,12 +544,12 @@ class ItemHandlerTest(
                 whenever(itemService.search("", listOf("foo", "bar"), emptyList(), request)).thenReturn(zeroResult.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search?tags=foo,bar")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search?tags=foo,bar")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -566,7 +560,7 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
 
             @Test
@@ -576,12 +570,12 @@ class ItemHandlerTest(
                 whenever(itemService.search("", listOf("foo", "bar"), emptyList(), request)).thenReturn(zeroResult.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("http://localhost:8080/api/v1/items/search?tags=foo,bar,,,")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("http://localhost:8080/api/v1/items/search?tags=foo,bar,,,")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -592,7 +586,7 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
 
 
@@ -603,12 +597,12 @@ class ItemHandlerTest(
                 whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search?status=")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search?status=")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -619,7 +613,7 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
 
             @Test
@@ -629,12 +623,12 @@ class ItemHandlerTest(
                 whenever(itemService.search("", emptyList(), listOf(Status.STARTED), request)).thenReturn(zeroResult.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search?status=STARTED")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search?status=STARTED")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -645,7 +639,7 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
 
             @Test
@@ -655,12 +649,12 @@ class ItemHandlerTest(
                 whenever(itemService.search("", emptyList(), listOf(Status.STARTED, Status.DELETED), request)).thenReturn(zeroResult.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search?status=STARTED,DELETED")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search?status=STARTED,DELETED")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -671,7 +665,7 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
 
             @Test
@@ -681,12 +675,12 @@ class ItemHandlerTest(
                 whenever(itemService.search("", emptyList(), listOf(Status.STARTED, Status.DELETED), request)).thenReturn(zeroResult.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search?status=STARTED,DELETED,,,")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search?status=STARTED,DELETED,,,")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -697,7 +691,7 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
 
             @Test
@@ -707,12 +701,12 @@ class ItemHandlerTest(
                 whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search?page=1")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search?page=1")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -723,7 +717,7 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
 
             @Test
@@ -733,12 +727,12 @@ class ItemHandlerTest(
                 whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search?size=24")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search?size=24")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -749,7 +743,7 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
 
             @Test
@@ -759,12 +753,12 @@ class ItemHandlerTest(
                 whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search?sort=downloadDate,ASC")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search?sort=downloadDate,ASC")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -775,7 +769,7 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
 
 
@@ -791,27 +785,27 @@ class ItemHandlerTest(
             fun `with no items`() {
                 /* Given */
                 val result = PageItem(
-                        content = listOf(),
-                        empty = true,
-                        first = true,
-                        last = true,
-                        number = 0,
-                        numberOfElements = 0,
-                        size = 0,
-                        totalElements = 0,
-                        totalPages = 0
+                    content = listOf(),
+                    empty = true,
+                    first = true,
+                    last = true,
+                    number = 0,
+                    numberOfElements = 0,
+                    size = 0,
+                    totalElements = 0,
+                    totalPages = 0
                 )
 
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
                 whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {isEqualTo("""{
                                "content":[],
                                "empty":true,
                                "first":true,
@@ -822,63 +816,63 @@ class ItemHandlerTest(
                                "totalElements":0,
                                "totalPages":0
                             }""")
-                        }
+                    }
             }
             private val podcast = Item.Podcast(UUID.fromString("ef62c5c3-e79f-4474-8228-40b76abcdb57"), "podcast 1", "https/foo.bar.com/rss")
 
             private val item1 = Item(
-                    id = UUID.fromString("6a287582-e181-48f9-a23d-c88d03879feb"),
-                    title = "item 1",
-                    url = "https://foo.bar.com/1.mp3",
+                id = UUID.fromString("6a287582-e181-48f9-a23d-c88d03879feb"),
+                title = "item 1",
+                url = "https://foo.bar.com/1.mp3",
 
-                    pubDate = now(clock),
-                    downloadDate = now(clock),
-                    creationDate = now(clock),
+                pubDate = now(clock),
+                downloadDate = now(clock),
+                creationDate = now(clock),
 
-                    description = "item 1 desc",
-                    mimeType = "audio/mp3",
-                    length = 1234,
-                    fileName = Path("1.mp3"),
-                    status = Status.FINISH,
+                description = "item 1 desc",
+                mimeType = "audio/mp3",
+                length = 1234,
+                fileName = Path("1.mp3"),
+                status = Status.FINISH,
 
-                    podcast = podcast,
-                    cover = Item.Cover(UUID.fromString("337edcd5-97d3-4f78-9a5b-1c14c999883b"), URI("https://foo.bar.com/cover.png"), 100, 100)
+                podcast = podcast,
+                cover = Item.Cover(UUID.fromString("337edcd5-97d3-4f78-9a5b-1c14c999883b"), URI("https://foo.bar.com/cover.png"), 100, 100)
             )
             private val item2 = Item(
-                    id = UUID.fromString("cb4cd9b9-957a-457e-a72a-519241c51aca"),
-                    title = "item 2",
-                    url = "https://foo.bar.com/2.mp3",
+                id = UUID.fromString("cb4cd9b9-957a-457e-a72a-519241c51aca"),
+                title = "item 2",
+                url = "https://foo.bar.com/2.mp3",
 
-                    pubDate = now(clock),
-                    downloadDate = now(clock),
-                    creationDate = now(clock),
+                pubDate = now(clock),
+                downloadDate = now(clock),
+                creationDate = now(clock),
 
-                    description = "item 2 desc",
-                    mimeType = "audio/mp3",
-                    length = 1234,
-                    fileName = Path("2.mp3"),
-                    status = Status.FINISH,
+                description = "item 2 desc",
+                mimeType = "audio/mp3",
+                length = 1234,
+                fileName = Path("2.mp3"),
+                status = Status.FINISH,
 
-                    podcast = podcast,
-                    cover = Item.Cover(UUID.fromString("319072db-4411-4975-884e-f1cacbfb1471"), URI("https://foo.bar.com/2/cover.png"), 100, 100)
+                podcast = podcast,
+                cover = Item.Cover(UUID.fromString("319072db-4411-4975-884e-f1cacbfb1471"), URI("https://foo.bar.com/2/cover.png"), 100, 100)
             )
             private val item3 = Item(
-                    id = UUID.fromString("ffbeb6b9-0e1f-4fb1-ab95-0f92effcc621"),
-                    title = "item 3",
-                    url = "https://foo.bar.com/3.mp3",
+                id = UUID.fromString("ffbeb6b9-0e1f-4fb1-ab95-0f92effcc621"),
+                title = "item 3",
+                url = "https://foo.bar.com/3.mp3",
 
-                    pubDate = now(clock),
-                    downloadDate = now(clock),
-                    creationDate = now(clock),
+                pubDate = now(clock),
+                downloadDate = now(clock),
+                creationDate = now(clock),
 
-                    description = "item 3 desc",
-                    mimeType = "audio/mp3",
-                    length = 1234,
-                    fileName = Path("3.mp3"),
-                    status = Status.FINISH,
+                description = "item 3 desc",
+                mimeType = "audio/mp3",
+                length = 1234,
+                fileName = Path("3.mp3"),
+                status = Status.FINISH,
 
-                    podcast = podcast,
-                    cover = Item.Cover(UUID.fromString("388d596e-858a-4746-bbe7-a1c027fa2fc4"), URI("https://foo.bar.com/3/cover.png"), 100, 100)
+                podcast = podcast,
+                cover = Item.Cover(UUID.fromString("388d596e-858a-4746-bbe7-a1c027fa2fc4"), URI("https://foo.bar.com/3/cover.png"), 100, 100)
             )
 
             @Test
@@ -888,13 +882,13 @@ class ItemHandlerTest(
                 whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {
-                            isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {
+                        isEqualTo("""{
                                "content":[
                                    {
                                       "cover":{
@@ -933,7 +927,7 @@ class ItemHandlerTest(
                                "totalElements":1,
                                "totalPages":1
                             }""")
-                        }
+                    }
             }
 
             @Test
@@ -943,13 +937,13 @@ class ItemHandlerTest(
                 whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {
-                            isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {
+                        isEqualTo("""{
                                "content":[
                                {
                                   "cover":{
@@ -1015,7 +1009,7 @@ class ItemHandlerTest(
                                "totalElements":2,
                                "totalPages":1
                             }""")
-                        }
+                    }
             }
 
             @Test
@@ -1025,13 +1019,13 @@ class ItemHandlerTest(
                 whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result.toMono())
                 /* When */
                 rest
-                        .get()
-                        .uri("https://localhost:8080/api/v1/items/search")
-                        .exchange()
-                        /* Then */
-                        .expectStatus().isOk
-                        .expectBody().assertThatJson {
-                            isEqualTo("""{
+                    .get()
+                    .uri("https://localhost:8080/api/v1/items/search")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody().assertThatJson {
+                        isEqualTo("""{
                                "content":[
                                {
                                   "cover":{
@@ -1112,7 +1106,7 @@ class ItemHandlerTest(
                                "totalElements":3,
                                "totalPages":1
                             }""")
-                        }
+                    }
             }
 
 
@@ -1125,31 +1119,31 @@ class ItemHandlerTest(
     inner class ShouldFindItemsOfPodcast {
 
         private val item = Item(
-                id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
-                title = "Foo",
-                url = "https://external.domain.tld/foo/bar.mp4",
+            id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
+            title = "Foo",
+            url = "https://external.domain.tld/foo/bar.mp4",
 
-                pubDate = OffsetDateTime.of(2019, 6, 24, 5, 28, 54, 34, ZoneOffset.ofHours(2)),
-                creationDate = OffsetDateTime.of(2019, 6, 24, 5, 29, 54, 34, ZoneOffset.ofHours(2)),
-                downloadDate = OffsetDateTime.of(2019, 6, 25, 5, 30, 54, 34, ZoneOffset.ofHours(2)),
+            pubDate = OffsetDateTime.of(2019, 6, 24, 5, 28, 54, 34, ZoneOffset.ofHours(2)),
+            creationDate = OffsetDateTime.of(2019, 6, 24, 5, 29, 54, 34, ZoneOffset.ofHours(2)),
+            downloadDate = OffsetDateTime.of(2019, 6, 25, 5, 30, 54, 34, ZoneOffset.ofHours(2)),
 
-                description = "desc",
-                mimeType = "audio/mp3",
-                length = 100,
-                fileName = null,
-                status = Status.NOT_DOWNLOADED,
+            description = "desc",
+            mimeType = "audio/mp3",
+            length = 100,
+            fileName = null,
+            status = Status.NOT_DOWNLOADED,
 
-                podcast = Item.Podcast(
-                        id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
-                        title = "Podcast title",
-                        url = "https://foo.bar.com/app/file.rss"
-                ),
-                cover = Item.Cover(
-                        id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                        url = URI("https://external.domain.tld/foo/bar.png"),
-                        width = 200,
-                        height = 200
-                )
+            podcast = Item.Podcast(
+                id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),
+                title = "Podcast title",
+                url = "https://foo.bar.com/app/file.rss"
+            ),
+            cover = Item.Cover(
+                id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
+                url = URI("https://external.domain.tld/foo/bar.png"),
+                width = 200,
+                height = 200
+            )
         )
 
         @Test
@@ -1159,18 +1153,18 @@ class ItemHandlerTest(
             val page = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
             val result = PageItem.of(listOf(item), 1, page)
             whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                    .thenReturn(result.toMono())
+                .thenReturn(result.toMono())
 
             /* When */
             rest
-                    .get()
-                    .uri("https://localhost:8080/api/v1/podcasts/$podcastId/items?page=0&size=12&sort=pubDate,DESC")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
-                    .expectBody()
-                    .assertThatJson {
-                        isEqualTo("""{
+                .get()
+                .uri("https://localhost:8080/api/v1/podcasts/$podcastId/items?page=0&size=12&sort=pubDate,DESC")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .assertThatJson {
+                    isEqualTo("""{
                           "content": [
                             {
                               "cover": {
@@ -1209,7 +1203,7 @@ class ItemHandlerTest(
                           "totalElements": 1,
                           "totalPages": 1
                         }""")
-                    }
+                }
         }
 
         @Test
@@ -1219,18 +1213,18 @@ class ItemHandlerTest(
             val page = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
             val result = PageItem.of(listOf(item), 1, page)
             whenever(itemService.search(anyOrNull(), eq(listOf("foo", "bar")), eq(listOf()), eq(page), eq(podcastId)))
-                    .thenReturn(result.toMono())
+                .thenReturn(result.toMono())
 
             /* When */
             rest
-                    .get()
-                    .uri("https://localhost:8080/api/v1/podcasts/$podcastId/items?page=0&size=12&sort=pubDate,DESC&tags=foo,bar")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
-                    .expectBody()
-                    .assertThatJson {
-                        isEqualTo("""{
+                .get()
+                .uri("https://localhost:8080/api/v1/podcasts/$podcastId/items?page=0&size=12&sort=pubDate,DESC&tags=foo,bar")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .assertThatJson {
+                    isEqualTo("""{
                           "content": [
                             {
                               "cover": {
@@ -1269,7 +1263,7 @@ class ItemHandlerTest(
                           "totalElements": 1,
                           "totalPages": 1
                         }""")
-                    }
+                }
         }
 
         @Test
@@ -1279,18 +1273,18 @@ class ItemHandlerTest(
             val page = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
             val result = PageItem.of(listOf(item), 1, page)
             whenever(itemService.search(eq("foo"), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                    .thenReturn(result.toMono())
+                .thenReturn(result.toMono())
 
             /* When */
             rest
-                    .get()
-                    .uri("https://localhost:8080/api/v1/podcasts/$podcastId/items?page=0&size=12&sort=pubDate,DESC&q=foo")
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
-                    .expectBody()
-                    .assertThatJson {
-                        isEqualTo("""{
+                .get()
+                .uri("https://localhost:8080/api/v1/podcasts/$podcastId/items?page=0&size=12&sort=pubDate,DESC&q=foo")
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .assertThatJson {
+                    isEqualTo("""{
                           "content": [
                             {
                               "cover": {
@@ -1329,89 +1323,89 @@ class ItemHandlerTest(
                           "totalElements": 1,
                           "totalPages": 1
                         }""")
-                    }
+                }
         }
     }
 
     @Nested
-    @DisplayName("should find watchLists associated to an item")
-    inner class ShouldFindWatchListsAssociatedToAnItem {
+    @DisplayName("should find playlist associated to an item")
+    inner class ShouldFindPlayListsAssociatedToAnItem {
 
         val item = Item(
-                id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
-                title = "Foo",
-                url = "https://external.domain.tld/foo/bar.mp4",
+            id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),
+            title = "Foo",
+            url = "https://external.domain.tld/foo/bar.mp4",
 
-                pubDate = now(),
-                downloadDate = now(),
-                creationDate = now(),
+            pubDate = now(),
+            downloadDate = now(),
+            creationDate = now(),
 
-                description = "desc",
-                mimeType = "audio/mp3",
-                length = 100,
-                fileName = null,
-                status = Status.NOT_DOWNLOADED,
+            description = "desc",
+            mimeType = "audio/mp3",
+            length = 100,
+            fileName = null,
+            status = Status.NOT_DOWNLOADED,
 
-                podcast = Item.Podcast(
-                        id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
-                        title = "Podcast Bar",
-                        url = "https://external.domain.tld/bar.rss"
-                ),
-                cover = Item.Cover(
-                        id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
-                        url = URI("https://external.domain.tld/foo/bar.png"),
-                        width = 200,
-                        height = 200
-                )
+            podcast = Item.Podcast(
+                id = UUID.fromString("8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9"),
+                title = "Podcast Bar",
+                url = "https://external.domain.tld/bar.rss"
+            ),
+            cover = Item.Cover(
+                id = UUID.fromString("f4efe8db-7abf-4998-b15c-9fa2e06096a1"),
+                url = URI("https://external.domain.tld/foo/bar.png"),
+                width = 200,
+                height = 200
+            )
         )
 
         @Test
         fun `with no watch list associated to this item`() {
             /* Given */
             whenever(itemService.findPlaylistsContainingItem(item.id))
-                    .thenReturn(Flux.empty())
+                .thenReturn(Flux.empty())
 
             /* When */
             rest
-                    .get()
-                    .uri("/api/v1/podcasts/{podcastId}/items/{id}/playlists", item.podcast.id, item.id)
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
-                    .expectBody()
-                    .assertThatJson {
-                        isEqualTo("""{
+                .get()
+                .uri("/api/v1/podcasts/{podcastId}/items/{id}/playlists", item.podcast.id, item.id)
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .assertThatJson {
+                    isEqualTo("""{
                           "content": []
                         }""")
-                    }
+                }
         }
 
         @Test
         fun `with 3 playlists associated to this item`() {
             /* Given */
             whenever(itemService.findPlaylistsContainingItem(item.id)).thenReturn(Flux.just(
-                    ItemPlaylist(UUID.fromString("50958264-d5ed-4a9a-a875-5173bb207720"), "foo"),
-                    ItemPlaylist(UUID.fromString("e053b63c-dc1d-4a3a-9c95-8f616a74d2aa"), "bar"),
-                    ItemPlaylist(UUID.fromString("6761208b-85e7-4098-817a-2db7c4de7ceb"), "other")
+                ItemPlaylist(UUID.fromString("50958264-d5ed-4a9a-a875-5173bb207720"), "foo"),
+                ItemPlaylist(UUID.fromString("e053b63c-dc1d-4a3a-9c95-8f616a74d2aa"), "bar"),
+                ItemPlaylist(UUID.fromString("6761208b-85e7-4098-817a-2db7c4de7ceb"), "other")
             ))
 
             /* When */
             rest
-                    .get()
-                    .uri("/api/v1/podcasts/{podcastId}/items/{id}/playlists", item.podcast.id, item.id)
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
-                    .expectBody()
-                    .assertThatJson {
-                        isEqualTo("""{
+                .get()
+                .uri("/api/v1/podcasts/{podcastId}/items/{id}/playlists", item.podcast.id, item.id)
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
+                .expectBody()
+                .assertThatJson {
+                    isEqualTo("""{
                           "content": [
                               {"id":"50958264-d5ed-4a9a-a875-5173bb207720","name":"foo"}, 
                               {"id":"e053b63c-dc1d-4a3a-9c95-8f616a74d2aa","name":"bar"}, 
                               {"id":"6761208b-85e7-4098-817a-2db7c4de7ceb","name":"other"}
                           ]
                         }""")
-                    }
+                }
         }
     }
 
@@ -1426,11 +1420,11 @@ class ItemHandlerTest(
             whenever(itemService.deleteById(id)).thenReturn(Mono.empty())
             /* When */
             rest
-                    .delete()
-                    .uri("/api/v1/podcasts/5957cb8a-a05c-4ac3-bb03-94f473d38273/items/{id}", id)
-                    .exchange()
-                    /* Then */
-                    .expectStatus().isOk
+                .delete()
+                .uri("/api/v1/podcasts/5957cb8a-a05c-4ac3-bb03-94f473d38273/items/{id}", id)
+                .exchange()
+                /* Then */
+                .expectStatus().isOk
         }
     }
 
@@ -1439,22 +1433,22 @@ class ItemHandlerTest(
     inner class ShouldUpload {
 
         private val item1 = Item(
-                id = UUID.fromString("6a287582-e181-48f9-a23d-c88d03879feb"),
-                title = "item 1",
-                url = "https://foo.bar.com/1.mp3",
+            id = UUID.fromString("6a287582-e181-48f9-a23d-c88d03879feb"),
+            title = "item 1",
+            url = "https://foo.bar.com/1.mp3",
 
-                pubDate = now(clock),
-                downloadDate = now(clock),
-                creationDate = now(clock),
+            pubDate = now(clock),
+            downloadDate = now(clock),
+            creationDate = now(clock),
 
-                description = "item 1 desc",
-                mimeType = "audio/mp3",
-                length = 1234,
-                fileName = Path("1.mp3"),
-                status = Status.FINISH,
+            description = "item 1 desc",
+            mimeType = "audio/mp3",
+            length = 1234,
+            fileName = Path("1.mp3"),
+            status = Status.FINISH,
 
-                podcast = Item.Podcast(UUID.fromString("ef62c5c3-e79f-4474-8228-40b76abcdb57"), "podcast 1", "https/foo.bar.com/rss"),
-                cover = Item.Cover(UUID.fromString("337edcd5-97d3-4f78-9a5b-1c14c999883b"), URI("https://foo.bar.com/cover.png"), 100, 100)
+            podcast = Item.Podcast(UUID.fromString("ef62c5c3-e79f-4474-8228-40b76abcdb57"), "podcast 1", "https/foo.bar.com/rss"),
+            cover = Item.Cover(UUID.fromString("337edcd5-97d3-4f78-9a5b-1c14c999883b"), URI("https://foo.bar.com/cover.png"), 100, 100)
         )
 
 
@@ -1476,19 +1470,19 @@ class ItemHandlerTest(
 
             /* When */
             rest
-                    .post()
-                    .uri("/api/v1/podcasts/{idPodcast}/items/upload", podcastId)
-                    .header("X-Forwarded-Proto", "http")
-                    .header("host", "localhost")
-                    .header("X-Forwarded-Port", "8080")
-                    .body(BodyInserters.fromMultipartData(body))
-                    /* Then */
-                    .exchange()
-                    .expectStatus().isCreated
-                    .expectHeader()
-                    .valueEquals("Location", "http://localhost:8080/api/v1/items/6a287582-e181-48f9-a23d-c88d03879feb")
-                    .expectBody().assertThatJson {
-                        isEqualTo("""{
+                .post()
+                .uri("/api/v1/podcasts/{idPodcast}/items/upload", podcastId)
+                .header("X-Forwarded-Proto", "http")
+                .header("host", "localhost")
+                .header("X-Forwarded-Port", "8080")
+                .body(BodyInserters.fromMultipartData(body))
+                /* Then */
+                .exchange()
+                .expectStatus().isCreated
+                .expectHeader()
+                .valueEquals("Location", "http://localhost:8080/api/v1/items/6a287582-e181-48f9-a23d-c88d03879feb")
+                .expectBody().assertThatJson {
+                    isEqualTo("""{
                            "id":"6a287582-e181-48f9-a23d-c88d03879feb",
                            "title":"item 1",
                            "url":"https://foo.bar.com/1.mp3",
@@ -1515,7 +1509,7 @@ class ItemHandlerTest(
                            "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/item_1.mp3",
                            "isDownloaded":true
                         }""")
-                    }
+                }
         }
 
     }
@@ -1524,6 +1518,7 @@ class ItemHandlerTest(
     class LocalTestConfiguration {
         @Bean fun fixedClock(): Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
     }
+
 }
 
 private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
