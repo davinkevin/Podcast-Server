@@ -9,13 +9,10 @@ import org.jdom2.Element
 import org.jdom2.output.Format
 import org.jdom2.output.XMLOutputter
 import org.springframework.http.MediaType
-import org.springframework.web.reactive.function.server.ServerRequest
-import org.springframework.web.reactive.function.server.ServerResponse
-import org.springframework.web.reactive.function.server.ServerResponse.noContent
-import org.springframework.web.reactive.function.server.ServerResponse.ok
-import org.springframework.web.reactive.function.server.bodyToMono
+import org.springframework.web.servlet.function.ServerRequest
+import org.springframework.web.servlet.function.ServerResponse
+import org.springframework.web.servlet.function.body
 import org.springframework.web.util.UriComponentsBuilder
-import reactor.core.publisher.Mono
 import java.net.URI
 import java.util.*
 import com.github.davinkevin.podcastserver.rss.Item as RssItem
@@ -24,91 +21,105 @@ class PlaylistHandler(
         private val playlistService: PlaylistService
 ) {
 
-    fun save(r: ServerRequest): Mono<ServerResponse> {
-        return r
-                .bodyToMono<SavePlaylist>()
-                .flatMap { playlistService.save(it.name) }
-                .map { PlaylistWithItemsHAL(
-                        id = it.id,
-                        name = it.name,
-                        items = it.items.map(PlaylistWithItems.Item::toHAL)
-                ) }
-                .flatMap { ok().bodyValue(it) }
+    fun save(r: ServerRequest): ServerResponse {
+        val playlistSaveRequest = r.body<SavePlaylist>()
 
+        val playlist = playlistService.save(playlistSaveRequest.name).block()!!
+
+        val body = PlaylistWithItemsHAL(
+            id = playlist.id,
+            name = playlist.name,
+            items = playlist.items.map(PlaylistWithItems.Item::toHAL)
+        )
+
+        return ServerResponse.ok().body(body)
     }
 
-    fun findAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): Mono<ServerResponse> =
-            playlistService
-                    .findAll()
-                    .map { PlaylistHAL(it.id, it.name) }
-                    .collectList()
-                    .map { FindAllPlaylistHAL(it) }
-                    .flatMap { ok().bodyValue(it) }
 
-    fun findById(r: ServerRequest): Mono<ServerResponse> {
-        val id = UUID.fromString(r.pathVariable("id"))
+    fun findAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
+        val playlists = playlistService.findAll().collectList().block()!!
 
-        return playlistService
-                .findById(id)
-                .map { PlaylistWithItemsHAL(
-                        id = it.id,
-                        name = it.name,
-                        items = it.items.map(PlaylistWithItems.Item::toHAL)
-                ) }
-                .flatMap { ok().bodyValue(it) }
+        val body = playlists
+            .map { PlaylistHAL(it.id, it.name) }
+            .let(::FindAllPlaylistHAL)
+
+        return ServerResponse.ok().body(body)
     }
 
-    fun deleteById(r: ServerRequest): Mono<ServerResponse> {
-        val id = UUID.fromString(r.pathVariable("id"))
+    fun findById(r: ServerRequest): ServerResponse {
+        val id = r.pathVariable("id")
+            .let(UUID::fromString)
 
-        return playlistService
-                .deleteById(id)
-                .then(noContent().build())
+        val playlist = playlistService.findById(id).block()!!
+
+        val body = PlaylistWithItemsHAL(
+            id = playlist.id,
+            name = playlist.name,
+            items = playlist.items.map(PlaylistWithItems.Item::toHAL)
+        )
+
+        return ServerResponse.ok().body(body)
     }
 
-    fun rss(r: ServerRequest): Mono<ServerResponse> {
+    fun deleteById(r: ServerRequest): ServerResponse {
+        val id = r.pathVariable("id")
+            .let(UUID::fromString)
+
+        playlistService.deleteById(id).block()
+
+        return ServerResponse.noContent().build()
+    }
+
+    fun rss(r: ServerRequest): ServerResponse {
         val host = r.extractHost()
-        val id = UUID.fromString(r.pathVariable("id"))
+        val id = r.pathVariable("id")
+            .let(UUID::fromString)
 
-        return playlistService
-                .findById(id)
-                .map { it.toRss(host) }
-                .map { XMLOutputter(Format.getPrettyFormat()).outputString(Document(it)) }
-                .flatMap { ok()
-                        .contentType(MediaType.APPLICATION_XML)
-                        .bodyValue(it)
-                }
+        val playlist = playlistService.findById(id).block()
+            ?: return ServerResponse.notFound().build()
 
+        val rss = playlist.toRss(host)
+
+        val body = XMLOutputter(Format.getPrettyFormat()).outputString(Document(rss))
+
+        return ServerResponse.ok()
+            .contentType(MediaType.APPLICATION_XML)
+            .body(body)
     }
 
-    fun addToPlaylist(r: ServerRequest): Mono<ServerResponse> {
-        val playlistId = UUID.fromString(r.pathVariable("id"))
-        val itemId = UUID.fromString(r.pathVariable("itemId"))
+    fun addToPlaylist(r: ServerRequest): ServerResponse {
+        val playlistId = r.pathVariable("id")
+            .let(UUID::fromString)
+        val itemId = r.pathVariable("itemId")
+            .let(UUID::fromString)
 
-        return playlistService
-                .addToPlaylist(playlistId, itemId)
-                .map { PlaylistWithItemsHAL(
-                        id = it.id,
-                        name = it.name,
-                        items = it.items.map(PlaylistWithItems.Item::toHAL)
-                ) }
-                .flatMap { ok().bodyValue(it) }
+        val playlistWithItem = playlistService.addToPlaylist(playlistId, itemId).block()!!
+
+        val body = PlaylistWithItemsHAL(
+            id = playlistWithItem.id,
+            name = playlistWithItem.name,
+            items = playlistWithItem.items.map(PlaylistWithItems.Item::toHAL)
+        )
+
+        return ServerResponse.ok().body(body)
     }
 
-    fun removeFromPlaylist(r: ServerRequest): Mono<ServerResponse> {
-        val playlistId = UUID.fromString(r.pathVariable("id"))
-        val itemId = UUID.fromString(r.pathVariable("itemId"))
+    fun removeFromPlaylist(r: ServerRequest): ServerResponse {
+        val playlistId = r.pathVariable("id")
+            .let(UUID::fromString)
+        val itemId = r.pathVariable("itemId")
+            .let(UUID::fromString)
 
-        return playlistService
-                .removeFromPlaylist(playlistId, itemId)
-                .map { PlaylistWithItemsHAL(
-                        id = it.id,
-                        name = it.name,
-                        items = it.items.map(PlaylistWithItems.Item::toHAL)
-                ) }
-                .flatMap { ok().bodyValue(it) }
+        val playlistWithItem = playlistService.removeFromPlaylist(playlistId, itemId).block()!!
+
+        val body = PlaylistWithItemsHAL(
+            id = playlistWithItem.id,
+            name = playlistWithItem.name,
+            items = playlistWithItem.items.map(PlaylistWithItems.Item::toHAL)
+        )
+
+        return ServerResponse.ok().body(body)
     }
-
 }
 
 private class SavePlaylist(val name: String)

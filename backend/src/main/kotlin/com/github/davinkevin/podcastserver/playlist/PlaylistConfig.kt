@@ -3,7 +3,7 @@ package com.github.davinkevin.podcastserver.playlist
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.web.reactive.function.server.router
+import org.springframework.web.servlet.function.router
 
 /**
  * Created by kevin on 2019-07-01
@@ -12,7 +12,7 @@ import org.springframework.web.reactive.function.server.router
 class PlaylistRoutingConfig {
 
     @Bean
-    fun watchlistRouter(playlist: PlaylistHandler) = router {
+    fun playlistRouter(playlist: PlaylistHandler) = router {
         "/api/v1/playlists".nest {
             GET("", playlist::findAll)
             POST("", playlist::save)
@@ -25,14 +25,13 @@ class PlaylistRoutingConfig {
             }
         }
     }
-
 }
 
 @Configuration
 @Import(
-        PlaylistRoutingConfig::class,
-        PlaylistHandler::class,
-        PlaylistService::class,
-        PlaylistRepository::class
+    PlaylistRoutingConfig::class,
+    PlaylistHandler::class,
+    PlaylistService::class,
+    PlaylistRepository::class
 )
 class PlaylistConfig
