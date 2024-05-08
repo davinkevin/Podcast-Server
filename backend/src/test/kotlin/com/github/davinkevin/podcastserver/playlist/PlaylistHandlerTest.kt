@@ -1,14 +1,13 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
+import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
@@ -22,12 +21,8 @@ import java.time.ZoneOffset
 import java.util.*
 import kotlin.io.path.Path
 
-/**
- * Created by kevin on 2019-07-06
- */
-@WebFluxTest(controllers = [PlaylistHandler::class])
-@Import(PlaylistRoutingConfig::class, PlaylistHandler::class)
-@ImportAutoConfiguration(ErrorWebFluxAutoConfiguration::class)
+@WebMvcTest(controllers = [PlaylistHandler::class])
+@Import(PlaylistRoutingConfig::class, PlaylistHandler::class, MockMvcRestExceptionConfiguration::class)
 class PlaylistHandlerTest (
     @Autowired val rest: WebTestClient
 ) {
@@ -544,8 +539,23 @@ class PlaylistHandlerTest (
                         """.trimIndent())
             }
 
-        }
+            @Test
+            fun `with item not found`() {
+                /* Given */
+                whenever(service.findById(playlist.id)).thenReturn(Mono.empty())
 
+                /* When */
+                rest
+                    .get()
+                    .uri("/api/v1/playlists/{id}/rss", playlist.id)
+                    .header("Host", "foo.com")
+                    .header("X-Forwarded-Proto", "https")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isNotFound
+            }
+
+        }
     }
 
     @Nested
