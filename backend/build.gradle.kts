@@ -173,7 +173,8 @@ tasks.register("downloadDependencies") {
 		val allDeps = configurations
 			.filter { it.isCanBeResolved && !it.isDeprecated() }
 			.onEach { it.incoming.artifactView { lenient(true) }.artifacts }
-			.sumOf { it.resolve().size }
+			.map { runCatching { it.resolve() }.getOrElse { emptySet() } }
+			.sumOf { it.size }
 
 		println("Downloaded all dependencies: ${allDeps + buildDeps}")
 	}
