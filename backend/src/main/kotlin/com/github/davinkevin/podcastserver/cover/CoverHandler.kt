@@ -17,7 +17,7 @@ class CoverHandler(
         val date = OffsetDateTime.now(clock)
                 .minusDays(retentionNumberOfDays)
 
-        cover.deleteCoversInFileSystemOlderThan(date).block()
+        cover.deleteCoversInFileSystemOlderThan(date)
 
         return ServerResponse.ok().build()
     }
