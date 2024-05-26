@@ -11,9 +11,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
 @WebMvcTest(controllers = [TagHandler::class])
@@ -32,7 +29,7 @@ class TagHandlerTest(
         fun `with existing tag`() {
             /* Given */
             val id = UUID.fromString("fdd3e040-5357-48c6-a31b-da3657ab7adf")
-            whenever(tagService.findById(id)).thenReturn(Tag(id, "foo").toMono())
+            whenever(tagService.findById(id)).thenReturn(Tag(id, "foo"))
 
             /* When */
             rest
@@ -54,7 +51,7 @@ class TagHandlerTest(
         fun `with no result`() {
             /* Given */
             val id = UUID.fromString("fdd3e040-5357-48c6-a31b-da3657ab7adf")
-            whenever(tagService.findById(id)).thenReturn(Mono.empty())
+            whenever(tagService.findById(id)).thenReturn(null)
 
             /* When */
             rest
@@ -77,7 +74,7 @@ class TagHandlerTest(
             val t1 = Tag(UUID.randomUUID(), "foo")
             val t2 = Tag(UUID.randomUUID(), "foo2")
             val t3 = Tag(UUID.randomUUID(), "foo3")
-            whenever(tagService.findByNameLike("foo")).thenReturn(Flux.just(t1, t2, t3))
+            whenever(tagService.findByNameLike("foo")).thenReturn(listOf(t1, t2, t3))
 
             /* When */
             rest
@@ -108,7 +105,7 @@ class TagHandlerTest(
         fun `bar which returns one element`() {
             /* Given */
             val t1 = Tag(UUID.randomUUID(), "bar")
-            whenever(tagService.findByNameLike("bar")).thenReturn(Flux.just(t1))
+            whenever(tagService.findByNameLike("bar")).thenReturn(listOf(t1))
 
             /* When */
             rest
@@ -132,7 +129,7 @@ class TagHandlerTest(
         @Test
         fun `tech which returns no element`() {
             /* Given */
-            whenever(tagService.findByNameLike("tech")).thenReturn(Flux.empty())
+            whenever(tagService.findByNameLike("tech")).thenReturn(emptyList())
 
             /* When */
             rest
@@ -153,7 +150,7 @@ class TagHandlerTest(
             val t1 = Tag(UUID.randomUUID(), "foo")
             val t2 = Tag(UUID.randomUUID(), "foo2")
             val t3 = Tag(UUID.randomUUID(), "foo3")
-            whenever(tagService.findByNameLike("")).thenReturn(Flux.just(t1, t2, t3))
+            whenever(tagService.findByNameLike("")).thenReturn(listOf(t1, t2, t3))
 
             /* When */
             rest

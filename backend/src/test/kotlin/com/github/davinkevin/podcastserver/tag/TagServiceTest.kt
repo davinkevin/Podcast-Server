@@ -1,10 +1,11 @@
 package com.github.davinkevin.podcastserver.tag
 
-import org.mockito.kotlin.whenever
+import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
@@ -12,7 +13,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
-import reactor.test.StepVerifier
 import java.util.*
 
 /**
@@ -37,11 +37,10 @@ class TagServiceTest (
             whenever(repo.findById(id)).thenReturn(Tag(id, "foo").toMono())
 
             /* When */
-            StepVerifier.create(service.findById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(Tag(id, "foo"))
-                    .verifyComplete()
+            val tag = service.findById(id)
+
+            /* Then */
+            assertThat(tag).isEqualTo(Tag(id, "foo"))
         }
 
         @Test
@@ -51,10 +50,10 @@ class TagServiceTest (
             whenever(repo.findById(id)).thenReturn(Mono.empty())
 
             /* When */
-            StepVerifier.create(service.findById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            val tag = service.findById(id)
+
+            /* Then */
+            assertThat(tag).isNull()
         }
     }
 
@@ -69,11 +68,10 @@ class TagServiceTest (
             whenever(repo.findByNameLike("foo")).thenReturn(Flux.just(tag))
 
             /* When */
-            StepVerifier.create(service.findByNameLike("foo"))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(tag)
-                    .verifyComplete()
+            val tags = service.findByNameLike("foo")
+
+            /* Then */
+            assertThat(tags).contains(tag)
         }
 
         @Test
@@ -82,11 +80,10 @@ class TagServiceTest (
             whenever(repo.findByNameLike("foo")).thenReturn(Flux.empty())
 
             /* When */
-            StepVerifier.create(service.findByNameLike("foo"))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
-        }
+            val tags = service.findByNameLike("foo")
 
+            /* Then */
+            assertThat(tags).isEmpty()
+        }
     }
 }

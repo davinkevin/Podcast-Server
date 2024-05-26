@@ -14,7 +14,7 @@ class TagHandler(private val tagService: TagService) {
         val id = s.pathVariable("id")
             .let(UUID::fromString)
 
-        val tag = tagService.findById(id).block()
+        val tag = tagService.findById(id)
             ?: return ServerResponse.notFound().build()
 
         val body = TagHAL(tag.id, tag.name)
@@ -25,7 +25,7 @@ class TagHandler(private val tagService: TagService) {
     fun findByNameLike(s: ServerRequest): ServerResponse {
         val name = s.paramOrNull("name") ?: ""
 
-        val tags = tagService.findByNameLike(name).collectList().block()!!
+        val tags = tagService.findByNameLike(name)
 
         val body = tags
             .map { TagHAL(it.id, it.name) }
