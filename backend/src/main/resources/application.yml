@@ -15,27 +15,23 @@ server:
  port: 8080
 
 management:
-  endpoint:
-    health:
-     show-details: always
-     group:
-      liveness.include:  ["r2dbc", "ping", "livenessState"]
-      readiness.include: ["ping", "readinessState"]
-  endpoints.web.exposure.include: ['health', 'info', 'env', 'configprops', 'prometheus', 'metrics']
+
+ endpoint:
+  health:
+   probes:
+    enabled: true
+   show-details: always
+   group:
+    liveness.include:  ["r2dbc", "ping"]
+    readiness.include: ["ping"]
+ endpoints:
+  web:
+   exposure:
+    include: ['health', 'info', 'env', 'configprops', 'prometheus', 'metrics']
 
 ##############################
 #    Application Specific    #
 ##############################
 
 podcastserver:
- rootfolder: /tmp/podcast-server/
- #concurrent-download: 2
  max-update-parallels: 256
- #cover-default-name: cover
- #number-of-try: 10
- #download-extension: .psdownload
- #rss-default-number-item: 50
- #externaltools:
-  #rtmpdump: /usr/local/bin/rtmpdump
-  #ffmpeg: /usr/local/bin/ffmpeg
-  #ffprobe: /usr/local/bin/ffprobe

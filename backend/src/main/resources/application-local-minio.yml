@@ -1,0 +1,6 @@
+podcastserver:
+ storage:
+  bucket: podcasts
+  username: ${MINIO_ALTERNATE_USER:podcast-server-user}
+  password: ${MINIO_ALTERNATE_PASSWORD:nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa}
+  url: http://localhost:9000

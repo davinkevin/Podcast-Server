@@ -1,0 +1,5 @@
+spring:
+ r2dbc:
+  username: ${PG_ALTERNATE_USER:podcast-server-user}
+  password: ${PG_ALTERNATE_PASSWORD:nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa}
+  url: r2dbc:postgresql://postgres:5432/podcast-server
