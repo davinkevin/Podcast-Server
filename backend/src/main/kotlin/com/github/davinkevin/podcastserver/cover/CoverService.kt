@@ -9,7 +9,7 @@ class CoverService(
 ) {
     fun deleteCoversInFileSystemOlderThan(date: OffsetDateTime) {
         cover
-            .findCoverOlderThan(date).collectList().block()!!
+            .findCoverOlderThan(date)
             .asSequence()
             .filter { file.coverExists(it.podcast.title, it.item.id, it.extension).hasElement().block()!! }
             .forEach { file.deleteCover(it).block() }

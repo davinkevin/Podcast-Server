@@ -43,7 +43,7 @@ class CoverServiceTest (
         @Test
         fun `with no cover to delete`() {
             /* Given */
-            whenever(cover.findCoverOlderThan(date)).thenReturn(Flux.empty())
+            whenever(cover.findCoverOlderThan(date)).thenReturn(emptyList())
             /* When */
             service.deleteCoversInFileSystemOlderThan(date)
 
@@ -60,7 +60,7 @@ class CoverServiceTest (
                     randomCover("item2", "podcast2"),
                     randomCover("item3", "podcast3")
             )
-            whenever(cover.findCoverOlderThan(date)).thenReturn(covers.toFlux())
+            whenever(cover.findCoverOlderThan(date)).thenReturn(covers)
             whenever(file.coverExists(any(), any(), any())).thenReturn(Mono.just(Path("file.mp3")))
             whenever(file.deleteCover(any())).thenReturn(Mono.empty())
 
@@ -76,7 +76,7 @@ class CoverServiceTest (
             /* Given */
             val covers = listOf(randomCover("item1", "podcast1"))
 
-            whenever(cover.findCoverOlderThan(date)).thenReturn(covers.toFlux())
+            whenever(cover.findCoverOlderThan(date)).thenReturn(covers)
             whenever(file.coverExists(any(), any(), any())).thenReturn(Mono.empty())
 
             /* When */
