@@ -10,6 +10,10 @@ import org.springframework.boot.runApplication
 class PodcastServerApplication
 
 fun main(args: Array<String>) {
-    System.getProperties().setProperty("org.jooq.no-logo", "true")
+    System.getProperties().apply {
+        setProperty("org.jooq.no-logo", "true")
+        setProperty("org.jooq.no-tips", "true")
+    }
+
     runApplication<PodcastServerApplication>(*args)
 }
