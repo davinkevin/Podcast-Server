@@ -355,7 +355,7 @@ class PodcastServiceTest(
                 val savedCover = p.cover.toCover()
 
                 whenever(coverRepository.save(p.cover)).thenReturn(savedCover.toMono())
-                whenever(tagRepository.save("Sport")).thenReturn(Tag(newTagId, "Sport").toMono())
+                whenever(tagRepository.save("Sport")).thenReturn(Tag(newTagId, "Sport"))
                 whenever(repository.save(
                         eq(p.title),
                         eq(p.url!!.toASCIIString()),
@@ -446,7 +446,7 @@ class PodcastServiceTest(
                 val pToUpdate = podcastForUpdate.copy(tags = setOf(newTagForCreation))
                 val p = podcast.copy(tags = setOf(newTagsInDb))
 
-                whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb.toMono())
+                whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb)
                 whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
                 whenever(repository.update(
                         id = eq(p.id),
@@ -477,7 +477,7 @@ class PodcastServiceTest(
                 val pToUpdate = podcastForUpdate.copy(tags = setOf(newTagForCreation, oldTagForCreation))
                 val p = podcast.copy(tags = setOf(newTagsInDb, oldTagInDb))
 
-                whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb.toMono())
+                whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb)
                 whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
                 whenever(repository.update(
                         id = eq(p.id),
@@ -504,7 +504,7 @@ class PodcastServiceTest(
                 val pToUpdate = podcastForUpdate.copy(tags = setOf(oldTagForCreation))
                 val p = podcast.copy(tags = setOf(oldTagInDb))
 
-                whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb.toMono())
+                whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb)
                 whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
                 whenever(repository.update(
                         id = eq(p.id),
@@ -543,7 +543,7 @@ class PodcastServiceTest(
                 val p = podcast.copy(tags = allTagsInDb)
 
                 whenever(tagRepository.save(argThat { this in listOfNewTags.map { it.name } }))
-                        .then { allTagsInDb.first() { t -> t.name == it.getArgument<String>(0) }.toMono() }
+                        .then { allTagsInDb.first() { t -> t.name == it.getArgument<String>(0) } }
                 whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
                 whenever(repository.update(
                         id = eq(p.id),

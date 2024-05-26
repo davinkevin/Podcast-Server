@@ -11,9 +11,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
-import reactor.test.StepVerifier
 import java.util.UUID.fromString
 
 /**
@@ -50,11 +48,10 @@ class TagRepositoryTest(
             val id = fromString("eb355a23-e030-4966-b75a-b70881a8bd08")
 
             /* When */
-            StepVerifier.create(repository.findById(id))
-                /* Then */
-                .expectSubscription()
-                .expectNext(Tag(id, "Foo"))
-                .verifyComplete()
+            val tag = repository.findById(id)
+
+            /* Then */
+            assertThat(tag).isEqualTo(Tag(id, "Foo"))
         }
 
         @Test
@@ -63,10 +60,10 @@ class TagRepositoryTest(
             val id = fromString("98b33370-a976-4e4d-9ab8-57d47241e693")
 
             /* When */
-            StepVerifier.create(repository.findById(id))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            val tag = repository.findById(id)
+
+            /* Then */
+            assertThat(tag).isNull()
         }
 
     }
@@ -78,24 +75,23 @@ class TagRepositoryTest(
         @Test
         fun `with with insensitive case results`() {
             /* Given */
-
             /* When */
-            StepVerifier.create(repository.findByNameLike("bar"))
-                /* Then */
-                .expectSubscription()
-                .expectNext(Tag(fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar"))
-                .expectNext(Tag(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr"))
-                .verifyComplete()
+            val tags = repository.findByNameLike("bar")
+
+            /* Then */
+            assertThat(tags).containsExactly(
+                Tag(fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar"),
+                Tag(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr")
+            )
         }
 
         @Test
         fun `without any match`() {
             /* Given */
             /* When */
-            StepVerifier.create(repository.findByNameLike("boo"))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            val tags = repository.findByNameLike("boo")
+            /* Then */
+            assertThat(tags).isEmpty()
         }
     }
 
@@ -107,15 +103,13 @@ class TagRepositoryTest(
         fun `an item with just name`() {
             /* Given */
             val name = "a_wonderful_tag_name"
+
             /* When */
-            StepVerifier.create(repository.save(name))
-                /* Then */
-                .expectSubscription()
-                .assertNext {
-                    assertThat(it.id).isNotNull()
-                    assertThat(it.name).isEqualTo(name)
-                }
-                .verifyComplete()
+            val tag = repository.save(name)
+
+            /* Then */
+            assertThat(tag.id).isNotNull()
+            assertThat(tag.name).isEqualTo(name)
 
             val numberOfTag = query.selectCount().from(TAG).r2dbc().fetchOne(count())
             assertThat(numberOfTag).isEqualTo(4)
@@ -126,15 +120,11 @@ class TagRepositoryTest(
             /* Given */
             val name = "Foo"
             /* When */
-            StepVerifier.create(repository.save(name))
-                /* Then */
-                .expectSubscription()
-                .assertNext {
-                    assertThat(it.id).isNotNull()
-                    assertThat(it.name).isEqualTo(name)
+            val tag = repository.save(name)
 
-                }
-                .verifyComplete()
+            /* Then */
+            assertThat(tag.id).isNotNull()
+            assertThat(tag.name).isEqualTo(name)
 
             val numberOfTag = query.selectCount().from(TAG).r2dbc().fetchOne(count())
             assertThat(numberOfTag).isEqualTo(3)

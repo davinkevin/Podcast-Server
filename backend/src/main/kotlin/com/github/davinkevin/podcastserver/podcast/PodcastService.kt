@@ -35,7 +35,7 @@ class PodcastService(
     fun save(p: PodcastForCreation): Mono<Podcast> {
 
         val oldTags = p.tags.toFlux().filter { it.id != null }.map { Tag(it.id!!, it.name) }
-        val newTags = p.tags.toFlux().filter { it.id == null }.flatMap { tagRepository.save(it.name) }
+        val newTags = p.tags.toFlux().filter { it.id == null }.flatMap { Mono.defer { tagRepository.save(it.name).toMono() } }
 
         val tags = Flux.merge(oldTags, newTags).collectList()
         val cover = coverRepository.save(p.cover)
@@ -55,7 +55,7 @@ class PodcastService(
     fun update(updatePodcast: PodcastForUpdate): Mono<Podcast> = findById(updatePodcast.id).flatMap { p ->
 
         val oldTags = updatePodcast.tags.toFlux().filter { it.id != null }.map { Tag(it.id!!, it.name) }
-        val newTags = updatePodcast.tags.toFlux().filter { it.id == null }.flatMap { tagRepository.save(it.name) }
+        val newTags = updatePodcast.tags.toFlux().filter { it.id == null }.flatMap { Mono.defer { tagRepository.save(it.name).toMono() } }
         val tags = Flux.merge(oldTags, newTags).collectList()
 
         val newCover = updatePodcast.cover

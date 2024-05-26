@@ -10,9 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.util.*
 
 /**
@@ -34,7 +31,7 @@ class TagServiceTest (
         fun `with existing tag`() {
             /* Given */
             val id = UUID.fromString("fdd3e040-5357-48c6-a31b-da3657ab7adf")
-            whenever(repo.findById(id)).thenReturn(Tag(id, "foo").toMono())
+            whenever(repo.findById(id)).thenReturn(Tag(id, "foo"))
 
             /* When */
             val tag = service.findById(id)
@@ -47,7 +44,7 @@ class TagServiceTest (
         fun `with no result`() {
             /* Given */
             val id = UUID.fromString("fdd3e040-5357-48c6-a31b-da3657ab7adf")
-            whenever(repo.findById(id)).thenReturn(Mono.empty())
+            whenever(repo.findById(id)).thenReturn(null)
 
             /* When */
             val tag = service.findById(id)
@@ -65,7 +62,7 @@ class TagServiceTest (
         fun `with existing tags`() {
             /* Given */
             val tag = Tag(UUID.fromString("fdd3e040-5357-48c6-a31b-da3657ab7adf"), "foo")
-            whenever(repo.findByNameLike("foo")).thenReturn(Flux.just(tag))
+            whenever(repo.findByNameLike("foo")).thenReturn(listOf(tag))
 
             /* When */
             val tags = service.findByNameLike("foo")
@@ -77,7 +74,7 @@ class TagServiceTest (
         @Test
         fun `with no result`() {
             /* Given */
-            whenever(repo.findByNameLike("foo")).thenReturn(Flux.empty())
+            whenever(repo.findByNameLike("foo")).thenReturn(emptyList())
 
             /* When */
             val tags = service.findByNameLike("foo")
