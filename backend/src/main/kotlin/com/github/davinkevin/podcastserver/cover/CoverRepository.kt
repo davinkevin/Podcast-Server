@@ -28,30 +28,33 @@ class CoverRepository(private val query: DSLContext) {
             .map { Cover(id, cover.url, cover.height, cover.width) }
     }
 
-    fun findCoverOlderThan(date: OffsetDateTime): Flux<DeleteCoverRequest> = Flux.defer {
-        Flux.from(
-            query
-                .select(
-                    PODCAST.ID, PODCAST.TITLE,
-                    ITEM.ID, ITEM.TITLE,
-                    COVER.ID, COVER.URL
-                )
-                .from(COVER
-                    .innerJoin(ITEM).on(COVER.ID.eq(ITEM.COVER_ID))
-                    .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
-                )
-                .where(ITEM.CREATION_DATE.lessOrEqual(date))
-                .orderBy(COVER.ID.asc())
-        )
-            .map { (podcastId, podcastTitle, itemId, itemTitle, coverId, coverUrl) ->
-                DeleteCoverRequest(
-                    id = coverId,
-                    extension = Path(coverUrl).extension,
-                    item = Item(itemId, itemTitle),
-                    podcast = Podcast(podcastId, podcastTitle)
-                )
-            }
-    }
+    fun findCoverOlderThan(date: OffsetDateTime): List<DeleteCoverRequest> = Flux.defer {
+            Flux.from(
+                query
+                    .select(
+                        PODCAST.ID, PODCAST.TITLE,
+                        ITEM.ID, ITEM.TITLE,
+                        COVER.ID, COVER.URL
+                    )
+                    .from(
+                        COVER
+                            .innerJoin(ITEM).on(COVER.ID.eq(ITEM.COVER_ID))
+                            .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
+                    )
+                    .where(ITEM.CREATION_DATE.lessOrEqual(date))
+                    .orderBy(COVER.ID.asc())
+            )
+                .map { (podcastId, podcastTitle, itemId, itemTitle, coverId, coverUrl) ->
+                    DeleteCoverRequest(
+                        id = coverId,
+                        extension = Path(coverUrl).extension,
+                        item = Item(itemId, itemTitle),
+                        podcast = Podcast(podcastId, podcastTitle)
+                    )
+                }
+        }
+        .collectList()
+        .block()!!
 }
 
 data class CoverForCreation(val width: Int, val height: Int, val url: URI)
