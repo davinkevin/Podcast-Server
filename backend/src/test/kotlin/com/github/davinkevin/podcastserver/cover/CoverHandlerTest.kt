@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.cover
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -40,7 +41,6 @@ class CoverHandlerTest(
         fun `with number of days provided as query param`() {
             /* Given */
             val expectedDate = fixedDate.minusDays(2)
-            whenever(cover.deleteCoversInFileSystemOlderThan(expectedDate)).thenReturn(Mono.empty())
 
             /* When */
             rest
@@ -57,7 +57,6 @@ class CoverHandlerTest(
         fun `with default number of days`() {
             /* Given */
             val expectedDate = fixedDate.minusDays(365)
-            whenever(cover.deleteCoversInFileSystemOlderThan(expectedDate)).thenReturn(Mono.empty())
 
             /* When */
             rest

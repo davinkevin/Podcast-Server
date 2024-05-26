@@ -45,11 +45,9 @@ class CoverServiceTest (
             /* Given */
             whenever(cover.findCoverOlderThan(date)).thenReturn(Flux.empty())
             /* When */
-            StepVerifier.create(service.deleteCoversInFileSystemOlderThan(date))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            service.deleteCoversInFileSystemOlderThan(date)
 
+            /* Then */
             verify(cover, times(1)).findCoverOlderThan(date)
             verify(file, never()).deleteCover(any())
         }
@@ -67,11 +65,9 @@ class CoverServiceTest (
             whenever(file.deleteCover(any())).thenReturn(Mono.empty())
 
             /* When */
-            StepVerifier.create(service.deleteCoversInFileSystemOlderThan(date))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            service.deleteCoversInFileSystemOlderThan(date)
 
+            /* Then */
             verify(file, times(3)).deleteCover(any())
         }
 
@@ -84,11 +80,9 @@ class CoverServiceTest (
             whenever(file.coverExists(any(), any(), any())).thenReturn(Mono.empty())
 
             /* When */
-            StepVerifier.create(service.deleteCoversInFileSystemOlderThan(date))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            service.deleteCoversInFileSystemOlderThan(date)
 
+            /* Then */
             verify(file, never()).deleteCover(any())
         }
 
