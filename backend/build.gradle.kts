@@ -128,10 +128,12 @@ tasks.test {
 	}
 }
 
-koverReport {
-	filters {
-		excludes {
-			classes("org.springframework.*", "*__*")
+kover {
+	reports {
+		filters {
+			excludes {
+				classes("org.springframework.*", "*__*")
+			}
 		}
 	}
 }
