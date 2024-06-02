@@ -6,15 +6,26 @@ package com.github.davinkevin.podcastserver.database.tables;
 
 import com.github.davinkevin.podcastserver.database.Keys;
 import com.github.davinkevin.podcastserver.database.Public;
+import com.github.davinkevin.podcastserver.database.tables.Item.ItemPath;
+import com.github.davinkevin.podcastserver.database.tables.Podcast.PodcastPath;
 import com.github.davinkevin.podcastserver.database.tables.records.CoverRecord;
 
+import java.util.Collection;
 import java.util.UUID;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
+import org.jooq.SQL;
 import org.jooq.Schema;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -66,11 +77,11 @@ public class Cover extends TableImpl<CoverRecord> {
     public final TableField<CoverRecord, Integer> WIDTH = createField(DSL.name("width"), SQLDataType.INTEGER.nullable(false).defaultValue(DSL.field(DSL.raw("200"), SQLDataType.INTEGER)), this, "");
 
     private Cover(Name alias, Table<CoverRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Cover(Name alias, Table<CoverRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private Cover(Name alias, Table<CoverRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -94,8 +105,37 @@ public class Cover extends TableImpl<CoverRecord> {
         this(DSL.name("cover"), null);
     }
 
-    public <O extends Record> Cover(Table<O> child, ForeignKey<O, CoverRecord> key) {
-        super(child, key, COVER);
+    public <O extends Record> Cover(Table<O> path, ForeignKey<O, CoverRecord> childPath, InverseForeignKey<O, CoverRecord> parentPath) {
+        super(path, childPath, parentPath, COVER);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class CoverPath extends Cover implements Path<CoverRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> CoverPath(Table<O> path, ForeignKey<O, CoverRecord> childPath, InverseForeignKey<O, CoverRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private CoverPath(Name alias, Table<CoverRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public CoverPath as(String alias) {
+            return new CoverPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public CoverPath as(Name alias) {
+            return new CoverPath(alias, this);
+        }
+
+        @Override
+        public CoverPath as(Table<?> alias) {
+            return new CoverPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -106,6 +146,31 @@ public class Cover extends TableImpl<CoverRecord> {
     @Override
     public UniqueKey<CoverRecord> getPrimaryKey() {
         return Keys.COVER_PKEY;
+    }
+
+    private transient ItemPath _item;
+
+    /**
+     * Get the implicit to-many join path to the <code>public.item</code> table
+     */
+    public ItemPath item() {
+        if (_item == null)
+            _item = new ItemPath(this, null, Keys.ITEM__ITEM_COVER_ID_FKEY.getInverseKey());
+
+        return _item;
+    }
+
+    private transient PodcastPath _podcast;
+
+    /**
+     * Get the implicit to-many join path to the <code>public.podcast</code>
+     * table
+     */
+    public PodcastPath podcast() {
+        if (_podcast == null)
+            _podcast = new PodcastPath(this, null, Keys.PODCAST__PODCAST_COVER_ID_FKEY.getInverseKey());
+
+        return _podcast;
     }
 
     @Override
@@ -145,5 +210,89 @@ public class Cover extends TableImpl<CoverRecord> {
     @Override
     public Cover rename(Table<?> name) {
         return new Cover(name.getQualifiedName(), null);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Cover where(Condition condition) {
+        return new Cover(getQualifiedName(), aliased() ? this : null, null, condition);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Cover where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Cover where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Cover where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Cover where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Cover where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Cover where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Cover where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Cover whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Cover whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

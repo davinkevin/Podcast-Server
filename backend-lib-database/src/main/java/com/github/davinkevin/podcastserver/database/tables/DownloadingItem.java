@@ -7,17 +7,27 @@ package com.github.davinkevin.podcastserver.database.tables;
 import com.github.davinkevin.podcastserver.database.Keys;
 import com.github.davinkevin.podcastserver.database.Public;
 import com.github.davinkevin.podcastserver.database.enums.DownloadingState;
+import com.github.davinkevin.podcastserver.database.tables.Item.ItemPath;
 import com.github.davinkevin.podcastserver.database.tables.records.DownloadingItemRecord;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
+import org.jooq.SQL;
 import org.jooq.Schema;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -61,14 +71,14 @@ public class DownloadingItem extends TableImpl<DownloadingItemRecord> {
     /**
      * The column <code>public.downloading_item.state</code>.
      */
-    public final TableField<DownloadingItemRecord, DownloadingState> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR.nullable(false).defaultValue(DSL.field(DSL.raw("'WAITING'::downloading_state"), SQLDataType.VARCHAR)).asEnumDataType(com.github.davinkevin.podcastserver.database.enums.DownloadingState.class), this, "");
+    public final TableField<DownloadingItemRecord, DownloadingState> STATE = createField(DSL.name("state"), SQLDataType.VARCHAR.nullable(false).defaultValue(DSL.field(DSL.raw("'WAITING'::downloading_state"), SQLDataType.VARCHAR)).asEnumDataType(DownloadingState.class), this, "");
 
     private DownloadingItem(Name alias, Table<DownloadingItemRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private DownloadingItem(Name alias, Table<DownloadingItemRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private DownloadingItem(Name alias, Table<DownloadingItemRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -92,8 +102,37 @@ public class DownloadingItem extends TableImpl<DownloadingItemRecord> {
         this(DSL.name("downloading_item"), null);
     }
 
-    public <O extends Record> DownloadingItem(Table<O> child, ForeignKey<O, DownloadingItemRecord> key) {
-        super(child, key, DOWNLOADING_ITEM);
+    public <O extends Record> DownloadingItem(Table<O> path, ForeignKey<O, DownloadingItemRecord> childPath, InverseForeignKey<O, DownloadingItemRecord> parentPath) {
+        super(path, childPath, parentPath, DOWNLOADING_ITEM);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class DownloadingItemPath extends DownloadingItem implements Path<DownloadingItemRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> DownloadingItemPath(Table<O> path, ForeignKey<O, DownloadingItemRecord> childPath, InverseForeignKey<O, DownloadingItemRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private DownloadingItemPath(Name alias, Table<DownloadingItemRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public DownloadingItemPath as(String alias) {
+            return new DownloadingItemPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public DownloadingItemPath as(Name alias) {
+            return new DownloadingItemPath(alias, this);
+        }
+
+        @Override
+        public DownloadingItemPath as(Table<?> alias) {
+            return new DownloadingItemPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -116,14 +155,14 @@ public class DownloadingItem extends TableImpl<DownloadingItemRecord> {
         return Arrays.asList(Keys.DOWNLOADING_ITEM__DOWNLOADING_ITEM_ITEM_ID_FKEY);
     }
 
-    private transient Item _item;
+    private transient ItemPath _item;
 
     /**
      * Get the implicit join path to the <code>public.item</code> table.
      */
-    public Item item() {
+    public ItemPath item() {
         if (_item == null)
-            _item = new Item(this, Keys.DOWNLOADING_ITEM__DOWNLOADING_ITEM_ITEM_ID_FKEY);
+            _item = new ItemPath(this, Keys.DOWNLOADING_ITEM__DOWNLOADING_ITEM_ITEM_ID_FKEY, null);
 
         return _item;
     }
@@ -165,5 +204,89 @@ public class DownloadingItem extends TableImpl<DownloadingItemRecord> {
     @Override
     public DownloadingItem rename(Table<?> name) {
         return new DownloadingItem(name.getQualifiedName(), null);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public DownloadingItem where(Condition condition) {
+        return new DownloadingItem(getQualifiedName(), aliased() ? this : null, null, condition);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public DownloadingItem where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public DownloadingItem where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public DownloadingItem where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public DownloadingItem where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public DownloadingItem where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public DownloadingItem where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public DownloadingItem where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public DownloadingItem whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public DownloadingItem whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

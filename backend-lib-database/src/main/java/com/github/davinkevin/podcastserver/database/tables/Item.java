@@ -8,22 +8,35 @@ import com.github.davinkevin.podcastserver.database.Indexes;
 import com.github.davinkevin.podcastserver.database.Keys;
 import com.github.davinkevin.podcastserver.database.Public;
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus;
+import com.github.davinkevin.podcastserver.database.tables.Cover.CoverPath;
+import com.github.davinkevin.podcastserver.database.tables.DownloadingItem.DownloadingItemPath;
+import com.github.davinkevin.podcastserver.database.tables.Podcast.PodcastPath;
+import com.github.davinkevin.podcastserver.database.tables.WatchList.WatchListPath;
+import com.github.davinkevin.podcastserver.database.tables.WatchListItems.WatchListItemsPath;
 import com.github.davinkevin.podcastserver.database.tables.records.ItemRecord;
 
 import java.nio.file.Path;
 import java.time.OffsetDateTime;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
 import org.jooq.Check;
+import org.jooq.Condition;
 import org.jooq.Converter;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
 import org.jooq.Index;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
+import org.jooq.SQL;
 import org.jooq.Schema;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -128,14 +141,14 @@ public class Item extends TableImpl<ItemRecord> {
     /**
      * The column <code>public.item.status</code>.
      */
-    public final TableField<ItemRecord, ItemStatus> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR.nullable(false).defaultValue(DSL.field(DSL.raw("'NOT_DOWNLOADED'::item_status"), SQLDataType.VARCHAR)).asEnumDataType(com.github.davinkevin.podcastserver.database.enums.ItemStatus.class), this, "");
+    public final TableField<ItemRecord, ItemStatus> STATUS = createField(DSL.name("status"), SQLDataType.VARCHAR.nullable(false).defaultValue(DSL.field(DSL.raw("'NOT_DOWNLOADED'::item_status"), SQLDataType.VARCHAR)).asEnumDataType(ItemStatus.class), this, "");
 
     private Item(Name alias, Table<ItemRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Item(Name alias, Table<ItemRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private Item(Name alias, Table<ItemRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -159,8 +172,38 @@ public class Item extends TableImpl<ItemRecord> {
         this(DSL.name("item"), null);
     }
 
-    public <O extends Record> Item(Table<O> child, ForeignKey<O, ItemRecord> key) {
-        super(child, key, ITEM);
+    public <O extends Record> Item(Table<O> path, ForeignKey<O, ItemRecord> childPath, InverseForeignKey<O, ItemRecord> parentPath) {
+        super(path, childPath, parentPath, ITEM);
+    }
+
+    /**
+     * A subtype implementing {@link org.jooq.Path} for simplified path-based
+     * joins.
+     */
+    public static class ItemPath extends Item implements org.jooq.Path<ItemRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> ItemPath(Table<O> path, ForeignKey<O, ItemRecord> childPath, InverseForeignKey<O, ItemRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private ItemPath(Name alias, Table<ItemRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public ItemPath as(String alias) {
+            return new ItemPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public ItemPath as(Name alias) {
+            return new ItemPath(alias, this);
+        }
+
+        @Override
+        public ItemPath as(Table<?> alias) {
+            return new ItemPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -188,27 +231,62 @@ public class Item extends TableImpl<ItemRecord> {
         return Arrays.asList(Keys.ITEM__ITEM_COVER_ID_FKEY, Keys.ITEM__ITEM_PODCAST_ID_FKEY);
     }
 
-    private transient Cover _cover;
-    private transient Podcast _podcast;
+    private transient CoverPath _cover;
 
     /**
      * Get the implicit join path to the <code>public.cover</code> table.
      */
-    public Cover cover() {
+    public CoverPath cover() {
         if (_cover == null)
-            _cover = new Cover(this, Keys.ITEM__ITEM_COVER_ID_FKEY);
+            _cover = new CoverPath(this, Keys.ITEM__ITEM_COVER_ID_FKEY, null);
 
         return _cover;
     }
 
+    private transient PodcastPath _podcast;
+
     /**
      * Get the implicit join path to the <code>public.podcast</code> table.
      */
-    public Podcast podcast() {
+    public PodcastPath podcast() {
         if (_podcast == null)
-            _podcast = new Podcast(this, Keys.ITEM__ITEM_PODCAST_ID_FKEY);
+            _podcast = new PodcastPath(this, Keys.ITEM__ITEM_PODCAST_ID_FKEY, null);
 
         return _podcast;
+    }
+
+    private transient DownloadingItemPath _downloadingItem;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.downloading_item</code> table
+     */
+    public DownloadingItemPath downloadingItem() {
+        if (_downloadingItem == null)
+            _downloadingItem = new DownloadingItemPath(this, null, Keys.DOWNLOADING_ITEM__DOWNLOADING_ITEM_ITEM_ID_FKEY.getInverseKey());
+
+        return _downloadingItem;
+    }
+
+    private transient WatchListItemsPath _watchListItems;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.watch_list_items</code> table
+     */
+    public WatchListItemsPath watchListItems() {
+        if (_watchListItems == null)
+            _watchListItems = new WatchListItemsPath(this, null, Keys.WATCH_LIST_ITEMS__WATCH_LIST_ITEMS_ITEMS_ID_FKEY.getInverseKey());
+
+        return _watchListItems;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>public.watch_list</code> table
+     */
+    public WatchListPath watchList() {
+        return watchListItems().watchList();
     }
 
     @Override
@@ -255,5 +333,89 @@ public class Item extends TableImpl<ItemRecord> {
     @Override
     public Item rename(Table<?> name) {
         return new Item(name.getQualifiedName(), null);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Item where(Condition condition) {
+        return new Item(getQualifiedName(), aliased() ? this : null, null, condition);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Item where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Item where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Item where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Item where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Item where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Item where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Item where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Item whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Item whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

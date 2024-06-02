@@ -6,17 +6,28 @@ package com.github.davinkevin.podcastserver.database.tables;
 
 import com.github.davinkevin.podcastserver.database.Keys;
 import com.github.davinkevin.podcastserver.database.Public;
+import com.github.davinkevin.podcastserver.database.tables.Podcast.PodcastPath;
+import com.github.davinkevin.podcastserver.database.tables.PodcastTags.PodcastTagsPath;
 import com.github.davinkevin.podcastserver.database.tables.records.TagRecord;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
+import org.jooq.SQL;
 import org.jooq.Schema;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -58,11 +69,11 @@ public class Tag extends TableImpl<TagRecord> {
     public final TableField<TagRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(255), this, "");
 
     private Tag(Name alias, Table<TagRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private Tag(Name alias, Table<TagRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private Tag(Name alias, Table<TagRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -86,8 +97,37 @@ public class Tag extends TableImpl<TagRecord> {
         this(DSL.name("tag"), null);
     }
 
-    public <O extends Record> Tag(Table<O> child, ForeignKey<O, TagRecord> key) {
-        super(child, key, TAG);
+    public <O extends Record> Tag(Table<O> path, ForeignKey<O, TagRecord> childPath, InverseForeignKey<O, TagRecord> parentPath) {
+        super(path, childPath, parentPath, TAG);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class TagPath extends Tag implements Path<TagRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> TagPath(Table<O> path, ForeignKey<O, TagRecord> childPath, InverseForeignKey<O, TagRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private TagPath(Name alias, Table<TagRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public TagPath as(String alias) {
+            return new TagPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public TagPath as(Name alias) {
+            return new TagPath(alias, this);
+        }
+
+        @Override
+        public TagPath as(Table<?> alias) {
+            return new TagPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -103,6 +143,27 @@ public class Tag extends TableImpl<TagRecord> {
     @Override
     public List<UniqueKey<TagRecord>> getUniqueKeys() {
         return Arrays.asList(Keys.TAG_NAME_KEY);
+    }
+
+    private transient PodcastTagsPath _podcastTags;
+
+    /**
+     * Get the implicit to-many join path to the
+     * <code>public.podcast_tags</code> table
+     */
+    public PodcastTagsPath podcastTags() {
+        if (_podcastTags == null)
+            _podcastTags = new PodcastTagsPath(this, null, Keys.PODCAST_TAGS__PODCAST_TAGS_TAGS_ID_FKEY.getInverseKey());
+
+        return _podcastTags;
+    }
+
+    /**
+     * Get the implicit many-to-many join path to the
+     * <code>public.podcast</code> table
+     */
+    public PodcastPath podcast() {
+        return podcastTags().podcast();
     }
 
     @Override
@@ -142,5 +203,89 @@ public class Tag extends TableImpl<TagRecord> {
     @Override
     public Tag rename(Table<?> name) {
         return new Tag(name.getQualifiedName(), null);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Tag where(Condition condition) {
+        return new Tag(getQualifiedName(), aliased() ? this : null, null, condition);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Tag where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Tag where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Tag where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Tag where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Tag where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Tag where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public Tag where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Tag whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public Tag whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }

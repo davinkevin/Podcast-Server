@@ -6,17 +6,28 @@ package com.github.davinkevin.podcastserver.database.tables;
 
 import com.github.davinkevin.podcastserver.database.Keys;
 import com.github.davinkevin.podcastserver.database.Public;
+import com.github.davinkevin.podcastserver.database.tables.Podcast.PodcastPath;
+import com.github.davinkevin.podcastserver.database.tables.Tag.TagPath;
 import com.github.davinkevin.podcastserver.database.tables.records.PodcastTagsRecord;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.UUID;
 
+import org.jooq.Condition;
 import org.jooq.Field;
 import org.jooq.ForeignKey;
+import org.jooq.InverseForeignKey;
 import org.jooq.Name;
+import org.jooq.Path;
+import org.jooq.PlainSQL;
+import org.jooq.QueryPart;
 import org.jooq.Record;
+import org.jooq.SQL;
 import org.jooq.Schema;
+import org.jooq.Select;
+import org.jooq.Stringly;
 import org.jooq.Table;
 import org.jooq.TableField;
 import org.jooq.TableOptions;
@@ -58,11 +69,11 @@ public class PodcastTags extends TableImpl<PodcastTagsRecord> {
     public final TableField<PodcastTagsRecord, UUID> TAGS_ID = createField(DSL.name("tags_id"), SQLDataType.UUID.nullable(false), this, "");
 
     private PodcastTags(Name alias, Table<PodcastTagsRecord> aliased) {
-        this(alias, aliased, null);
+        this(alias, aliased, (Field<?>[]) null, null);
     }
 
-    private PodcastTags(Name alias, Table<PodcastTagsRecord> aliased, Field<?>[] parameters) {
-        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table());
+    private PodcastTags(Name alias, Table<PodcastTagsRecord> aliased, Field<?>[] parameters, Condition where) {
+        super(alias, null, aliased, parameters, DSL.comment(""), TableOptions.table(), where);
     }
 
     /**
@@ -86,8 +97,37 @@ public class PodcastTags extends TableImpl<PodcastTagsRecord> {
         this(DSL.name("podcast_tags"), null);
     }
 
-    public <O extends Record> PodcastTags(Table<O> child, ForeignKey<O, PodcastTagsRecord> key) {
-        super(child, key, PODCAST_TAGS);
+    public <O extends Record> PodcastTags(Table<O> path, ForeignKey<O, PodcastTagsRecord> childPath, InverseForeignKey<O, PodcastTagsRecord> parentPath) {
+        super(path, childPath, parentPath, PODCAST_TAGS);
+    }
+
+    /**
+     * A subtype implementing {@link Path} for simplified path-based joins.
+     */
+    public static class PodcastTagsPath extends PodcastTags implements Path<PodcastTagsRecord> {
+
+        private static final long serialVersionUID = 1L;
+        public <O extends Record> PodcastTagsPath(Table<O> path, ForeignKey<O, PodcastTagsRecord> childPath, InverseForeignKey<O, PodcastTagsRecord> parentPath) {
+            super(path, childPath, parentPath);
+        }
+        private PodcastTagsPath(Name alias, Table<PodcastTagsRecord> aliased) {
+            super(alias, aliased);
+        }
+
+        @Override
+        public PodcastTagsPath as(String alias) {
+            return new PodcastTagsPath(DSL.name(alias), this);
+        }
+
+        @Override
+        public PodcastTagsPath as(Name alias) {
+            return new PodcastTagsPath(alias, this);
+        }
+
+        @Override
+        public PodcastTagsPath as(Table<?> alias) {
+            return new PodcastTagsPath(alias.getQualifiedName(), this);
+        }
     }
 
     @Override
@@ -105,25 +145,26 @@ public class PodcastTags extends TableImpl<PodcastTagsRecord> {
         return Arrays.asList(Keys.PODCAST_TAGS__PODCAST_TAGS_PODCASTS_ID_FKEY, Keys.PODCAST_TAGS__PODCAST_TAGS_TAGS_ID_FKEY);
     }
 
-    private transient Podcast _podcast;
-    private transient Tag _tag;
+    private transient PodcastPath _podcast;
 
     /**
      * Get the implicit join path to the <code>public.podcast</code> table.
      */
-    public Podcast podcast() {
+    public PodcastPath podcast() {
         if (_podcast == null)
-            _podcast = new Podcast(this, Keys.PODCAST_TAGS__PODCAST_TAGS_PODCASTS_ID_FKEY);
+            _podcast = new PodcastPath(this, Keys.PODCAST_TAGS__PODCAST_TAGS_PODCASTS_ID_FKEY, null);
 
         return _podcast;
     }
 
+    private transient TagPath _tag;
+
     /**
      * Get the implicit join path to the <code>public.tag</code> table.
      */
-    public Tag tag() {
+    public TagPath tag() {
         if (_tag == null)
-            _tag = new Tag(this, Keys.PODCAST_TAGS__PODCAST_TAGS_TAGS_ID_FKEY);
+            _tag = new TagPath(this, Keys.PODCAST_TAGS__PODCAST_TAGS_TAGS_ID_FKEY, null);
 
         return _tag;
     }
@@ -165,5 +206,89 @@ public class PodcastTags extends TableImpl<PodcastTagsRecord> {
     @Override
     public PodcastTags rename(Table<?> name) {
         return new PodcastTags(name.getQualifiedName(), null);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public PodcastTags where(Condition condition) {
+        return new PodcastTags(getQualifiedName(), aliased() ? this : null, null, condition);
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public PodcastTags where(Collection<? extends Condition> conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public PodcastTags where(Condition... conditions) {
+        return where(DSL.and(conditions));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public PodcastTags where(Field<Boolean> condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public PodcastTags where(SQL condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public PodcastTags where(@Stringly.SQL String condition) {
+        return where(DSL.condition(condition));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public PodcastTags where(@Stringly.SQL String condition, Object... binds) {
+        return where(DSL.condition(condition, binds));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    @PlainSQL
+    public PodcastTags where(@Stringly.SQL String condition, QueryPart... parts) {
+        return where(DSL.condition(condition, parts));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public PodcastTags whereExists(Select<?> select) {
+        return where(DSL.exists(select));
+    }
+
+    /**
+     * Create an inline derived table from this table
+     */
+    @Override
+    public PodcastTags whereNotExists(Select<?> select) {
+        return where(DSL.notExists(select));
     }
 }
