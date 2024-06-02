@@ -1,6 +1,17 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2024.6.0
+
+### Features
+
+- **dev:** Add multiple profiles for local development ([9095c57](9095c5766fb591b8c7aace3153fb47ef2c3f73dd) - [#233](https://gitlab.com/davinkevin/Podcast-Server/-/issues/233))
+
+### Bug Fixes
+
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.47 ([d5e0fc5](d5e0fc5bd210f36e97f9a2cd98443c02fa9a291d))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.48 ([3d4171d](3d4171d0841ffb83cbea4589bb3a6e1deb6fce44))
+
 ## 2024.5.0
 
 ### Features
