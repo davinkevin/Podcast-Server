@@ -1,15 +1,15 @@
 package com.github.davinkevin.podcastserver.find
 
 import com.github.davinkevin.podcastserver.find.finders.Finder
-import org.mockito.kotlin.whenever
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.kotlin.core.publisher.toMono
-import reactor.test.StepVerifier
 import java.net.URI
 
 @ExtendWith(SpringExtension::class)
@@ -29,12 +29,13 @@ class FindServiceTest(
         whenever(firstFinder.compatibility(url)).thenReturn(2)
         whenever(firstFinder.findInformation(url)).thenReturn(p.toMono())
         whenever(secondFinder.compatibility(url)).thenReturn(3)
+
         /* When */
-        StepVerifier.create(service.find(URI(url)))
-                /* Then */
-                .expectSubscription()
-                .expectNext(p)
-                .verifyComplete()
+        val podcastInfo = service.find(URI(url))
+
+        /* Then */
+        assertThat(podcastInfo).isNotNull()
+            .isSameAs(p)
     }
 
     @Test
@@ -44,11 +45,13 @@ class FindServiceTest(
         whenever(firstFinder.compatibility(url)).thenReturn(2)
         whenever(firstFinder.findInformation(url)).thenReturn(RuntimeException("error !").toMono())
         whenever(secondFinder.compatibility(url)).thenReturn(3)
+
         /* When */
-        StepVerifier.create(service.find(URI(url)))
-                /* Then */
-                .expectSubscription()
-                .expectNext(FindPodcastInformation(title = "", url = URI(url), type = "RSS", cover = null, description = ""))
-                .verifyComplete()
+        val podcastInfo = service.find(URI(url))
+
+        /* Then */
+        assertThat(podcastInfo).isEqualTo(
+            FindPodcastInformation(title = "", url = URI(url), type = "RSS", cover = null, description = "")
+        )
     }
 }

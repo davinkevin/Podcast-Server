@@ -10,7 +10,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
 @WebMvcTest(controllers = [FindHandler::class])
@@ -37,7 +36,7 @@ class FindHandlerTest(
                     type = "aType",
                     cover = FindCoverInformation(100, 100, URI("http://foo.bar.com/img.png"))
             )
-            whenever(finder.find(url)).thenReturn(podcast.toMono())
+            whenever(finder.find(url)).thenReturn(podcast)
 
             /* When */
             rest
