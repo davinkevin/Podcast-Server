@@ -1,23 +1,25 @@
 package com.github.davinkevin.podcastserver.find.finders.rss
 
+import com.github.davinkevin.podcastserver.extension.restclient.withStringUTF8MessageConverter
+import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
-import org.springframework.web.reactive.function.client.WebClient
-import reactor.netty.http.client.HttpClient
-import com.github.davinkevin.podcastserver.service.image.ImageService
+import org.springframework.web.client.RestClient
 
 @Configuration
 @Import(ImageServiceConfig::class)
 class RSSFinderConfig {
 
     @Bean
-    fun rssFinder(imageService: ImageService, wcb: WebClient.Builder): RSSFinder {
-        val builder = wcb.clone()
-                .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
+    fun rssFinder(
+        imageService: ImageService,
+        rcb: RestClient.Builder
+    ): RSSFinder {
+        val client = rcb.clone()
+            .withStringUTF8MessageConverter()
 
-        return RSSFinder(imageService, builder)
+        return RSSFinder(imageService, client)
     }
 }
