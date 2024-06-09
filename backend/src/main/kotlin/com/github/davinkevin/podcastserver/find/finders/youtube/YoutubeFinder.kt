@@ -1,56 +1,51 @@
 package com.github.davinkevin.podcastserver.find.finders.youtube
 
-import com.github.davinkevin.podcastserver.extension.java.util.orNull
-import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
 import com.github.davinkevin.podcastserver.find.finders.Finder
+import com.github.davinkevin.podcastserver.find.finders.fetchFindCoverInformation
+import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.update.updaters.youtube.youtubeCompatibility
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.switchIfEmpty
-import reactor.kotlin.core.publisher.toMono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
 import java.net.URI
-import java.util.*
-import com.github.davinkevin.podcastserver.service.image.ImageService
 
 /**
  * Created by kevin on 22/02/15
  */
 class YoutubeFinder(
-        private val imageService: ImageService,
-        private val wcb: WebClient.Builder
+    private val imageService: ImageService,
+    private val rcb: RestClient.Builder
 ) : Finder {
 
-    override fun findInformation(url: String) = wcb
+    override fun findPodcastInformation(url: String): FindPodcastInformation? {
+        val content = rcb
             .clone()
             .baseUrl(url)
             .build()
             .get()
             .retrieve()
-            .bodyToMono<String>()
-            .map { Jsoup.parse(it, url) }
-            .flatMap { doc -> findCover(doc).zipWith(doc.toMono()) }
-            .map { (cover, doc) -> FindPodcastInformation (
-                    url = URI(url),
-                    type = "Youtube",
-                    title = doc.meta("property=og:title"),
-                    description = doc.meta("name=description"),
-                    cover = cover.orNull()
-            ) }
+            .body<String>()
+            ?: return null
 
-    private fun findCover(page: Document): Mono<Optional<FindCoverInformation>> {
-        return page.meta("property=og:image")
-                .toMono()
-                .filter { it.isNotEmpty() }
-                .flatMap { imageService.fetchCoverInformationOrOption(URI(it)) }
-                .switchIfEmpty { Optional.empty<FindCoverInformation>().toMono() }
+        val html = Jsoup.parse(content, url)
+        val cover = html.meta("property=og:image")
+            .takeIf { it.isNotEmpty() }
+            ?.let { imageService.fetchFindCoverInformation(URI(it)) }
+
+        return FindPodcastInformation(
+            url = URI(url),
+            type = "Youtube",
+            title = html.meta("property=og:title"),
+            description = html.meta("name=description"),
+            cover = cover
+        )
     }
+
+    override fun findInformation(url: String): Mono<FindPodcastInformation> =
+        Mono.fromCallable { findPodcastInformation(url) }
 
     override fun compatibility(url: String): Int = youtubeCompatibility(url)
 }
