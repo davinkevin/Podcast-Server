@@ -3,10 +3,10 @@ package com.github.davinkevin.podcastserver.find.finders.youtube
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.finders.Finder
 import com.github.davinkevin.podcastserver.find.finders.fetchFindCoverInformation
+import com.github.davinkevin.podcastserver.find.finders.meta
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.update.updaters.youtube.youtubeCompatibility
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import reactor.core.publisher.Mono
@@ -49,5 +49,3 @@ class YoutubeFinder(
 
     override fun compatibility(url: String): Int = youtubeCompatibility(url)
 }
-
-private fun Document.meta(s: String) = this.select("meta[$s]").attr("content")

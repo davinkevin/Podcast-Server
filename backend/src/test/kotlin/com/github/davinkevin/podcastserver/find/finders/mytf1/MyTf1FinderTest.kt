@@ -1,16 +1,15 @@
 package com.github.davinkevin.podcastserver.find.finders.mytf1
 
 import com.github.davinkevin.podcastserver.MockServer
-import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.remapToMockServer
+import com.github.davinkevin.podcastserver.remapRestClientToMockServer
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
+import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.ok
-import org.mockito.kotlin.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -18,18 +17,17 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
+import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.kotlin.core.publisher.toMono
-import reactor.test.StepVerifier
 import java.net.URI
-import com.github.davinkevin.podcastserver.service.image.ImageService
 
 /**
  * Created by kevin on 12/01/2020
@@ -42,9 +40,13 @@ class MyTf1FinderTest(
     @MockBean lateinit var image: ImageService
 
     @TestConfiguration
-    @Import(MyTf1FinderConfig::class, WebClientAutoConfiguration::class, JacksonAutoConfiguration::class, WebClientConfig::class)
+    @Import(
+        MyTf1FinderConfig::class,
+        RestClientAutoConfiguration::class,
+        JacksonAutoConfiguration::class,
+    )
     class LocalTestConfiguration {
-        @Bean fun webClientCustomization() = remapToMockServer("www.tf1.fr")
+        @Bean fun remapTf1Fr() = remapRestClientToMockServer("www.tf1.fr")
     }
 
     @Nested
@@ -64,26 +66,24 @@ class MyTf1FinderTest(
                     width = 456
             ).toMono())
 
-            backend.stubFor(get("/tmc/quotidien-avec-yann-barthes").willReturn(
-                    ok(fileAsString("/remote/podcast/mytf1/quotidien.root.html"))
-            ))
+            backend.stubFor(get("/tmc/quotidien-avec-yann-barthes")
+                .willReturn(ok(fileAsString("/remote/podcast/mytf1/quotidien.root.html"))))
 
             /* When */
-            StepVerifier.create(finder.findInformation(url))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(FindPodcastInformation(
-                            title = "Quotidien avec Yann Barthès - TMC | MYTF1",
-                            description = "Yann Barthès est désormais sur TMC et TF1",
-                            url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"),
-                            cover = FindCoverInformation(
-                                    height = 123,
-                                    width = 456,
-                                    url = URI("https://photos.tf1.fr/1200/0/vignette-portrait-quotidien-2-aa530a-0@1x.png")
-                            ),
-                            type= "MyTF1"
-                    ))
-                    .verifyComplete()
+            val podcast = finder.findPodcastInformation(url)!!
+
+            /* Then */
+            assertThat(podcast).isEqualTo(FindPodcastInformation(
+                title = "Quotidien avec Yann Barthès - TMC | MYTF1",
+                description = "Yann Barthès est désormais sur TMC et TF1",
+                url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"),
+                cover = FindCoverInformation(
+                    height = 123,
+                    width = 456,
+                    url = URI("https://photos.tf1.fr/1200/0/vignette-portrait-quotidien-2-aa530a-0@1x.png")
+                ),
+                type= "MyTF1"
+            ))
         }
 
         @Nested
@@ -100,17 +100,16 @@ class MyTf1FinderTest(
                 ))
 
                 /* When */
-                StepVerifier.create(finder.findInformation(url))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(FindPodcastInformation(
-                                title = "Quotidien avec Yann Barthès - TMC | MYTF1",
-                                description = "Yann Barthès est désormais sur TMC et TF1",
-                                url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"),
-                                cover = null,
-                                type= "MyTF1"
-                        ))
-                        .verifyComplete()
+                val podcast = finder.findPodcastInformation(url)!!
+
+                /* Then */
+                assertThat(podcast).isEqualTo(FindPodcastInformation(
+                    title = "Quotidien avec Yann Barthès - TMC | MYTF1",
+                    description = "Yann Barthès est désormais sur TMC et TF1",
+                    url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"),
+                    cover = null,
+                    type= "MyTF1"
+                ))
             }
 
             @Test
@@ -123,17 +122,16 @@ class MyTf1FinderTest(
                 ))
 
                 /* When */
-                StepVerifier.create(finder.findInformation(url))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(FindPodcastInformation(
-                                title = "Quotidien avec Yann Barthès - TMC | MYTF1",
-                                description = "Yann Barthès est désormais sur TMC et TF1",
-                                url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"),
-                                cover = null,
-                                type= "MyTF1"
-                        ))
-                        .verifyComplete()
+                val podcast = finder.findPodcastInformation(url)!!
+
+                /* Then */
+                assertThat(podcast).isEqualTo(FindPodcastInformation(
+                    title = "Quotidien avec Yann Barthès - TMC | MYTF1",
+                    description = "Yann Barthès est désormais sur TMC et TF1",
+                    url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"),
+                    cover = null,
+                    type= "MyTF1"
+                ))
             }
 
             @Test
@@ -153,21 +151,20 @@ class MyTf1FinderTest(
                 ))
 
                 /* When */
-                StepVerifier.create(finder.findInformation(url))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(FindPodcastInformation(
-                                title = "Quotidien avec Yann Barthès - TMC | MYTF1",
-                                description = "Yann Barthès est désormais sur TMC et TF1",
-                                url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"),
-                                cover = FindCoverInformation(
-                                        height = 123,
-                                        width = 456,
-                                        url = URI("https://photos.tf1.fr/1200/0/vignette-portrait-quotidien-2-aa530a-0@1x.png")
-                                ),
-                                type= "MyTF1"
-                        ))
-                        .verifyComplete()
+                val podcast = finder.findPodcastInformation(url)!!
+
+                /* Then */
+                assertThat(podcast).isEqualTo(FindPodcastInformation(
+                    title = "Quotidien avec Yann Barthès - TMC | MYTF1",
+                    description = "Yann Barthès est désormais sur TMC et TF1",
+                    url = URI("https://www.tf1.fr/tmc/quotidien-avec-yann-barthes"),
+                    cover = FindCoverInformation(
+                        height = 123,
+                        width = 456,
+                        url = URI("https://photos.tf1.fr/1200/0/vignette-portrait-quotidien-2-aa530a-0@1x.png")
+                    ),
+                    type= "MyTF1"
+                ))
             }
 
         }
