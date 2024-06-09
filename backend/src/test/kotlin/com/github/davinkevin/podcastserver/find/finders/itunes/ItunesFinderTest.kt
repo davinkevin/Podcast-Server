@@ -9,11 +9,10 @@ import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
 import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import org.mockito.kotlin.whenever
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
@@ -69,13 +68,12 @@ class ItunesFinderTest(
     }
 
     @Test
-    @Disabled
     fun `should find url`(backend: WireMockServer) {
         /* GIVEN */
         val url = "https://podcasts.apple.com/fr/podcast/positron/id662892474"
         backend.apply {
             stubFor(get("/lookup?id=662892474")
-                    .willReturn(permanentRedirect("https://itunes.apple.com/after-redirect")))
+                    .willReturn(permanentRedirect("/after-redirect")))
 
             stubFor(get("/after-redirect").willReturn(
                     ok(fileAsString("/remote/podcast/itunes/lookup.json"))
@@ -109,6 +107,6 @@ class ItunesFinderTest(
             WebClientConfig::class
     )
     class LocalTestConfiguration {
-        @Bean fun remapToMockServer() = remapToMockServer("podcasts.apple.com")
+        @Bean fun remapItunesAppleComToMockServer() = remapToMockServer("itunes.apple.com")
     }
 }
