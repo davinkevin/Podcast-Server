@@ -14,16 +14,20 @@ class NoOpFinder : Finder {
 
     private val log = LoggerFactory.getLogger(NoOpFinder::class.java)
 
-    override fun findInformation(url: String): Mono<FindPodcastInformation> {
+    override fun findPodcastInformation(url: String): FindPodcastInformation {
         log.warn("Using Noop finder for url {}", url)
 
         return FindPodcastInformation(
-                title = "",
-                url = URI(url),
-                description = "",
-                type = "noop",
-                cover = null
-        ).toMono()
+            title = "",
+            url = URI(url),
+            description = "",
+            type = "noop",
+            cover = null
+        )
+    }
+
+    override fun findInformation(url: String): Mono<FindPodcastInformation> {
+        return findPodcastInformation(url).toMono()
     }
 
     override fun compatibility(url: String): Int = Int.MAX_VALUE

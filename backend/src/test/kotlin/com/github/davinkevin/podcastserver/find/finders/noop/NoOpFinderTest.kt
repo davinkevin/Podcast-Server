@@ -1,8 +1,7 @@
 package com.github.davinkevin.podcastserver.find.finders.noop
 
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import org.assertj.core.api.Assertions
-import org.assertj.core.api.Assertions.*
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
@@ -10,7 +9,6 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.test.StepVerifier
 import java.net.URI
 
 /**
@@ -24,16 +22,17 @@ class NoOpFinderTest(
 
     @Test
     fun `should find default information`() {
-        StepVerifier.create(finder.findInformation("https://foo.bar.com/"))
-                .expectSubscription()
-                .expectNext(FindPodcastInformation(
-                        title = "",
-                        url = URI("https://foo.bar.com/"),
-                        description = "",
-                        type = "noop",
-                        cover = null
-                ))
-                .verifyComplete()
+        /* Given */
+        /* When */
+        val podcast = finder.findPodcastInformation("https://foo.bar.com/")
+        /* Then */
+        assertThat(podcast).isEqualTo(FindPodcastInformation(
+            title = "",
+            url = URI("https://foo.bar.com/"),
+            description = "",
+            type = "noop",
+            cover = null
+        ))
     }
 
     @ParameterizedTest
@@ -50,7 +49,9 @@ class NoOpFinderTest(
         "https://gdata.youtube.com/feeds/api/playlists/foo",
         "https://www.6play.fr/france-2/vu/"
     ])
-    fun `should be compatible with every at minimum level`(/* Given */ url: String) {
+    fun `should be compatible with every at minimum level`(
+        /* Given */ url: String
+    ) {
         assertThat(finder.compatibility(url))
                 .isEqualTo(Int.MAX_VALUE)
     }
