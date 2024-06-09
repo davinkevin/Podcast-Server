@@ -27,7 +27,7 @@ class FindServiceTest(
         val url = "https://foo.bar.com"
         val p = FindPodcastInformation(title = "", url = URI(url), type = "first", cover = null, description = "")
         whenever(firstFinder.compatibility(url)).thenReturn(2)
-        whenever(firstFinder.findInformation(url)).thenReturn(p.toMono())
+        whenever(firstFinder.findPodcastInformation(url)).thenReturn(p)
         whenever(secondFinder.compatibility(url)).thenReturn(3)
 
         /* When */
@@ -43,7 +43,7 @@ class FindServiceTest(
         /* Given */
         val url = "https://foo.bar.com"
         whenever(firstFinder.compatibility(url)).thenReturn(2)
-        whenever(firstFinder.findInformation(url)).thenReturn(RuntimeException("error !").toMono())
+        whenever(firstFinder.findPodcastInformation(url)).thenReturn(null)
         whenever(secondFinder.compatibility(url)).thenReturn(3)
 
         /* When */
