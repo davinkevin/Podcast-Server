@@ -1,51 +1,44 @@
 package com.github.davinkevin.podcastserver.find.finders.gulli
 
-import com.github.davinkevin.podcastserver.extension.java.util.orNull
-import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
 import com.github.davinkevin.podcastserver.find.finders.Finder
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
-import java.net.URI
-import java.util.*
+import com.github.davinkevin.podcastserver.find.finders.fetchFindCoverInformation
 import com.github.davinkevin.podcastserver.service.image.ImageService
+import org.jsoup.Jsoup
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
+import reactor.kotlin.core.publisher.toMono
+import java.net.URI
 
 class GulliFinder(
-        private val client: WebClient,
-        private val image: ImageService
+    private val client: RestClient,
+    private val image: ImageService
 ): Finder {
 
-    override fun findInformation(url: String): Mono<FindPodcastInformation> {
+    override fun findInformation(url: String) = findPodcastInformation(url).toMono()
+
+    override fun findPodcastInformation(url: String): FindPodcastInformation? {
         val path = url.substringAfterLast("replay.gulli.fr")
 
-        return client
-                .get()
-                .uri(path)
-                .retrieve()
-                .bodyToMono<String>()
-                .map { Jsoup.parse(it, url) }
-                .flatMap { findCover(it).zipWith(it.toMono()) }
-                .map { (cover, d) -> FindPodcastInformation(
-                        title = d.select("ol.breadcrumb li.active").first()!!.text(),
-                        cover = cover.orNull(),
-                        description = d.select(".container_full .description").text(),
-                        url = URI(url),
-                        type = "Gulli"
-                ) }
-    }
+        val page = client
+            .get()
+            .uri(path)
+            .retrieve()
+            .body<String>()
+            ?: return null
 
-    private fun findCover(d: Document): Mono<Optional<FindCoverInformation>> {
-        val imgTag = d.select(".container_full .visuel img")
-                .firstOrNull() ?: return Optional.empty<FindCoverInformation>().toMono()
+        val html = Jsoup.parse(page, url)
+        val cover3 = html.select(".container_full .visuel img")
+            .firstOrNull()
+            ?.let { image.fetchFindCoverInformation(URI(it.attr("src"))) }
 
-        return image.fetchCoverInformationOrOption(URI(imgTag.attr("src")))
+        return FindPodcastInformation(
+            title = html.select("ol.breadcrumb li.active").first()!!.text(),
+            description = html.select(".container_full .description").text(),
+            url = URI(url),
+            type = "Gulli",
+            cover = cover3,
+        )
     }
 
     override fun compatibility(url: String): Int = when {
