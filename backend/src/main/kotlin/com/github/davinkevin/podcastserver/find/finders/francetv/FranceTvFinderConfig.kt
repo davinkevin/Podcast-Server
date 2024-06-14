@@ -1,13 +1,11 @@
 package com.github.davinkevin.podcastserver.find.finders.francetv
 
+import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
-import org.springframework.web.reactive.function.client.WebClient
-import reactor.netty.http.client.HttpClient
-import com.github.davinkevin.podcastserver.service.image.ImageService
+import org.springframework.web.client.RestClient
 
 /**
  * Created by kevin on 01/11/2019
@@ -17,9 +15,8 @@ import com.github.davinkevin.podcastserver.service.image.ImageService
 class FranceTvFinderConfig {
 
     @Bean
-    fun franceTvFinder(wcb: WebClient.Builder, imageService: ImageService): FranceTvFinder {
-        val client = wcb.clone()
-                .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
+    fun franceTvFinder(rcb: RestClient.Builder, imageService: ImageService): FranceTvFinder {
+        val client = rcb.clone()
                 .baseUrl("https://www.france.tv/")
                 .build()
 
