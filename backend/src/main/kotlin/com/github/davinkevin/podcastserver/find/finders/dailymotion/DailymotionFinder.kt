@@ -2,51 +2,54 @@ package com.github.davinkevin.podcastserver.find.finders.dailymotion
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
-import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
-import com.github.davinkevin.podcastserver.find.finders.fetchCoverInformationOrOption
 import com.github.davinkevin.podcastserver.find.finders.Finder
-import com.github.davinkevin.podcastserver.utils.MatcherExtractor
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
+import com.github.davinkevin.podcastserver.find.finders.fetchFindCoverInformation
+import com.github.davinkevin.podcastserver.service.image.ImageService
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
 import java.net.URI
-import com.github.davinkevin.podcastserver.service.image.ImageService
 
 /**
  * Created by kevin on 01/11/2019
  */
 class DailymotionFinder(
-        private val wc: WebClient,
-        private val image: ImageService
+    private val wc: RestClient,
+    private val image: ImageService
 ): Finder {
 
-    override fun findInformation(url: String): Mono<FindPodcastInformation> {
-        val userName = USER_NAME_EXTRACTOR.on(url).group(1) ?: return RuntimeException("username not found int url $url").toMono()
+    override fun findPodcastInformation(url: String): FindPodcastInformation? {
+        val matches = USER_NAME_EXTRACTOR.find(url) ?: throw RuntimeException("username not found in url $url")
+        val userName = matches.groups["id"]!!.value
 
-        return wc.get()
-                .uri { it
-                        .pathSegment("user")
-                        .path(userName)
-                        .queryParam("fields", "avatar_720_url,description,username")
-                        .build()
-                }
-                .retrieve()
-                .bodyToMono<DailymotionUserDetail>()
-                .flatMap { p -> image
-                        .fetchCoverInformationOrOption(URI(p.avatar))
-                        .zipWith(p.toMono())
-                }
-                .map { (cover, podcast) -> FindPodcastInformation(
-                        title = podcast.username,
-                        url = URI(url),
-                        description = podcast.description ?: "",
-                        type = "Dailymotion",
-                        cover = cover.orNull()
-                ) }
+        val detail = wc.get()
+            .uri { it
+                .pathSegment("user")
+                .path(userName)
+                .queryParam("fields", "avatar_720_url,description,username")
+                .build()
+            }
+            .retrieve()
+            .body<DailymotionUserDetail>()
+            ?: return null
+
+        val cover = detail.avatar
+            .let(::URI)
+            .let(image::fetchFindCoverInformation)
+
+        return FindPodcastInformation(
+            title = detail.username,
+            url = URI(url),
+            description = detail.description ?: "",
+            type = "Dailymotion",
+            cover = cover
+        )
+    }
+
+    override fun findInformation(url: String): Mono<FindPodcastInformation> {
+        return findPodcastInformation(url).toMono()
     }
 
     override fun compatibility(url: String): Int = when {
@@ -55,7 +58,7 @@ class DailymotionFinder(
     }
 }
 
-private val USER_NAME_EXTRACTOR = MatcherExtractor.from("^.+dailymotion.com/(.*)")
+private val USER_NAME_EXTRACTOR = "^.+dailymotion.com/(?<id>.*)".toRegex()
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 private class DailymotionUserDetail(
