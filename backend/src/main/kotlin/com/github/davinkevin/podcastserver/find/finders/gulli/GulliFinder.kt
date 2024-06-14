@@ -7,15 +7,12 @@ import com.github.davinkevin.podcastserver.service.image.ImageService
 import org.jsoup.Jsoup
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
 class GulliFinder(
     private val client: RestClient,
     private val image: ImageService
 ): Finder {
-
-    override fun findInformation(url: String) = findPodcastInformation(url).toMono()
 
     override fun findPodcastInformation(url: String): FindPodcastInformation? {
         val path = url.substringAfterLast("replay.gulli.fr")

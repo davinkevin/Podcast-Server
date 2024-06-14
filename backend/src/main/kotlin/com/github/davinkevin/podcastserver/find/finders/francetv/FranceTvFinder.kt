@@ -8,7 +8,6 @@ import com.github.davinkevin.podcastserver.service.image.ImageService
 import org.jsoup.Jsoup
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
 /**
@@ -42,7 +41,6 @@ class FranceTvFinder(
         )
     }
 
-    override fun findInformation(url: String) = findPodcastInformation(url).toMono()
     override fun compatibility(url: String): Int = when {
         "www.france.tv" in url -> 1
         else -> Int.MAX_VALUE

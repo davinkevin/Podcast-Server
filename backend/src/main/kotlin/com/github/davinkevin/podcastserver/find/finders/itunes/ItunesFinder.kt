@@ -8,7 +8,6 @@ import com.github.davinkevin.podcastserver.find.finders.Finder
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import reactor.kotlin.core.publisher.toMono
 
 class ItunesFinder(
     private val rssFinder: RSSFinder,
@@ -31,8 +30,6 @@ class ItunesFinder(
 
         return rssFinder.findPodcastInformation(feedUrl)
     }
-
-    override fun findInformation(url: String) = findPodcastInformation(url).toMono()
 
     override fun compatibility(url: String): Int = when {
         "itunes.apple.com" in url -> 1

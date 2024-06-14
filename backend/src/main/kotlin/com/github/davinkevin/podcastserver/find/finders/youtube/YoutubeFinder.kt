@@ -9,7 +9,6 @@ import com.github.davinkevin.podcastserver.update.updaters.youtube.youtubeCompat
 import org.jsoup.Jsoup
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import reactor.core.publisher.Mono
 import java.net.URI
 
 /**
@@ -43,9 +42,6 @@ class YoutubeFinder(
             cover = cover
         )
     }
-
-    override fun findInformation(url: String): Mono<FindPodcastInformation> =
-        Mono.fromCallable { findPodcastInformation(url) }
 
     override fun compatibility(url: String): Int = youtubeCompatibility(url)
 }

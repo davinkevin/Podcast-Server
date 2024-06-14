@@ -8,8 +8,6 @@ import com.github.davinkevin.podcastserver.find.finders.fetchFindCoverInformatio
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
 /**
@@ -46,10 +44,6 @@ class DailymotionFinder(
             type = "Dailymotion",
             cover = cover
         )
-    }
-
-    override fun findInformation(url: String): Mono<FindPodcastInformation> {
-        return findPodcastInformation(url).toMono()
     }
 
     override fun compatibility(url: String): Int = when {

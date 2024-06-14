@@ -10,7 +10,6 @@ import org.jdom2.Namespace
 import org.jdom2.input.SAXBuilder
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import reactor.core.publisher.Mono
 import java.io.StringReader
 import java.net.URI
 
@@ -47,10 +46,6 @@ class RSSFinder(
             description = channel.getChildText("description"),
             cover = cover
         )
-    }
-
-    override fun findInformation(url: String): Mono<FindPodcastInformation> {
-        return Mono.fromCallable { findPodcastInformation(url) }
     }
 
     private fun findCover(channelElement: Element): FindCoverInformation? {

@@ -10,7 +10,6 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import reactor.core.publisher.Mono
 import java.net.URI
 
 /**
@@ -41,10 +40,6 @@ class MyTf1Finder(
             cover = cover,
             type = "MyTF1"
         )
-    }
-
-    override fun findInformation(url: String): Mono<FindPodcastInformation> {
-        return Mono.fromCallable { findPodcastInformation(url) }
     }
 
     private fun findCover(d: Document): FindCoverInformation? {
