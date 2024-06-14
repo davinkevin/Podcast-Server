@@ -6,7 +6,7 @@ import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
-import com.github.davinkevin.podcastserver.remapToMockServer
+import com.github.davinkevin.podcastserver.remapRestClientToMockServer
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.assertj.core.api.Assertions.assertThat
@@ -15,6 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
+import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson
 import org.springframework.boot.test.context.TestConfiguration
@@ -22,8 +23,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.kotlin.core.publisher.toMono
-import reactor.test.StepVerifier
 import java.net.URI
 
 /**
@@ -73,40 +72,77 @@ class ItunesFinderTest(
         val url = "https://podcasts.apple.com/fr/podcast/positron/id662892474"
         backend.apply {
             stubFor(get("/lookup?id=662892474")
-                    .willReturn(permanentRedirect("/after-redirect")))
+                .willReturn(permanentRedirect("/after-redirect")))
 
             stubFor(get("/after-redirect").willReturn(
-                    ok(fileAsString("/remote/podcast/itunes/lookup.json"))
-                            .withHeader("Content-Type", "text/javascript;charset=utf-8")
+                ok(fileAsString("/remote/podcast/itunes/lookup.json"))
+                    .withHeader("Content-Type", "text/javascript;charset=utf-8")
             ))
 
         }
         val podcastInformation = FindPodcastInformation(
-                title = "Positron",
-                description = "Zapping de bons plans !<br /> <br /> Positron, c'est une émissions dynamique qui vous promet de « ne plus jamais vous ennuyer » en vous recommandant des livres, films, séries ou albums que vous ne connaissez peut-être pas encore, mais que vous adorerez bientôt !",
-                url = URI("http://feeds.feedburner.com/emissionpositron"),
-                cover = FindCoverInformation(height = 140, width = 140, url = URI("http://frenchspin.com/sites/positron/audio/positron140.png") ),
-                type = "RSS"
+            title = "Positron",
+            description = "Zapping de bons plans !<br /> <br /> Positron, c'est une émissions dynamique qui vous promet de « ne plus jamais vous ennuyer » en vous recommandant des livres, films, séries ou albums que vous ne connaissez peut-être pas encore, mais que vous adorerez bientôt !",
+            url = URI("http://feeds.feedburner.com/emissionpositron"),
+            cover = FindCoverInformation(height = 140, width = 140, url = URI("http://frenchspin.com/sites/positron/audio/positron140.png") ),
+            type = "RSS"
         )
-        whenever(rssFinder.findInformation("http://feeds.feedburner.com/emissionpositron"))
-                .thenReturn(podcastInformation.toMono())
+        whenever(rssFinder.findPodcastInformation("http://feeds.feedburner.com/emissionpositron"))
+            .thenReturn(podcastInformation)
 
         /* WHEN  */
-        StepVerifier.create(finder.findInformation(url))
-                /* THEN  */
-                .expectSubscription()
-                .assertNext { assertThat(it).isSameAs(podcastInformation) }
-                .verifyComplete()
+        val podcast = finder.findPodcastInformation(url)!!
+
+        /* THEN  */
+        assertThat(podcast).isSameAs(podcastInformation)
+    }
+
+    @Test
+    fun `no podcast and return null because page is empty`(backend: WireMockServer) {
+        /* GIVEN */
+        val url = "https://podcasts.apple.com/fr/podcast/positron/id662892474"
+        backend.apply {
+            stubFor(get("/lookup?id=662892474")
+                .willReturn(permanentRedirect("/after-redirect")))
+
+            stubFor(get("/after-redirect").willReturn(ok()))
+        }
+        val podcastInformation = FindPodcastInformation(
+            title = "Positron",
+            description = "Zapping de bons plans !<br /> <br /> Positron, c'est une émissions dynamique qui vous promet de « ne plus jamais vous ennuyer » en vous recommandant des livres, films, séries ou albums que vous ne connaissez peut-être pas encore, mais que vous adorerez bientôt !",
+            url = URI("http://feeds.feedburner.com/emissionpositron"),
+            cover = FindCoverInformation(height = 140, width = 140, url = URI("http://frenchspin.com/sites/positron/audio/positron140.png") ),
+            type = "RSS"
+        )
+        whenever(rssFinder.findPodcastInformation("http://feeds.feedburner.com/emissionpositron"))
+            .thenReturn(podcastInformation)
+
+        /* WHEN  */
+        val podcast = finder.findPodcastInformation(url)
+
+        /* THEN  */
+        assertThat(podcast).isNull()
+    }
+
+    @Test
+    fun `nothing because url doesn't match and null is returned`() {
+        /* Given */
+        val url = "https://podcasts.apple.com/fr/podcast/positron/foobar"
+        /* When */
+        val podcast = finder.findPodcastInformation(url)
+        /* Then  */
+        assertThat(podcast).isNull()
     }
 
     @TestConfiguration
     @Import(
-            ItunesFinderConfig::class,
-            WebClientAutoConfiguration::class,
-            JacksonAutoConfiguration::class,
-            WebClientConfig::class
+        ItunesFinderConfig::class,
+        RestClientAutoConfiguration::class,
+        WebClientAutoConfiguration::class,
+        JacksonAutoConfiguration::class,
+        WebClientConfig::class
     )
     class LocalTestConfiguration {
-        @Bean fun remapItunesAppleComToMockServer() = remapToMockServer("itunes.apple.com")
+        @Bean fun remapItunesAppleComToMockServer() = remapRestClientToMockServer("itunes.apple.com")
     }
 }

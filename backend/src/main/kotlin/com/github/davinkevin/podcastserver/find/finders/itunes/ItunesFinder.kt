@@ -1,39 +1,49 @@
 package com.github.davinkevin.podcastserver.find.finders.itunes
 
-import com.fasterxml.jackson.databind.JsonNode
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import com.github.davinkevin.podcastserver.find.finders.Finder
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinder
-import com.github.davinkevin.podcastserver.utils.MatcherExtractor.Companion.from
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
-import reactor.core.publisher.Mono
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
+import reactor.kotlin.core.publisher.toMono
 
 class ItunesFinder(
     private val rssFinder: RSSFinder,
-    private val wc: WebClient,
+    private val wc: RestClient,
     private val om: ObjectMapper
 ) : Finder {
 
-    override fun findInformation(url: String): Mono<FindPodcastInformation> {
-        val id = ARTIST_ID.on(url).group(1) ?: return Mono.empty()
+    override fun findPodcastInformation(url: String): FindPodcastInformation? {
+        val matches = ARTIST_ID.find(url) ?: return null
+        val id = matches.groups["id"]!!.value
 
-        return wc.get()
+        val response = wc.get()
             .uri { it.path("lookup").queryParam("id", id).build() }
             .retrieve()
-            .bodyToMono<String>()
-            .map { om.readTree(it)["results"][0]["feedUrl"].asText() }
-            .flatMap { rssFinder.findInformation(it) }
+            .body<String>()
+            ?: return null
+
+        val feedUrl = om.readValue<ItunesResponse>(response)
+            .results.first().feedUrl
+
+        return rssFinder.findPodcastInformation(feedUrl)
     }
+
+    override fun findInformation(url: String) = findPodcastInformation(url).toMono()
 
     override fun compatibility(url: String): Int = when {
         "itunes.apple.com" in url -> 1
         "podcasts.apple.com" in url -> 1
         else -> Integer.MAX_VALUE
     }
+}
 
-    companion object {
-        private val ARTIST_ID = from(".*id=?([\\d]+).*")
-    }
+private val ARTIST_ID = ".*id=?(?<id>\\d+).*".toRegex()
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+private class ItunesResponse(val results: List<Result>) {
+    class Result(val feedUrl: String)
 }
