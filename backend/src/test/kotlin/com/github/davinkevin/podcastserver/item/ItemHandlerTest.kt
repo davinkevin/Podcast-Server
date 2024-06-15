@@ -9,10 +9,7 @@ import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.any
-import org.mockito.kotlin.anyOrNull
-import org.mockito.kotlin.eq
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.TestConfiguration
@@ -84,7 +81,7 @@ class ItemHandlerTest(
         @Test
         fun `with the default number of days to keep because no parameters`() {
             /* Given */
-            whenever(itemService.deleteItemOlderThan(fixedDate.minusDays(30))).thenReturn(Mono.empty())
+            doNothing().whenever(itemService).deleteItemOlderThan(fixedDate.minusDays(30))
 
             /* When */
             rest.delete()
@@ -92,12 +89,14 @@ class ItemHandlerTest(
                 .exchange()
                 /* Then */
                 .expectStatus().isOk
+
+            verify(itemService).deleteItemOlderThan(fixedDate.minusDays(30))
         }
 
         @Test
         fun `with number of days to keep on the url query params`() {
             /* Given */
-            whenever(itemService.deleteItemOlderThan(fixedDate.minusDays(60))).thenReturn(Mono.empty())
+            doNothing().whenever(itemService).deleteItemOlderThan(fixedDate.minusDays(60))
 
             /* When */
             rest.delete()
@@ -105,6 +104,8 @@ class ItemHandlerTest(
                 .exchange()
                 /* Then */
                 .expectStatus().isOk
+
+            verify(itemService).deleteItemOlderThan(fixedDate.minusDays(60))
         }
     }
 
@@ -119,7 +120,7 @@ class ItemHandlerTest(
             val itemDownloaded = item.copy(
                 status = Status.FINISH, fileName = Path("file_to_download.mp4")
             )
-            whenever(itemService.findById(item.id)).thenReturn(itemDownloaded.toMono())
+            whenever(itemService.findById(item.id)).thenReturn(itemDownloaded)
             whenever(fileService.toExternalUrl(FileDescriptor(itemDownloaded.podcast.title, itemDownloaded.fileName!!), host))
                 .thenReturn(URI.create("https://localhost:8080/data/Podcast%20Bar/file_to_download.mp4"))
 
@@ -137,7 +138,7 @@ class ItemHandlerTest(
         @Test
         fun `by redirecting if element is not downloaded`() {
             /* Given */
-            whenever(itemService.findById(item.id)).thenReturn(item.toMono())
+            whenever(itemService.findById(item.id)).thenReturn(item)
             /* When */
             rest
                 .get()
@@ -152,7 +153,7 @@ class ItemHandlerTest(
         @Test
         fun `and throw 404 if nothing is found`() {
             /* Given */
-            whenever(itemService.findById(item.id)).thenReturn(Mono.empty())
+            whenever(itemService.findById(item.id)).thenReturn(null)
             /* When */
             rest
                 .get()
@@ -177,7 +178,7 @@ class ItemHandlerTest(
         fun `by redirecting to local file server if cover exists locally`() {
             /* Given */
             val host = URI.create("https://localhost:8080/")
-            whenever(itemService.findById(item.id)).thenReturn(item.toMono())
+            whenever(itemService.findById(item.id)).thenReturn(item)
             whenever(fileService.coverExists(any<Item>())).thenReturn(Path("${item.id}.png").toMono())
             whenever(fileService.toExternalUrl(FileDescriptor(item.podcast.title, Path("${item.id}.png")), host))
                 .thenReturn(URI.create("https://localhost:8080/data/Podcast%20Bar/27184b1a-7642-4ffd-ac7e-14fb36f7f15c.png"))
@@ -196,7 +197,7 @@ class ItemHandlerTest(
         @Test
         fun `by redirecting to external file if cover does not exist locally`() {
             /* Given */
-            whenever(itemService.findById(item.id)).thenReturn(item.toMono())
+            whenever(itemService.findById(item.id)).thenReturn(item)
             whenever(fileService.coverExists(item)).thenReturn(Mono.empty())
 
             /* When */
@@ -248,7 +249,7 @@ class ItemHandlerTest(
             /* Given */
             val pid = notDownloadedItem.podcast.id
             val iid = notDownloadedItem.id
-            whenever(itemService.findById(iid)).thenReturn(notDownloadedItem.toMono())
+            whenever(itemService.findById(iid)).thenReturn(notDownloadedItem)
             /* When */
             rest.get()
                 .uri("/api/v1/podcasts/{pid}/items/{iid}", pid, iid)
@@ -297,7 +298,7 @@ class ItemHandlerTest(
             )
             val pid = downloadedItem.podcast.id
             val iid = downloadedItem.id
-            whenever(itemService.findById(iid)).thenReturn(downloadedItem.toMono())
+            whenever(itemService.findById(iid)).thenReturn(downloadedItem)
             /* When */
             rest.get()
                 .uri("/api/v1/podcasts/{pid}/items/{iid}", pid, iid)
@@ -373,7 +374,7 @@ class ItemHandlerTest(
         @Test
         fun `an item`() {
             /* Given */
-            whenever(itemService.reset(anItemToBeReseted.id)).thenReturn(anItemToBeReseted.toMono())
+            whenever(itemService.reset(anItemToBeReseted.id)).thenReturn(anItemToBeReseted)
             /* When */
             rest.post()
                 .uri("/api/v1/podcasts/${anItemToBeReseted.podcast.id}/items/${anItemToBeReseted.id}/reset")
@@ -437,7 +438,7 @@ class ItemHandlerTest(
             fun `with default values`() {
                 /* Given */
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
-                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult)
                 /* When */
                 rest
                     .get()
@@ -463,7 +464,7 @@ class ItemHandlerTest(
             fun `with query parameter`() {
                 /* Given */
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
-                whenever(itemService.search("foo", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                whenever(itemService.search("foo", emptyList(), emptyList(), request)).thenReturn(zeroResult)
                 /* When */
                 rest
                     .get()
@@ -489,7 +490,7 @@ class ItemHandlerTest(
             fun `with no tag`() {
                 /* Given */
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
-                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult)
                 /* When */
                 rest
                     .get()
@@ -515,7 +516,7 @@ class ItemHandlerTest(
             fun `with one tag`() {
                 /* Given */
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
-                whenever(itemService.search("", listOf("foo"), emptyList(), request)).thenReturn(zeroResult.toMono())
+                whenever(itemService.search("", listOf("foo"), emptyList(), request)).thenReturn(zeroResult)
                 /* When */
                 rest
                     .get()
@@ -541,7 +542,7 @@ class ItemHandlerTest(
             fun `with multiple tags`() {
                 /* Given */
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
-                whenever(itemService.search("", listOf("foo", "bar"), emptyList(), request)).thenReturn(zeroResult.toMono())
+                whenever(itemService.search("", listOf("foo", "bar"), emptyList(), request)).thenReturn(zeroResult)
                 /* When */
                 rest
                     .get()
@@ -567,7 +568,7 @@ class ItemHandlerTest(
             fun `with some tags empty`() {
                 /* Given */
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
-                whenever(itemService.search("", listOf("foo", "bar"), emptyList(), request)).thenReturn(zeroResult.toMono())
+                whenever(itemService.search("", listOf("foo", "bar"), emptyList(), request)).thenReturn(zeroResult)
                 /* When */
                 rest
                     .get()
@@ -594,7 +595,7 @@ class ItemHandlerTest(
             fun `with no status`() {
                 /* Given */
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
-                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult)
                 /* When */
                 rest
                     .get()
@@ -620,7 +621,7 @@ class ItemHandlerTest(
             fun `with one status`() {
                 /* Given */
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
-                whenever(itemService.search("", emptyList(), listOf(Status.STARTED), request)).thenReturn(zeroResult.toMono())
+                whenever(itemService.search("", emptyList(), listOf(Status.STARTED), request)).thenReturn(zeroResult)
                 /* When */
                 rest
                     .get()
@@ -646,7 +647,7 @@ class ItemHandlerTest(
             fun `with multiple status`() {
                 /* Given */
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
-                whenever(itemService.search("", emptyList(), listOf(Status.STARTED, Status.DELETED), request)).thenReturn(zeroResult.toMono())
+                whenever(itemService.search("", emptyList(), listOf(Status.STARTED, Status.DELETED), request)).thenReturn(zeroResult)
                 /* When */
                 rest
                     .get()
@@ -672,7 +673,7 @@ class ItemHandlerTest(
             fun `with some status empty`() {
                 /* Given */
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
-                whenever(itemService.search("", emptyList(), listOf(Status.STARTED, Status.DELETED), request)).thenReturn(zeroResult.toMono())
+                whenever(itemService.search("", emptyList(), listOf(Status.STARTED, Status.DELETED), request)).thenReturn(zeroResult)
                 /* When */
                 rest
                     .get()
@@ -698,7 +699,7 @@ class ItemHandlerTest(
             fun `with page parameter`() {
                 /* Given */
                 val request = ItemPageRequest(1, 12, ItemSort("DESC", "pubDate"))
-                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult)
                 /* When */
                 rest
                     .get()
@@ -724,7 +725,7 @@ class ItemHandlerTest(
             fun `with size parameter`() {
                 /* Given */
                 val request = ItemPageRequest(0, 24, ItemSort("DESC", "pubDate"))
-                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult)
                 /* When */
                 rest
                     .get()
@@ -750,7 +751,7 @@ class ItemHandlerTest(
             fun `with sort parameter`() {
                 /* Given */
                 val request = ItemPageRequest(0, 12, ItemSort("ASC", "downloadDate"))
-                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult.toMono())
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(zeroResult)
                 /* When */
                 rest
                     .get()
@@ -797,7 +798,7 @@ class ItemHandlerTest(
                 )
 
                 val request = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
-                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result.toMono())
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result)
                 /* When */
                 rest
                     .get()
@@ -879,7 +880,7 @@ class ItemHandlerTest(
             fun `with one items`() {
                 /* Given */
                 val result = PageItem.of(listOf(item1), 1, request)
-                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result.toMono())
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result)
                 /* When */
                 rest
                     .get()
@@ -934,7 +935,7 @@ class ItemHandlerTest(
             fun `with two items`() {
                 /* Given */
                 val result = PageItem.of(listOf(item1, item2), 2, request)
-                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result.toMono())
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result)
                 /* When */
                 rest
                     .get()
@@ -1016,7 +1017,7 @@ class ItemHandlerTest(
             fun `with three items`() {
                 /* Given */
                 val result = PageItem.of(listOf(item1, item2, item3), 3, request)
-                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result.toMono())
+                whenever(itemService.search("", emptyList(), emptyList(), request)).thenReturn(result)
                 /* When */
                 rest
                     .get()
@@ -1153,7 +1154,7 @@ class ItemHandlerTest(
             val page = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
             val result = PageItem.of(listOf(item), 1, page)
             whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                .thenReturn(result.toMono())
+                .thenReturn(result)
 
             /* When */
             rest
@@ -1213,7 +1214,7 @@ class ItemHandlerTest(
             val page = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
             val result = PageItem.of(listOf(item), 1, page)
             whenever(itemService.search(anyOrNull(), eq(listOf("foo", "bar")), eq(listOf()), eq(page), eq(podcastId)))
-                .thenReturn(result.toMono())
+                .thenReturn(result)
 
             /* When */
             rest
@@ -1273,7 +1274,7 @@ class ItemHandlerTest(
             val page = ItemPageRequest(0, 12, ItemSort("DESC", "pubDate"))
             val result = PageItem.of(listOf(item), 1, page)
             whenever(itemService.search(eq("foo"), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                .thenReturn(result.toMono())
+                .thenReturn(result)
 
             /* When */
             rest
@@ -1363,7 +1364,7 @@ class ItemHandlerTest(
         fun `with no watch list associated to this item`() {
             /* Given */
             whenever(itemService.findPlaylistsContainingItem(item.id))
-                .thenReturn(Flux.empty())
+                .thenReturn(emptyList())
 
             /* When */
             rest
@@ -1383,7 +1384,7 @@ class ItemHandlerTest(
         @Test
         fun `with 3 playlists associated to this item`() {
             /* Given */
-            whenever(itemService.findPlaylistsContainingItem(item.id)).thenReturn(Flux.just(
+            whenever(itemService.findPlaylistsContainingItem(item.id)).thenReturn(listOf(
                 ItemPlaylist(UUID.fromString("50958264-d5ed-4a9a-a875-5173bb207720"), "foo"),
                 ItemPlaylist(UUID.fromString("e053b63c-dc1d-4a3a-9c95-8f616a74d2aa"), "bar"),
                 ItemPlaylist(UUID.fromString("6761208b-85e7-4098-817a-2db7c4de7ceb"), "other")
@@ -1417,7 +1418,7 @@ class ItemHandlerTest(
         fun `by id`() {
             /* Given */
             val id = UUID.randomUUID()
-            whenever(itemService.deleteById(id)).thenReturn(Mono.empty())
+            doNothing().whenever(itemService).deleteById(id)
             /* When */
             rest
                 .delete()
@@ -1466,7 +1467,7 @@ class ItemHandlerTest(
             val filePart = TestFilePart()
             val podcastId = UUID.fromString("7e90ebf0-bc4d-451a-82e1-e9ce3fb3fe73")
             val body = MultipartBodyBuilder().apply { part("file", filePart).filename(filePart.filename()) }.build()
-            whenever(itemService.upload(eq(podcastId), any())).thenReturn(item1.toMono())
+            whenever(itemService.upload(eq(podcastId), any())).thenReturn(item1)
 
             /* When */
             rest

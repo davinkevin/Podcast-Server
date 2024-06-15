@@ -8,9 +8,9 @@ import com.github.davinkevin.podcastserver.entity.Status.FINISH
 import com.github.davinkevin.podcastserver.entity.Status.NOT_DOWNLOADED
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
+import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -35,9 +35,6 @@ import java.time.*
 import java.util.*
 import kotlin.io.path.Path
 
-/**
- * Created by kevin on 2019-02-12
- */
 @ExtendWith(SpringExtension::class)
 @Import(ItemService::class)
 @Suppress("UnassignedFluxMonoInstance")
@@ -47,7 +44,6 @@ class ItemServiceTest(
 ) {
 
     @MockBean private lateinit var repository: ItemRepository
-    @Suppress("unused") @MockBean private lateinit var p: PodcastServerParameters
     @MockBean private lateinit var fileService: FileStorageService
     @MockBean private lateinit var idm: ItemDownloadManager
     @MockBean private lateinit var podcastRepository: PodcastRepository
@@ -92,22 +88,17 @@ class ItemServiceTest(
         )
         val repoResponse = Flux.fromIterable(items)
         whenever(repository.findAllToDelete(limit)).thenReturn(repoResponse)
-        whenever(fileService.
-        deleteItem(any())).thenReturn(Mono.empty())
+        whenever(fileService.deleteItem(any())).thenReturn(Mono.empty())
         whenever(repository.updateAsDeleted(any())).thenReturn(Mono.empty())
 
         /* When */
-        StepVerifier.create(itemService.deleteItemOlderThan(limit))
-                .expectSubscription()
-                .then {
-                    val ids = items.map { it.id }
+        itemService.deleteItemOlderThan(limit)
 
-                    verify(repository).findAllToDelete(limit)
-                    verify(fileService, times(3)).deleteItem(argWhere { it in items })
-                    verify(repository).updateAsDeleted(argWhere { it == ids })
-                }
-                /* Then */
-                .verifyComplete()
+        /* Then */
+        val ids = items.map { it.id }
+        verify(repository).findAllToDelete(limit)
+        verify(fileService, times(3)).deleteItem(argWhere { it in items })
+        verify(repository).updateAsDeleted(argWhere { it == ids })
     }
 
     @Test
@@ -115,11 +106,9 @@ class ItemServiceTest(
         /* Given */
         whenever(repository.findById(any<UUID>())).thenReturn(item.toMono())
         /* When */
-        StepVerifier.create(itemService.findById(item.id))
-                /* Then */
-                .expectSubscription()
-                .expectNext(item)
-                .verifyComplete()
+        val foundItem = itemService.findById(item.id)
+        /* Then */
+        assertThat(foundItem).isSameAs(item)
     }
 
     @Nested
@@ -133,17 +122,15 @@ class ItemServiceTest(
         fun `and do nothing because item is currently downloading`() {
             /* Given */
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(true.toMono())
-            whenever(repository.resetById(item.id)).thenReturn(item.toMono())
+            whenever(repository.findById(item.id)).thenReturn(item.toMono())
 
             /* When */
-            StepVerifier.create(itemService.reset(item.id))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(item)
-                    .verifyComplete()
+            val resetItem = itemService.reset(item.id)!!
 
+            /* Then */
+            assertThat(resetItem).isSameAs(item)
             verify(repository, never()).hasToBeDeleted(any())
-            verify(repository, never()).findById(any<UUID>())
+            verify(repository, never()).resetById(any<UUID>())
             verify(fileService, never()).deleteItem(any())
         }
 
@@ -151,17 +138,15 @@ class ItemServiceTest(
         fun `and do nothing because the podcast is delete protected`() {
             /* Given */
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
-            whenever(repository.resetById(item.id)).thenReturn(item.toMono())
+            whenever(repository.findById(item.id)).thenReturn(item.toMono())
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(false.toMono())
 
             /* When */
-            StepVerifier.create(itemService.reset(item.id))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(item)
-                    .verifyComplete()
+            val resetItem = itemService.reset(item.id)!!
 
-            verify(repository, never()).findById(any<UUID>())
+            /* Then */
+            assertThat(resetItem).isSameAs(item)
+            verify(repository, never()).resetById(any<UUID>())
             verify(fileService, never()).deleteItem(any())
         }
 
@@ -174,12 +159,10 @@ class ItemServiceTest(
             whenever(repository.findById(item.id)).thenReturn(item.toMono())
 
             /* When */
-            StepVerifier.create(itemService.reset(item.id))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(item)
-                    .verifyComplete()
+            val resetItem = itemService.reset(item.id)!!
 
+            /* Then */
+            assertThat(resetItem).isSameAs(item)
             verify(fileService, never()).deleteItem(any())
         }
 
@@ -193,12 +176,10 @@ class ItemServiceTest(
             whenever(repository.findById(item.id)).thenReturn(currentItem.toMono())
 
             /* When */
-            StepVerifier.create(itemService.reset(item.id))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(item)
-                    .verifyComplete()
+            val resetItem = itemService.reset(item.id)!!
 
+            /* Then */
+            assertThat(resetItem).isSameAs(item)
             verify(fileService, never()).deleteItem(any())
         }
 
@@ -212,12 +193,10 @@ class ItemServiceTest(
             whenever(repository.findById(item.id)).thenReturn(currentItem.toMono())
 
             /* When */
-            StepVerifier.create(itemService.reset(item.id))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(item)
-                    .verifyComplete()
+            val resetItem = itemService.reset(item.id)!!
 
+            /* Then */
+            assertThat(resetItem).isSameAs(item)
             verify(fileService, never()).deleteItem(any())
         }
 
@@ -233,12 +212,10 @@ class ItemServiceTest(
             whenever(fileService.deleteItem(deleteItemInformation)).thenReturn(Mono.empty())
 
             /* When */
-            StepVerifier.create(itemService.reset(item.id))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(item)
-                    .verifyComplete()
+            val resetItem = itemService.reset(item.id)!!
 
+            /* Then */
+            assertThat(resetItem).isSameAs(item)
             verify(fileService).deleteItem(deleteItemInformation)
         }
 
@@ -247,7 +224,7 @@ class ItemServiceTest(
     }
 
     @Nested
-    @DisplayName("shoud search")
+    @DisplayName("should search")
     inner class ShouldSearch {
 
         @Test
@@ -263,11 +240,10 @@ class ItemServiceTest(
                     .thenReturn(result.toMono())
 
             /* When */
-            StepVerifier.create(itemService.search(q, tags, statuses, page, podcastId))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(result)
-                    .verifyComplete()
+            val items = itemService.search(q, tags, statuses, page, podcastId)
+
+            /* Then */
+            assertThat(items).isSameAs(result)
         }
 
         @Test
@@ -282,11 +258,10 @@ class ItemServiceTest(
                     .thenReturn(result.toMono())
 
             /* When */
-            StepVerifier.create(itemService.search(q, tags, statuses, page))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(result)
-                    .verifyComplete()
+            val items = itemService.search(q, tags, statuses, page)
+
+            /* Then */
+            assertThat(items).isSameAs(result)
         }
     }
 
@@ -299,12 +274,12 @@ class ItemServiceTest(
             /* Given */
             val uuid = UUID.randomUUID()
             whenever(repository.findPlaylistsContainingItem(uuid)).thenReturn(Flux.empty())
-            /* When */
-            StepVerifier.create(itemService.findPlaylistsContainingItem(uuid))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
 
+            /* When */
+            val playlists = itemService.findPlaylistsContainingItem(uuid)
+
+            /* Then */
+            assertThat(playlists).isEmpty()
         }
 
         @Test
@@ -318,13 +293,14 @@ class ItemServiceTest(
             ))
 
             /* When */
-            StepVerifier.create(itemService.findPlaylistsContainingItem(uuid))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(ItemPlaylist(UUID.fromString("50958264-d5ed-4a9a-a875-5173bb207720"), "foo"))
-                    .expectNext(ItemPlaylist(UUID.fromString("e053b63c-dc1d-4a3a-9c95-8f616a74d2aa"), "bar"))
-                    .expectNext(ItemPlaylist(UUID.fromString("6761208b-85e7-4098-817a-2db7c4de7ceb"), "other"))
-                    .verifyComplete()
+            val playlists = itemService.findPlaylistsContainingItem(uuid)
+
+            /* Then */
+            assertThat(playlists).containsExactly(
+                ItemPlaylist(UUID.fromString("50958264-d5ed-4a9a-a875-5173bb207720"), "foo"),
+                ItemPlaylist(UUID.fromString("e053b63c-dc1d-4a3a-9c95-8f616a74d2aa"), "bar"),
+                ItemPlaylist(UUID.fromString("6761208b-85e7-4098-817a-2db7c4de7ceb"), "other")
+            )
         }
     }
 
@@ -341,12 +317,11 @@ class ItemServiceTest(
             val id = UUID.randomUUID()
             whenever(repository.deleteById(id)).thenReturn(Mono.empty())
             whenever(idm.removeItemFromQueueAndDownload(id)).thenReturn(Mono.empty())
-            /* When */
-            StepVerifier.create(itemService.deleteById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
 
+            /* When */
+            itemService.deleteById(id)
+
+            /* Then */
             verify(fileService, never()).deleteItem(any())
         }
 
@@ -360,11 +335,9 @@ class ItemServiceTest(
             whenever(idm.removeItemFromQueueAndDownload(id)).thenReturn(Mono.empty())
 
             /* When */
-            StepVerifier.create(itemService.deleteById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            itemService.deleteById(id)
 
+            /* Then */
             verify(fileService, times(1)).deleteItem(deleteItem)
         }
     }
@@ -447,11 +420,10 @@ class ItemServiceTest(
             whenever(podcastRepository.updateLastUpdate(podcast.id)).thenReturn(Mono.empty())
 
             /* When */
-            StepVerifier.create(itemService.upload(podcast.id, file))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(itemCreated)
-                    .verifyComplete()
+            val item = itemService.upload(podcast.id, file)
+
+            /* Then */
+            assertThat(item).isSameAs(itemCreated)
         }
     }
 

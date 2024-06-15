@@ -5,19 +5,16 @@ import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.slf4j.LoggerFactory
 import org.springframework.http.codec.multipart.FilePart
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
 import java.nio.file.Paths
 import java.time.*
 import java.time.format.DateTimeFormatter
 import java.util.*
+import kotlin.collections.component1
+import kotlin.collections.component2
+import kotlin.collections.component3
 import kotlin.io.path.Path
 
 /**
@@ -28,94 +25,108 @@ class ItemService(
     private val podcastRepository: PodcastRepository,
 
     private val idm: ItemDownloadManager,
-    private val p: PodcastServerParameters,
-
     private val file: FileStorageService,
+
     private val clock: Clock
 ) {
 
     private val log = LoggerFactory.getLogger(ItemService::class.java)!!
 
-    fun deleteItemOlderThan(date: OffsetDateTime) = repository.
-    findAllToDelete(date)
-        .doOnSubscribe { log.info("Deletion of items older than {}", date) }
-        .delayUntil { file.deleteItem(it) }
-        .map { v -> v.id }
-        .collectList()
-        .flatMap { repository.updateAsDeleted(it) }
+    fun deleteItemOlderThan(date: OffsetDateTime) {
+        log.info("Deletion of items older than {}", date)
+        val items = repository.findAllToDelete(date).collectList().block()!!
 
-    fun findById(id: UUID) = repository.findById(id)
+        items.forEach { file.deleteItem(it).block() }
 
-    fun reset(id: UUID): Mono<Item> = deleteItemFiles(id)
-        .then(repository.resetById(id))
-
-    private fun deleteItemFiles(id: UUID): Mono<Void> = id.toMono()
-        .filterWhen { idm.isInDownloadingQueueById(it).map { v -> !v } }
-        .filterWhen { repository.hasToBeDeleted(it) }
-        .flatMap { repository.findById(it) }
-        .delayUntil { item -> item.toMono()
-            .filter { it.isDownloaded() }
-            .filter { it.fileName != Path("") }
-            .map { DeleteItemRequest(it.id, it.fileName!!, it.podcast.title) }
-            .flatMap { file.deleteItem(it) }
-        }
-        .then()
-
-    fun search(q: String, tags: List<String>, status: List<Status>, page: ItemPageRequest, podcastId: UUID? = null): Mono<PageItem> =
-        repository.search(q = q, tags = tags, status = status, page = page, podcastId = podcastId)
-
-    fun upload(podcastId: UUID, filePart: FilePart): Mono<Item> {
-        val filename = Paths.get(filePart.filename().replace("[^a-zA-Z0-9.-]".toRegex(), "_"))
-
-        return Mono.zip(
-            file.cache(filePart, filename),
-            podcastRepository.findById(podcastId)
-        )
-            .flatMap { (cacheFile, podcast) -> file.upload(podcast.title, cacheFile).thenReturn(podcast) }
-            .flatMap { Mono.zip(
-                file.metadata(it.title, filename),
-                it.toMono()
-            ) }
-            .map { (metadata, podcast) ->
-                val (_, p2, p3) = filePart.filename().split(" - ")
-                val title = p3.substringBeforeLast(".")
-                val date = LocalDate.parse(p2, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
-                val time = LocalTime.of(0, 0)
-                val pubDate = ZonedDateTime.of(date, time, ZoneId.systemDefault())
-
-                ItemForCreation(
-                    title = title,
-                    url = null,
-                    guid = filename.fileName.toString(),
-
-                    pubDate = pubDate.toOffsetDateTime(),
-                    downloadDate = OffsetDateTime.now(clock),
-                    creationDate = OffsetDateTime.now(clock),
-
-                    description = podcast.description,
-                    mimeType = metadata.contentType,
-                    length = metadata.size,
-                    fileName = filename.fileName,
-                    status = Status.FINISH,
-
-                    podcastId = podcast.id,
-                    cover = podcast.cover.toCoverForCreation()
-                )
-            }
-            .flatMap { repository.create(it) }
-            .delayUntil { podcastRepository.updateLastUpdate(podcastId) }
+        repository.updateAsDeleted(items.map { it.id }).block()
     }
 
-    fun findPlaylistsContainingItem(itemId: UUID): Flux<ItemPlaylist> =
-        repository.findPlaylistsContainingItem(itemId)
+    fun findById(id: UUID): Item? = repository.findById(id).block()
 
-    fun deleteById(itemId: UUID): Mono<Void> {
-        return idm.removeItemFromQueueAndDownload(itemId).then(
-            repository
-                .deleteById(itemId)
-                .delayUntil { file.deleteItem(it) }
-                .then()
+    fun reset(id: UUID): Item? {
+        val isDownloading = idm.isInDownloadingQueueById(id).block()!!
+        if (isDownloading) {
+            return findById(id)
+        }
+
+        val canBeDeleted = repository.hasToBeDeleted(id).block()!!
+        if (!canBeDeleted) {
+            return findById(id)
+        }
+
+        val item = repository.findById(id).block()!!
+        if (item.isDownloaded() && item.fileName != Path("")) {
+            file.deleteItem(DeleteItemRequest(item.id, item.fileName!!, item.podcast.title)).block()
+        }
+
+        return repository.resetById(id).block()!!
+    }
+
+    fun search(
+        q: String,
+        tags: List<String>,
+        status: List<Status>,
+        page: ItemPageRequest,
+        podcastId: UUID? = null
+    ): PageItem {
+        return repository.search(q = q, tags = tags, status = status, page = page, podcastId = podcastId)
+            .block()!!
+    }
+
+    fun upload(podcastId: UUID, filePart: FilePart): Item {
+        val filename = Paths.get(filePart.filename().replace("[^a-zA-Z0-9.-]".toRegex(), "_"))
+
+        val path = file.cache(filePart, filename).block()!!
+        val podcast = podcastRepository.findById(podcastId).block()!!
+
+        file.upload(podcast.title, path).block()
+        val metadata = file.metadata(podcast.title, path).block()!!
+
+        val (_, p2, p3) = filePart.filename().split(" - ")
+        val title = p3.substringBeforeLast(".")
+        val date = LocalDate.parse(p2, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
+        val time = LocalTime.of(0, 0)
+        val pubDate = ZonedDateTime.of(date, time, ZoneId.systemDefault())
+
+        val item = ItemForCreation(
+            title = title,
+            url = null,
+            guid = filename.fileName.toString(),
+
+            pubDate = pubDate.toOffsetDateTime(),
+            downloadDate = OffsetDateTime.now(clock),
+            creationDate = OffsetDateTime.now(clock),
+
+            description = podcast.description,
+            mimeType = metadata.contentType,
+            length = metadata.size,
+            fileName = filename.fileName,
+            status = Status.FINISH,
+
+            podcastId = podcast.id,
+            cover = podcast.cover.toCoverForCreation()
         )
+
+        val createdItem = repository.create(item).block()!!
+        podcastRepository.updateLastUpdate(podcastId).block()
+
+        return createdItem
+    }
+
+    fun findPlaylistsContainingItem(itemId: UUID): List<ItemPlaylist> {
+        return repository.findPlaylistsContainingItem(itemId)
+            .collectList()
+            .block()!!
+    }
+
+    fun deleteById(itemId: UUID) {
+        idm.removeItemFromQueueAndDownload(itemId).block()
+
+        val item = repository.deleteById(itemId).block()
+
+        if (item !== null) {
+            file.deleteItem(item).block()
+        }
     }
 }
 

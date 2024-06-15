@@ -46,7 +46,7 @@ class ItemHandler(
         val date = OffsetDateTime.now(clock)
             .minusDays(retentionNumberOfDays)
 
-        itemService.deleteItemOlderThan(date).block()
+        itemService.deleteItemOlderThan(date)
 
         return ServerResponse.ok().build()
     }
@@ -54,7 +54,7 @@ class ItemHandler(
     fun reset(s: ServerRequest): ServerResponse {
         val id = s.pathVariable("id").let(UUID::fromString)
 
-        val item = itemService.reset(id).block()!!
+        val item = itemService.reset(id)!!
 
         return ServerResponse.ok().body(item.toHAL())
     }
@@ -64,7 +64,7 @@ class ItemHandler(
         val id = s.pathVariable("id")
             .let(UUID::fromString)
 
-        val item = itemService.findById(id).block()
+        val item = itemService.findById(id)
             ?: throw ResponseStatusException(HttpStatus.NOT_FOUND, "No item found for id $id")
 
         val uri = findURIOf(item, host)
@@ -79,7 +79,7 @@ class ItemHandler(
         val id = s.pathVariable("id")
             .let(UUID::fromString)
 
-        val item = itemService.findById(id).block()!!.also {
+        val item = itemService.findById(id)!!.also {
             log.debug("the url of cover is {}", it.cover.url)
         }
         val coverUrl = findCoverURIOf(item, host)
@@ -102,8 +102,7 @@ class ItemHandler(
         val id = s.pathVariable("id")
             .let(UUID::fromString)
 
-        val item = itemService.findById(id)
-            .block()!!
+        val item = itemService.findById(id)!!
             .toHAL()
 
         return ServerResponse.ok().body(item)
@@ -122,10 +121,8 @@ class ItemHandler(
             page = itemPageable,
             podcastId = null
         )
-            .map { it.toHAL() }
-            .block()!!
 
-        return ServerResponse.ok().body(result)
+        return ServerResponse.ok().body(result.toHAL())
     }
 
     fun podcastItems(r: ServerRequest): ServerResponse {
@@ -144,9 +141,8 @@ class ItemHandler(
             page = itemPageable,
             podcastId = podcastId
         )
-            .map { it.toHAL() }.block()!!
 
-        return ServerResponse.ok().body(items)
+        return ServerResponse.ok().body(items.toHAL())
     }
 
     fun upload(r: ServerRequest): ServerResponse {
@@ -162,7 +158,6 @@ class ItemHandler(
             ?: error("`file` field not available in upload request")
 
         val item = itemService.upload(podcastId, file)
-            .block()!!
             .toHAL()
 
         return ServerResponse
@@ -174,12 +169,8 @@ class ItemHandler(
         val itemId = r.pathVariable("id")
             .let(UUID::fromString)
 
-        val playlists = itemService
+        val response = itemService
             .findPlaylistsContainingItem(itemId)
-            .collectList()
-            .block()!!
-
-        val response = playlists
             .map { PlaylistsHAL.PlaylistHAL(it.id, it.name) }
             .let(::PlaylistsHAL)
 
@@ -189,7 +180,7 @@ class ItemHandler(
     fun delete(r: ServerRequest): ServerResponse {
         val itemId = r.pathVariable("id").let(UUID::fromString)
 
-        itemService.deleteById(itemId).block()
+        itemService.deleteById(itemId)
 
         return ServerResponse.ok().build()
     }
@@ -291,7 +282,7 @@ data class InternalFilePart(val part: Part): FilePart {
 
     override fun filename(): String = part.submittedFileName
 
-    override fun transferTo(dest: Path): Mono<Void> = Mono.defer<Void?> {
+    override fun transferTo(dest: Path): Mono<Void> = Mono.defer {
         Files.copy(part.inputStream, dest)
             .toMono()
             .then()

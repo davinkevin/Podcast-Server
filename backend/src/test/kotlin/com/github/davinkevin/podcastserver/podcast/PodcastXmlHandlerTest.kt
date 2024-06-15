@@ -17,9 +17,6 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
@@ -421,7 +418,7 @@ class PodcastXmlHandlerTest(
                 val result = PageItem.of(items.take(size), size, page)
 
                 whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                    .thenReturn(result.toMono())
+                    .thenReturn(result)
                 whenever(podcastService.findById(podcastId))
                     .thenReturn(podcast.toMono())
 
@@ -446,7 +443,7 @@ class PodcastXmlHandlerTest(
                 val result = PageItem.of(items.take(200), 200, page)
 
                 whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                    .thenReturn(result.toMono())
+                    .thenReturn(result)
                 whenever(podcastService.findById(podcastId))
                     .thenReturn(podcast.toMono())
 
@@ -481,7 +478,7 @@ class PodcastXmlHandlerTest(
                 val result = resultWith(numberOfItem)
 
                 whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                    .thenReturn(result.toMono())
+                    .thenReturn(result)
                 whenever(podcastService.findById(podcastId))
                     .thenReturn(podcast.toMono())
 
@@ -507,7 +504,7 @@ class PodcastXmlHandlerTest(
             val result = PageItem.of(emptyList(), 0, page)
 
             whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                .thenReturn(result.toMono())
+                .thenReturn(result)
             whenever(podcastService.findById(podcastId)).thenReturn(podcast.toMono())
 
             val xml = fileAsString("/xml/podcast-with-lots-of-parameters.xml")
@@ -531,7 +528,7 @@ class PodcastXmlHandlerTest(
             val result = PageItem.of(emptyList(), 0, page)
 
             whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                .thenReturn(result.toMono())
+                .thenReturn(result)
             whenever(podcastService.findById(podcastId))
                 .thenReturn(podcast.toMono())
 
@@ -557,7 +554,7 @@ class PodcastXmlHandlerTest(
             val result = PageItem.of(emptyList(), 0, page)
 
             whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                .thenReturn(result.toMono())
+                .thenReturn(result)
             whenever(podcastService.findById(podcastId))
                 .thenReturn(podcast.toMono())
 
@@ -582,7 +579,7 @@ class PodcastXmlHandlerTest(
             val result = PageItem.of(emptyList(), 0, page)
 
             whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
-                .thenReturn(result.toMono())
+                .thenReturn(result)
             whenever(podcastService.findById(podcastId))
                 .thenReturn(podcast.toMono())
 

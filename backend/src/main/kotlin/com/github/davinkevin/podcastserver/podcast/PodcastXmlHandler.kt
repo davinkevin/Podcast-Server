@@ -18,9 +18,6 @@ import org.springframework.http.MediaType
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.paramOrNull
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
 import java.net.URI
 import java.util.*
 import com.github.davinkevin.podcastserver.rss.Item as RssItem
@@ -55,16 +52,14 @@ class PodcastXmlHandler(
         val limit = queryLimit.toLimit()
         val itemPageable = ItemPageRequest(0, limit, ItemSort("DESC", "pubDate"))
 
-        val (page, podcast) = Mono.zip(
-            itemService.search(
-                q = "",
-                tags = listOf(),
-                status = listOf(),
-                page = itemPageable,
-                podcastId = podcastId
-            ),
-            podcastService.findById(podcastId)
-        ).block()!!
+        val page = itemService.search(
+            q = "",
+            tags = listOf(),
+            status = listOf(),
+            page = itemPageable,
+            podcastId = podcastId
+        )
+        val podcast = podcastService.findById(podcastId).block()!!
 
         val items = page.content.map { it.toRssItem(host) }
         val rss = podcast.toRssChannel(callUrl)
