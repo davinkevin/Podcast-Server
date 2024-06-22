@@ -34,14 +34,14 @@ class ItemService(
 
     fun deleteItemOlderThan(date: OffsetDateTime) {
         log.info("Deletion of items older than {}", date)
-        val items = repository.findAllToDelete(date).collectList().block()!!
+        val items = repository.findAllToDelete(date)
 
         items.forEach { file.deleteItem(it).block() }
 
-        repository.updateAsDeleted(items.map { it.id }).block()
+        repository.updateAsDeleted(items.map { it.id })
     }
 
-    fun findById(id: UUID): Item? = repository.findById(id).block()
+    fun findById(id: UUID): Item? = repository.findById(id)
 
     fun reset(id: UUID): Item? {
         val isDownloading = idm.isInDownloadingQueueById(id).block()!!
@@ -49,17 +49,19 @@ class ItemService(
             return findById(id)
         }
 
-        val canBeDeleted = repository.hasToBeDeleted(id).block()!!
+        val canBeDeleted = repository.hasToBeDeleted(id)
         if (!canBeDeleted) {
             return findById(id)
         }
 
-        val item = repository.findById(id).block()!!
+        val item = repository.findById(id)
+            ?: return null
+
         if (item.isDownloaded() && item.fileName != Path("")) {
             file.deleteItem(DeleteItemRequest(item.id, item.fileName!!, item.podcast.title)).block()
         }
 
-        return repository.resetById(id).block()!!
+        return repository.resetById(id)!!
     }
 
     fun search(
@@ -70,7 +72,6 @@ class ItemService(
         podcastId: UUID? = null
     ): PageItem {
         return repository.search(q = q, tags = tags, status = status, page = page, podcastId = podcastId)
-            .block()!!
     }
 
     fun upload(podcastId: UUID, filePart: FilePart): Item {
@@ -107,22 +108,18 @@ class ItemService(
             cover = podcast.cover.toCoverForCreation()
         )
 
-        val createdItem = repository.create(item).block()!!
+        val createdItem = repository.create(item)!!
         podcastRepository.updateLastUpdate(podcastId).block()
 
         return createdItem
     }
 
-    fun findPlaylistsContainingItem(itemId: UUID): List<ItemPlaylist> {
-        return repository.findPlaylistsContainingItem(itemId)
-            .collectList()
-            .block()!!
-    }
+    fun findPlaylistsContainingItem(itemId: UUID) = repository.findPlaylistsContainingItem(itemId)
 
     fun deleteById(itemId: UUID) {
         idm.removeItemFromQueueAndDownload(itemId).block()
 
-        val item = repository.deleteById(itemId).block()
+        val item = repository.deleteById(itemId)
 
         if (item !== null) {
             file.deleteItem(item).block()

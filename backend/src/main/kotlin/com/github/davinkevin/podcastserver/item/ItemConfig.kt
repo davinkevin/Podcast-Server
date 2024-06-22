@@ -42,9 +42,7 @@ class ItemConfig {
 
     @Bean
     fun onStartupCleanInvalidStateItems(item: ItemRepository) = CommandLineRunner {
-        item
-                .resetItemWithDownloadingState()
-                .block()
+        item.resetItemWithDownloadingState()
     }
 
 }

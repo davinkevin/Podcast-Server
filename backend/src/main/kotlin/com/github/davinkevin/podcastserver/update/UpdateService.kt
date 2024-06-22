@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory
 import reactor.core.publisher.Mono
 import reactor.core.scheduler.Schedulers
 import reactor.kotlin.core.publisher.switchIfEmpty
+import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.OffsetDateTime.now
@@ -85,10 +86,9 @@ class UpdateService(
     ): Mono<Void> {
         val realSignature = if (items.isEmpty()) "" else signature
         val updateSignature = podcastRepository.updateSignature(podcast.id, realSignature).then(1.toMono())
-        val createItems = items
-            .map { it.toCreation(podcast.id)}
-            .toMono()
-            .flatMapMany { itemRepository.create(it) }
+        val creationRequests = items.map { it.toCreation(podcast.id)}
+        val createItems = itemRepository.create(creationRequests)
+            .toFlux()
             .delayUntil { item -> fileService.downloadItemCover(item)
                 .onErrorResume {
                     log.error("Error during download of cover ${item.cover.url}")

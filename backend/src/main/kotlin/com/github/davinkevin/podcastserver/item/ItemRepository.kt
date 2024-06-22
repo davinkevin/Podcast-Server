@@ -13,10 +13,7 @@ import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
 import java.net.URI
 import java.nio.file.Path
 import java.time.OffsetDateTime
@@ -29,46 +26,53 @@ class ItemRepository(private val query: DSLContext) {
 
     private val log = LoggerFactory.getLogger(ItemRepository::class.java)
 
-    fun findById(id: UUID): Mono<Item> = Mono.defer { findById(listOf(id)).toMono() }
+    fun findById(id: UUID): Item? = findById(listOf(id)).firstOrNull()
 
-    fun findById(ids: List<UUID>): Flux<Item> = Flux.defer {
-        Flux.from(query
-            .select(ITEM.ID, ITEM.TITLE, ITEM.URL,
-                ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
-                ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.FILE_NAME, ITEM.STATUS,
+    private fun findById(ids: List<UUID>): List<Item> {
+        return Flux.from(
+            query
+                .select(
+                    ITEM.ID, ITEM.TITLE, ITEM.URL,
+                    ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
+                    ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.FILE_NAME, ITEM.STATUS,
 
-                PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
-                COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT
-            )
-            .from(
-                ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
-                    .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
-            )
-            .where(ITEM.ID.`in`(ids))
+                    PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
+                    COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT
+                )
+                .from(
+                    ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
+                        .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
+                )
+                .where(ITEM.ID.`in`(ids))
         )
             .map(::toItem)
+            .collectList()
+            .block()!!
     }
 
-
-    fun findAllToDelete(date: OffsetDateTime): Flux<DeleteItemRequest> = Flux.defer {
-        Flux.from(query
-            .select(ITEM.ID, ITEM.FILE_NAME, PODCAST.TITLE)
-            .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
-            .where(ITEM.DOWNLOAD_DATE.lessOrEqual(date))
-            .and(ITEM.STATUS.eq(FINISH))
-            .and(PODCAST.HAS_TO_BE_DELETED.isTrue)
-            .and(ITEM.ID.notIn(query.select(WATCH_LIST_ITEMS.ITEMS_ID).from(WATCH_LIST_ITEMS)))
+    fun findAllToDelete(date: OffsetDateTime): List<DeleteItemRequest> {
+        return Flux.from(
+            query
+                .select(ITEM.ID, ITEM.FILE_NAME, PODCAST.TITLE)
+                .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
+                .where(ITEM.DOWNLOAD_DATE.lessOrEqual(date))
+                .and(ITEM.STATUS.eq(FINISH))
+                .and(PODCAST.HAS_TO_BE_DELETED.isTrue)
+                .and(ITEM.ID.notIn(query.select(WATCH_LIST_ITEMS.ITEMS_ID).from(WATCH_LIST_ITEMS)))
         )
             .map { DeleteItemRequest(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
+            .collectList()
+            .block()!!
     }
 
-    fun deleteById(id: UUID): Mono<DeleteItemRequest> = Mono.defer {
-        val removeFromPlaylist = query
+    fun deleteById(id: UUID): DeleteItemRequest? {
+        query
             .delete(WATCH_LIST_ITEMS)
             .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(id))
             .toMono()
+            .block()
 
-        val delete = query
+        return query
             .select(ITEM.ID, ITEM.FILE_NAME, ITEM.STATUS, PODCAST.TITLE, PODCAST.HAS_TO_BE_DELETED)
             .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
             .where(ITEM.ID.eq(id))
@@ -77,30 +81,30 @@ class ItemRepository(private val query: DSLContext) {
             .filter { it[PODCAST.HAS_TO_BE_DELETED] }
             .filter { it[ITEM.STATUS] == FINISH }
             .map { DeleteItemRequest(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
-
-        removeFromPlaylist.then(delete)
+            .block()
     }
 
-    fun updateAsDeleted(items: Collection<UUID>): Mono<Void> = Mono.defer {
+    fun updateAsDeleted(items: Collection<UUID>) {
         query
             .update(ITEM)
             .set(ITEM.STATUS, DELETED)
             .set(ITEM.FILE_NAME, null as Path?)
             .where(ITEM.ID.`in`(items))
             .toMono()
-            .then()
+            .block()
     }
 
-    fun hasToBeDeleted(id: UUID): Mono<Boolean> = Mono.defer {
-        query
+    fun hasToBeDeleted(id: UUID): Boolean {
+        return query
             .select(PODCAST.HAS_TO_BE_DELETED)
             .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
             .where(ITEM.ID.eq(id))
             .toMono()
             .map { it[PODCAST.HAS_TO_BE_DELETED] }
+            .block() ?: false
     }
 
-    fun resetById(id: UUID): Mono<Item> = Mono.defer {
+    fun resetById(id: UUID): Item? {
         query
             .update(ITEM)
             .set(ITEM.STATUS, NOT_DOWNLOADED)
@@ -109,10 +113,12 @@ class ItemRepository(private val query: DSLContext) {
             .set(ITEM.NUMBER_OF_FAIL, 0)
             .where(ITEM.ID.eq(id))
             .toMono()
-            .flatMap { findById(id) }
+            .block()!!
+
+        return findById(id)
     }
 
-    fun search(q: String, tags: List<String>, status: List<Status>, page: ItemPageRequest, podcastId: UUID?): Mono<PageItem> = Mono.defer {
+    fun search(q: String, tags: List<String>, status: List<Status>, page: ItemPageRequest, podcastId: UUID?): PageItem {
 
         val statusesCondition = if (status.isEmpty()) noCondition() else ITEM.STATUS.`in`(status)
 
@@ -148,7 +154,7 @@ class ItemRepository(private val query: DSLContext) {
                 .limit((page.size * page.page), page.size)
         )
 
-        val content: Mono<List<Item>> = Flux.from(query
+        val content = Flux.from(query
             .with(fi)
             .select(
                 fi.field(ITEM.ID), fi.field(ITEM.TITLE), fi.field(ITEM.URL),
@@ -174,16 +180,18 @@ class ItemRepository(private val query: DSLContext) {
 
                        podcastId, podcastTitle, podcastUrl,
                        coverId, coverUrl, coverWidth, coverHeight
-                   ) -> Item(
-                id, title, url,
-                pubDate, downloadDate, creationDate,
-                description, mimeType, length, fileName, status.fromDb(),
+                   ) ->
+                Item(
+                    id, title, url,
+                    pubDate, downloadDate, creationDate,
+                    description, mimeType, length, fileName, status.fromDb(),
 
-                Item.Podcast(podcastId, podcastTitle, podcastUrl),
-                Item.Cover(coverId, URI(coverUrl), coverWidth, coverHeight)
-            )
+                    Item.Podcast(podcastId, podcastTitle, podcastUrl),
+                    Item.Cover(coverId, URI(coverUrl), coverWidth, coverHeight)
+                )
             }
             .collectList()
+            .block()!!
 
         val totalElements = query
             .select(countDistinct(ITEM.ID))
@@ -191,17 +199,14 @@ class ItemRepository(private val query: DSLContext) {
             .where(filterConditions)
             .toMono()
             .map { (v) -> v }
+            .block()!!
 
-
-        Mono.zip(content, totalElements)
-            .map { (content, totalElements) -> PageItem.of(content, totalElements, page) }
+        return PageItem.of(content, totalElements, page)
     }
 
-    fun create(item: ItemForCreation): Mono<Item> = Mono.defer {
-        create(listOf(item)).toMono()
-    }
+    fun create(item: ItemForCreation): Item? = create(listOf(item)).firstOrNull()
 
-    fun create(items: List<ItemForCreation>): Flux<Item> = Flux.defer {
+    fun create(items: List<ItemForCreation>): List<Item> {
         val itemsWithIds = items.map(::ItemForCreationWithId)
 
         val queries = itemsWithIds.map { v ->
@@ -209,7 +214,7 @@ class ItemRepository(private val query: DSLContext) {
             val item = v.itemForCreation
 
             val similarItemCondition = (ITEM.URL.eq(item.url).or(ITEM.GUID.eq(item.guid)))
-                  .and(ITEM.PODCAST_ID.eq(item.podcastId))
+                .and(ITEM.PODCAST_ID.eq(item.podcastId))
 
             val coverId = value(UUID.randomUUID()).cast(UUID::class.java)
             val itemDoesNotExist = notExists(selectOne().from(ITEM).where(similarItemCondition))
@@ -274,44 +279,52 @@ class ItemRepository(private val query: DSLContext) {
                         coverCreation.field(COVER.ID)
                     )
                         .from(coverCreation)
-                        .where(selectCount().from(ITEM).where(
-                            ITEM.URL.eq(item.url).and(ITEM.PODCAST_ID.eq(item.podcastId))
-                        ).asField<Int>().eq(0))
+                        .where(
+                            selectCount().from(ITEM).where(
+                                ITEM.URL.eq(item.url).and(ITEM.PODCAST_ID.eq(item.podcastId))
+                            ).asField<Int>().eq(0)
+                        )
                 )
                 .onConflictOnConstraint(Keys.ITEM_WITH_GUID_IS_UNIQUE_IN_PODCAST)
                 .doUpdate()
                 .set(ITEM.URL, item.url)
         }
 
-        Flux.from(query.batch(queries))
-            .index()
-            .filter { (_, isCreated) -> isCreated >= 1 }
-            .map { (idx, _) -> itemsWithIds[idx.toInt()].id }
+        val ids: List<UUID> = Flux.from(query.batch(queries))
             .collectList()
-            .flatMapMany { findById(it) }
+            .block()!!
+            .withIndex()
+            .filter { (_, isCreated) -> isCreated >= 1 }
+            .map { (idx, _) -> itemsWithIds[idx].id }
+
+        return findById(ids)
     }
 
-    fun resetItemWithDownloadingState(): Mono<Void> = Mono.defer {
+    fun resetItemWithDownloadingState() {
         query
             .update(ITEM)
             .set(ITEM.STATUS, NOT_DOWNLOADED)
             .where(ITEM.STATUS.`in`(STARTED, PAUSED))
             .toMono()
-            .then()
-            .doOnTerminate { log.info("Reset of item with downloading state done") }
+            .block()!!
+
+        log.info("Reset of item with downloading state done")
     }
 
-    fun findPlaylistsContainingItem(itemId: UUID): Flux<ItemPlaylist> = Flux.defer {
-        Flux.from(
-            query
-                .select(WATCH_LIST.ID, WATCH_LIST.NAME)
-                .from(WATCH_LIST
-                    .innerJoin(WATCH_LIST_ITEMS)
-                    .on(WATCH_LIST.ID.eq(WATCH_LIST_ITEMS.WATCH_LISTS_ID))
-                )
-                .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(itemId))
-                .orderBy(WATCH_LIST.ID)
-        )
+    fun findPlaylistsContainingItem(itemId: UUID): List<ItemPlaylist> {
+        return Flux.from(
+                query
+                    .select(WATCH_LIST.ID, WATCH_LIST.NAME)
+                    .from(
+                        WATCH_LIST
+                            .innerJoin(WATCH_LIST_ITEMS)
+                            .on(WATCH_LIST.ID.eq(WATCH_LIST_ITEMS.WATCH_LISTS_ID))
+                    )
+                    .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(itemId))
+                    .orderBy(WATCH_LIST.ID)
+            )
+            .collectList()
+            .block()!!
             .map { (id, name) -> ItemPlaylist(id, name) }
     }
 }

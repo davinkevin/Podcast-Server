@@ -5,9 +5,9 @@ import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.r2dbc
-import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.within
+import org.assertj.core.api.Assertions.*
 import org.jooq.DSLContext
 import org.jooq.exception.DataAccessException
 import org.jooq.impl.DSL.*
@@ -19,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import reactor.core.publisher.Flux
 import reactor.kotlin.core.publisher.toMono
-import reactor.test.StepVerifier
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
@@ -114,13 +113,10 @@ class ItemRepositoryTest(
             val id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
 
             /* When */
-            StepVerifier.create(repository.findById(id))
-                /* Then */
-                .expectSubscription()
-                .assertNext {
-                    assertThat(it.id).isEqualTo(id)
-                }
-                .verifyComplete()
+            val item = repository.findById(id)!!
+
+            /* Then */
+            assertThat(item.id).isEqualTo(id)
         }
 
         @Test
@@ -129,10 +125,10 @@ class ItemRepositoryTest(
             val id = fromString("98b33370-a976-4e4d-9ab8-57d47241e693")
 
             /* When */
-            StepVerifier.create(repository.findById(id))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            val item = repository.findById(id)
+
+            /* Then */
+            assertThat(item).isNull()
         }
     }
 
@@ -193,12 +189,15 @@ class ItemRepositoryTest(
         fun `to delete`() {
             /* Given */
             /* When */
-            StepVerifier.create(repository.findAllToDelete(fixedDate))
-                /* Then */
-                .assertNext {
-                    assertThat(it.id).isEqualTo(fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"))
-                }
-                .verifyComplete()
+            val it = repository.findAllToDelete(fixedDate)
+            /* Then */
+            assertThat(it)
+                .hasSize(1)
+                .containsOnly(DeleteItemRequest(
+                    id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
+                    fileName = Path("geekinc.124.mp3"),
+                    podcastTitle = "Geek Inc HD"
+                ))
         }
     }
 
@@ -265,11 +264,10 @@ class ItemRepositoryTest(
                 val id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56")
 
                 /* When */
-                StepVerifier.create(repository.deleteById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(DeleteItemRequest(fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), Path("geekinc.124.mp3"), "Geek Inc HD"))
-                    .verifyComplete()
+                val response = repository.deleteById(id)
+
+                /* Then */
+                assertThat(response).isEqualTo(DeleteItemRequest(fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), Path("geekinc.124.mp3"), "Geek Inc HD"))
             }
 
             @Test
@@ -278,10 +276,10 @@ class ItemRepositoryTest(
                 val id = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
 
                 /* When */
-                StepVerifier.create(repository.deleteById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                val response = repository.deleteById(id)
+
+                /* Then */
+                assertThat(response).isNull()
             }
 
             @Test
@@ -290,11 +288,9 @@ class ItemRepositoryTest(
                 val id = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
 
                 /* When */
-                StepVerifier.create(repository.deleteById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
-
+                val response = repository.deleteById(id)
+                /* Then */
+                assertThat(response).isNull()
                 val items = Flux.from(query.select(ITEM.ID).from(ITEM))
                     .map { it[ITEM.ID] }
                     .collectList()
@@ -315,10 +311,10 @@ class ItemRepositoryTest(
                 val id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
 
                 /* When */
-                StepVerifier.create(repository.deleteById(id))
-                    .expectSubscription()
-                    /* Then */
-                    .verifyComplete()
+                val response = repository.deleteById(id)
+
+                /* Then */
+                assertThat(response).isNull()
             }
         }
 
@@ -385,11 +381,9 @@ class ItemRepositoryTest(
             val item3 = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
             val ids = listOf(item1, item2, item3)
             /* When */
-            StepVerifier.create(repository.updateAsDeleted(ids))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            repository.updateAsDeleted(ids)
 
+            /* Then */
             val items = Flux.from(query.selectFrom(ITEM).where(ITEM.ID.`in`(ids)))
                 .collectList()
                 .block()
@@ -459,24 +453,21 @@ class ItemRepositoryTest(
             /* Given */
             val id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
             /* When */
-            StepVerifier.create(repository.resetById(id))
-                /* Then */
-                .expectSubscription()
-                .assertNext {
-                    assertThat(it.id).isEqualTo(id)
-                    assertThat(it.title).isEqualTo("Geek INC 126")
-                    assertThat(it.url).isEqualTo("http://fakeurl.com/geekinc.126.mp3")
-                    assertThat(it.fileName).isEqualTo(null)
-                    assertThat(it.fileName).isEqualTo(null)
-                    assertThat(it.podcast).isEqualTo(Item.Podcast(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Geek Inc HD", "http://fake.url.com/rss"))
-                    assertThat(it.status).isEqualTo(Status.NOT_DOWNLOADED)
-                    assertThat((it.downloadDate == null)).isEqualTo(true)
-                }
-                .then {
-                    val numberOfFail = query.selectFrom(ITEM).where(ITEM.ID.eq(id)).toMono().block()?.numberOfFail
-                    assertThat(numberOfFail).isEqualTo(0)
-                }
-                .verifyComplete()
+            val it = repository.resetById(id)!!
+            /* Then */
+            assertAll {
+                assertThat(it.id).isEqualTo(id)
+                assertThat(it.title).isEqualTo("Geek INC 126")
+                assertThat(it.url).isEqualTo("http://fakeurl.com/geekinc.126.mp3")
+                assertThat(it.fileName).isEqualTo(null)
+                assertThat(it.fileName).isEqualTo(null)
+                assertThat(it.podcast).isEqualTo(Item.Podcast(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Geek Inc HD", "http://fake.url.com/rss"))
+                assertThat(it.status).isEqualTo(Status.NOT_DOWNLOADED)
+                assertThat((it.downloadDate == null)).isEqualTo(true)
+            }
+            /* And */
+            val numberOfFail = query.selectFrom(ITEM).where(ITEM.ID.eq(id)).toMono().block()?.numberOfFail
+            assertThat(numberOfFail).isEqualTo(0)
         }
 
     }
@@ -533,17 +524,14 @@ class ItemRepositoryTest(
                 .block()
         }
 
-
         @Test
         fun `and return true because its parent podcast has to`() {
             /* Given */
             val id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
             /* When */
-            StepVerifier.create(repository.hasToBeDeleted(id))
-                /* Then */
-                .expectSubscription()
-                .expectNext(true)
-                .verifyComplete()
+            val hasToBeDeleted = repository.hasToBeDeleted(id)
+            /* Then */
+            assertThat(hasToBeDeleted).isTrue()
         }
 
         @Test
@@ -551,11 +539,10 @@ class ItemRepositoryTest(
             /* Given */
             val id = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
             /* When */
-            StepVerifier.create(repository.hasToBeDeleted(id))
-                /* Then */
-                .expectSubscription()
-                .expectNext(false)
-                .verifyComplete()
+            val hasToBeDeleted = repository.hasToBeDeleted(id)
+
+            /* Then */
+            assertThat(hasToBeDeleted).isFalse()
         }
 
 
@@ -619,24 +606,23 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(0, 12, ItemSort("asc", "downloadDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isTrue
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(0)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(200)
-                        assertThat(it.totalPages).isEqualTo(17)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 1", "Geek Inc HD 1", "Foo podcast 1", "Other Podcast 1",
-                            "Appload 2", "Geek Inc HD 2", "Foo podcast 2", "Other Podcast 2",
-                            "Appload 3", "Geek Inc HD 3", "Foo podcast 3", "Other Podcast 3"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf(), listOf(), page, null)
+
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isTrue
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(0)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(200)
+                    assertThat(it.totalPages).isEqualTo(17)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 1", "Geek Inc HD 1", "Foo podcast 1", "Other Podcast 1",
+                        "Appload 2", "Geek Inc HD 2", "Foo podcast 2", "Other Podcast 2",
+                        "Appload 3", "Geek Inc HD 3", "Foo podcast 3", "Other Podcast 3"
+                    )
+                }
             }
 
             @Test
@@ -645,24 +631,22 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isTrue
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(0)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(200)
-                        assertThat(it.totalPages).isEqualTo(17)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 50", "Geek Inc HD 50", "Foo podcast 50", "Other Podcast 50",
-                            "Appload 49", "Geek Inc HD 49", "Foo podcast 49", "Other Podcast 49",
-                            "Appload 48", "Geek Inc HD 48", "Foo podcast 48", "Other Podcast 48"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf(), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isTrue
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(0)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(200)
+                    assertThat(it.totalPages).isEqualTo(17)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 50", "Geek Inc HD 50", "Foo podcast 50", "Other Podcast 50",
+                        "Appload 49", "Geek Inc HD 49", "Foo podcast 49", "Other Podcast 49",
+                        "Appload 48", "Geek Inc HD 48", "Foo podcast 48", "Other Podcast 48"
+                    )
+                }
             }
         }
 
@@ -676,24 +660,22 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isTrue
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(0)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(200)
-                        assertThat(it.totalPages).isEqualTo(17)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 50", "Geek Inc HD 50", "Foo podcast 50", "Other Podcast 50",
-                            "Appload 49", "Geek Inc HD 49", "Foo podcast 49", "Other Podcast 49",
-                            "Appload 48", "Geek Inc HD 48", "Foo podcast 48", "Other Podcast 48"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf(), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isTrue
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(0)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(200)
+                    assertThat(it.totalPages).isEqualTo(17)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 50", "Geek Inc HD 50", "Foo podcast 50", "Other Podcast 50",
+                        "Appload 49", "Geek Inc HD 49", "Foo podcast 49", "Other Podcast 49",
+                        "Appload 48", "Geek Inc HD 48", "Foo podcast 48", "Other Podcast 48"
+                    )
+                }
             }
 
             @Test
@@ -702,27 +684,25 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("podcast", listOf(), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isTrue
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(0)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(100)
-                        assertThat(it.totalPages).isEqualTo(9)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Other Podcast 50", "Foo podcast 50",
-                            "Other Podcast 49", "Foo podcast 49",
-                            "Other Podcast 48", "Foo podcast 48",
-                            "Other Podcast 47", "Foo podcast 47",
-                            "Other Podcast 46", "Foo podcast 46",
-                            "Other Podcast 45", "Foo podcast 45"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("podcast", listOf(), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isTrue
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(0)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(100)
+                    assertThat(it.totalPages).isEqualTo(9)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Other Podcast 50", "Foo podcast 50",
+                        "Other Podcast 49", "Foo podcast 49",
+                        "Other Podcast 48", "Foo podcast 48",
+                        "Other Podcast 47", "Foo podcast 47",
+                        "Other Podcast 46", "Foo podcast 46",
+                        "Other Podcast 45", "Foo podcast 45"
+                    )
+                }
             }
 
             @Test
@@ -731,27 +711,25 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("content", listOf(), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isTrue
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(0)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Other Podcast 50", "Other Podcast 49",
-                            "Other Podcast 48", "Other Podcast 47",
-                            "Other Podcast 46", "Other Podcast 45",
-                            "Other Podcast 44", "Other Podcast 43",
-                            "Other Podcast 42", "Other Podcast 41",
-                            "Other Podcast 40", "Other Podcast 39"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("content", listOf(), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isTrue
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(0)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Other Podcast 50", "Other Podcast 49",
+                        "Other Podcast 48", "Other Podcast 47",
+                        "Other Podcast 46", "Other Podcast 45",
+                        "Other Podcast 44", "Other Podcast 43",
+                        "Other Podcast 42", "Other Podcast 41",
+                        "Other Podcast 40", "Other Podcast 39"
+                    )
+                }
             }
 
 
@@ -767,24 +745,22 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isTrue
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(0)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(200)
-                        assertThat(it.totalPages).isEqualTo(17)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 50", "Geek Inc HD 50", "Foo podcast 50", "Other Podcast 50",
-                            "Appload 49", "Geek Inc HD 49", "Foo podcast 49", "Other Podcast 49",
-                            "Appload 48", "Geek Inc HD 48", "Foo podcast 48", "Other Podcast 48"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf(), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isTrue
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(0)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(200)
+                    assertThat(it.totalPages).isEqualTo(17)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 50", "Geek Inc HD 50", "Foo podcast 50", "Other Podcast 50",
+                        "Appload 49", "Geek Inc HD 49", "Foo podcast 49", "Other Podcast 49",
+                        "Appload 48", "Geek Inc HD 48", "Foo podcast 48", "Other Podcast 48"
+                    )
+                }
             }
 
             @Test
@@ -793,24 +769,22 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(1)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(200)
-                        assertThat(it.totalPages).isEqualTo(17)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 47", "Geek Inc HD 47", "Foo podcast 47", "Other Podcast 47",
-                            "Appload 46", "Geek Inc HD 46", "Foo podcast 46", "Other Podcast 46",
-                            "Appload 45", "Geek Inc HD 45", "Foo podcast 45", "Other Podcast 45"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf(), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(1)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(200)
+                    assertThat(it.totalPages).isEqualTo(17)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 47", "Geek Inc HD 47", "Foo podcast 47", "Other Podcast 47",
+                        "Appload 46", "Geek Inc HD 46", "Foo podcast 46", "Other Podcast 46",
+                        "Appload 45", "Geek Inc HD 45", "Foo podcast 45", "Other Podcast 45"
+                    )
+                }
             }
 
             @Test
@@ -819,24 +793,22 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(15, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(15)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(200)
-                        assertThat(it.totalPages).isEqualTo(17)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 5", "Geek Inc HD 5", "Foo podcast 5", "Other Podcast 5",
-                            "Appload 4", "Geek Inc HD 4", "Foo podcast 4", "Other Podcast 4",
-                            "Appload 3", "Geek Inc HD 3", "Foo podcast 3", "Other Podcast 3"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf(), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(15)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(200)
+                    assertThat(it.totalPages).isEqualTo(17)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 5", "Geek Inc HD 5", "Foo podcast 5", "Other Podcast 5",
+                        "Appload 4", "Geek Inc HD 4", "Foo podcast 4", "Other Podcast 4",
+                        "Appload 3", "Geek Inc HD 3", "Foo podcast 3", "Other Podcast 3"
+                    )
+                }
             }
 
             @Test
@@ -845,23 +817,21 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(16, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(8)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isTrue
-                        assertThat(it.number).isEqualTo(16)
-                        assertThat(it.numberOfElements).isEqualTo(8)
-                        assertThat(it.totalElements).isEqualTo(200)
-                        assertThat(it.totalPages).isEqualTo(17)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 2", "Geek Inc HD 2", "Foo podcast 2", "Other Podcast 2",
-                            "Appload 1", "Geek Inc HD 1", "Foo podcast 1", "Other Podcast 1"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf(), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(8)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isTrue
+                    assertThat(it.number).isEqualTo(16)
+                    assertThat(it.numberOfElements).isEqualTo(8)
+                    assertThat(it.totalElements).isEqualTo(200)
+                    assertThat(it.totalPages).isEqualTo(17)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 2", "Geek Inc HD 2", "Foo podcast 2", "Other Podcast 2",
+                        "Appload 1", "Geek Inc HD 1", "Foo podcast 1", "Other Podcast 1"
+                    )
+                }
             }
 
 
@@ -877,27 +847,25 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isTrue
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(0)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(100)
-                        assertThat(it.totalPages).isEqualTo(9)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 50", "Other Podcast 50",
-                            "Appload 49", "Other Podcast 49",
-                            "Appload 48", "Other Podcast 48",
-                            "Appload 47", "Other Podcast 47",
-                            "Appload 46", "Other Podcast 46",
-                            "Appload 45", "Other Podcast 45"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf("T1"), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isTrue
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(0)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(100)
+                    assertThat(it.totalPages).isEqualTo(9)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 50", "Other Podcast 50",
+                        "Appload 49", "Other Podcast 49",
+                        "Appload 48", "Other Podcast 48",
+                        "Appload 47", "Other Podcast 47",
+                        "Appload 46", "Other Podcast 46",
+                        "Appload 45", "Other Podcast 45"
+                    )
+                }
             }
 
             @Test
@@ -906,27 +874,25 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(1)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(100)
-                        assertThat(it.totalPages).isEqualTo(9)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 44", "Other Podcast 44",
-                            "Appload 43", "Other Podcast 43",
-                            "Appload 42", "Other Podcast 42",
-                            "Appload 41", "Other Podcast 41",
-                            "Appload 40", "Other Podcast 40",
-                            "Appload 39", "Other Podcast 39"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf("T1"), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(1)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(100)
+                    assertThat(it.totalPages).isEqualTo(9)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 44", "Other Podcast 44",
+                        "Appload 43", "Other Podcast 43",
+                        "Appload 42", "Other Podcast 42",
+                        "Appload 41", "Other Podcast 41",
+                        "Appload 40", "Other Podcast 40",
+                        "Appload 39", "Other Podcast 39"
+                    )
+                }
             }
 
             @Test
@@ -935,27 +901,25 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(7, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(7)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(100)
-                        assertThat(it.totalPages).isEqualTo(9)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 8", "Other Podcast 8",
-                            "Appload 7", "Other Podcast 7",
-                            "Appload 6", "Other Podcast 6",
-                            "Appload 5", "Other Podcast 5",
-                            "Appload 4", "Other Podcast 4",
-                            "Appload 3", "Other Podcast 3"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf("T1"), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(7)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(100)
+                    assertThat(it.totalPages).isEqualTo(9)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 8", "Other Podcast 8",
+                        "Appload 7", "Other Podcast 7",
+                        "Appload 6", "Other Podcast 6",
+                        "Appload 5", "Other Podcast 5",
+                        "Appload 4", "Other Podcast 4",
+                        "Appload 3", "Other Podcast 3"
+                    )
+                }
             }
 
             @Test
@@ -964,22 +928,20 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(8, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1"), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(4)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isTrue
-                        assertThat(it.number).isEqualTo(8)
-                        assertThat(it.numberOfElements).isEqualTo(4)
-                        assertThat(it.totalElements).isEqualTo(100)
-                        assertThat(it.totalPages).isEqualTo(9)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 2", "Other Podcast 2", "Appload 1", "Other Podcast 1"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf("T1"), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(4)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isTrue
+                    assertThat(it.number).isEqualTo(8)
+                    assertThat(it.numberOfElements).isEqualTo(4)
+                    assertThat(it.totalElements).isEqualTo(100)
+                    assertThat(it.totalPages).isEqualTo(9)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 2", "Other Podcast 2", "Appload 1", "Other Podcast 1"
+                    )
+                }
             }
         }
 
@@ -993,33 +955,31 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isTrue
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(0)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 50",
-                            "Appload 49",
-                            "Appload 48",
-                            "Appload 47",
-                            "Appload 46",
-                            "Appload 45",
-                            "Appload 44",
-                            "Appload 43",
-                            "Appload 42",
-                            "Appload 41",
-                            "Appload 40",
-                            "Appload 39"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf("T1", "T2"), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isTrue
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(0)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 50",
+                        "Appload 49",
+                        "Appload 48",
+                        "Appload 47",
+                        "Appload 46",
+                        "Appload 45",
+                        "Appload 44",
+                        "Appload 43",
+                        "Appload 42",
+                        "Appload 41",
+                        "Appload 40",
+                        "Appload 39"
+                    )
+                }
             }
 
             @Test
@@ -1028,33 +988,31 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(1)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 38",
-                            "Appload 37",
-                            "Appload 36",
-                            "Appload 35",
-                            "Appload 34",
-                            "Appload 33",
-                            "Appload 32",
-                            "Appload 31",
-                            "Appload 30",
-                            "Appload 29",
-                            "Appload 28",
-                            "Appload 27"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf("T1", "T2"), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(1)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 38",
+                        "Appload 37",
+                        "Appload 36",
+                        "Appload 35",
+                        "Appload 34",
+                        "Appload 33",
+                        "Appload 32",
+                        "Appload 31",
+                        "Appload 30",
+                        "Appload 29",
+                        "Appload 28",
+                        "Appload 27"
+                    )
+                }
             }
 
             @Test
@@ -1063,33 +1021,31 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(3, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(3)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 14",
-                            "Appload 13",
-                            "Appload 12",
-                            "Appload 11",
-                            "Appload 10",
-                            "Appload 9",
-                            "Appload 8",
-                            "Appload 7",
-                            "Appload 6",
-                            "Appload 5",
-                            "Appload 4",
-                            "Appload 3"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf("T1", "T2"), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(3)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 14",
+                        "Appload 13",
+                        "Appload 12",
+                        "Appload 11",
+                        "Appload 10",
+                        "Appload 9",
+                        "Appload 8",
+                        "Appload 7",
+                        "Appload 6",
+                        "Appload 5",
+                        "Appload 4",
+                        "Appload 3"
+                    )
+                }
             }
 
             @Test
@@ -1098,22 +1054,20 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(4, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T1", "T2"), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(2)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isTrue
-                        assertThat(it.number).isEqualTo(4)
-                        assertThat(it.numberOfElements).isEqualTo(2)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Appload 2", "Appload 1"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf("T1", "T2"), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(2)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isTrue
+                    assertThat(it.number).isEqualTo(4)
+                    assertThat(it.numberOfElements).isEqualTo(2)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Appload 2", "Appload 1"
+                    )
+                }
             }
         }
 
@@ -1127,24 +1081,22 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isTrue
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(0)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Geek Inc HD 50", "Geek Inc HD 49", "Geek Inc HD 48", "Geek Inc HD 47",
-                            "Geek Inc HD 46", "Geek Inc HD 45", "Geek Inc HD 44", "Geek Inc HD 43",
-                            "Geek Inc HD 42", "Geek Inc HD 41", "Geek Inc HD 40", "Geek Inc HD 39"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf("T3"), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isTrue
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(0)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Geek Inc HD 50", "Geek Inc HD 49", "Geek Inc HD 48", "Geek Inc HD 47",
+                        "Geek Inc HD 46", "Geek Inc HD 45", "Geek Inc HD 44", "Geek Inc HD 43",
+                        "Geek Inc HD 42", "Geek Inc HD 41", "Geek Inc HD 40", "Geek Inc HD 39"
+                    )
+                }
             }
 
             @Test
@@ -1153,24 +1105,22 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(1)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Geek Inc HD 38", "Geek Inc HD 37", "Geek Inc HD 36", "Geek Inc HD 35",
-                            "Geek Inc HD 34", "Geek Inc HD 33", "Geek Inc HD 32", "Geek Inc HD 31",
-                            "Geek Inc HD 30", "Geek Inc HD 29", "Geek Inc HD 28", "Geek Inc HD 27"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf("T3"), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(1)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Geek Inc HD 38", "Geek Inc HD 37", "Geek Inc HD 36", "Geek Inc HD 35",
+                        "Geek Inc HD 34", "Geek Inc HD 33", "Geek Inc HD 32", "Geek Inc HD 31",
+                        "Geek Inc HD 30", "Geek Inc HD 29", "Geek Inc HD 28", "Geek Inc HD 27"
+                    )
+                }
             }
 
             @Test
@@ -1179,24 +1129,22 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(3, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(3)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Geek Inc HD 14", "Geek Inc HD 13", "Geek Inc HD 12", "Geek Inc HD 11",
-                            "Geek Inc HD 10", "Geek Inc HD 9", "Geek Inc HD 8", "Geek Inc HD 7",
-                            "Geek Inc HD 6", "Geek Inc HD 5", "Geek Inc HD 4", "Geek Inc HD 3"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf("T3"), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(3)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Geek Inc HD 14", "Geek Inc HD 13", "Geek Inc HD 12", "Geek Inc HD 11",
+                        "Geek Inc HD 10", "Geek Inc HD 9", "Geek Inc HD 8", "Geek Inc HD 7",
+                        "Geek Inc HD 6", "Geek Inc HD 5", "Geek Inc HD 4", "Geek Inc HD 3"
+                    )
+                }
             }
 
             @Test
@@ -1205,21 +1153,19 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(4, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf("T3"), listOf(), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(2)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isTrue
-                        assertThat(it.number).isEqualTo(4)
-                        assertThat(it.numberOfElements).isEqualTo(2)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title))
-                            .contains("Geek Inc HD 2", "Geek Inc HD 1")
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf("T3"), listOf(), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(2)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isTrue
+                    assertThat(it.number).isEqualTo(4)
+                    assertThat(it.numberOfElements).isEqualTo(2)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title))
+                        .contains("Geek Inc HD 2", "Geek Inc HD 1")
+                }
             }
         }
 
@@ -1233,33 +1179,31 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(Status.NOT_DOWNLOADED), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isTrue
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(0)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Other Podcast 50",
-                            "Other Podcast 49",
-                            "Other Podcast 48",
-                            "Other Podcast 47",
-                            "Other Podcast 46",
-                            "Other Podcast 45",
-                            "Other Podcast 44",
-                            "Other Podcast 43",
-                            "Other Podcast 42",
-                            "Other Podcast 41",
-                            "Other Podcast 40",
-                            "Other Podcast 39"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf(), listOf(Status.NOT_DOWNLOADED), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isTrue
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(0)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Other Podcast 50",
+                        "Other Podcast 49",
+                        "Other Podcast 48",
+                        "Other Podcast 47",
+                        "Other Podcast 46",
+                        "Other Podcast 45",
+                        "Other Podcast 44",
+                        "Other Podcast 43",
+                        "Other Podcast 42",
+                        "Other Podcast 41",
+                        "Other Podcast 40",
+                        "Other Podcast 39"
+                    )
+                }
             }
 
             @Test
@@ -1268,33 +1212,31 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(1, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(Status.NOT_DOWNLOADED), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(1)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Other Podcast 38",
-                            "Other Podcast 37",
-                            "Other Podcast 36",
-                            "Other Podcast 35",
-                            "Other Podcast 34",
-                            "Other Podcast 33",
-                            "Other Podcast 32",
-                            "Other Podcast 31",
-                            "Other Podcast 30",
-                            "Other Podcast 29",
-                            "Other Podcast 28",
-                            "Other Podcast 27"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf(), listOf(Status.NOT_DOWNLOADED), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(1)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Other Podcast 38",
+                        "Other Podcast 37",
+                        "Other Podcast 36",
+                        "Other Podcast 35",
+                        "Other Podcast 34",
+                        "Other Podcast 33",
+                        "Other Podcast 32",
+                        "Other Podcast 31",
+                        "Other Podcast 30",
+                        "Other Podcast 29",
+                        "Other Podcast 28",
+                        "Other Podcast 27"
+                    )
+                }
             }
 
             @Test
@@ -1303,33 +1245,31 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(3, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(Status.NOT_DOWNLOADED), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(3)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title)).contains(
-                            "Other Podcast 14",
-                            "Other Podcast 13",
-                            "Other Podcast 12",
-                            "Other Podcast 11",
-                            "Other Podcast 10",
-                            "Other Podcast 9",
-                            "Other Podcast 8",
-                            "Other Podcast 7",
-                            "Other Podcast 6",
-                            "Other Podcast 5",
-                            "Other Podcast 4",
-                            "Other Podcast 3"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf(), listOf(Status.NOT_DOWNLOADED), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(3)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title)).contains(
+                        "Other Podcast 14",
+                        "Other Podcast 13",
+                        "Other Podcast 12",
+                        "Other Podcast 11",
+                        "Other Podcast 10",
+                        "Other Podcast 9",
+                        "Other Podcast 8",
+                        "Other Podcast 7",
+                        "Other Podcast 6",
+                        "Other Podcast 5",
+                        "Other Podcast 4",
+                        "Other Podcast 3"
+                    )
+                }
             }
 
             @Test
@@ -1338,21 +1278,19 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(4, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(Status.NOT_DOWNLOADED), page, null))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(2)
-                        assertThat(it.first).isFalse
-                        assertThat(it.last).isTrue
-                        assertThat(it.number).isEqualTo(4)
-                        assertThat(it.numberOfElements).isEqualTo(2)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title))
-                            .contains("Other Podcast 2", "Other Podcast 1")
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf(), listOf(Status.NOT_DOWNLOADED), page, null)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(2)
+                    assertThat(it.first).isFalse
+                    assertThat(it.last).isTrue
+                    assertThat(it.number).isEqualTo(4)
+                    assertThat(it.numberOfElements).isEqualTo(2)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title))
+                        .contains("Other Podcast 2", "Other Podcast 1")
+                }
             }
         }
 
@@ -1368,33 +1306,31 @@ class ItemRepositoryTest(
                 val page = ItemPageRequest(0, 12, ItemSort("desc", "pubDate"))
 
                 /* When */
-                StepVerifier.create(repository.search("", listOf(), listOf(), page, podcastId))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.content.size).isEqualTo(12)
-                        assertThat(it.first).isTrue
-                        assertThat(it.last).isFalse
-                        assertThat(it.number).isEqualTo(0)
-                        assertThat(it.numberOfElements).isEqualTo(12)
-                        assertThat(it.totalElements).isEqualTo(50)
-                        assertThat(it.totalPages).isEqualTo(5)
-                        assertThat(it.content.map(Item::title)).containsExactly(
-                            "Appload 50",
-                            "Appload 49",
-                            "Appload 48",
-                            "Appload 47",
-                            "Appload 46",
-                            "Appload 45",
-                            "Appload 44",
-                            "Appload 43",
-                            "Appload 42",
-                            "Appload 41",
-                            "Appload 40",
-                            "Appload 39"
-                        )
-                    }
-                    .verifyComplete()
+                val it = repository.search("", listOf(), listOf(), page, podcastId)
+                /* Then */
+                assertAll {
+                    assertThat(it.content.size).isEqualTo(12)
+                    assertThat(it.first).isTrue
+                    assertThat(it.last).isFalse
+                    assertThat(it.number).isEqualTo(0)
+                    assertThat(it.numberOfElements).isEqualTo(12)
+                    assertThat(it.totalElements).isEqualTo(50)
+                    assertThat(it.totalPages).isEqualTo(5)
+                    assertThat(it.content.map(Item::title)).containsExactly(
+                        "Appload 50",
+                        "Appload 49",
+                        "Appload 48",
+                        "Appload 47",
+                        "Appload 46",
+                        "Appload 45",
+                        "Appload 44",
+                        "Appload 43",
+                        "Appload 42",
+                        "Appload 41",
+                        "Appload 40",
+                        "Appload 39"
+                    )
+                }
             }
         }
     }
@@ -1484,33 +1420,33 @@ class ItemRepositoryTest(
                     val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())
 
                     /* When */
-                    StepVerifier.create(repository.create(item))
-                        /* Then */
-                        .expectSubscription()
-                        .assertNext {
-                            assertThat(it.title).isEqualTo("an item")
-                            assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
-                            assertThat(it.pubDate).isCloseTo(now(), within(10, SECONDS))
-                            assertThat(it.downloadDate).isCloseTo(now(), within(10, SECONDS))
-                            assertThat(it.creationDate).isCloseTo(now(), within(10, SECONDS))
-                            assertThat(it.description).isEqualTo("a description")
-                            assertThat(it.mimeType).isEqualTo("audio/mp3")
-                            assertThat(it.length).isEqualTo(1234)
-                            assertThat(it.fileName).isEqualTo(Path("ofejeaoijefa.mp3"))
-                            assertThat(it.status).isEqualTo(Status.FINISH)
+                    val it = repository.create(item)!!
 
-                            assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
-                            assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
-                            assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
+                    /* Then */
+                    assertAll {
+                        assertThat(it.title).isEqualTo("an item")
+                        assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
+                        assertThat(it.pubDate).isCloseTo(now(), within(10, SECONDS))
+                        assertThat(it.downloadDate).isCloseTo(now(), within(10, SECONDS))
+                        assertThat(it.creationDate).isCloseTo(now(), within(10, SECONDS))
+                        assertThat(it.description).isEqualTo("a description")
+                        assertThat(it.mimeType).isEqualTo("audio/mp3")
+                        assertThat(it.length).isEqualTo(1234)
+                        assertThat(it.fileName).isEqualTo(Path("ofejeaoijefa.mp3"))
+                        assertThat(it.status).isEqualTo(Status.FINISH)
 
-                            assertThat(it.cover.height).isEqualTo(100)
-                            assertThat(it.cover.width).isEqualTo(100)
-                            assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
-                        }
-                        .verifyComplete()
+                        assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
+                        assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
+                        assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
 
-                    assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
-                    assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
+                        assertThat(it.cover.height).isEqualTo(100)
+                        assertThat(it.cover.width).isEqualTo(100)
+                        assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
+
+                        assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
+                        assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
+                    }
+
                 }
 
                 @Test
@@ -1538,33 +1474,33 @@ class ItemRepositoryTest(
                     val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())!!
 
                     /* When */
-                    StepVerifier.create(repository.create(item))
-                        /* Then */
-                        .expectSubscription()
-                        .assertNext {
-                            assertThat(it.title).isEqualTo("$1 item")
-                            assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
-                            assertThat(it.pubDate).isCloseTo(now(), within(10, SECONDS))
-                            assertThat(it.downloadDate).isCloseTo(now(), within(10, SECONDS))
-                            assertThat(it.creationDate).isCloseTo(now(), within(10, SECONDS))
-                            assertThat(it.description).isEqualTo("it costs $1")
-                            assertThat(it.mimeType).isEqualTo("$1/mp3")
-                            assertThat(it.length).isEqualTo(1234)
-                            assertThat(it.fileName).isEqualTo(Path("$1.mp3"))
-                            assertThat(it.status).isEqualTo(Status.FINISH)
+                    val it = repository.create(item)!!
 
-                            assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
-                            assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
-                            assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
+                    /* Then */
+                    assertAll {
+                        assertThat(it.title).isEqualTo("$1 item")
+                        assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
+                        assertThat(it.pubDate).isCloseTo(now(), within(10, SECONDS))
+                        assertThat(it.downloadDate).isCloseTo(now(), within(10, SECONDS))
+                        assertThat(it.creationDate).isCloseTo(now(), within(10, SECONDS))
+                        assertThat(it.description).isEqualTo("it costs $1")
+                        assertThat(it.mimeType).isEqualTo("$1/mp3")
+                        assertThat(it.length).isEqualTo(1234)
+                        assertThat(it.fileName).isEqualTo(Path("$1.mp3"))
+                        assertThat(it.status).isEqualTo(Status.FINISH)
 
-                            assertThat(it.cover.height).isEqualTo(100)
-                            assertThat(it.cover.width).isEqualTo(100)
-                            assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
-                        }
-                        .verifyComplete()
+                        assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
+                        assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
+                        assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
 
-                    assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
-                    assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
+                        assertThat(it.cover.height).isEqualTo(100)
+                        assertThat(it.cover.width).isEqualTo(100)
+                        assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
+
+                        assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
+                        assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
+                    }
+
                 }
 
                 @Test
@@ -1591,11 +1527,10 @@ class ItemRepositoryTest(
                     val numberOfItem = query.selectCount().from(ITEM).r2dbc().fetchOne(count())
                     val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())
                     /* When */
-                    StepVerifier.create(repository.create(item))
-                        /* Then */
-                        .expectSubscription()
-                        .verifyComplete()
+                    val it = repository.create(item)
 
+                    /* Then */
+                    assertThat(it).isNull()
                     assertThat(numberOfItem).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
                     assertThat(numberOfCover).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
                 }
@@ -1625,10 +1560,10 @@ class ItemRepositoryTest(
                     val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())
 
                     /* When */
-                    StepVerifier.create(repository.create(item))
-                        /* Then */
-                        .expectSubscription()
-                        .verifyComplete()
+                    val it = repository.create(item)
+
+                    /* Then */
+                    assertThat(it).isNull()
 
                     assertThat(numberOfItem).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
                     assertThat(numberOfCover).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
@@ -1669,30 +1604,29 @@ class ItemRepositoryTest(
                     val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())
 
                     /* When */
-                    StepVerifier.create(repository.create(item))
-                        /* Then */
-                        .expectSubscription()
-                        .assertNext {
-                            assertThat(it.title).isEqualTo("an item")
-                            assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
-                            assertThat(it.pubDate).isEqualToIgnoringNanos(now)
-                            assertThat(it.downloadDate).isNull()
-                            assertThat(it.creationDate).isEqualToIgnoringNanos(now)
-                            assertThat(it.description).isEqualTo("a description")
-                            assertThat(it.mimeType).isEqualTo("audio/mp3")
-                            assertThat(it.length).isEqualTo(1234)
-                            assertThat(it.fileName).isEqualTo(Path("ofejeaoijefa.mp3"))
-                            assertThat(it.status).isEqualTo(Status.FINISH)
+                    val it = repository.create(item)!!
 
-                            assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
-                            assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
-                            assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
+                    /* Then */
+                    assertAll {
+                        assertThat(it.title).isEqualTo("an item")
+                        assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
+                        assertThat(it.pubDate).isEqualToIgnoringNanos(now)
+                        assertThat(it.downloadDate).isNull()
+                        assertThat(it.creationDate).isEqualToIgnoringNanos(now)
+                        assertThat(it.description).isEqualTo("a description")
+                        assertThat(it.mimeType).isEqualTo("audio/mp3")
+                        assertThat(it.length).isEqualTo(1234)
+                        assertThat(it.fileName).isEqualTo(Path("ofejeaoijefa.mp3"))
+                        assertThat(it.status).isEqualTo(Status.FINISH)
 
-                            assertThat(it.cover.height).isEqualTo(100)
-                            assertThat(it.cover.width).isEqualTo(100)
-                            assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
-                        }
-                        .verifyComplete()
+                        assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
+                        assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
+                        assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
+
+                        assertThat(it.cover.height).isEqualTo(100)
+                        assertThat(it.cover.width).isEqualTo(100)
+                        assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
+                    }
 
                     assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
                     assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
@@ -1724,30 +1658,29 @@ class ItemRepositoryTest(
                     val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())
 
                     /* When */
-                    StepVerifier.create(repository.create(item))
-                        /* Then */
-                        .expectSubscription()
-                        .assertNext {
-                            assertThat(it.title).isEqualTo("an item")
-                            assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
-                            assertThat(it.pubDate).isEqualToIgnoringNanos(now)
-                            assertThat(it.downloadDate).isEqualToIgnoringNanos(now)
-                            assertThat(it.creationDate).isEqualToIgnoringNanos(now)
-                            assertThat(it.description).isEqualTo("a description")
-                            assertThat(it.mimeType).isEqualTo("audio/mp3")
-                            assertThat(it.length).isEqualTo(1234)
-                            assertThat(it.fileName).isEqualTo(Path("ofejeaoijefa.mp3"))
-                            assertThat(it.status).isEqualTo(Status.NOT_DOWNLOADED)
+                    val it = repository.create(item)!!
 
-                            assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
-                            assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
-                            assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
+                    /* Then */
+                    assertAll {
+                        assertThat(it.title).isEqualTo("an item")
+                        assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
+                        assertThat(it.pubDate).isEqualToIgnoringNanos(now)
+                        assertThat(it.downloadDate).isEqualToIgnoringNanos(now)
+                        assertThat(it.creationDate).isEqualToIgnoringNanos(now)
+                        assertThat(it.description).isEqualTo("a description")
+                        assertThat(it.mimeType).isEqualTo("audio/mp3")
+                        assertThat(it.length).isEqualTo(1234)
+                        assertThat(it.fileName).isEqualTo(Path("ofejeaoijefa.mp3"))
+                        assertThat(it.status).isEqualTo(Status.NOT_DOWNLOADED)
 
-                            assertThat(it.cover.height).isEqualTo(100)
-                            assertThat(it.cover.width).isEqualTo(100)
-                            assertThat(it.cover.url).isEqualTo(URI("http://fake.url.com/geekinc/cover.png"))
-                        }
-                        .verifyComplete()
+                        assertThat(it.podcast.id).isEqualTo(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"))
+                        assertThat(it.podcast.title).isEqualTo("Geek Inc HD")
+                        assertThat(it.podcast.url).isEqualTo("http://fake.url.com/rss")
+
+                        assertThat(it.cover.height).isEqualTo(100)
+                        assertThat(it.cover.width).isEqualTo(100)
+                        assertThat(it.cover.url).isEqualTo(URI("http://fake.url.com/geekinc/cover.png"))
+                    }
 
                     assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
                     assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
@@ -1781,11 +1714,11 @@ class ItemRepositoryTest(
                     )
 
                     /* When */
-                    StepVerifier.create(repository.create(item))
+                    assertThatThrownBy { repository.create(item) }
+
                         /* Then */
-                        .expectSubscription()
-                        .expectError(DataAccessException::class.java)
-                        .verify()
+                        .isInstanceOf(DataAccessException::class.java)
+
                 }
 
                 @Test
@@ -1811,11 +1744,10 @@ class ItemRepositoryTest(
                     )
 
                     /* When */
-                    StepVerifier.create(repository.create(item))
+                    assertThatThrownBy { repository.create(item) }
+
                         /* Then */
-                        .expectSubscription()
-                        .expectError(DataAccessException::class.java)
-                        .verify()
+                        .isInstanceOf(DataAccessException::class.java)
                 }
 
             }
@@ -1891,16 +1823,14 @@ class ItemRepositoryTest(
                     val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())!!
 
                     /* When */
-                    StepVerifier.create(repository.create(listOf(item1, item2, item3)))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNextCount(3)
-                        .verifyComplete()
+                    val items = repository.create(listOf(item1, item2, item3))
+
+                    /* Then */
+                    assertThat(items).hasSize(3)
 
                     assertThat(numberOfItem + 3).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
                     assertThat(numberOfCover + 3).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
                 }
-
             }
         }
 
@@ -1975,11 +1905,9 @@ class ItemRepositoryTest(
                 fromString("0a674614-c867-44df-b7e0-5e5af31f7b56")
             )
             /* When */
-            StepVerifier.create(repository.resetItemWithDownloadingState())
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            repository.resetItemWithDownloadingState()
 
+            /* Then */
             val statuses = query.selectFrom(ITEM).where(ITEM.ID.`in`(ids))
                 .r2dbc()
                 .fetch()
@@ -2055,10 +1983,9 @@ class ItemRepositoryTest(
             /* Given */
             val uuid = fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb")
             /* When */
-            StepVerifier.create(repository.findPlaylistsContainingItem(uuid))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            val items = repository.findPlaylistsContainingItem(uuid)
+            /* Then */
+            assertThat(items).isEmpty()
         }
 
         @Test
@@ -2066,13 +1993,16 @@ class ItemRepositoryTest(
             /* Given */
             val uuid = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56")
             /* When */
-            StepVerifier.create(repository.findPlaylistsContainingItem(uuid))
-                /* Then */
-                .expectSubscription()
-                .assertNext {
-                    assertThat(it.name).isEqualTo("Humour Playlist")
-                }
-                .verifyComplete()
+            val items = repository.findPlaylistsContainingItem(uuid)
+            /* Then */
+            assertThat(items)
+                .hasSize(1)
+                .containsOnly(
+                    ItemPlaylist(
+                        id = fromString("dc024a30-bd02-11e5-a837-0800200c9a66"),
+                        name = "Humour Playlist"
+                    )
+                )
         }
 
         @Test
@@ -2080,19 +2010,20 @@ class ItemRepositoryTest(
             /* Given */
             val uuid = fromString("0a774611-c867-44df-b7e0-5e5af31f7b56")
             /* When */
-            StepVerifier.create(repository.findPlaylistsContainingItem(uuid))
-                /* Then */
-                .expectSubscription()
-                .assertNext {
-                    assertThat(it.name).isEqualTo("Conférence Rewind")
-                    assertThat(it.id).isEqualTo(fromString("24248480-bd04-11e5-a837-0800200c9a66"))
-                }
-                .assertNext {
-                    assertThat(it.name).isEqualTo("Humour Playlist")
-                    assertThat(it.id).isEqualTo(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"))
-                }
-                .verifyComplete()
-        }
+            val items = repository.findPlaylistsContainingItem(uuid)
 
+            /* Then */
+            assertThat(items).containsOnly(
+                ItemPlaylist(
+                    id = fromString("24248480-bd04-11e5-a837-0800200c9a66"),
+                    name = "Conférence Rewind"
+                ),
+
+                ItemPlaylist(
+                    id = fromString("dc024a30-bd02-11e5-a837-0800200c9a66"),
+                    name = "Humour Playlist"
+                )
+            )
+        }
     }
 }

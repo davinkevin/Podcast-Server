@@ -25,10 +25,8 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
-import reactor.test.StepVerifier
 import java.net.URI
 import java.nio.file.Paths
 import java.time.*
@@ -86,10 +84,9 @@ class ItemServiceTest(
                 DeleteItemRequest(UUID.fromString("dca41d0b-a59c-43fa-8d2d-2129fb637546"), Path("num1"), "num2"),
                 DeleteItemRequest(UUID.fromString("40430ce3-b421-4c82-b34d-2deb4c46b1cd"), Path("itemT"), "podcastT")
         )
-        val repoResponse = Flux.fromIterable(items)
-        whenever(repository.findAllToDelete(limit)).thenReturn(repoResponse)
+        whenever(repository.findAllToDelete(limit)).thenReturn(items)
         whenever(fileService.deleteItem(any())).thenReturn(Mono.empty())
-        whenever(repository.updateAsDeleted(any())).thenReturn(Mono.empty())
+        doNothing().whenever(repository).updateAsDeleted(any())
 
         /* When */
         itemService.deleteItemOlderThan(limit)
@@ -104,7 +101,7 @@ class ItemServiceTest(
     @Test
     fun `should find by id`() {
         /* Given */
-        whenever(repository.findById(any<UUID>())).thenReturn(item.toMono())
+        whenever(repository.findById(any<UUID>())).thenReturn(item)
         /* When */
         val foundItem = itemService.findById(item.id)
         /* Then */
@@ -122,7 +119,7 @@ class ItemServiceTest(
         fun `and do nothing because item is currently downloading`() {
             /* Given */
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(true.toMono())
-            whenever(repository.findById(item.id)).thenReturn(item.toMono())
+            whenever(repository.findById(item.id)).thenReturn(item)
 
             /* When */
             val resetItem = itemService.reset(item.id)!!
@@ -138,8 +135,8 @@ class ItemServiceTest(
         fun `and do nothing because the podcast is delete protected`() {
             /* Given */
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
-            whenever(repository.findById(item.id)).thenReturn(item.toMono())
-            whenever(repository.hasToBeDeleted(item.id)).thenReturn(false.toMono())
+            whenever(repository.findById(item.id)).thenReturn(item)
+            whenever(repository.hasToBeDeleted(item.id)).thenReturn(false)
 
             /* When */
             val resetItem = itemService.reset(item.id)!!
@@ -153,10 +150,10 @@ class ItemServiceTest(
         @Test
         fun `and do nothing because element is not downloaded`() {
             /* Given */
-            whenever(repository.resetById(item.id)).thenReturn(item.toMono())
+            whenever(repository.resetById(item.id)).thenReturn(item)
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
-            whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
-            whenever(repository.findById(item.id)).thenReturn(item.toMono())
+            whenever(repository.hasToBeDeleted(item.id)).thenReturn(true)
+            whenever(repository.findById(item.id)).thenReturn(item)
 
             /* When */
             val resetItem = itemService.reset(item.id)!!
@@ -170,10 +167,10 @@ class ItemServiceTest(
         fun `and do nothing because element doesn't have a filename`() {
             /* Given */
             val currentItem = item.copy(status = FINISH, fileName = null)
-            whenever(repository.resetById(item.id)).thenReturn(item.toMono())
+            whenever(repository.resetById(item.id)).thenReturn(item)
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
-            whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
-            whenever(repository.findById(item.id)).thenReturn(currentItem.toMono())
+            whenever(repository.hasToBeDeleted(item.id)).thenReturn(true)
+            whenever(repository.findById(item.id)).thenReturn(currentItem)
 
             /* When */
             val resetItem = itemService.reset(item.id)!!
@@ -187,10 +184,10 @@ class ItemServiceTest(
         fun `and do nothing because element has filename empty`() {
             /* Given */
             val currentItem = item.copy(status = FINISH, fileName = Path(""))
-            whenever(repository.resetById(item.id)).thenReturn(item.toMono())
+            whenever(repository.resetById(item.id)).thenReturn(item)
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
-            whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
-            whenever(repository.findById(item.id)).thenReturn(currentItem.toMono())
+            whenever(repository.hasToBeDeleted(item.id)).thenReturn(true)
+            whenever(repository.findById(item.id)).thenReturn(currentItem)
 
             /* When */
             val resetItem = itemService.reset(item.id)!!
@@ -205,10 +202,10 @@ class ItemServiceTest(
             /* Given */
             val currentItem = item.copy(status = FINISH, fileName = Path("foo.mp4"))
             val deleteItemInformation = DeleteItemRequest(currentItem.id, currentItem.fileName!!, currentItem.podcast.title)
-            whenever(repository.resetById(item.id)).thenReturn(item.toMono())
+            whenever(repository.resetById(item.id)).thenReturn(item)
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
-            whenever(repository.hasToBeDeleted(item.id)).thenReturn(true.toMono())
-            whenever(repository.findById(item.id)).thenReturn(currentItem.toMono())
+            whenever(repository.hasToBeDeleted(item.id)).thenReturn(true)
+            whenever(repository.findById(item.id)).thenReturn(currentItem)
             whenever(fileService.deleteItem(deleteItemInformation)).thenReturn(Mono.empty())
 
             /* When */
@@ -237,7 +234,7 @@ class ItemServiceTest(
             val podcastId = UUID.fromString("167991ba-44ca-4f2b-b47b-5233a33d33b8")
             val result = PageItem.of(listOf(item), 1, page)
             whenever(repository.search(q, tags, statuses, page, podcastId))
-                    .thenReturn(result.toMono())
+                    .thenReturn(result)
 
             /* When */
             val items = itemService.search(q, tags, statuses, page, podcastId)
@@ -255,7 +252,7 @@ class ItemServiceTest(
             val page = ItemPageRequest(0, 12, ItemSort("DESC", "title"))
             val result = PageItem.of(listOf(item), 1, page)
             whenever(repository.search(q, tags, statuses, page, null))
-                    .thenReturn(result.toMono())
+                    .thenReturn(result)
 
             /* When */
             val items = itemService.search(q, tags, statuses, page)
@@ -273,7 +270,7 @@ class ItemServiceTest(
         fun `and return nothing because no playlist contains this item`() {
             /* Given */
             val uuid = UUID.randomUUID()
-            whenever(repository.findPlaylistsContainingItem(uuid)).thenReturn(Flux.empty())
+            whenever(repository.findPlaylistsContainingItem(uuid)).thenReturn(emptyList())
 
             /* When */
             val playlists = itemService.findPlaylistsContainingItem(uuid)
@@ -286,7 +283,7 @@ class ItemServiceTest(
         fun `and return 3 playlist associated to this item`() {
             /* Given */
             val uuid = UUID.randomUUID()
-            whenever(repository.findPlaylistsContainingItem(uuid)).thenReturn(Flux.just(
+            whenever(repository.findPlaylistsContainingItem(uuid)).thenReturn(listOf(
                     ItemPlaylist(UUID.fromString("50958264-d5ed-4a9a-a875-5173bb207720"), "foo"),
                     ItemPlaylist(UUID.fromString("e053b63c-dc1d-4a3a-9c95-8f616a74d2aa"), "bar"),
                     ItemPlaylist(UUID.fromString("6761208b-85e7-4098-817a-2db7c4de7ceb"), "other")
@@ -315,7 +312,7 @@ class ItemServiceTest(
         fun `an item which should not be deleted from disk`() {
             /* Given */
             val id = UUID.randomUUID()
-            whenever(repository.deleteById(id)).thenReturn(Mono.empty())
+            whenever(repository.deleteById(id)).thenReturn(null)
             whenever(idm.removeItemFromQueueAndDownload(id)).thenReturn(Mono.empty())
 
             /* When */
@@ -330,7 +327,7 @@ class ItemServiceTest(
             /* Given */
             val id = UUID.randomUUID()
             val deleteItem = DeleteItemRequest(id, Path("foo"), "bar")
-            whenever(repository.deleteById(id)).thenReturn(Mono.just(deleteItem))
+            whenever(repository.deleteById(id)).thenReturn(deleteItem)
             whenever(fileService.deleteItem(deleteItem)).thenReturn(Mono.empty())
             whenever(idm.removeItemFromQueueAndDownload(id)).thenReturn(Mono.empty())
 
@@ -416,7 +413,7 @@ class ItemServiceTest(
             whenever(fileService.metadata(podcast.title, normalizedFileName)).thenReturn(
                 FileMetaData("audio/mp3", 1234L).toMono()
             )
-            whenever(repository.create(itemToCreate)).thenReturn(itemCreated.toMono())
+            whenever(repository.create(itemToCreate)).thenReturn(itemCreated)
             whenever(podcastRepository.updateLastUpdate(podcast.id)).thenReturn(Mono.empty())
 
             /* When */
