@@ -5,6 +5,7 @@ import org.mockito.kotlin.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.doNothing
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
@@ -35,8 +36,7 @@ class UpdateHandlerTest(
         @Test
         fun `with default values`() {
             /* Given */
-            whenever(update.updateAll(force = false, download = false))
-                    .thenReturn(Mono.empty())
+            doNothing().whenever(update).updateAll(force = false, download = false)
             /* When */
             rest
                     .get()
@@ -52,8 +52,7 @@ class UpdateHandlerTest(
         @Test
         fun forced() {
             /* Given */
-            whenever(update.updateAll(force = true, download = false))
-                    .thenReturn(Mono.empty())
+            doNothing().whenever(update).updateAll(force = true, download = false)
 
             /* When */
             rest
@@ -70,8 +69,8 @@ class UpdateHandlerTest(
         @Test
         fun `and download`() {
             /* Given */
-            whenever(update.updateAll(force = false, download = true))
-                    .thenReturn(Mono.empty())
+            doNothing().whenever(update).updateAll(force = false, download = true)
+
             /* When */
             rest
                     .get()
@@ -93,7 +92,7 @@ class UpdateHandlerTest(
         fun `with success`() {
             /* Given */
             val id = UUID.fromString("cd651e1f-1dbd-4f20-af61-951ec0473884")
-            whenever(update.update(id)).thenReturn(Mono.empty())
+            doNothing().whenever(update).update(id)
             /* When */
             rest
                     .get()

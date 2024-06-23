@@ -9,15 +9,13 @@ import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.image.ImageService
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import org.slf4j.LoggerFactory
+import org.springframework.core.task.SimpleAsyncTaskExecutor
 import reactor.core.publisher.Mono
-import reactor.core.scheduler.Schedulers
 import reactor.kotlin.core.publisher.switchIfEmpty
-import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.OffsetDateTime.now
@@ -29,77 +27,81 @@ class UpdateService(
     private val updaters: UpdaterSelector,
     private val liveUpdate: MessagingTemplate,
     private val fileService: FileStorageService,
-    private val parameters: PodcastServerParameters,
-    private val idm: ItemDownloadManager
+    private val idm: ItemDownloadManager,
+    private val updateExecutor: SimpleAsyncTaskExecutor,
 ) {
 
     private val log = LoggerFactory.getLogger(UpdateService::class.java)!!
 
-    fun updateAll(force: Boolean, download: Boolean): Mono<Void> {
-
+    fun updateAll(force: Boolean, download: Boolean) {
         liveUpdate.isUpdating(true)
 
-        podcastRepository
-            .findAll()
-            .parallel(parameters.maxUpdateParallels)
-            .runOn(Schedulers.parallel())
-            .filter { it.url != null }
-            .map {
-                val signature = if(force || it.signature == null) UUID.randomUUID().toString() else it.signature
-                PodcastToUpdate(it.id, URI(it.url!!), signature)
-            }
-            .flatMap({ pu -> updaters.of(pu.url).update(pu) }, false, parameters.maxUpdateParallels)
-            .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
-            .sequential()
-            .collectList()
-            .subscribeOn(Schedulers.boundedElastic())
-            .doOnNext {
-                liveUpdate.isUpdating(false)
-                log.info("End of the global update with ${it.size} found")
-            }
-            .filter { download }
-            .flatMap { idm.launchDownload() }
-            .subscribe()
+        updateExecutor.execute {
+            val results = podcastRepository.findAll()
+                .collectList()
+                .block()!!
+                .filter { it.url != null }
+                .map {
+                    val signature = if (force || it.signature == null) UUID.randomUUID().toString() else it.signature
+                    PodcastToUpdate(it.id, URI(it.url!!), signature)
+                }
+                .mapNotNull { pu -> updaters.of(pu.url).update(pu).block() }
+                .map { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
 
-        return Mono.empty()
+            liveUpdate.isUpdating(false)
+            log.info("End of the global update with ${results.size} found")
+
+            if (download) {
+                idm.launchDownload().block()
+            }
+        }
     }
 
-    fun update(podcastId: UUID): Mono<Void> {
+    fun update(podcastId: UUID) {
         liveUpdate.isUpdating(true)
 
-        podcastRepository
-            .findById(podcastId)
-            .filter { it.url != null }
-            .map { PodcastToUpdate(it.id, URI(it.url!!), UUID.randomUUID().toString()) }
-            .flatMap { updaters.of(it.url).update(it) }
-            .flatMap { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
-            .doOnTerminate { liveUpdate.isUpdating(false) }
-            .subscribe()
+        updateExecutor.execute {
+            val podcast = podcastRepository.findById(podcastId).block()!!
 
-        return Mono.empty()
+            if (podcast.url == null) {
+                return@execute
+            }
+
+            val request = PodcastToUpdate(podcast.id, URI(podcast.url), UUID.randomUUID().toString())
+
+            val update = updaters.of(request.url).update(request).block()
+                ?: return@execute
+
+            saveSignatureAndCreateItems(update.podcast, update.items, update.newSignature)
+
+            liveUpdate.isUpdating(false)
+        }
     }
 
     private fun saveSignatureAndCreateItems(
         podcast: PodcastToUpdate,
         items: Set<ItemFromUpdate>,
         signature: String,
-    ): Mono<Void> {
+    ) {
         val realSignature = if (items.isEmpty()) "" else signature
-        val updateSignature = podcastRepository.updateSignature(podcast.id, realSignature).then(1.toMono())
-        val creationRequests = items.map { it.toCreation(podcast.id)}
-        val createItems = itemRepository.create(creationRequests)
-            .toFlux()
-            .delayUntil { item -> fileService.downloadItemCover(item)
-                .onErrorResume {
-                    log.error("Error during download of cover ${item.cover.url}")
-                    Mono.empty()
-                }
-            }
-            .collectList()
-            .filter { it.isNotEmpty() }
-            .delayUntil { podcastRepository.updateLastUpdate(podcast.id) }
+        podcastRepository.updateSignature(podcast.id, realSignature).block()
 
-        return Mono.zip(updateSignature, createItems).then()
+        val creationRequests = items.map { it.toCreation(podcast.id)}
+        val createdItems = itemRepository.create(creationRequests)
+
+        if(createdItems.isEmpty()) {
+            return
+        }
+
+        createdItems.forEach { item ->
+            fileService.downloadItemCover(item).onErrorResume {
+                log.error("Error during download of cover ${item.cover.url}")
+                Mono.empty()
+            }
+                .block()
+        }
+
+        podcastRepository.updateLastUpdate(podcast.id).block()
     }
 }
 
@@ -129,6 +131,6 @@ fun ImageService.fetchCoverUpdateInformationOrOption(url: URI?): Mono<Optional<I
     return Mono.justOrEmpty(url)
         .flatMap { fetchCoverInformation(url!!) }
         .map { ItemFromUpdate.Cover(it.width, it.height, it.url) }
-        .map { Optional.of<ItemFromUpdate.Cover>(it) }
+        .map { Optional.of(it) }
         .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
 }

@@ -13,7 +13,7 @@ class UpdateHandler(
         val force = r.paramOrNull("force")?.toBoolean() ?: false
         val withDownload = r.paramOrNull("download")?.toBoolean() ?: false
 
-        update.updateAll(force, withDownload).block()
+        update.updateAll(force, withDownload)
 
         return ServerResponse.ok().build()
     }
@@ -22,7 +22,7 @@ class UpdateHandler(
         val id = r.pathVariable("podcastId")
             .let(UUID::fromString)
 
-        update.update(id).block()
+        update.update(id)
 
         return ServerResponse.ok().build()
     }
