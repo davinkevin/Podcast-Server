@@ -134,3 +134,11 @@ fun ImageService.fetchCoverUpdateInformationOrOption(url: URI?): Mono<Optional<I
         .map { Optional.of(it) }
         .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
 }
+
+fun ImageService.fetchCoverUpdateInformation(url: URI): ItemFromUpdate.Cover? {
+    val coverInformation = fetchCoverInformation(url).block()
+        ?: return null
+
+    return ItemFromUpdate
+        .Cover(coverInformation.width, coverInformation.height, coverInformation.url)
+}
