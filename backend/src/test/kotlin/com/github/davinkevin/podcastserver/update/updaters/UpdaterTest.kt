@@ -30,10 +30,10 @@ class UpdaterTest {
         )
 
         /* When */
-        StepVerifier.create(updater.update(podcast))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+        val updatePodcastInformation = updater.update(podcast)
+
+        /* Then */
+        assertThat(updatePodcastInformation).isNull()
     }
 
     @Test
@@ -70,11 +70,11 @@ class UpdaterTest {
         )
 
         /* When */
-        StepVerifier.create(updater.update(podcast))
-                /* Then */
-                .expectSubscription()
-                .expectNext(UpdatePodcastInformation(podcast, items, "qefokijqeiojqoiejeqf="))
-                .verifyComplete()
+        val updatePodcastInformation = updater.update(podcast)
+
+        /* Then */
+        assertThat(updatePodcastInformation).isNotNull
+            .isEqualTo(UpdatePodcastInformation(podcast, items, "qefokijqeiojqoiejeqf="))
     }
 
     @Test
@@ -91,10 +91,10 @@ class UpdaterTest {
         )
 
         /* When */
-        StepVerifier.create(updater.update(podcast))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+        val updatePodcastInformation = updater.update(podcast)
+
+        /* Then */
+        assertThat(updatePodcastInformation).isNull()
     }
 }
 

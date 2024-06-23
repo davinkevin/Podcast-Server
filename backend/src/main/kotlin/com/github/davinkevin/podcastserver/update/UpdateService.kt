@@ -45,7 +45,7 @@ class UpdateService(
                     val signature = if (force || it.signature == null) UUID.randomUUID().toString() else it.signature
                     PodcastToUpdate(it.id, URI(it.url!!), signature)
                 }
-                .mapNotNull { pu -> updaters.of(pu.url).update(pu).block() }
+                .mapNotNull { pu -> updaters.of(pu.url).update(pu) }
                 .map { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
 
             liveUpdate.isUpdating(false)
@@ -69,7 +69,7 @@ class UpdateService(
 
             val request = PodcastToUpdate(podcast.id, URI(podcast.url), UUID.randomUUID().toString())
 
-            val update = updaters.of(request.url).update(request).block()
+            val update = updaters.of(request.url).update(request)
                 ?: return@execute
 
             saveSignatureAndCreateItems(update.podcast, update.items, update.newSignature)
