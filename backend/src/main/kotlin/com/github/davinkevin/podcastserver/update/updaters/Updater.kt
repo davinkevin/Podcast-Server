@@ -4,7 +4,6 @@ import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.slf4j.LoggerFactory
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toFlux
 import java.net.URI
 import java.time.ZonedDateTime
 import java.util.*
@@ -42,7 +41,7 @@ interface Updater {
         return UpdatePodcastInformation(podcast, items, signature)
     }
 
-    fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> = findItemsBlocking(podcast).toFlux()
+    fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> = Mono.fromCallable { findItemsBlocking(podcast) }.flatMapIterable { it }
     fun signatureOf(url: URI): Mono<String> = Mono.fromCallable { signatureOfBlocking(url) }
 
     fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> = emptyList()

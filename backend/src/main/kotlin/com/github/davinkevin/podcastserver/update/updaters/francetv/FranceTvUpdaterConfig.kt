@@ -1,12 +1,12 @@
 package com.github.davinkevin.podcastserver.update.updaters.francetv
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.web.reactive.function.client.WebClient
-import com.github.davinkevin.podcastserver.service.image.ImageService
+import org.springframework.web.client.RestClient
 import java.time.Clock
 
 /**
@@ -18,12 +18,12 @@ class FranceTvUpdaterConfig {
 
     @Bean
     fun franceTvUpdater(
-            wcb: WebClient.Builder,
-            image: ImageService,
-            mapper: ObjectMapper,
-            clock: Clock
+        rcb: RestClient.Builder,
+        image: ImageService,
+        mapper: ObjectMapper,
+        clock: Clock
     ): FranceTvUpdater {
-        val franceTvClient = wcb.clone().baseUrl("https://www.france.tv/").build()
+        val franceTvClient = rcb.clone().baseUrl("https://www.france.tv/").build()
 
         return FranceTvUpdater(franceTvClient, image, mapper, clock)
     }
