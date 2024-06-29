@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom"
-     xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
-     xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0"
-     xmlns:media="http://search.yahoo.com/mrss/"
-     version="2.0">
+<rss
+        xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+        xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0"
+        xmlns:media="http://search.yahoo.com/mrss/"
+        version="2.0">
     <channel>
         <title>AppLoad</title>
         <link>http://www.app-load.com/</link>
@@ -778,8 +778,7 @@ Plus d'infos sur l'épisode :
 
 &lt;li&gt;La mise en ligne est assurée par &lt;a href="http://twitter.com/aeden_" target="_blank"&gt;Florent Berthelot&lt;/a&gt;.&lt;/li&gt;
 &lt;/ul&gt;&lt;img src="http://feeds.feedburner.com/~r/Appload/~4/9Q2N8cCddo4" height="1" width="1" alt=""/&gt;</description>
-            <pubDate>Thu, 20 Nov 2014 14:30:02 +0100</pubDate>
-            
+            <!--<pubDate>Thu, 20 Nov 2014 14:30:02 +0100</pubDate> voluntary wrong date -->
             <guid isPermaLink="false">0C480306-664F-4519-9B5F-39938B74DF0A</guid>
             <itunes:author>Patrick Beja</itunes:author>
             <itunes:subtitle>Le gai babil</itunes:subtitle>
