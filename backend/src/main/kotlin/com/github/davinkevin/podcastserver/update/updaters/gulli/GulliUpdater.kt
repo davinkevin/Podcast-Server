@@ -2,22 +2,19 @@ package com.github.davinkevin.podcastserver.update.updaters.gulli
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
-import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.service.image.ImageService
-import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformationOrOption
+import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformation
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Type
 import com.github.davinkevin.podcastserver.update.updaters.Updater
 import org.jsoup.Jsoup
 import org.springframework.util.DigestUtils
-import org.springframework.web.reactive.function.client.WebClient
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import org.springframework.web.reactive.function.client.bodyToMono
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
 import java.net.URI
 import java.time.ZonedDateTime
 
@@ -25,62 +22,74 @@ import java.time.ZonedDateTime
  * Created by kevin on 14/03/2020
  */
 class GulliUpdater(
-        private val wc: WebClient,
-        private val image: ImageService,
-        private val mapper: ObjectMapper
+    private val restClient: RestClient,
+    private val image: ImageService,
+    private val mapper: ObjectMapper
 ): Updater {
 
-    override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
-        val path = podcast.url.toASCIIString().substringAfter("replay.gulli.fr")
+    override fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> {
+        val path = podcast.url
+            .toASCIIString()
+            .substringAfter("replay.gulli.fr")
 
-        return wc.get()
-                .uri(path)
-                .retrieve()
-                .bodyToMono<String>()
-                .map { Jsoup.parse(it, "https://replay.gulli.fr/") }
-                .flatMapIterable { it.select(".bloc_listing li a") }
-                .map { it.attr("href") }
-                .flatMap { url -> wc
-                        .get()
-                        .uri(url.substringAfter("replay.gulli.fr"))
-                        .retrieve()
-                        .bodyToMono<String>()
-                        .zipWith(url.toMono())
-                }
-                .map { (page, url) ->
-                    val html = Jsoup.parse(page, "https://replay.gulli.fr/")
-                    val json = html.select("""script[type="application/ld+json"]""").html()
-                    mapper.readValue<GulliItem>(json) to url
-                }
-                .flatMap { (item, url) -> image
-                        .fetchCoverUpdateInformationOrOption(item.thumbnailUrl)
-                        .map {
-                            ItemFromUpdate(
-                                    title = item.name,
-                                    description = item.description,
-                                    pubDate = ZonedDateTime.parse(item.uploadDate),
-                                    url = URI(url),
-                                    cover = it.orNull(),
-                                    mimeType = "video/mp4"
-                            )
-                        }
-                }
+        val page = restClient.get()
+            .uri(path)
+            .retrieve()
+            .body<String>()
+            ?: return emptyList()
+
+        val html = Jsoup.parse(page, "https://replay.gulli.fr/")
+
+        return html.select(".bloc_listing li a")
+            .map { it.attr("href") }
+            .mapNotNull(::findIndividualItem)
     }
 
-    override fun signatureOf(url: URI): Mono<String> {
+    private fun findIndividualItem(url: String): ItemFromUpdate? {
+        val page = restClient
+            .get()
+            .uri(url.substringAfter("replay.gulli.fr"))
+            .retrieve()
+            .body<String>()
+            ?: return null
+
+        val html = Jsoup.parse(page, "https://replay.gulli.fr/")
+        val json = html.select("""script[type="application/ld+json"]""").html()
+
+        val item = mapper.readValue<GulliItem>(json)
+        val cover = image.fetchCoverUpdateInformation(item.thumbnailUrl)
+
+        return ItemFromUpdate(
+            title = item.name,
+            description = item.description,
+            pubDate = ZonedDateTime.parse(item.uploadDate),
+            url = URI(url),
+            cover = cover,
+            mimeType = "video/mp4"
+        )
+    }
+
+    override fun signatureOfBlocking(url: URI): String {
         val path = url.toASCIIString().substringAfter("replay.gulli.fr")
 
-        return wc.get()
-                .uri(path)
-                .retrieve()
-                .bodyToMono<String>()
-                .map { Jsoup.parse(it, "https://replay.gulli.fr/") }
-                .flatMapIterable { it.select(".bloc_listing li a") }
-                .map { it.attr("href") }
-                .sort()
-                .reduce { t, u -> "$t, $u" }
-                .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
-                .switchIfEmpty("".toMono())
+        val page = restClient.get()
+            .uri(path)
+            .retrieve()
+            .body<String>()
+            ?: return ""
+
+        val html = Jsoup.parse(page, "https://replay.gulli.fr/")
+
+        val itemUrl = html.select(".bloc_listing li a")
+            .map { it.attr("href") }
+            .ifEmpty { return "" }
+
+        return itemUrl
+            .toList()
+            .sorted()
+            .reduce { t, u -> "$t, $u" }
+            .let(String::toByteArray)
+            .let(DigestUtils::md5DigestAsHex)
     }
 
     override fun type() = Type("Gulli", "Gulli")
