@@ -1,25 +1,22 @@
 package com.github.davinkevin.podcastserver.update.updaters.rss
 
-import com.github.davinkevin.podcastserver.extension.java.util.orNull
 import com.github.davinkevin.podcastserver.service.image.ImageService
-import com.github.davinkevin.podcastserver.update.updaters.*
+import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformation
+import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.Type
+import com.github.davinkevin.podcastserver.update.updaters.Updater
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.jdom2.input.SAXBuilder
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.util.DigestUtils
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.switchIfEmpty
-import reactor.kotlin.core.publisher.toFlux
-import reactor.kotlin.core.publisher.toMono
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.*
 
 private val MEDIA = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")
 private val FEED_BURNER = Namespace.getNamespace("feedburner", "http://rssnamespace.org/feedburner/ext/1.0")
@@ -27,54 +24,53 @@ private val ITUNES_NS = Namespace.getNamespace("itunes", "http://www.itunes.com/
 
 class RSSUpdater(
     private val imageService: ImageService,
-    private val wcb: WebClient.Builder
+    private val rcb: RestClient.Builder
 ) : Updater {
 
     private val log = LoggerFactory.getLogger(RSSUpdater::class.java)
 
-    override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
-        return fetchRss(podcast.url)
-            .map { SAXBuilder().build(it.inputStream) }
-            .flatMap { it.rootElement.getChild("channel").toMono() }
-            .flatMapMany { channel -> channel
-                .getChildren("item")
-                .toFlux()
-                .filter { hasEnclosure(it) }
-                .map { channel to it }
-            }
-            .flatMap { (channel, elem) -> findCoverForItem(channel, elem).toMono()
-                .flatMap { imageService.fetchCover(it) }
-                .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
-                .map { elem to it }
-            }
-            .map { (elem, cover) ->
-                ItemFromUpdate(
-                    title = elem.getChildText("title"),
-                    pubDate = getPubDate(elem),
-                    description = elem.getChildText("description"),
-                    cover = cover.orNull(),
-                    url = urlOf(elem),
-                    guid = elem.getChildText("guid"),
+    override fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> {
+        val resource = fetchRss(podcast.url)
+            ?: return emptyList()
 
-                    length = elem.enclosure().getAttributeValue("length")?.toLong(),
-                    mimeType = mimeTypeOf(elem)
-                )
-            }
+        val xml = SAXBuilder().build(resource.inputStream)
+
+        val channel = xml.rootElement.getChild("channel")
+            ?: return emptyList()
+
+        val rssCover = channel.getChild("image")?.getChildText("url")
+        val itunesCover = channel.getChild("image", ITUNES_NS)?.getAttributeValue("href")
+        val alternativeCoverURL = (rssCover ?: itunesCover)?.let(::URI)
+
+        return channel
+            .getChildren("item")
+            .toList()
+            .filter(::hasEnclosure)
+            .map { findItem(it, alternativeCoverURL) }
     }
 
-    private fun findCoverForItem(channelElement: Element, elem: Element): URI? {
+    private fun findItem(elem: Element, alternativeCoverURL: URI?): ItemFromUpdate {
+        val coverUrl = findCover(elem) ?: alternativeCoverURL
+        val cover = coverUrl?.let(imageService::fetchCoverUpdateInformation)
+
+        return ItemFromUpdate(
+            title = elem.getChildText("title"),
+            pubDate = getPubDate(elem),
+            description = elem.getChildText("description"),
+            cover = cover,
+            url = urlOf(elem),
+            guid = elem.getChildText("guid"),
+
+            length = elem.enclosure().getAttributeValue("length")?.toLong(),
+            mimeType = mimeTypeOf(elem)
+        )
+    }
+
+    private fun findCover(elem: Element): URI? {
         val thumbnail = elem.getChild("thumbnail", MEDIA)
+            ?: return null
 
-        if (thumbnail != null) {
-            return URI.create(thumbnail.getAttributeValue("url") ?: thumbnail.text)
-        }
-
-        val rss = channelElement.getChild("image")?.getChildText("url")
-        val itunes = channelElement.getChild("image", ITUNES_NS)?.getAttributeValue("href")
-
-        val url = rss ?: itunes ?: return null
-
-        return URI.create(url)
+        return URI.create(thumbnail.getAttributeValue("url") ?: thumbnail.text)
     }
 
     private fun hasEnclosure(item: Element) = item.enclosure() != null
@@ -110,21 +106,23 @@ class RSSUpdater(
             .getOrDefault(ZonedDateTime.now())
     }
 
-    override fun signatureOf(url: URI): Mono<String> = fetchRss(url)
-        .map { DigestUtils.md5DigestAsHex(it.inputStream) }
-        .onErrorResume {
-            log.error("error during update", it)
-            "error_during_update".toMono()
-        }
+    override fun signatureOfBlocking(url: URI): String {
+        val resource = fetchRss(url)
+            ?: return ""
 
-    private fun fetchRss(url: URI): Mono<ByteArrayResource> {
-        return wcb
-            .clone()
-            .baseUrl(url.toASCIIString())
-            .build()
-            .get()
-            .retrieve()
-            .bodyToMono()
+        return DigestUtils.md5DigestAsHex(resource.inputStream)
+    }
+
+    private fun fetchRss(url: URI): ByteArrayResource? {
+        return runCatching {
+            rcb.clone()
+                .baseUrl(url.toASCIIString())
+                .build()
+                .get()
+                .retrieve()
+                .body<ByteArrayResource>()
+        }
+            .getOrNull()
     }
 
     override fun type() = Type("RSS", "RSS")
@@ -136,5 +134,3 @@ class RSSUpdater(
 }
 
 private fun Element.enclosure() = this.getChild("enclosure")
-private fun ImageService.fetchCover(url: URI) = this.fetchCoverInformation(url)
-    .map { cover -> Optional.of(cover.toCoverFromUpdate()) }

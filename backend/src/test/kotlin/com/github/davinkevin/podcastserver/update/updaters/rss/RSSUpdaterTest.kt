@@ -1,47 +1,46 @@
 package com.github.davinkevin.podcastserver.update.updaters.rss
 
-import com.github.davinkevin.podcastserver.*
-import com.github.davinkevin.podcastserver.config.WebClientConfig
-import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
+import com.github.davinkevin.podcastserver.MockServer
+import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
+import com.github.davinkevin.podcastserver.service.image.ImageService
+import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
+import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.kotlin.core.publisher.toMono
-import reactor.test.StepVerifier
-import java.net.URI
-import java.time.ZoneOffset
-import java.util.*
-import com.github.davinkevin.podcastserver.service.image.ImageService
-import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
+import java.net.URI
 import java.time.Duration
+import java.time.ZoneOffset
 import java.time.ZonedDateTime.now
+import java.util.*
 
-
-/**
- * Created by kevin on 28/06/15 for Podcast Server
- */
 @ExtendWith(SpringExtension::class)
 class RSSUpdaterTest(
         @Autowired val updater: RSSUpdater
 ){
+
+    @TestConfiguration
+    @Import(RSSUpdaterConfig::class, RestClientAutoConfiguration::class)
+    class LocalTestConfiguration {
+        @Bean fun webClientCustomization() = WebClientCustomizer { wcb -> wcb.baseUrl("http://localhost:5555/") }
+    }
 
     @MockBean lateinit var image: ImageService
 
@@ -64,11 +63,10 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(217)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+
+            /* Then */
+            assertThat(items).hasSize(217)
         }
 
         @Test
@@ -78,13 +76,11 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.with-only-rss-cover.xml"))))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast)
-                    .filter { it.cover?.url == URI("http://app-load.com/audio/rss/appload1400.jpg") }
-            )
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(215)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+                .filter { it.cover?.url == URI("http://app-load.com/audio/rss/appload1400.jpg") }
+
+            /* Then */
+            assertThat(items).hasSize(215)
         }
 
         @Test
@@ -94,13 +90,11 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.with-only-itunes-cover.xml"))))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast)
-                    .filter { it.cover?.url == URI("http://app-load.com/audio/itunes/appload1400.jpg") }
-            )
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(215)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+                .filter { it.cover?.url == URI("http://app-load.com/audio/itunes/appload1400.jpg") }
+
+            /* Then */
+            assertThat(items).hasSize(215)
         }
 
         @Test
@@ -110,11 +104,11 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.without-any-cover.xml"))))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast).filter { it.cover == null })
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(215)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+                .filter { it.cover == null }
+
+            /* Then */
+            assertThat(items).hasSize(215)
         }
 
         @Test
@@ -126,11 +120,11 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast).filter { it.cover == null })
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(215)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+                .filter { it.cover == null }
+
+            /* Then */
+            assertThat(items).hasSize(215)
         }
 
         @Test
@@ -144,11 +138,11 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast).filter { it.cover == null })
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(217)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+                .filter { it.cover == null }
+
+            /* Then */
+            assertThat(items).hasSize(217)
         }
 
         @Test
@@ -158,13 +152,11 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast)
-                    .filter { Duration.between(it.pubDate, now()).abs().seconds < 50 }
-            )
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(1)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+                .filter { Duration.between(it.pubDate, now()).abs().seconds < 50 }
+
+            /* Then */
+            assertThat(items).hasSize(2)
         }
 
         @Test
@@ -174,11 +166,11 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast).filter { it.pubDate?.offset == ZoneOffset.ofHours(6) })
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(1)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+                .filter { it.pubDate?.offset == ZoneOffset.ofHours(6) }
+
+            /* Then */
+            assertThat(items).hasSize(1)
         }
 
         @Test
@@ -188,11 +180,11 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast).filter { it.pubDate?.offset == ZoneOffset.ofHours(8) })
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(2)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+                .filter { it.pubDate?.offset == ZoneOffset.ofHours(8) }
+
+            /* Then */
+            assertThat(items).hasSize(2)
         }
 
         @Test
@@ -202,13 +194,12 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast).filter { it.pubDate?.offset == ZoneOffset.ofHours(9) })
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(1)
-                    .verifyComplete()
-        }
+            val items = updater.findItemsBlocking(podcast)
+                .filter { it.pubDate?.offset == ZoneOffset.ofHours(9) }
 
+            /* Then */
+            assertThat(items).hasSize(1)
+        }
 
         @Test
         fun `with success but flux empty because not channel in rss feed`(backend: WireMockServer) {
@@ -217,10 +208,24 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(""" <rss version="2.0"></rss>""")))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+                .filter { it.cover?.url == URI("http://app-load.com/audio/rss/appload1400.jpg") }
+
+            /* Then */
+            assertThat(items).isEmpty()
+        }
+
+        @Test
+        fun `with success if xml link returns an empty page`(backend: WireMockServer) {
+            /* Given */
+            backend.stubFor(get("/rss.xml")
+                    .willReturn(ok()))
+
+            /* When */
+            val items = updater.findItemsBlocking(podcast)
+
+            /* Then */
+            assertThat(items).isEmpty()
         }
 
         @Test
@@ -230,11 +235,11 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast).filter { it.url.toASCIIString().contains("+") })
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(1)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+                .filter { it.url.toASCIIString().contains("+") }
+
+            /* Then */
+            assertThat(items).hasSize(1)
         }
 
         @Test
@@ -244,11 +249,69 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast).filter { it.mimeType.contains("unknown") })
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(1)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+                .filter { it.mimeType.contains("unknown") }
+
+            /* Then */
+            assertThat(items).hasSize(1)
+        }
+
+        @Test
+        fun `should filter item without enclosure`(backend: WireMockServer) {
+            /* Given */
+            val xml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rss version="2.0">
+                    <channel>
+                        <title>AppLoad</title>
+                        <link>http://www.app-load.com/</link>
+                        <item>
+                            <title>AppLoad 215 - N'invitez pas Cédric</title>
+                            <link>http://feedproxy.google.com/~r/Appload/~3/zHhCKm4_NZs/</link>
+                            <pubDate>Thu, 118 Jun 2015 14:30:25 +0200</pubDate> <!-- volontary wrong date  -->                            
+                            <guid isPermaLink="false">63B5D695-F6CC-4704-B927-99B1862D82BF</guid>
+                        </item>
+                    </channel>
+                </rss>
+            """.trimIndent()
+            backend.stubFor(get("/rss.xml")
+                    .willReturn(okTextXml(xml)))
+
+            /* When */
+            val items = updater.findItemsBlocking(podcast)
+                .filter { it.mimeType.contains("unknown") }
+
+            /* Then */
+            assertThat(items).isEmpty()
+        }
+
+        @Test
+        fun `should support item without enclosure's length`(backend: WireMockServer) {
+            /* Given */
+            val xml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rss version="2.0">
+                    <channel>
+                        <title>AppLoad</title>
+                        <link>http://www.app-load.com/</link>
+                        <item>
+                            <title>AppLoad 215 - N'invitez pas Cédric</title>
+                            <link>http://feedproxy.google.com/~r/Appload/~3/zHhCKm4_NZs/</link>
+                            <pubDate>Thu, 118 Jun 2015 14:30:25 +0200</pubDate> <!-- volontary wrong date  -->                            
+                            <guid isPermaLink="false">63B5D695-F6CC-4704-B927-99B1862D82BF</guid>
+                            <enclosure url='https://localhost:5555/item.mp3'/>
+                        </item>
+                    </channel>
+                </rss>
+            """.trimIndent()
+            backend.stubFor(get("/rss.xml")
+                    .willReturn(okTextXml(xml)))
+
+            /* When */
+            val items = updater.findItemsBlocking(podcast)
+
+            /* Then */
+            assertThat(items).hasSize(1)
         }
     }
 
@@ -264,11 +327,10 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            StepVerifier.create(updater.signatureOf(podcast.url))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext { assertThat(it).isEqualTo("baf07ee03f27ddb7ea8114d766021993") }
-                    .verifyComplete()
+            val sign = updater.signatureOfBlocking(podcast.url)
+
+            /* Then */
+            assertThat(sign).isEqualTo("32909f0e501be25905b804be7c8360cc")
         }
 
         @Test
@@ -278,13 +340,11 @@ class RSSUpdaterTest(
                     .willReturn(notFound()))
 
             /* When */
-            StepVerifier.create(updater.signatureOf(podcast.url))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext { assertThat(it).isEqualTo("error_during_update") }
-                    .verifyComplete()
-        }
+            val sign = updater.signatureOfBlocking(podcast.url)
 
+            /* Then */
+            assertThat(sign).isEqualTo("")
+        }
     }
 
     @Test
@@ -320,11 +380,5 @@ class RSSUpdaterTest(
             /* Then */
             assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
         }
-    }
-
-    @TestConfiguration
-    @Import(RSSUpdaterConfig::class, WebClientAutoConfiguration::class, WebClientConfig::class)
-    class LocalTestConfiguration {
-        @Bean fun webClientCustomization() = WebClientCustomizer { wcb -> wcb.baseUrl("http://localhost:5555/") }
     }
 }

@@ -1,27 +1,18 @@
 package com.github.davinkevin.podcastserver.update.updaters.rss
 
+import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
-import org.springframework.web.reactive.function.client.WebClient
-import reactor.netty.http.client.HttpClient
-import com.github.davinkevin.podcastserver.service.image.ImageService
+import org.springframework.web.client.RestClient
 
-/**
- * Created by kevin on 01/09/2019
- */
 @Configuration
 @Import(ImageServiceConfig::class)
 class RSSUpdaterConfig {
 
     @Bean
-    fun rssUpdater(imageService: ImageService, wcb: WebClient.Builder): RSSUpdater {
-        val builder = wcb
-                .clone()
-                .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
-
-        return RSSUpdater(imageService, builder)
+    fun rssUpdater(imageService: ImageService, rcb: RestClient.Builder): RSSUpdater {
+        return RSSUpdater(imageService, rcb.clone())
     }
 }
