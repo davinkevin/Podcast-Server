@@ -1,84 +1,88 @@
 package com.github.davinkevin.podcastserver.update.updaters.mytf1
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.github.davinkevin.podcastserver.extension.java.util.orNull
+import com.github.davinkevin.podcastserver.service.image.ImageService
+import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformation
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Type
 import com.github.davinkevin.podcastserver.update.updaters.Updater
-import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformationOrOption
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor
 import org.springframework.util.DigestUtils
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import java.net.URI
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets
 import java.time.ZonedDateTime
-import com.github.davinkevin.podcastserver.service.image.ImageService
 import java.util.*
 
 /**
  * Created by kevin on 11/03/2020
  */
 class MyTf1Updater(
-        private val wc: WebClient,
-        private val om: ObjectMapper,
-        private val image: ImageService
+    private val rc: RestClient,
+    private val om: ObjectMapper,
+    private val image: ImageService
 ): Updater {
 
-    override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
+    override fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> {
         val baseVideoUrl = extractBaseVideoUrl(podcast.url)
-        return wc
-                .get()
-                .uri { it
-                        .path(graphqlEndpoints)
-                        .queryParam("id", searchQueryId)
-                        .queryParam("variables", graphQlQuery(podcast.url))
-                        .build()
-                }
-                .retrieve()
-                .bodyToMono<TF1GraphQLResult>()
-                .flatMapIterable { it.data.programBySlug.videos.items }
-                .flatMap { toItem(it, baseVideoUrl) }
 
+        val result = rc
+            .get()
+            .uri { it
+                .path(graphqlEndpoints)
+                .queryParam("id", searchQueryId)
+                .queryParam("variables", graphQlQuery(podcast.url))
+                .build()
+            }
+            .retrieve()
+            .body<TF1GraphQLResult>()
+            ?: return emptyList()
+
+        return result.data.programBySlug
+            .videos.items
+            .map { toItem(it, baseVideoUrl) }
     }
 
-    private fun toItem(video: TF1GraphQLResult.Video, baseVideoUrl: String): Mono<ItemFromUpdate> {
-        return image
-                .fetchCoverUpdateInformationOrOption(video.bestCover())
-                .map {
-                    ItemFromUpdate(
-                            title = video.decoration.label,
-                            description = video.decoration.description,
-                            pubDate = video.date,
-                            url = URI("$baseVideoUrl/${video.slug}.html"),
-                            cover = it.orNull(),
-                            mimeType = "video/mp4"
-                    )
-                }
+    private fun toItem(video: TF1GraphQLResult.Video, baseVideoUrl: String): ItemFromUpdate {
+        val cover = video.bestCover()
+            ?.let(image::fetchCoverUpdateInformation)
+
+        return ItemFromUpdate(
+            title = video.decoration.label,
+            description = video.decoration.description,
+            pubDate = video.date,
+            url = URI("$baseVideoUrl/${video.slug}.html"),
+            cover = cover,
+            mimeType = "video/mp4"
+        )
     }
 
-    override fun signatureOf(url: URI): Mono<String> {
-        return wc
-                .get()
-                .uri { it
-                        .path(graphqlEndpoints)
-                        .queryParam("id", searchQueryId)
-                        .queryParam("variables", graphQlQuery(url))
-                        .build()
-                }
-                .retrieve()
-                .bodyToMono<TF1GraphQLResult>()
-                .flatMapIterable { it.data.programBySlug.videos.items }
-                .map { it.url }
-                .sort()
-                .reduce { t, u -> """$t, $u""" }
-                .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
-                .switchIfEmpty("".toMono())
+    override fun signatureOfBlocking(url: URI): String {
+        val page = rc
+            .get()
+            .uri { it
+                .path(graphqlEndpoints)
+                .queryParam("id", searchQueryId)
+                .queryParam("variables", graphQlQuery(url))
+                .build()
+            }
+            .retrieve()
+            .body<TF1GraphQLResult>()
+            ?: return ""
+
+        val tf1Items = page.data.programBySlug
+            .videos.items
+            .ifEmpty { return "" }
+
+        return tf1Items
+            .map { it.url }
+            .sorted()
+            .reduce { t, u -> """$t, $u""" }
+            .let(String::toByteArray)
+            .let(DigestUtils::md5DigestAsHex)
     }
 
     private fun graphQlQuery(url: URI): String {
@@ -109,7 +113,8 @@ class MyTf1Updater(
 
     private fun extractProgram(url: URI): String {
         val path = url.path
-        return SLUG_EXTRACTOR.on(path).group(1) ?: error("Slug not found in podcast with ${url.toASCIIString()}")
+        return SLUG_EXTRACTOR.on(path).group(1)
+            ?: error("Slug not found in podcast with ${url.toASCIIString()}")
     }
 
     private fun extractTypeFromUrl(url: String): Set<String>? {
