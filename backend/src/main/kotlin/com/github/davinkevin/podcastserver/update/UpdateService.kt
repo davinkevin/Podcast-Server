@@ -64,7 +64,7 @@ class UpdateService(
             liveUpdate.isUpdating(false)
 
             if (download) {
-                idm.launchDownload().block()
+                updateExecutor.execute { idm.launchDownload().block() }
             }
 
             return@measureTimedValue results
