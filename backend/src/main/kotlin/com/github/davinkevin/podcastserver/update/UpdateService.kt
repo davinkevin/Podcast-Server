@@ -20,6 +20,9 @@ import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.OffsetDateTime.now
 import java.util.*
+import java.util.concurrent.Callable
+import java.util.concurrent.TimeUnit
+import kotlin.time.measureTimedValue
 
 class UpdateService(
     private val podcastRepository: PodcastRepository,
@@ -34,10 +37,14 @@ class UpdateService(
     private val log = LoggerFactory.getLogger(UpdateService::class.java)!!
 
     fun updateAll(force: Boolean, download: Boolean) {
-        liveUpdate.isUpdating(true)
+        updateExecutor.execute { updateAllSync(force, download) }
+    }
 
-        updateExecutor.execute {
-            val results = podcastRepository.findAll()
+    private fun updateAllSync(force: Boolean, download: Boolean) {
+        val (value, duration) = measureTimedValue {
+            liveUpdate.isUpdating(true)
+
+            val allRequests = podcastRepository.findAll()
                 .collectList()
                 .block()!!
                 .filter { it.url != null }
@@ -45,16 +52,24 @@ class UpdateService(
                     val signature = if (force || it.signature == null) UUID.randomUUID().toString() else it.signature
                     PodcastToUpdate(it.id, URI(it.url!!), signature)
                 }
-                .mapNotNull { pu -> updaters.of(pu.url).update(pu) }
-                .map { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
+
+            val results = allRequests
+                .map { Callable { updaters.of(it.url).update(it) } }
+                .map { updateExecutor.submitCompletable(it).exceptionally { null } }
+                .mapNotNull { it.get(5, TimeUnit.MINUTES) }
+
+            results
+                .forEach { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
 
             liveUpdate.isUpdating(false)
-            log.info("End of the global update with ${results.size} found")
 
             if (download) {
                 idm.launchDownload().block()
             }
+
+            return@measureTimedValue results
         }
+        log.info("End of the global update with {} found, done in {}s", value.size, duration.inWholeSeconds)
     }
 
     fun update(podcastId: UUID) {
@@ -104,7 +119,6 @@ class UpdateService(
         podcastRepository.updateLastUpdate(podcast.id).block()
     }
 }
-
 
 private fun ItemFromUpdate.toCreation(podcastId: UUID) = ItemForCreation(
     title = title!!,

@@ -7,6 +7,7 @@ import reactor.core.publisher.Mono
 import java.net.URI
 import java.time.ZonedDateTime
 import java.util.*
+import kotlin.time.measureTimedValue
 
 val log = LoggerFactory.getLogger(Updater::class.java)!!
 
@@ -14,31 +15,34 @@ interface Updater {
 
     fun update(podcast: PodcastToUpdate): UpdatePodcastInformation? {
         log.info("podcast {} starts update", podcast.url)
+        val (value, duration) = measureTimedValue {
+            val signature = runCatching { signatureOf(podcast.url).block() }
+                .onFailure { log.error("podcast {} ends with error", podcast.url, it) }
+                .getOrNull()
+                ?: return@measureTimedValue null
 
-        val signature = runCatching { signatureOf(podcast.url).block() }
-            .onFailure { log.error("podcast {} ends with error", podcast.url, it) }
-            .getOrNull()
-            ?: return null
+            if (podcast.signature == signature) {
+                log.debug("podcast {} hasn't change", podcast.url)
+                return@measureTimedValue null
+            }
 
-        if (podcast.signature == signature) {
-            log.debug("podcast {} hasn't change", podcast.url)
-            return null
+            log.debug("podcast {} has new signature {}", podcast.url, signature)
+
+            val items = runCatching { findItems(podcast).collectList().block()!!.toSet() }
+                .onFailure { log.error("podcast {} ends with error", podcast.url, it) }
+                .getOrNull() ?: return@measureTimedValue null
+
+            if (items.isEmpty())
+                log.warn("podcast {} has no item found, potentially updater {} not working anymore", podcast.url, this::class)
+            else
+                log.debug("podcast {} has {} items found", podcast.url, items.size)
+
+            return@measureTimedValue UpdatePodcastInformation(podcast, items, signature)
         }
 
-        log.debug("podcast {} has new signature {}", podcast.url, signature)
+        log.info("podcast {} ends update after {} seconds", podcast.url, duration.inWholeSeconds)
 
-        val items = runCatching { findItems(podcast).collectList().block()!!.toSet() }
-            .onFailure { log.error("podcast {} ends with error", podcast.url, it) }
-            .getOrNull() ?: return null
-
-        if (items.isEmpty())
-            log.warn("podcast {} has no item found, potentially updater {} not working anymore", podcast.url, this::class)
-        else
-            log.debug("podcast {} has {} items found", podcast.url, items.size)
-
-        log.info("podcast {} ends update", podcast.url)
-
-        return UpdatePodcastInformation(podcast, items, signature)
+        return value
     }
 
     fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> = Mono.fromCallable { findItemsBlocking(podcast) }.flatMapIterable { it }
