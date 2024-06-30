@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters.upload
 
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
-import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -11,7 +10,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.test.StepVerifier
 import java.net.URI
 import java.util.*
 
@@ -35,16 +33,12 @@ class UploadUpdaterTest(
 
     @Test
     fun `should serve items`() {
-        StepVerifier.create(updater.findItems(podcast))
-                .verifyComplete()
-
+        assertThat(updater.findItemsBlocking(podcast)).isEmpty()
     }
 
     @Test
     fun `should generate an empty signature`() {
-        StepVerifier.create(updater.signatureOf(podcast.url))
-                .expectNext("")
-                .verifyComplete()
+        assertThat(updater.signatureOfBlocking(podcast.url)).isEqualTo("")
     }
 
     @Test
