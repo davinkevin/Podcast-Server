@@ -321,7 +321,7 @@ stages:
   stage: 🐳 packaging
   extends: [ .only-on-backend-changes ]
   image: gradle:jdk21
-  needs: [👷 backend-base-image]
+  needs: [⬇ backend, 👷 backend-base-image]
   services:
     - postgres:16.3-alpine
   variables:
