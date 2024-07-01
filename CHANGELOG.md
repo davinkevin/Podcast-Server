@@ -1,6 +1,30 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2024.7.0
+
+### Bug Fixes
+
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.64 ([0b8023b](0b8023bfbf1986cb7b565d1fd56346c8490ec79b))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.65 ([3178a33](3178a33aaec5e2721b482eb02d37752b18a7c417))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.66 ([477d670](477d670b9f1c530d07b4e8cfa469f65f609354b5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.67 ([4cb4dc2](4cb4dc20411008684b919b653926f1c0801b7b12))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.68 ([4554a4f](4554a4f58e200d7208563c632932f03cd3fc5cb7))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.69 ([5a45964](5a45964c64c5bde9d1aea1548d97071e93a7ebc5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.25.70 ([78f32cb](78f32cb5aeb21658ccb2b9fde78b934af809e9c6))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.26.6 ([4ec3b19](4ec3b19611ff3783d0037d5eac24bd0b2bdea790))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.26.7 ([3c82230](3c82230a868c42dbd094defb2cc8f5583be4c99b))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.26.8 ([7ded3f4](7ded3f43a5af3b27f72e52056fb50ca86ab8313c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.26.9 ([5ee4f9e](5ee4f9eac95289950406d3584bca73ecfdde9e76))
+- **deps:** Update dependency net.javacrumbs.json-unit:json-unit-assertj to v3.3.0 ([7ae57e9](7ae57e9641a4a5e20206b9ff7fa37d99cc36c4f3))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.26.10 ([4c8c01d](4c8c01d5c6f1f51abed6b3b167b4980b04450522))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.26.11 ([c84e932](c84e9323bb1fb0b45ce9584a68c615ea91389a66))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.26.12 ([f51848a](f51848af8632c47cedd588e8a36c69753c3d2598))
+
+### Testing
+
+- **backend:** Re-enable ItunesFinder test ([a7339dd](a7339ddedc17e8797264c46c64465a0a45a4882b))
+
 ## 2024.6.0
 
 ### Features
