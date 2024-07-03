@@ -10,7 +10,8 @@ import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.tomakehurst.wiremock.WireMockServer
-import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.client.WireMock.get
+import com.github.tomakehurst.wiremock.client.WireMock.ok
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
@@ -22,7 +23,6 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
@@ -31,9 +31,6 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.DigestUtils
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
-import reactor.test.StepVerifier
 import java.net.URI
 import java.time.*
 import java.util.*
@@ -97,7 +94,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).isEmpty()
@@ -112,7 +109,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).isEmpty()
@@ -127,7 +124,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).isEmpty()
@@ -147,7 +144,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertAll {
@@ -175,7 +172,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertAll {
@@ -204,7 +201,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(10)
@@ -222,7 +219,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).isEmpty()
@@ -240,7 +237,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            assertThatThrownBy { updater.findItemsBlocking(podcast) }
+            assertThatThrownBy { updater.findItems(podcast) }
                 /* Then */
                 .hasMessage("No <script type=\"application/ld+json\"></script> found")
         }
@@ -257,7 +254,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            assertThatThrownBy { updater.findItemsBlocking(podcast) }
+            assertThatThrownBy { updater.findItems(podcast) }
                 /* Then */
                 .hasMessage("No element of type VideoObject")
         }
@@ -278,7 +275,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertAll {
@@ -310,7 +307,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            val signature = updater.signatureOfBlocking(podcast.url)
+            val signature = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(signature).isEqualTo("")
@@ -325,7 +322,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            val signature = updater.signatureOfBlocking(podcast.url)
+            val signature = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(signature).isEqualTo("")
@@ -340,7 +337,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            val signature = updater.signatureOfBlocking(podcast.url)
+            val signature = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(signature).isEqualTo("")
@@ -355,7 +352,7 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            val signature = updater.signatureOfBlocking(podcast.url)
+            val signature = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(signature).isEqualTo("e40066f26d1ddb195fd89578b158abf3")
@@ -372,8 +369,8 @@ class FranceTvUpdaterTest(
             }
 
             /* When */
-            val first = updater.signatureOfBlocking(podcast.url)
-            val second = updater.signatureOfBlocking(podcast.url)
+            val first = updater.signatureOf(podcast.url)
+            val second = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(first).isEqualTo("e40066f26d1ddb195fd89578b158abf3")

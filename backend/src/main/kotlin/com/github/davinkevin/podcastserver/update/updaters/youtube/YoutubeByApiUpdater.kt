@@ -29,7 +29,7 @@ class YoutubeByApiUpdater(
 
     private val log = LoggerFactory.getLogger(YoutubeByApiUpdater::class.java)
 
-    override fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> {
+    override fun findItems(podcast: PodcastToUpdate): List<ItemFromUpdate> {
         log.debug("find items of {}", podcast.url)
 
         val id = findPlaylistId(podcast.url)
@@ -45,7 +45,7 @@ class YoutubeByApiUpdater(
             .toList()
     }
 
-    override fun signatureOfBlocking(url: URI): String {
+    override fun signatureOf(url: URI): String {
         log.debug("signature of {}", url)
 
         val id = findPlaylistId(url)

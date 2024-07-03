@@ -12,9 +12,6 @@ import org.jsoup.Jsoup
 import org.springframework.util.DigestUtils
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import org.springframework.web.reactive.function.client.bodyToMono
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.ZonedDateTime
 
@@ -27,7 +24,7 @@ class GulliUpdater(
     private val mapper: ObjectMapper
 ): Updater {
 
-    override fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> {
+    override fun findItems(podcast: PodcastToUpdate): List<ItemFromUpdate> {
         val path = podcast.url
             .toASCIIString()
             .substringAfter("replay.gulli.fr")
@@ -69,7 +66,7 @@ class GulliUpdater(
         )
     }
 
-    override fun signatureOfBlocking(url: URI): String {
+    override fun signatureOf(url: URI): String {
         val path = url.toASCIIString().substringAfter("replay.gulli.fr")
 
         val page = restClient.get()

@@ -11,10 +11,6 @@ import com.github.davinkevin.podcastserver.utils.MatcherExtractor
 import org.springframework.util.DigestUtils
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toFlux
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.Instant
 import java.time.ZoneId
@@ -25,9 +21,7 @@ class DailymotionUpdater(
     private val image: ImageService
 ): Updater {
 
-    override fun signatureOf(url: URI): Mono<String> = signatureOfBlocking(url).toMono()
-
-    override fun signatureOfBlocking(url: URI): String? {
+    override fun signatureOf(url: URI): String? {
         val userName = USER_NAME_EXTRACTOR
             .on(url.toASCIIString())
             .group(1)
@@ -53,11 +47,7 @@ class DailymotionUpdater(
         return sign
     }
 
-    override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
-        return findItemsBlocking(podcast).toFlux()
-    }
-
-    override fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> {
+    override fun findItems(podcast: PodcastToUpdate): List<ItemFromUpdate> {
         val userName = USER_NAME_EXTRACTOR.on(podcast.url.toASCIIString()).group(1) ?: error("username not found")
 
         val channelDetails = rc

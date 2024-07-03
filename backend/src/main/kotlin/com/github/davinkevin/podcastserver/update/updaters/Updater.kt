@@ -2,8 +2,6 @@ package com.github.davinkevin.podcastserver.update.updaters
 
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.slf4j.LoggerFactory
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import java.net.URI
 import java.time.ZonedDateTime
 import java.util.*
@@ -16,7 +14,7 @@ interface Updater {
     fun update(podcast: PodcastToUpdate): UpdatePodcastInformation? {
         log.info("podcast {} starts update", podcast.url)
         val (value, duration) = measureTimedValue {
-            val signature = runCatching { signatureOf(podcast.url).block() }
+            val signature = runCatching { signatureOf(podcast.url) }
                 .onFailure { log.error("podcast {} ends with error", podcast.url, it) }
                 .getOrNull()
                 ?: return@measureTimedValue null
@@ -28,7 +26,7 @@ interface Updater {
 
             log.debug("podcast {} has new signature {}", podcast.url, signature)
 
-            val items = runCatching { findItems(podcast).collectList().block()!!.toSet() }
+            val items = runCatching { findItems(podcast).toSet() }
                 .onFailure { log.error("podcast {} ends with error", podcast.url, it) }
                 .getOrNull() ?: return@measureTimedValue null
 
@@ -45,11 +43,8 @@ interface Updater {
         return value
     }
 
-    fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> = Mono.fromCallable { findItemsBlocking(podcast) }.flatMapIterable { it }
-    fun signatureOf(url: URI): Mono<String> = Mono.fromCallable { signatureOfBlocking(url) }
-
-    fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> = emptyList()
-    fun signatureOfBlocking(url: URI): String? = ""
+    fun findItems(podcast: PodcastToUpdate): List<ItemFromUpdate> = emptyList()
+    fun signatureOf(url: URI): String? = ""
 
     fun type(): Type
     fun compatibility(url: String): Int

@@ -63,7 +63,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(217)
@@ -76,7 +76,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.with-only-rss-cover.xml"))))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
                 .filter { it.cover?.url == URI("http://app-load.com/audio/rss/appload1400.jpg") }
 
             /* Then */
@@ -90,7 +90,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.with-only-itunes-cover.xml"))))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
                 .filter { it.cover?.url == URI("http://app-load.com/audio/itunes/appload1400.jpg") }
 
             /* Then */
@@ -104,7 +104,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.without-any-cover.xml"))))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
                 .filter { it.cover == null }
 
             /* Then */
@@ -120,7 +120,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
                 .filter { it.cover == null }
 
             /* Then */
@@ -138,7 +138,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
                 .filter { it.cover == null }
 
             /* Then */
@@ -152,7 +152,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
                 .filter { Duration.between(it.pubDate, now()).abs().seconds < 50 }
 
             /* Then */
@@ -166,7 +166,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
                 .filter { it.pubDate?.offset == ZoneOffset.ofHours(6) }
 
             /* Then */
@@ -180,7 +180,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
                 .filter { it.pubDate?.offset == ZoneOffset.ofHours(8) }
 
             /* Then */
@@ -194,7 +194,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
                 .filter { it.pubDate?.offset == ZoneOffset.ofHours(9) }
 
             /* Then */
@@ -208,7 +208,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(""" <rss version="2.0"></rss>""")))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
                 .filter { it.cover?.url == URI("http://app-load.com/audio/rss/appload1400.jpg") }
 
             /* Then */
@@ -222,7 +222,7 @@ class RSSUpdaterTest(
                     .willReturn(ok()))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).isEmpty()
@@ -235,7 +235,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
                 .filter { it.url.toASCIIString().contains("+") }
 
             /* Then */
@@ -249,7 +249,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
                 .filter { it.mimeType.contains("unknown") }
 
             /* Then */
@@ -278,7 +278,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(xml)))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
                 .filter { it.mimeType.contains("unknown") }
 
             /* Then */
@@ -308,7 +308,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(xml)))
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(1)
@@ -327,7 +327,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
-            val sign = updater.signatureOfBlocking(podcast.url)
+            val sign = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(sign).isEqualTo("32909f0e501be25905b804be7c8360cc")
@@ -340,7 +340,7 @@ class RSSUpdaterTest(
                     .willReturn(notFound()))
 
             /* When */
-            val sign = updater.signatureOfBlocking(podcast.url)
+            val sign = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(sign).isEqualTo("")

@@ -22,7 +22,7 @@ class YoutubeByXmlUpdater(
     private val youtube: RestClient
 ): Updater {
 
-    override fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> {
+    override fun findItems(podcast: PodcastToUpdate): List<ItemFromUpdate> {
         val page = fetchXml(podcast.url)
             ?: return emptyList()
 
@@ -61,7 +61,7 @@ class YoutubeByXmlUpdater(
         )
     }
 
-    override fun signatureOfBlocking(url: URI): String {
+    override fun signatureOf(url: URI): String {
         val page = fetchXml(url)
             ?: return ""
 
