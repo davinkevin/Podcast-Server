@@ -7,9 +7,7 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
-import org.springframework.web.reactive.function.client.WebClient
-import reactor.netty.http.client.HttpClient
+import org.springframework.web.client.RestClient
 
 /**
  * Created by kevin on 31/08/2019
@@ -22,27 +20,27 @@ class YoutubeUpdaterConfig {
     @Bean
     fun youtubeUpdater(
         api: YoutubeApi,
-        wcb: WebClient.Builder
+        rcb: RestClient.Builder,
     ): Updater {
         val key = api.youtube
 
-        val builder = wcb
-                .clone()
-                .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
-                .defaultHeader("User-Agent", "curl/7.64.1")
+        val builder = rcb
+            .clone()
+            .defaultHeader("User-Agent", "curl/7.64.1")
 
-        val youtubeClient = builder.clone()
-                .baseUrl("https://www.youtube.com")
-                .build()
+        val youtubeClient = builder
+            .clone()
+            .baseUrl("https://www.youtube.com")
+            .build()
 
         if (key.isEmpty()) {
-         return YoutubeByXmlUpdater(youtubeClient)
+            return YoutubeByXmlUpdater(youtubeClient)
         }
 
         return YoutubeByApiUpdater(
-                key = key,
-                youtube = youtubeClient,
-                googleApi = builder.clone().baseUrl("https://www.googleapis.com").build()
+            key = key,
+            youtube = youtubeClient,
+            googleApi = builder.clone().baseUrl("https://www.googleapis.com").build()
         )
     }
 }

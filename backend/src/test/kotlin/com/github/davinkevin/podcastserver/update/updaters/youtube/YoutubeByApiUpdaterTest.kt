@@ -1,10 +1,10 @@
 package com.github.davinkevin.podcastserver.update.updaters.youtube
 
 import com.github.davinkevin.podcastserver.MockServer
-import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
+import com.github.davinkevin.podcastserver.remapRestClientToMockServer
+import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
-import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import org.assertj.core.api.Assertions.assertThat
@@ -17,13 +17,13 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
+import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
@@ -40,6 +40,19 @@ import java.util.*
 class YoutubeByApiUpdaterTest(
         @Autowired val updater: YoutubeByApiUpdater
 ) {
+
+    @MockBean lateinit var image: ImageService
+
+    @TestConfiguration
+    @Import(
+        YoutubeUpdaterConfig::class,
+        RestClientAutoConfiguration::class,
+        JacksonAutoConfiguration::class,
+    )
+    class LocalTestConfiguration {
+        @Bean fun remapGoogleApiToMock() = remapRestClientToMockServer("www.googleapis.com")
+        @Bean fun remapYoutubeToMock() = remapRestClientToMockServer("www.youtube.com")
+    }
 
     @Nested
     @DisplayName("should find items")
@@ -63,11 +76,10 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast))
-                    .expectSubscription()
-                    /* Then */
-                    .expectNextCount(91)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+
+            /* Then */
+            assertThat(items).hasSize(91)
         }
 
         @Test
@@ -87,11 +99,10 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast))
-                    .expectSubscription()
-                    /* Then */
-                    .expectNextCount(91)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+
+            /* Then */
+            assertThat(items).hasSize(91)
         }
 
         @Test
@@ -108,11 +119,10 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast))
-                    .expectSubscription()
-                    /* Then */
-                    .expectNextCount(91)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+
+            /* Then */
+            assertThat(items).hasSize(91)
         }
 
         @Test
@@ -132,11 +142,10 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast))
-                .expectSubscription()
-                /* Then */
-                .expectNextCount(91)
-                .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+
+            /* Then */
+            assertThat(items).hasSize(91)
         }
 
         @Test
@@ -153,11 +162,10 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast))
-                .expectSubscription()
-                /* Then */
-                .expectNextCount(91)
-                .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+
+            /* Then */
+            assertThat(items).hasSize(91)
         }
 
         @Test
@@ -177,11 +185,10 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast))
-                    .expectSubscription()
-                    /* Then */
-                    .expectNextCount(50)
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+
+            /* Then */
+            assertThat(items).hasSize(50)
         }
 
         @Test
@@ -199,13 +206,46 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast))
-                    .expectSubscription()
-                    /* Then */
-                    .expectErrorMessage("channel id not found")
-                    .verify()
+            assertThatThrownBy { updater.findItemsBlocking(podcast) }
+                /* Then */
+                .hasMessage("channel id not found")
         }
 
+        @Test
+        fun `and handle case where returned page is empty`(backend: WireMockServer) {
+            /* Given */
+            val podcast = PodcastToUpdate(
+                url = URI("https://www.youtube.com/user/joueurdugrenier"),
+                id = UUID.randomUUID(),
+                signature = "noSign"
+            )
+
+            backend.apply {
+                stubFor(get("/youtube/v3/channels?key=key&forUsername=joueurdugrenier&part=id")
+                    .willReturn(ok()))
+            }
+
+            /* When */
+            assertThatThrownBy { updater.findItemsBlocking(podcast) }
+                /* Then */
+                .hasMessage("channel id not found")
+        }
+
+        @Test
+        fun `from handle and returns error because page is empty`(backend: WireMockServer) {
+            /* Given */
+            val podcast = PodcastToUpdate(UUID.randomUUID(), URI("https://www.youtube.com/@joueurdugrenier"), "noSign")
+
+            backend.apply {
+                stubFor(get("/@joueurdugrenier")
+                    .willReturn(ok()))
+            }
+
+            /* When */
+            assertThatThrownBy { updater.findItemsBlocking(podcast) }
+                /* Then */
+                .hasMessage("channel id not found")
+        }
 
         @Test
         fun `and returns empty if no result`(backend: WireMockServer) {
@@ -227,10 +267,10 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            StepVerifier.create(updater.findItems(podcast))
-                    .expectSubscription()
-                    /* Then */
-                    .verifyComplete()
+            val items = updater.findItemsBlocking(podcast)
+
+            /* Then */
+            assertThat(items).hasSize(0)
         }
     }
 
@@ -282,13 +322,10 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            StepVerifier.create(updater.signatureOf(podcast.url))
-                    .expectSubscription()
-                    /* Then */
-                    .assertNext {
-                        assertThat(it).isEqualTo("64cc064a14dba90a0df24218db758479")
-                    }
-                    .verifyComplete()
+            val sign = updater.signatureOfBlocking(podcast.url)
+
+            /* Then */
+            assertThat(sign).isEqualTo("64cc064a14dba90a0df24218db758479")
         }
 
         @Test
@@ -304,13 +341,10 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            StepVerifier.create(updater.signatureOf(podcast.url))
-                    .expectSubscription()
-                    /* Then */
-                    .assertNext {
-                        assertThat(it).isEqualTo("")
-                    }
-                    .verifyComplete()
+            val sign = updater.signatureOfBlocking(podcast.url)
+
+            /* Then */
+            assertThat(sign).isEqualTo("")
         }
     }
 
@@ -319,19 +353,6 @@ class YoutubeByApiUpdaterTest(
         val type = updater.type()
         assertThat(type.name).isEqualTo("Youtube")
         assertThat(type.key).isEqualTo("Youtube")
-    }
-
-    @TestConfiguration
-    @Import(
-            YoutubeUpdaterConfig::class,
-            WebClientAutoConfiguration::class,
-            JacksonAutoConfiguration::class,
-            WebClientConfig::class
-    )
-    class LocalTestConfiguration {
-        @Bean fun remapGoogleApiToMock() = remapToMockServer("www.googleapis.com")
-        @Bean fun remapYoutubeToMock() = remapToMockServer("www.youtube.com")
-
     }
 
     data class CompositeType(val idx: Int, val other: Int) {
