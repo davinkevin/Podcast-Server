@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.update.updaters.youtube
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.extension.java.util.orNull
+import com.github.davinkevin.podcastserver.find.finders.meta
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Updater
@@ -10,12 +11,8 @@ import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByApiU
 import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
 import org.springframework.util.DigestUtils
-import org.springframework.web.reactive.function.client.WebClient
-import org.springframework.web.reactive.function.client.bodyToMono
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.switchIfEmpty
-import reactor.kotlin.core.publisher.toMono
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
@@ -26,91 +23,106 @@ import java.util.*
  */
 class YoutubeByApiUpdater(
     private val key: String,
-    private val youtube: WebClient,
-    private val googleApi: WebClient,
+    private val youtube: RestClient,
+    private val googleApi: RestClient,
 ): Updater {
 
     private val log = LoggerFactory.getLogger(YoutubeByApiUpdater::class.java)
 
-    override fun findItems(podcast: PodcastToUpdate): Flux<ItemFromUpdate> {
+    override fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> {
         log.debug("find items of {}", podcast.url)
 
-        return findPlaylistId(podcast.url)
-            .flatMapMany { id -> fetchPageWithToken(id)
-                .expand { fetchPageWithToken(id, it.nextPageToken) }
-            }
-            .takeUntil { it.nextPageToken.isEmpty() }
+        val id = findPlaylistId(podcast.url)
+
+        return generateSequence(fetchPageWithToken(id)) {
+            if(it.nextPageToken.isNotEmpty()) {
+                fetchPageWithToken(id, it.nextPageToken)
+            } else null
+        }
             .take(MAX_PAGE)
-            .flatMapIterable { it.items }
-            .map { it.toItem() }
+            .flatMap { it.items }
+            .map(YoutubeApiItem::toItem)
+            .toList()
     }
 
-    override fun signatureOf(url: URI): Mono<String> {
+    override fun signatureOfBlocking(url: URI): String {
         log.debug("signature of {}", url)
 
-        return findPlaylistId(url)
-            .flatMap { id -> fetchPageWithToken(id) }
-            .map { it.items.joinToString { i -> i.snippet.resourceId.videoId } }
-            .filter { it.isNotEmpty() }
-            .map { DigestUtils.md5DigestAsHex(it.toByteArray()) }
-            .switchIfEmpty { "".toMono() }
+        val id = findPlaylistId(url)
+
+        val youtubeApiResponse = fetchPageWithToken(id)
+
+        val elements = youtubeApiResponse.items
+            .joinToString { i -> i.snippet.resourceId.videoId }
+
+        if (elements.isEmpty()) {
+            return ""
+        }
+
+        return DigestUtils.md5DigestAsHex(elements.toByteArray())
     }
 
-    private fun fetchPageWithToken(id: String, pageToken: String = "") =
-        googleApi
-            .get()
-            .uri { it.path("/youtube/v3/playlistItems")
-                .queryParam("part", "snippet")
-                .queryParam("maxResults", 50)
-                .queryParam("playlistId", id)
-                .queryParam("key", key)
-                .apply {
-                    if (pageToken.isNotEmpty()) {
-                        this.queryParam("pageToken", pageToken)
-                    }
+    private fun fetchPageWithToken(id: String, pageToken: String = ""): YoutubeApiResponse {
+        val response = kotlin.runCatching {
+            googleApi
+                .get()
+                .uri {
+                    it.path("/youtube/v3/playlistItems")
+                        .queryParam("part", "snippet")
+                        .queryParam("maxResults", 50)
+                        .queryParam("playlistId", id)
+                        .queryParam("key", key)
+                        .apply {
+                            if (pageToken.isNotEmpty()) {
+                                this.queryParam("pageToken", pageToken)
+                            }
+                        }
+                        .build()
                 }
-                .build()
-            }
-            .retrieve()
-            .bodyToMono<YoutubeApiResponse>()
-            .onErrorResume { YoutubeApiResponse(emptyList()).toMono() }
+                .retrieve()
+                .body<YoutubeApiResponse>()
+        }
 
-    private fun findPlaylistId(url: URI): Mono<String> {
+        return response.getOrNull() ?: return YoutubeApiResponse(emptyList())
+    }
+
+
+    private fun findPlaylistId(url: URI): String {
         val channelId = when {
             isPlaylist(url) -> findPlaylistIdFromPlaylistUrl(url)
             isHandle(url) -> findPlaylistIdUsingHtmlPage(url)
             isChannel(url) -> findChannelIdFromUrl(url)
             else -> findPlaylistIdFromUserName(url)
-        }
+        } ?: error("channel id not found")
 
-        return channelId
-            .map(::transformChannelIdToPlaylistId)
-            .switchIfEmpty { RuntimeException("channel id not found").toMono() }
+        return transformChannelIdToPlaylistId(channelId)
     }
 
-    private fun findPlaylistIdFromPlaylistUrl(url: URI): Mono<String> {
-        return url.toASCIIString().substringAfter("list=").toMono()
+    private fun findPlaylistIdFromPlaylistUrl(url: URI): String {
+        return url.toASCIIString().substringAfter("list=")
     }
 
-    private fun findPlaylistIdUsingHtmlPage(url: URI): Mono<String> {
-        return youtube
+    private fun findPlaylistIdUsingHtmlPage(url: URI): String? {
+        val page = youtube
             .get()
             .uri(url)
             .retrieve()
-            .bodyToMono<String>()
-            .map { Jsoup.parse(it, "https://www.youtube.com") }
-            .flatMap { it.select("meta[itemprop=identifier]").firstOrNull().toMono() }
-            .map { it.attr("content") }
+            .body<String>()
+            ?: return null
+
+        val html = Jsoup.parse(page, "https://www.youtube.com")
+
+        return html.meta("itemprop=identifier")
     }
 
-    private fun findChannelIdFromUrl(url: URI): Mono<String> {
-        return url.toASCIIString().substringAfterLast("/").toMono()
+    private fun findChannelIdFromUrl(url: URI): String {
+        return url.toASCIIString().substringAfterLast("/")
     }
 
-    private fun findPlaylistIdFromUserName(url: URI): Mono<String> {
+    private fun findPlaylistIdFromUserName(url: URI): String? {
         val username = url.path.substringAfterLast("/")
 
-        return googleApi
+        val channelDetails = googleApi
             .get()
             .uri {
                 it.path("/youtube/v3/channels")
@@ -120,9 +132,10 @@ class YoutubeByApiUpdater(
                     .build()
             }
             .retrieve()
-            .bodyToMono<ChannelDetailsPage>()
-            .flatMap { it.items.firstOrNull()?.id.toMono() }
+            .body<ChannelDetailsPage>()
+            ?: return null
 
+        return channelDetails.items.firstOrNull()?.id
     }
 
     private fun transformChannelIdToPlaylistId(channelId: String) =
@@ -133,7 +146,7 @@ class YoutubeByApiUpdater(
     override fun compatibility(url: String): Int = youtubeCompatibility(url)
 
     companion object {
-        private const val MAX_PAGE = 10L
+        private const val MAX_PAGE = 10
         internal const val URL_PAGE_BASE = "https://www.youtube.com/watch?v=%s"
     }
 }
