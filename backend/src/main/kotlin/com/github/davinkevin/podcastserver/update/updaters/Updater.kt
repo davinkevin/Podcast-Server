@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.update.updaters
 
-import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.time.ZonedDateTime
@@ -69,8 +68,3 @@ data class ItemFromUpdate(
     data class Cover(val width: Int, val height: Int, val url: URI)
 }
 
-fun CoverInformation.toCoverFromUpdate() = ItemFromUpdate.Cover(
-        height = this@toCoverFromUpdate.height,
-        width = this@toCoverFromUpdate.width,
-        url = this@toCoverFromUpdate.url
-)
