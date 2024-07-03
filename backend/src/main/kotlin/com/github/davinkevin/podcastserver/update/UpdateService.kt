@@ -15,8 +15,6 @@ import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import org.slf4j.LoggerFactory
 import org.springframework.core.task.SimpleAsyncTaskExecutor
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.switchIfEmpty
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.OffsetDateTime.now
 import java.util.*
@@ -49,7 +47,11 @@ class UpdateService(
                 .block()!!
                 .filter { it.url != null }
                 .map {
-                    val signature = if (force || it.signature == null) UUID.randomUUID().toString() else it.signature
+                    val signature = when {
+                        force -> UUID.randomUUID().toString()
+                        it.signature == null -> UUID.randomUUID().toString()
+                        else -> it.signature
+                    }
                     PodcastToUpdate(it.id, URI(it.url!!), signature)
                 }
 
@@ -72,25 +74,26 @@ class UpdateService(
         log.info("End of the global update with {} found, done in {}s", value.size, duration.inWholeSeconds)
     }
 
-    fun update(podcastId: UUID) {
+    fun update(podcastId: UUID) = updateExecutor.execute {
         liveUpdate.isUpdating(true)
 
-        updateExecutor.execute {
-            val podcast = podcastRepository.findById(podcastId).block()!!
-
-            if (podcast.url == null) {
-                return@execute
-            }
-
-            val request = PodcastToUpdate(podcast.id, URI(podcast.url), UUID.randomUUID().toString())
-
-            val update = updaters.of(request.url).update(request)
-                ?: return@execute
-
-            saveSignatureAndCreateItems(update.podcast, update.items, update.newSignature)
-
+        val podcast = podcastRepository.findById(podcastId).block()!!
+        if (podcast.url == null) {
             liveUpdate.isUpdating(false)
+            return@execute
         }
+
+        val request = PodcastToUpdate(podcast.id, URI(podcast.url), UUID.randomUUID().toString())
+
+        val update = updaters.of(request.url).update(request)
+        if (update == null) {
+            liveUpdate.isUpdating(false)
+            return@execute
+        }
+
+        saveSignatureAndCreateItems(update.podcast, update.items, update.newSignature)
+
+        liveUpdate.isUpdating(false)
     }
 
     private fun saveSignatureAndCreateItems(
@@ -100,6 +103,10 @@ class UpdateService(
     ) {
         val realSignature = if (items.isEmpty()) "" else signature
         podcastRepository.updateSignature(podcast.id, realSignature).block()
+
+        if (items.isEmpty()) {
+            return
+        }
 
         val creationRequests = items.map { it.toCreation(podcast.id)}
         val createdItems = itemRepository.create(creationRequests)
@@ -120,34 +127,29 @@ class UpdateService(
     }
 }
 
-private fun ItemFromUpdate.toCreation(podcastId: UUID) = ItemForCreation(
-    title = title!!,
-    url = url.toASCIIString(),
-    guid = this.guidOrUrl(),
+private fun ItemFromUpdate.toCreation(podcastId: UUID): ItemForCreation {
+    val pubDate = pubDate?.toOffsetDateTime()
+    return ItemForCreation(
+        title = title!!,
+        url = url.toASCIIString(),
+        guid = this.guidOrUrl(),
 
-    pubDate = pubDate?.toOffsetDateTime() ?: now(),
-    downloadDate = null,
-    creationDate = now(),
+        pubDate = pubDate ?: now(),
+        downloadDate = null,
+        creationDate = now(),
 
-    description = description ?: "",
-    mimeType = mimeType,
-    length = length,
-    fileName = null,
-    status = Status.NOT_DOWNLOADED,
+        description = description ?: "",
+        mimeType = mimeType,
+        length = length,
+        fileName = null,
+        status = Status.NOT_DOWNLOADED,
 
-    podcastId = podcastId,
-    cover = cover?.toCreation()
-)
+        podcastId = podcastId,
+        cover = cover?.toCreation()
+    )
+}
 
 private fun ItemFromUpdate.Cover.toCreation() = CoverForCreation(width, height, url)
-
-fun ImageService.fetchCoverUpdateInformationOrOption(url: URI?): Mono<Optional<ItemFromUpdate.Cover>> {
-    return Mono.justOrEmpty(url)
-        .flatMap { fetchCoverInformation(url!!) }
-        .map { ItemFromUpdate.Cover(it.width, it.height, it.url) }
-        .map { Optional.of(it) }
-        .switchIfEmpty { Optional.empty<ItemFromUpdate.Cover>().toMono() }
-}
 
 fun ImageService.fetchCoverUpdateInformation(url: URI): ItemFromUpdate.Cover? {
     val coverInformation = fetchCoverInformation(url).block()
