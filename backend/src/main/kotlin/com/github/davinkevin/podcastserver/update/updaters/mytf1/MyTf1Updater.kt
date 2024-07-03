@@ -26,7 +26,7 @@ class MyTf1Updater(
     private val image: ImageService
 ): Updater {
 
-    override fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> {
+    override fun findItems(podcast: PodcastToUpdate): List<ItemFromUpdate> {
         val baseVideoUrl = extractBaseVideoUrl(podcast.url)
 
         val result = rc
@@ -60,7 +60,7 @@ class MyTf1Updater(
         )
     }
 
-    override fun signatureOfBlocking(url: URI): String {
+    override fun signatureOf(url: URI): String {
         val page = rc
             .get()
             .uri { it

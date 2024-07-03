@@ -33,12 +33,12 @@ class UploadUpdaterTest(
 
     @Test
     fun `should serve items`() {
-        assertThat(updater.findItemsBlocking(podcast)).isEmpty()
+        assertThat(updater.findItems(podcast)).isEmpty()
     }
 
     @Test
     fun `should generate an empty signature`() {
-        assertThat(updater.signatureOfBlocking(podcast.url)).isEqualTo("")
+        assertThat(updater.signatureOf(podcast.url)).isEqualTo("")
     }
 
     @Test

@@ -78,7 +78,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val items = updater.findItemsBlocking(channel)
+                val items = updater.findItems(channel)
 
                 /* Then */
                 assertThat(items).isEmpty()
@@ -98,7 +98,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val items = updater.findItemsBlocking(channel)
+                val items = updater.findItems(channel)
 
                 /* Then */
                 assertThat(items).isEmpty()
@@ -117,7 +117,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val items = updater.findItemsBlocking(channel)
+                val items = updater.findItems(channel)
 
                 /* Then */
                 assertThat(items).isEmpty()
@@ -136,7 +136,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val items = updater.findItemsBlocking(channel)
+                val items = updater.findItems(channel)
 
                 /* Then */
                 assertThat(items).hasSize(1)
@@ -163,7 +163,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val items = updater.findItemsBlocking(channel)
+                val items = updater.findItems(channel)
 
                 /* Then */
                 assertThat(items).hasSize(15)
@@ -184,7 +184,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val items = updater.findItemsBlocking(playlist)
+                val items = updater.findItems(playlist)
 
                 /* Then */
                 assertThat(items).hasSize(0)
@@ -200,7 +200,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val items = updater.findItemsBlocking(playlist)
+                val items = updater.findItems(playlist)
 
                 /* Then */
                 assertThat(items).hasSize(1)
@@ -224,7 +224,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val items = updater.findItemsBlocking(playlist)
+                val items = updater.findItems(playlist)
 
                 /* Then */
                 assertThat(items).hasSize(15)
@@ -252,7 +252,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val sign = updater.signatureOfBlocking(playlist.url)
+                val sign = updater.signatureOf(playlist.url)
 
                 /* Then */
                 assertThat(sign).isEqualTo("")
@@ -268,7 +268,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val sign = updater.signatureOfBlocking(playlist.url)
+                val sign = updater.signatureOf(playlist.url)
 
                 /* Then */
                 assertThat(sign).isEqualTo("e134f42e363e1b763518e6af46fb3a96")
@@ -289,7 +289,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val sign = updater.signatureOfBlocking(channel.url)
+                val sign = updater.signatureOf(channel.url)
 
                 /* Then */
                 assertThat(sign).isEqualTo("")
@@ -308,7 +308,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val sign = updater.signatureOfBlocking(channel.url)
+                val sign = updater.signatureOf(channel.url)
 
                 /* Then */
                 assertThat(sign).isEqualTo("")
@@ -327,7 +327,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val sign = updater.signatureOfBlocking(channel.url)
+                val sign = updater.signatureOf(channel.url)
 
                 /* Then */
                 assertThat(sign).isEqualTo("")
@@ -346,7 +346,7 @@ class YoutubeByXmlUpdaterTest(
                 }
 
                 /* When */
-                val sign = updater.signatureOfBlocking(channel.url)
+                val sign = updater.signatureOf(channel.url)
 
                 /* Then */
                 assertThat(sign).isEqualTo("af35e61ec15b5356cb2ed7c22f5e7a92")

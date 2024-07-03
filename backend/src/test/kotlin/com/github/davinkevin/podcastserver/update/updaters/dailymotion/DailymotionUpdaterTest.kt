@@ -70,7 +70,7 @@ class DailymotionUpdaterTest(
             )
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).isEmpty()
@@ -85,7 +85,7 @@ class DailymotionUpdaterTest(
             )
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertAll {
@@ -110,7 +110,7 @@ class DailymotionUpdaterTest(
             )
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertAll {
@@ -134,7 +134,7 @@ class DailymotionUpdaterTest(
             )
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(10)
@@ -145,7 +145,7 @@ class DailymotionUpdaterTest(
             /* Given */
             val p = podcast.copy(url = URI("https://www.dailymotion.com"))
             /* When */
-            assertThatThrownBy { updater.findItemsBlocking(p) }
+            assertThatThrownBy { updater.findItems(p) }
                     /* Then */
                     .hasMessage("username not found")
         }
@@ -158,7 +158,7 @@ class DailymotionUpdaterTest(
 
             )
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).isEmpty()
@@ -178,7 +178,7 @@ class DailymotionUpdaterTest(
             )
 
             /* When */
-            val signature = updater.signatureOfBlocking(podcast.url)
+            val signature = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(signature).isEqualTo("")
@@ -192,7 +192,7 @@ class DailymotionUpdaterTest(
             )
 
             /* When */
-            val signature = updater.signatureOfBlocking(podcast.url)
+            val signature = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(signature).isEqualTo("0e2c090cb4f478c4d1c7ab21534e63ff")
@@ -206,7 +206,7 @@ class DailymotionUpdaterTest(
             )
 
             /* When */
-            val signature = updater.signatureOfBlocking(podcast.url)
+            val signature = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(signature).isEqualTo("af103324ed308bbaba8398737ba3fea2")
@@ -217,7 +217,7 @@ class DailymotionUpdaterTest(
             /* Given */
             val p = podcast.copy(url = URI("https://www.dailymotion.com"))
             /* When */
-            assertThatThrownBy { updater.signatureOfBlocking(p.url) }
+            assertThatThrownBy { updater.signatureOf(p.url) }
                     /* Then */
                     .hasMessage("username not found")
         }
@@ -230,7 +230,7 @@ class DailymotionUpdaterTest(
             )
 
             /* When */
-            val signature = updater.signatureOfBlocking(podcast.url)
+            val signature = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(signature).isNull()

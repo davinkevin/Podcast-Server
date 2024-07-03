@@ -7,8 +7,8 @@ import com.github.davinkevin.podcastserver.update.updaters.Updater
 import java.net.URI
 
 class UploadUpdater : Updater {
-    override fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> = emptyList()
-    override fun signatureOfBlocking(url: URI): String = ""
+    override fun findItems(podcast: PodcastToUpdate): List<ItemFromUpdate> = emptyList()
+    override fun signatureOf(url: URI): String = ""
     override fun type(): Type = TYPE
     override fun compatibility(url: String): Int = Integer.MAX_VALUE
 }

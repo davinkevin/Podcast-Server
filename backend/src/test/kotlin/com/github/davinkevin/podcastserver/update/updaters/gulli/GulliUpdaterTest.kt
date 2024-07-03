@@ -10,13 +10,13 @@ import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.any
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
@@ -26,7 +26,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.kotlin.core.publisher.toMono
-import reactor.test.StepVerifier
 import java.net.URI
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -73,7 +72,7 @@ class GulliUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(0)
@@ -93,7 +92,7 @@ class GulliUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(0)
@@ -113,7 +112,7 @@ class GulliUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(1)
@@ -151,7 +150,7 @@ class GulliUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(6)
@@ -172,7 +171,7 @@ class GulliUpdaterTest(
             )
 
             /* When */
-            val sign = updater.signatureOfBlocking(podcast.url)
+            val sign = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(sign).isEqualTo("")
@@ -186,7 +185,7 @@ class GulliUpdaterTest(
             )
 
             /* When */
-            val sign = updater.signatureOfBlocking(podcast.url)
+            val sign = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(sign).isEqualTo("")
@@ -200,7 +199,7 @@ class GulliUpdaterTest(
             )
 
             /* When */
-            val sign = updater.signatureOfBlocking(podcast.url)
+            val sign = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(sign).isEqualTo("67e44194d6aa62875e04fea1f2ffc9cc")
@@ -214,7 +213,7 @@ class GulliUpdaterTest(
             )
 
             /* When */
-            val sign = updater.signatureOfBlocking(podcast.url)
+            val sign = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(sign).isEqualTo("b8119ec4c3128965c098bc0d0dad8237")

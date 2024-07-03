@@ -76,7 +76,7 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(91)
@@ -99,7 +99,7 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(91)
@@ -119,7 +119,7 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(91)
@@ -142,7 +142,7 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(91)
@@ -162,7 +162,7 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(91)
@@ -185,7 +185,7 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(50)
@@ -206,7 +206,7 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            assertThatThrownBy { updater.findItemsBlocking(podcast) }
+            assertThatThrownBy { updater.findItems(podcast) }
                 /* Then */
                 .hasMessage("channel id not found")
         }
@@ -226,7 +226,7 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            assertThatThrownBy { updater.findItemsBlocking(podcast) }
+            assertThatThrownBy { updater.findItems(podcast) }
                 /* Then */
                 .hasMessage("channel id not found")
         }
@@ -242,7 +242,7 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            assertThatThrownBy { updater.findItemsBlocking(podcast) }
+            assertThatThrownBy { updater.findItems(podcast) }
                 /* Then */
                 .hasMessage("channel id not found")
         }
@@ -267,7 +267,7 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(0)
@@ -322,7 +322,7 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            val sign = updater.signatureOfBlocking(podcast.url)
+            val sign = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(sign).isEqualTo("64cc064a14dba90a0df24218db758479")
@@ -341,7 +341,7 @@ class YoutubeByApiUpdaterTest(
             }
 
             /* When */
-            val sign = updater.signatureOfBlocking(podcast.url)
+            val sign = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(sign).isEqualTo("")

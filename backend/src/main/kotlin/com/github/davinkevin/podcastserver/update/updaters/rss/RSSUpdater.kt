@@ -29,7 +29,7 @@ class RSSUpdater(
 
     private val log = LoggerFactory.getLogger(RSSUpdater::class.java)
 
-    override fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> {
+    override fun findItems(podcast: PodcastToUpdate): List<ItemFromUpdate> {
         val resource = fetchRss(podcast.url)
             ?: return emptyList()
 
@@ -106,7 +106,7 @@ class RSSUpdater(
             .getOrDefault(ZonedDateTime.now())
     }
 
-    override fun signatureOfBlocking(url: URI): String {
+    override fun signatureOf(url: URI): String {
         val resource = fetchRss(url)
             ?: return ""
 

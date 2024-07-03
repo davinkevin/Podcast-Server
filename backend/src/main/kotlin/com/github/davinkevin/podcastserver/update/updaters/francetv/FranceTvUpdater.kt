@@ -13,10 +13,6 @@ import org.slf4j.LoggerFactory
 import org.springframework.util.DigestUtils
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toFlux
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.Clock
 import java.time.ZonedDateTime
@@ -33,7 +29,7 @@ class FranceTvUpdater(
 
     private val log = LoggerFactory.getLogger(FranceTvUpdater::class.java)
 
-    override fun findItemsBlocking(podcast: PodcastToUpdate): List<ItemFromUpdate> {
+    override fun findItems(podcast: PodcastToUpdate): List<ItemFromUpdate> {
 
         val url = podcast.url.toASCIIString()
 
@@ -101,7 +97,7 @@ class FranceTvUpdater(
         )
     }
 
-    override fun signatureOfBlocking(url: URI): String {
+    override fun signatureOf(url: URI): String {
         val replay = replayUrl(url)
 
         val page = franceTvClient

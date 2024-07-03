@@ -72,7 +72,7 @@ class MyTf1UpdaterTest(
             )
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).isEmpty()
@@ -87,7 +87,7 @@ class MyTf1UpdaterTest(
             )
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).isEmpty()
@@ -102,7 +102,7 @@ class MyTf1UpdaterTest(
             whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(100)
@@ -117,7 +117,7 @@ class MyTf1UpdaterTest(
             whenever(imageService.fetchCoverInformation(any())).thenReturn(Mono.empty())
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(100)
@@ -133,7 +133,7 @@ class MyTf1UpdaterTest(
             whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(100)
@@ -149,7 +149,7 @@ class MyTf1UpdaterTest(
             whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
 
             /* When */
-            val items = updater.findItemsBlocking(p)
+            val items = updater.findItems(p)
 
             /* Then */
             assertThat(items).hasSize(100)
@@ -165,7 +165,7 @@ class MyTf1UpdaterTest(
             whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
 
             /* When */
-            val items = updater.findItemsBlocking(p)
+            val items = updater.findItems(p)
 
             /* Then */
             assertThat(items).hasSize(100)
@@ -181,7 +181,7 @@ class MyTf1UpdaterTest(
             whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
 
             /* When */
-            val items = updater.findItemsBlocking(p)
+            val items = updater.findItems(p)
 
             /* Then */
             assertThat(items).hasSize(100)
@@ -197,7 +197,7 @@ class MyTf1UpdaterTest(
 
 
             /* When */
-            val items = updater.findItemsBlocking(podcast)
+            val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(100)
@@ -221,7 +221,7 @@ class MyTf1UpdaterTest(
             val p = podcast.copy(url = URI("https://www.tf1.fr/foo"))
 
             /* When */
-            assertThatThrownBy { updater.findItemsBlocking(p) }
+            assertThatThrownBy { updater.findItems(p) }
                 /* Then */
                 .hasMessage("Slug not found in podcast with https://www.tf1.fr/foo")
         }
@@ -243,7 +243,7 @@ class MyTf1UpdaterTest(
             }
 
             /* When */
-            val sign = updater.signatureOfBlocking(podcast.url)
+            val sign = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(sign).isEqualTo("")
@@ -259,7 +259,7 @@ class MyTf1UpdaterTest(
             }
 
             /* When */
-            val sign = updater.signatureOfBlocking(podcast.url)
+            val sign = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(sign).isEqualTo("")
@@ -274,7 +274,7 @@ class MyTf1UpdaterTest(
                 )
             }
             /* When */
-            val sign = updater.signatureOfBlocking(podcast.url)
+            val sign = updater.signatureOf(podcast.url)
 
             /* Then */
             assertThat(sign).isEqualTo("e254efc2cd90286877d9d38f45b1d5fb")
@@ -290,7 +290,7 @@ class MyTf1UpdaterTest(
             )
 
             /* When */
-            val sign = updater.signatureOfBlocking(url)
+            val sign = updater.signatureOf(url)
 
             /* Then */
             assertThat(sign).isEqualTo("e254efc2cd90286877d9d38f45b1d5fb")
@@ -308,7 +308,7 @@ class MyTf1UpdaterTest(
             }
 
             /* When */
-            val sign = updater.signatureOfBlocking(url)
+            val sign = updater.signatureOf(url)
 
             /* Then */
             assertThat(sign).isEqualTo("e254efc2cd90286877d9d38f45b1d5fb")
@@ -325,7 +325,7 @@ class MyTf1UpdaterTest(
                 )
             }
             /* When */
-            val sign = updater.signatureOfBlocking(url)
+            val sign = updater.signatureOf(url)
 
             /* Then */
             assertThat(sign).isEqualTo("e254efc2cd90286877d9d38f45b1d5fb")
@@ -337,7 +337,7 @@ class MyTf1UpdaterTest(
             val p = podcast.copy(url = URI("https://www.tf1.fr/foo"))
 
             /* When */
-            assertThatThrownBy { updater.signatureOfBlocking(p.url) }
+            assertThatThrownBy { updater.signatureOf(p.url) }
                 /* Then */
                 .hasMessage("Slug not found in podcast with https://www.tf1.fr/foo")
         }
