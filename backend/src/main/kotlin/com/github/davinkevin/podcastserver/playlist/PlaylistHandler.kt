@@ -24,7 +24,7 @@ class PlaylistHandler(
     fun save(r: ServerRequest): ServerResponse {
         val playlistSaveRequest = r.body<SavePlaylist>()
 
-        val playlist = playlistService.save(playlistSaveRequest.name).block()!!
+        val playlist = playlistService.save(playlistSaveRequest.name)
 
         val body = PlaylistWithItemsHAL(
             id = playlist.id,
@@ -37,7 +37,7 @@ class PlaylistHandler(
 
 
     fun findAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
-        val playlists = playlistService.findAll().collectList().block()!!
+        val playlists = playlistService.findAll()
 
         val body = playlists
             .map { PlaylistHAL(it.id, it.name) }
@@ -50,7 +50,8 @@ class PlaylistHandler(
         val id = r.pathVariable("id")
             .let(UUID::fromString)
 
-        val playlist = playlistService.findById(id).block()!!
+        val playlist = playlistService.findById(id)
+            ?: return ServerResponse.notFound().build()
 
         val body = PlaylistWithItemsHAL(
             id = playlist.id,
@@ -65,7 +66,7 @@ class PlaylistHandler(
         val id = r.pathVariable("id")
             .let(UUID::fromString)
 
-        playlistService.deleteById(id).block()
+        playlistService.deleteById(id)
 
         return ServerResponse.noContent().build()
     }
@@ -75,7 +76,7 @@ class PlaylistHandler(
         val id = r.pathVariable("id")
             .let(UUID::fromString)
 
-        val playlist = playlistService.findById(id).block()
+        val playlist = playlistService.findById(id)
             ?: return ServerResponse.notFound().build()
 
         val rss = playlist.toRss(host)
@@ -93,7 +94,7 @@ class PlaylistHandler(
         val itemId = r.pathVariable("itemId")
             .let(UUID::fromString)
 
-        val playlistWithItem = playlistService.addToPlaylist(playlistId, itemId).block()!!
+        val playlistWithItem = playlistService.addToPlaylist(playlistId, itemId)
 
         val body = PlaylistWithItemsHAL(
             id = playlistWithItem.id,
@@ -110,7 +111,7 @@ class PlaylistHandler(
         val itemId = r.pathVariable("itemId")
             .let(UUID::fromString)
 
-        val playlistWithItem = playlistService.removeFromPlaylist(playlistId, itemId).block()!!
+        val playlistWithItem = playlistService.removeFromPlaylist(playlistId, itemId)
 
         val body = PlaylistWithItemsHAL(
             id = playlistWithItem.id,

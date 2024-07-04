@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptio
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
@@ -12,8 +13,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.OffsetDateTime
@@ -62,7 +61,7 @@ class PlaylistHandlerTest (
         fun `with a name`() {
             /* Given */
             val playlist = PlaylistWithItems(id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), name = "foo", items = emptyList())
-            whenever(service.save("foo")).thenReturn(playlist.toMono())
+            whenever(service.save("foo")).thenReturn(playlist)
             /* When */
             rest
                     .post()
@@ -85,8 +84,7 @@ class PlaylistHandlerTest (
         @Test
         fun `with 1 item`() {
             /* Given */
-            whenever(service.save("foo"))
-                .thenReturn(playlist.toMono())
+            whenever(service.save("foo")).thenReturn(playlist)
 
             /* When */
             rest
@@ -136,7 +134,7 @@ class PlaylistHandlerTest (
                 )
             )
             whenever(service.save("foo"))
-                .thenReturn(playlistWithItemWithoutCoverExtension.toMono())
+                .thenReturn(playlistWithItemWithoutCoverExtension)
 
             /* When */
             rest
@@ -181,7 +179,7 @@ class PlaylistHandlerTest (
         @Test
         fun `with no watch list`() {
             /* Given */
-            whenever(service.findAll()).thenReturn(Flux.empty())
+            whenever(service.findAll()).thenReturn(emptyList())
             /* When */
             rest
                     .get()
@@ -198,11 +196,12 @@ class PlaylistHandlerTest (
         @Test
         fun `with watch lists in results`() {
             /* Given */
-            whenever(service.findAll()).thenReturn(Flux.just(
+            whenever(service.findAll()).thenReturn(listOf(
                     Playlist(UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"), "first"),
                     Playlist(UUID.fromString("6e15b195-7a1f-43e8-bc06-bf88b7f865f8"), "second"),
                     Playlist(UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"), "third")
-            ))
+            )
+            )
 
             /* When */
             rest
@@ -237,7 +236,7 @@ class PlaylistHandlerTest (
             fun `with no items`() {
                 /* Given */
                 val playlist = PlaylistWithItems(id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), name = "foo", items = emptyList())
-                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
+                whenever(service.findById(playlist.id)).thenReturn(playlist)
                 /* When */
                 rest
                         .get()
@@ -283,7 +282,7 @@ class PlaylistHandlerTest (
                                 )
                         )
                 )
-                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
+                whenever(service.findById(playlist.id)).thenReturn(playlist)
                 /* When */
                 rest
                         .get()
@@ -366,7 +365,7 @@ class PlaylistHandlerTest (
                                 )
                         )
                 )
-                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
+                whenever(service.findById(playlist.id)).thenReturn(playlist)
                 /* When */
                 rest
                         .get()
@@ -452,7 +451,7 @@ class PlaylistHandlerTest (
             @Test
             fun `with 1 item`() {
                 /* Given */
-                whenever(service.findById(playlist.id)).thenReturn(playlist.toMono())
+                whenever(service.findById(playlist.id)).thenReturn(playlist)
 
                 /* When */
                 rest
@@ -502,7 +501,7 @@ class PlaylistHandlerTest (
                     )
                 )
                 whenever(service.findById(playlistWithItemWithoutCoverExtension.id))
-                    .thenReturn(playlistWithItemWithoutCoverExtension.toMono())
+                    .thenReturn(playlistWithItemWithoutCoverExtension)
 
                 /* When */
                 rest
@@ -542,7 +541,7 @@ class PlaylistHandlerTest (
             @Test
             fun `with item not found`() {
                 /* Given */
-                whenever(service.findById(playlist.id)).thenReturn(Mono.empty())
+                whenever(service.findById(playlist.id)).thenReturn(null)
 
                 /* When */
                 rest
@@ -566,7 +565,7 @@ class PlaylistHandlerTest (
         fun `by id`() {
             /* Given */
             val id = UUID.randomUUID()
-            whenever(service.deleteById(id)).thenReturn(Mono.empty())
+            doNothing().whenever(service).deleteById(id)
             /* When */
             rest
                     .delete()
@@ -608,7 +607,7 @@ class PlaylistHandlerTest (
                     name = "foo",
                     items = listOf(item)
             )
-            whenever(service.addToPlaylist(playlist.id, item.id)).thenReturn(playlist.toMono())
+            whenever(service.addToPlaylist(playlist.id, item.id)).thenReturn(playlist)
 
             /* When */
             rest
@@ -660,7 +659,7 @@ class PlaylistHandlerTest (
             )
             val itemId = UUID.fromString("dd5b4b49-7fd8-4d7b-a406-e8e451ef7792")
             whenever(service.removeFromPlaylist(playlist.id, itemId))
-                .thenReturn(playlist.toMono())
+                .thenReturn(playlist)
 
             /* When */
             rest
