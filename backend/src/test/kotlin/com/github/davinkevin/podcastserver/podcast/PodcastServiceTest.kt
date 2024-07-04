@@ -20,7 +20,6 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
 import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
-import reactor.test.StepVerifier
 import java.net.URI
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -63,12 +62,12 @@ class PodcastServiceTest(
     fun `should find by id`() {
         /* Given */
         whenever(repository.findById(podcast.id)).thenReturn(podcast.toMono())
+
         /* When */
-        StepVerifier.create(service.findById(podcast.id))
-                /* Then */
-                .expectSubscription()
-                .expectNext(podcast)
-                .verifyComplete()
+        val p = service.findById(podcast.id)
+
+        /* Then */
+        assertThat(p).isSameAs(podcast)
     }
 
     @Nested
@@ -132,23 +131,24 @@ class PodcastServiceTest(
             /* Given */
             val podcasts = listOf(podcast1, podcast2, podcast3)
             whenever(repository.findAll()).thenReturn(podcasts.toFlux())
+
             /* When */
-            StepVerifier.create(service.findAll())
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(podcast1, podcast2, podcast3)
-                    .verifyComplete()
+            val p = service.findAll()
+
+            /* Then */
+            assertThat(p).containsExactly(podcast1, podcast2, podcast3)
         }
 
         @Test
         fun `with 0 podcast`() {
             /* Given */
             whenever(repository.findAll()).thenReturn(Flux.empty())
+
             /* When */
-            StepVerifier.create(service.findAll())
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            val p = service.findAll()
+
+            /* Then */
+            assertThat(p).isEmpty()
         }
 
     }
@@ -171,36 +171,36 @@ class PodcastServiceTest(
             fun `by pubDate`() {
                 /* Given */
                 whenever(repository.findStatByPodcastIdAndPubDate(podcast.id, 3)).thenReturn(r.toFlux())
+
                 /* When */
-                StepVerifier.create(service.findStatByPodcastIdAndPubDate(podcast.id, 3))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNextSequence(r)
-                        .verifyComplete()
+                val stats = service.findStatByPodcastIdAndPubDate(podcast.id, 3)
+
+                /* Then */
+                assertThat(stats).isEqualTo(r)
             }
 
             @Test
             fun `by downloadDate`() {
                 /* Given */
                 whenever(repository.findStatByPodcastIdAndDownloadDate(podcast.id, 3)).thenReturn(r.toFlux())
+
                 /* When */
-                StepVerifier.create(service.findStatByPodcastIdAndDownloadDate(podcast.id, 3))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNextSequence(r)
-                        .verifyComplete()
+                val stats = service.findStatByPodcastIdAndDownloadDate(podcast.id, 3)
+
+                /* Then */
+                assertThat(stats).isEqualTo(r)
             }
 
             @Test
             fun `by creationDate`() {
                 /* Given */
                 whenever(repository.findStatByPodcastIdAndCreationDate(podcast.id, 3)).thenReturn(r.toFlux())
+
                 /* When */
-                StepVerifier.create(service.findStatByPodcastIdAndCreationDate(podcast.id, 3))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNextSequence(r)
-                        .verifyComplete()
+                val stats = service.findStatByPodcastIdAndCreationDate(podcast.id, 3)
+
+                /* Then */
+                assertThat(stats).isEqualTo(r)
             }
         }
 
@@ -221,39 +221,45 @@ class PodcastServiceTest(
             fun `by pubDate`() {
                 /* Given */
                 whenever(repository.findStatByTypeAndPubDate(3)).thenReturn(Flux.just(youtube, rss))
+
                 /* When */
-                StepVerifier.create(service.findStatByTypeAndPubDate(3))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(youtube)
-                        .expectNext(rss)
-                        .verifyComplete()
+                val stats = service.findStatByTypeAndPubDate(3)
+
+                /* Then */
+                assertThat(stats).containsExactly(
+                    youtube,
+                    rss,
+                )
             }
 
             @Test
             fun `by downloadDate`() {
                 /* Given */
                 whenever(repository.findStatByTypeAndDownloadDate(3)).thenReturn(Flux.just(youtube, rss))
+
                 /* When */
-                StepVerifier.create(service.findStatByTypeAndDownloadDate(3))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(youtube)
-                        .expectNext(rss)
-                        .verifyComplete()
+                val stats = service.findStatByTypeAndDownloadDate(3)
+
+                /* Then */
+                assertThat(stats).containsExactly(
+                    youtube,
+                    rss,
+                )
             }
 
             @Test
             fun `by creationDate`() {
                 /* Given */
                 whenever(repository.findStatByTypeAndCreationDate(3)).thenReturn(Flux.just(youtube, rss))
+
                 /* When */
-                StepVerifier.create(service.findStatByTypeAndCreationDate(3))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(youtube)
-                        .expectNext(rss)
-                        .verifyComplete()
+                val stats = service.findStatByTypeAndCreationDate(3)
+
+                /* Then */
+                assertThat(stats).containsExactly(
+                    youtube,
+                    rss,
+                )
             }
 
         }
@@ -298,18 +304,17 @@ class PodcastServiceTest(
             fun `with no tags and just a cover`() {
                 /* Given */
                 val tags = emptySet<TagForCreation>()
-                val p = podcastForCreation.copy(tags = tags)
-                val savedCover = p.cover.toCover()
-                whenever(coverRepository.save(p.cover)).thenReturn(savedCover.toMono())
-                whenever(repository.save(eq(p.title), eq(p.url!!.toASCIIString()), eq(p.hasToBeDeleted), eq(p.type), argThat { isEmpty() }, eq(savedCover)))
+                val pBeforeUpdate = podcastForCreation.copy(tags = tags)
+                val savedCover = pBeforeUpdate.cover.toCover()
+                whenever(coverRepository.save(pBeforeUpdate.cover)).thenReturn(savedCover.toMono())
+                whenever(repository.save(eq(pBeforeUpdate.title), eq(pBeforeUpdate.url!!.toASCIIString()), eq(pBeforeUpdate.hasToBeDeleted), eq(pBeforeUpdate.type), argThat { isEmpty() }, eq(savedCover)))
                         .thenReturn(podcast.toMono())
 
                 /* When */
-                StepVerifier.create(service.save(p))
-                        /* Then */
-                        .expectSubscription()
-                        .assertNext { assertThat(it).isSameAs(podcast) }
-                        .verifyComplete()
+                val savedPodcast = service.save(pBeforeUpdate)
+
+                /* Then */
+                assertThat(savedPodcast).isSameAs(podcast)
             }
 
 
@@ -335,11 +340,10 @@ class PodcastServiceTest(
                         .thenReturn(podcast.toMono())
 
                 /* When */
-                StepVerifier.create(service.save(p))
-                        /* Then */
-                        .expectSubscription()
-                        .assertNext { assertThat(it).isSameAs(podcast) }
-                        .verifyComplete()
+                val savedPodcast = service.save(p)
+
+                /* Then */
+                assertThat(savedPodcast).isSameAs(podcast)
             }
 
             @Test
@@ -367,11 +371,10 @@ class PodcastServiceTest(
                         .thenReturn(podcast.toMono())
 
                 /* When */
-                StepVerifier.create(service.save(p))
-                        /* Then */
-                        .expectSubscription()
-                        .assertNext { assertThat(it).isSameAs(podcast) }
-                        .verifyComplete()
+                val savedPodcast = service.save(p)
+
+                /* Then */
+                assertThat(savedPodcast).isSameAs(podcast)
             }
 
         }
@@ -412,17 +415,16 @@ class PodcastServiceTest(
                     tags = argThat { isEmpty() },
                     cover = argThat {
                         id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
-                                url == java.net.URI("https://external.domain.tld/cover.png") &&
+                                url == URI("https://external.domain.tld/cover.png") &&
                                 height == 200 && width == 200
                     }
             )).thenReturn(p.toMono())
 
             /* When */
-            StepVerifier.create(service.update(podcastForUpdate))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(p)
-                    .verifyComplete()
+            val podcastAfterUpdate = service.update(podcastForUpdate)
+
+            /* Then */
+            assertThat(podcastAfterUpdate).isEqualTo(p)
 
             verify(tagRepository, never()).save(any())
             verify(coverRepository, never()).save(any())
@@ -456,18 +458,16 @@ class PodcastServiceTest(
                         tags = argThat { contains(newTagsInDb) && size == 1 },
                         cover = argThat {
                             id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
-                                    url == java.net.URI("https://external.domain.tld/cover.png") &&
+                                    url == URI("https://external.domain.tld/cover.png") &&
                                     height == 200 && width == 200
                         }
                 )).thenReturn(p.toMono())
 
                 /* When */
-                StepVerifier.create(service.update(pToUpdate))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(p)
-                        .verifyComplete()
+                val podcastAfterUpdate = service.update(pToUpdate)
 
+                /* Then */
+                assertThat(podcastAfterUpdate).isEqualTo(p)
                 verify(tagRepository, times(1)).save(any())
             }
 
@@ -489,12 +489,10 @@ class PodcastServiceTest(
                 )).thenReturn(p.toMono())
 
                 /* When */
-                StepVerifier.create(service.update(pToUpdate))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(p)
-                        .verifyComplete()
+                val podcastAfterUpdate = service.update(pToUpdate)
 
+                /* Then */
+                assertThat(podcastAfterUpdate).isEqualTo(p)
                 verify(tagRepository, times(1)).save(any())
             }
 
@@ -516,12 +514,10 @@ class PodcastServiceTest(
                 )).thenReturn(p.toMono())
 
                 /* When */
-                StepVerifier.create(service.update(pToUpdate))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(p)
-                        .verifyComplete()
+                val podcastAfterUpdate = service.update(pToUpdate)
 
+                /* Then */
+                assertThat(podcastAfterUpdate).isEqualTo(p)
                 verify(tagRepository, never()).save(any())
             }
 
@@ -543,7 +539,7 @@ class PodcastServiceTest(
                 val p = podcast.copy(tags = allTagsInDb)
 
                 whenever(tagRepository.save(argThat { this in listOfNewTags.map { it.name } }))
-                        .then { allTagsInDb.first() { t -> t.name == it.getArgument<String>(0) } }
+                        .then { allTagsInDb.first { t -> t.name == it.getArgument<String>(0) } }
                 whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
                 whenever(repository.update(
                         id = eq(p.id),
@@ -555,12 +551,10 @@ class PodcastServiceTest(
                 )).thenReturn(p.toMono())
 
                 /* When */
-                StepVerifier.create(service.update(pToUpdate))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(p)
-                        .verifyComplete()
+                val podcastAfterUpdate = service.update(pToUpdate)
 
+                /* Then */
+                assertThat(podcastAfterUpdate).isEqualTo(p)
                 verify(tagRepository, times(listOfNewTags.size)).save(any())
             }
 
@@ -600,12 +594,10 @@ class PodcastServiceTest(
                 )).thenReturn(p.toMono())
 
                 /* When */
-                StepVerifier.create(service.update(pToUpdate))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(p)
-                        .verifyComplete()
+                val podcastAfterUpdate = service.update(pToUpdate)
 
+                /* Then */
+                assertThat(podcastAfterUpdate).isEqualTo(p)
                 verify(coverRepository, never()).save(any())
             }
 
@@ -632,12 +624,10 @@ class PodcastServiceTest(
                 )).thenReturn(p.toMono())
 
                 /* When */
-                StepVerifier.create(service.update(pToUpdate))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(p)
-                        .verifyComplete()
+                val podcastAfterUpdate = service.update(pToUpdate)
 
+                /* Then */
+                assertThat(podcastAfterUpdate).isEqualTo(p)
                 verify(coverRepository, never()).save(any())
             }
 
@@ -663,12 +653,10 @@ class PodcastServiceTest(
                 )).thenReturn(p.toMono())
 
                 /* When */
-                StepVerifier.create(service.update(pToUpdate))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(p)
-                        .verifyComplete()
+                val podcastAfterUpdate = service.update(pToUpdate)
 
+                /* Then */
+                assertThat(podcastAfterUpdate).isEqualTo(p)
                 verify(coverRepository, times(1)).save(any())
                 verify(fileService, times(1)).downloadPodcastCover(any())
             }
@@ -709,12 +697,10 @@ class PodcastServiceTest(
                 whenever(fileService.movePodcast(moveOperation)).thenReturn(Mono.empty())
 
                 /* When */
-                StepVerifier.create(service.update(pToUpdate))
-                        /* Then */
-                        .expectSubscription()
-                        .expectNext(pAfterUpdate)
-                        .verifyComplete()
+                val podcastAfterUpdate = service.update(pToUpdate)
 
+                /* Then */
+                assertThat(podcastAfterUpdate).isEqualTo(pAfterUpdate)
                 verify(tagRepository, never()).save(any())
                 verify(coverRepository, never()).save(any())
                 verify(fileService, never()).downloadPodcastCover(any())
@@ -740,11 +726,9 @@ class PodcastServiceTest(
             whenever(fileService.deletePodcast(information)).thenReturn(Mono.empty())
 
             /* When */
-            StepVerifier.create(service.deleteById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            service.deleteById(id)
 
+            /* Then */
             verify(fileService, times(1)).deletePodcast(information)
         }
 
@@ -755,11 +739,9 @@ class PodcastServiceTest(
             whenever(repository.deleteById(id)).thenReturn(Mono.empty())
 
             /* When */
-            StepVerifier.create(service.deleteById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            service.deleteById(id)
 
+            /* Then */
             verify(fileService, never()).deletePodcast(any())
         }
     }

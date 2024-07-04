@@ -6,94 +6,101 @@ import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.service.storage.MovePodcastRequest
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.davinkevin.podcastserver.tag.TagRepository
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toFlux
-import reactor.kotlin.core.publisher.toMono
-import reactor.kotlin.core.util.function.component1
-import reactor.kotlin.core.util.function.component2
 import java.util.*
 
 class PodcastService(
-        private val repository: PodcastRepository,
-        private val coverRepository: CoverRepository,
-        private val tagRepository: TagRepository,
-        private val fileService: FileStorageService
+    private val repository: PodcastRepository,
+    private val coverRepository: CoverRepository,
+    private val tagRepository: TagRepository,
+    private val fileService: FileStorageService
 ) {
 
-    fun findAll(): Flux<Podcast> = repository.findAll()
-    fun findById(id: UUID): Mono<Podcast> = repository.findById(id)
+    fun findAll(): List<Podcast> = repository.findAll().collectList().block()!!
+    fun findById(id: UUID): Podcast? = repository.findById(id).block()
 
-    fun findStatByPodcastIdAndPubDate(id: UUID, numberOfMonths: Int) = repository.findStatByPodcastIdAndPubDate(id, numberOfMonths)
-    fun findStatByPodcastIdAndDownloadDate(id: UUID, numberOfMonths: Int) = repository.findStatByPodcastIdAndDownloadDate(id, numberOfMonths)
-    fun findStatByPodcastIdAndCreationDate(id: UUID, numberOfMonths: Int) = repository.findStatByPodcastIdAndCreationDate(id, numberOfMonths)
+    fun findStatByPodcastIdAndPubDate(id: UUID, numberOfMonths: Int): List<NumberOfItemByDateWrapper> =
+        repository.findStatByPodcastIdAndPubDate(id, numberOfMonths).collectList().block()!!
+    fun findStatByPodcastIdAndDownloadDate(id: UUID, numberOfMonths: Int): List<NumberOfItemByDateWrapper> =
+        repository.findStatByPodcastIdAndDownloadDate(id, numberOfMonths).collectList().block()!!
+    fun findStatByPodcastIdAndCreationDate(id: UUID, numberOfMonths: Int): List<NumberOfItemByDateWrapper> =
+        repository.findStatByPodcastIdAndCreationDate(id, numberOfMonths).collectList().block()!!
 
-    fun findStatByTypeAndCreationDate(numberOfMonths: Int) = repository.findStatByTypeAndCreationDate(numberOfMonths)
-    fun findStatByTypeAndPubDate(numberOfMonths: Int) = repository.findStatByTypeAndPubDate(numberOfMonths)
-    fun findStatByTypeAndDownloadDate(numberOfMonths: Int) = repository.findStatByTypeAndDownloadDate(numberOfMonths)
+    fun findStatByTypeAndCreationDate(numberOfMonths: Int): List<StatsPodcastType> =
+        repository.findStatByTypeAndCreationDate(numberOfMonths).collectList().block()!!
+    fun findStatByTypeAndPubDate(numberOfMonths: Int): List<StatsPodcastType> =
+        repository.findStatByTypeAndPubDate(numberOfMonths).collectList().block()!!
+    fun findStatByTypeAndDownloadDate(numberOfMonths: Int): List<StatsPodcastType> =
+        repository.findStatByTypeAndDownloadDate(numberOfMonths).collectList().block()!!
 
-    fun save(p: PodcastForCreation): Mono<Podcast> {
+    fun save(p: PodcastForCreation): Podcast {
+        val oldTags = p.tags.filter { it.id != null }.map { Tag(it.id!!, it.name) }
+        val newTags = p.tags.filter { it.id == null }.map { tagRepository.save(it.name) }
 
-        val oldTags = p.tags.toFlux().filter { it.id != null }.map { Tag(it.id!!, it.name) }
-        val newTags = p.tags.toFlux().filter { it.id == null }.flatMap { Mono.defer { tagRepository.save(it.name).toMono() } }
+        val tags = oldTags + newTags
+        val cover = coverRepository.save(p.cover).block()!!
 
-        val tags = Flux.merge(oldTags, newTags).collectList()
-        val cover = coverRepository.save(p.cover)
+        val podcast = repository.save(
+            title = p.title,
+            url = p.url?.toASCIIString(),
+            hasToBeDeleted = p.hasToBeDeleted,
+            type = p.type,
+            tags = tags,
+            cover = cover
+        ).block()!!
 
-        return Mono.zip(tags, cover)
-                .flatMap { (t, c) ->  repository.save(
-                        title = p.title,
-                        url = p.url?.toASCIIString(),
-                        hasToBeDeleted = p.hasToBeDeleted,
-                        type = p.type,
-                        tags = t,
-                        cover = c)
-                }
-                .delayUntil { fileService.downloadPodcastCover(it) }
+        fileService.downloadPodcastCover(podcast).block()
+
+        return podcast
     }
 
-    fun update(updatePodcast: PodcastForUpdate): Mono<Podcast> = findById(updatePodcast.id).flatMap { p ->
+    fun update(updatePodcast: PodcastForUpdate): Podcast {
+        val p = findById(updatePodcast.id)
+            ?: error("Trying to upgrade a non existent podcast")
 
-        val oldTags = updatePodcast.tags.toFlux().filter { it.id != null }.map { Tag(it.id!!, it.name) }
-        val newTags = updatePodcast.tags.toFlux().filter { it.id == null }.flatMap { Mono.defer { tagRepository.save(it.name).toMono() } }
-        val tags = Flux.merge(oldTags, newTags).collectList()
+        val oldTags = updatePodcast.tags.filter { it.id != null }.map { Tag(it.id!!, it.name) }
+        val newTags = updatePodcast.tags.filter { it.id == null }.map { tagRepository.save(it.name) }
+        val tags = oldTags + newTags
 
         val newCover = updatePodcast.cover
         val oldCover = p.cover
-        val cover =
-                if (!newCover.url.toASCIIString().startsWith("/") && oldCover.url != newCover.url)
-                    coverRepository.save(newCover).delayUntil {
-                        fileService.downloadPodcastCover(p.copy(cover = Cover(it.id, it.url, it.height, it.width)))
-                    }
-                else Cover(oldCover.id, oldCover.url, oldCover.height, oldCover.width).toMono()
 
-        val title =
-                if (p.title != updatePodcast.title) {
-                    val movePodcastDetails = MovePodcastRequest(
-                            id = updatePodcast.id,
-                            from = p.title,
-                            to = updatePodcast.title
-                    )
-                    fileService.movePodcast(movePodcastDetails)
-                } else Mono.empty()
+        val isLocalCover = newCover.url.toASCIIString().startsWith("/")
+        val coversAreIdentical = oldCover.url != newCover.url
+        val cover = if (!isLocalCover && coversAreIdentical)
+            coverRepository.save(newCover).block()!!.also {
+                fileService
+                    .downloadPodcastCover(p.copy(cover = Cover(it.id, it.url, it.height, it.width)))
+                    .block()
+            }
+        else Cover(oldCover.id, oldCover.url, oldCover.height, oldCover.width)
 
-        Mono.zip(tags, cover)
-                .flatMap { (t, c) ->
-                    repository.update(
-                            id = updatePodcast.id,
-                            title = updatePodcast.title,
-                            url = updatePodcast.url?.toASCIIString(),
-                            hasToBeDeleted = updatePodcast.hasToBeDeleted,
-                            tags = t,
-                            cover = c)
-                }
-                .delayUntil { title }
+        val podcast = repository.update(
+            id = updatePodcast.id,
+            title = updatePodcast.title,
+            url = updatePodcast.url?.toASCIIString(),
+            hasToBeDeleted = updatePodcast.hasToBeDeleted,
+            tags = tags,
+            cover = cover
+        ).block()!!
+
+        val podcastTitleHasChanged = p.title != updatePodcast.title
+        if (podcastTitleHasChanged) {
+            val movePodcastDetails = MovePodcastRequest(
+                id = updatePodcast.id,
+                from = p.title,
+                to = updatePodcast.title
+            )
+            fileService.movePodcast(movePodcastDetails).block()
+        }
+
+        return podcast
     }
 
-    fun deleteById(id: UUID): Mono<Void> =
-            repository
-                    .deleteById(id)
-                    .delayUntil { fileService.deletePodcast(it) }
-                    .then()
+    fun deleteById(id: UUID) {
+        repository
+            .deleteById(id)
+            .delayUntil { fileService.deletePodcast(it) }
+            .block()
+    }
 }
 
