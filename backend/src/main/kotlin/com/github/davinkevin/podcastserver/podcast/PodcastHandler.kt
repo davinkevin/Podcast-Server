@@ -31,7 +31,8 @@ class PodcastHandler(
     fun findById(r: ServerRequest): ServerResponse {
         val id = r.pathVariable("id").let(UUID::fromString)
 
-        val podcast = podcastService.findById(id).block()!!
+        val podcast = podcastService.findById(id)
+            ?: return ServerResponse.notFound().build()
 
         val body = podcast.toHAL()
 
@@ -40,7 +41,6 @@ class PodcastHandler(
 
     fun findAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
         val podcasts = podcastService.findAll()
-            .collectList().block()!!
             .map(Podcast::toHAL)
 
         val body = FindAllPodcastHAL(podcasts)
@@ -52,7 +52,7 @@ class PodcastHandler(
         val creationRequest = r.body<PodcastCreationHAL>()
             .toPodcastCreation()
 
-        val podcast = podcastService.save(creationRequest).block()!!
+        val podcast = podcastService.save(creationRequest)
 
         return ServerResponse.ok().body(podcast.toHAL())
     }
@@ -61,7 +61,7 @@ class PodcastHandler(
         val updateRequest = r.body<PodcastUpdateHAL>()
             .toPodcastUpdate()
 
-        val podcast = podcastService.update(updateRequest).block()!!
+        val podcast = podcastService.update(updateRequest)
 
         return ServerResponse.ok().body(podcast.toHAL())
     }
@@ -69,7 +69,7 @@ class PodcastHandler(
     fun delete(r: ServerRequest): ServerResponse {
         val id = r.pathVariable("id").let(UUID::fromString)
 
-        podcastService.deleteById(id).block()
+        podcastService.deleteById(id)
 
         return ServerResponse.noContent().build()
     }
@@ -78,7 +78,8 @@ class PodcastHandler(
         val host = r.extractHost()
         val id = r.pathVariable("id").let(UUID::fromString)
 
-        val podcast = podcastService.findById(id).block()!!
+        val podcast = podcastService.findById(id)
+            ?: return ServerResponse.notFound().build()
 
         log.debug("the url of the podcast cover is {}", podcast.cover.url)
 
@@ -92,9 +93,9 @@ class PodcastHandler(
         return ServerResponse.seeOther(uri).build()
     }
 
-    fun findStatByPodcastIdAndPubDate(r: ServerRequest): ServerResponse = statsBy(r) { id, number -> podcastService.findStatByPodcastIdAndPubDate(id, number).collectList().block()!! }
-    fun findStatByPodcastIdAndDownloadDate(r: ServerRequest): ServerResponse = statsBy(r) { id, number -> podcastService.findStatByPodcastIdAndDownloadDate(id, number).collectList().block()!! }
-    fun findStatByPodcastIdAndCreationDate(r: ServerRequest): ServerResponse = statsBy(r) { id, number -> podcastService.findStatByPodcastIdAndCreationDate(id, number).collectList().block()!! }
+    fun findStatByPodcastIdAndPubDate(r: ServerRequest): ServerResponse = statsBy(r) { id, number -> podcastService.findStatByPodcastIdAndPubDate(id, number) }
+    fun findStatByPodcastIdAndDownloadDate(r: ServerRequest): ServerResponse = statsBy(r) { id, number -> podcastService.findStatByPodcastIdAndDownloadDate(id, number) }
+    fun findStatByPodcastIdAndCreationDate(r: ServerRequest): ServerResponse = statsBy(r) { id, number -> podcastService.findStatByPodcastIdAndCreationDate(id, number) }
 
     private fun statsBy(r: ServerRequest, proj: (id: UUID, n: Int) -> List<NumberOfItemByDateWrapper>): ServerResponse {
         val id = UUID.fromString(r.pathVariable("id"))
@@ -105,9 +106,9 @@ class PodcastHandler(
         return ServerResponse.ok().body(stats)
     }
 
-    fun findStatByTypeAndCreationDate(r: ServerRequest) = statsBy(r) { number -> podcastService.findStatByTypeAndCreationDate(number).collectList().block()!! }
-    fun findStatByTypeAndPubDate(r: ServerRequest) = statsBy(r) { number -> podcastService.findStatByTypeAndPubDate(number).collectList().block()!! }
-    fun findStatByTypeAndDownloadDate(r: ServerRequest) = statsBy(r) { number -> podcastService.findStatByTypeAndDownloadDate(number).collectList().block()!! }
+    fun findStatByTypeAndCreationDate(r: ServerRequest) = statsBy(r) { number -> podcastService.findStatByTypeAndCreationDate(number) }
+    fun findStatByTypeAndPubDate(r: ServerRequest) = statsBy(r) { number -> podcastService.findStatByTypeAndPubDate(number) }
+    fun findStatByTypeAndDownloadDate(r: ServerRequest) = statsBy(r) { number -> podcastService.findStatByTypeAndDownloadDate(number) }
     private fun statsBy(r: ServerRequest, proj: (n: Int) -> List<StatsPodcastType>): ServerResponse {
         val numberOfMonths = r.paramOrNull("numberOfMonths")?.toInt() ?: 1
 

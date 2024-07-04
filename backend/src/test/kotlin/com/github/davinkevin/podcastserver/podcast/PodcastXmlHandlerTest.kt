@@ -21,9 +21,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
-import reactor.core.publisher.Flux
-import reactor.kotlin.core.publisher.toFlux
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -116,7 +113,7 @@ class PodcastXmlHandlerTest(
         @Test
         fun `with no podcast`() {
             /* Given */
-            whenever(podcastService.findAll()).thenReturn(Flux.empty())
+            whenever(podcastService.findAll()).thenReturn(emptyList())
 
             /* When */
             rest
@@ -140,7 +137,7 @@ class PodcastXmlHandlerTest(
         @Test
         fun `with one podcast`() {
             /* Given */
-            whenever(podcastService.findAll()).thenReturn(listOf(podcast1).toFlux())
+            whenever(podcastService.findAll()).thenReturn(listOf(podcast1))
 
             /* When */
             rest
@@ -166,7 +163,7 @@ class PodcastXmlHandlerTest(
         @Test
         fun `with 3 podcasts`() {
             /* Given */
-            whenever(podcastService.findAll()).thenReturn(listOf(podcast1, podcast2, podcast3).toFlux())
+            whenever(podcastService.findAll()).thenReturn(listOf(podcast1, podcast2, podcast3))
 
             /* When */
             rest
@@ -197,7 +194,7 @@ class PodcastXmlHandlerTest(
 
             @BeforeEach
             fun beforeEach() {
-                whenever(podcastService.findAll()).thenReturn(listOf(podcast1).toFlux())
+                whenever(podcastService.findAll()).thenReturn(listOf(podcast1))
             }
 
             @Test
@@ -420,7 +417,7 @@ class PodcastXmlHandlerTest(
                 whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
                     .thenReturn(result)
                 whenever(podcastService.findById(podcastId))
-                    .thenReturn(podcast.toMono())
+                    .thenReturn(podcast)
 
                 val xml = fileAsString("/xml/podcast-with-50-items.xml")
 
@@ -445,7 +442,7 @@ class PodcastXmlHandlerTest(
                 whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
                     .thenReturn(result)
                 whenever(podcastService.findById(podcastId))
-                    .thenReturn(podcast.toMono())
+                    .thenReturn(podcast)
 
                 val xml = fileAsString("/xml/podcast-with-200-items.xml")
 
@@ -480,7 +477,7 @@ class PodcastXmlHandlerTest(
                 whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
                     .thenReturn(result)
                 whenever(podcastService.findById(podcastId))
-                    .thenReturn(podcast.toMono())
+                    .thenReturn(podcast)
 
                 val xml = xmlWith(numberOfItem)
 
@@ -505,7 +502,7 @@ class PodcastXmlHandlerTest(
 
             whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
                 .thenReturn(result)
-            whenever(podcastService.findById(podcastId)).thenReturn(podcast.toMono())
+            whenever(podcastService.findById(podcastId)).thenReturn(podcast)
 
             val xml = fileAsString("/xml/podcast-with-lots-of-parameters.xml")
 
@@ -530,7 +527,7 @@ class PodcastXmlHandlerTest(
             whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
                 .thenReturn(result)
             whenever(podcastService.findById(podcastId))
-                .thenReturn(podcast.toMono())
+                .thenReturn(podcast)
 
             val xml = fileAsString("/xml/podcast-with-x-forwarded-port.xml")
 
@@ -556,7 +553,7 @@ class PodcastXmlHandlerTest(
             whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
                 .thenReturn(result)
             whenever(podcastService.findById(podcastId))
-                .thenReturn(podcast.toMono())
+                .thenReturn(podcast)
 
             val xml = fileAsString("/xml/podcast-with-port-not-defined-and-http.xml")
 
@@ -581,7 +578,7 @@ class PodcastXmlHandlerTest(
             whenever(itemService.search(anyOrNull(), eq(listOf()), eq(listOf()), eq(page), eq(podcastId)))
                 .thenReturn(result)
             whenever(podcastService.findById(podcastId))
-                .thenReturn(podcast.toMono())
+                .thenReturn(podcast)
 
             val xml = fileAsString("/xml/podcast-with-port-not-defined-and-https.xml")
 

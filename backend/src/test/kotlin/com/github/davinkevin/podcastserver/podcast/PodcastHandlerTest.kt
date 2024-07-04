@@ -12,19 +12,15 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.any
+import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.error.ErrorWebFluxAutoConfiguration
-import org.springframework.boot.test.autoconfigure.web.reactive.WebFluxTest
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.LocalDate
@@ -68,7 +64,7 @@ class PodcastHandlerTest(
     @Test
     fun `should find by id`() {
         /* Given */
-        whenever(podcastService.findById(podcast.id)).thenReturn(podcast.toMono())
+        whenever(podcastService.findById(podcast.id)).thenReturn(podcast)
         /* When */
         rest
                 .get()
@@ -161,7 +157,7 @@ class PodcastHandlerTest(
         fun `with 3 podcasts`() {
             /* Given */
             val podcasts = listOf(podcast1, podcast2, podcast3)
-            whenever(podcastService.findAll()).thenReturn(podcasts.toFlux())
+            whenever(podcastService.findAll()).thenReturn(podcasts)
             /* When */
             rest
                     .get()
@@ -212,7 +208,7 @@ class PodcastHandlerTest(
         @Test
         fun `with no podcast`() {
             /* Given */
-            whenever(podcastService.findAll()).thenReturn(Flux.empty())
+            whenever(podcastService.findAll()).thenReturn(emptyList())
             /* When */
             rest
                     .get()
@@ -251,7 +247,7 @@ class PodcastHandlerTest(
         @Test
         fun `with standard information`() {
             /* Given */
-            whenever(podcastService.save(any())).thenReturn(p.toMono())
+            whenever(podcastService.save(any())).thenReturn(p)
             /* When */
             rest
                     .post()
@@ -321,7 +317,7 @@ class PodcastHandlerTest(
                     tags = listOf(),
                     cover = Cover(UUID.fromString("d6d4033a-d499-4c09-8d3e-d74595ae0993"), URI("http://foo.bar.com/cover.png"), 1200, 600)
             )
-            whenever(podcastService.save(any())).thenReturn(uploadPodcast.toMono())
+            whenever(podcastService.save(any())).thenReturn(uploadPodcast)
 
             /* When */
             rest
@@ -374,7 +370,7 @@ class PodcastHandlerTest(
                 tags = listOf(),
                 cover = Cover(UUID.fromString("d6d4033a-d499-4c09-8d3e-d74595ae0993"), URI("http://foo.bar.com/cover.png"), 1200, 600)
             )
-            whenever(podcastService.save(any())).thenReturn(uploadPodcast.toMono())
+            whenever(podcastService.save(any())).thenReturn(uploadPodcast)
 
             /* When */
             rest
@@ -442,7 +438,7 @@ class PodcastHandlerTest(
         @Test
         fun `a podcast`() {
             /* Given */
-            whenever(podcastService.update(any())).thenReturn(p.toMono())
+            whenever(podcastService.update(any())).thenReturn(p)
             /* When */
             rest
                     .put()
@@ -502,7 +498,7 @@ class PodcastHandlerTest(
         @Test
         fun `a podcast without URL`() {
             /* Given */
-            whenever(podcastService.update(any())).thenReturn(p.toMono())
+            whenever(podcastService.update(any())).thenReturn(p)
             /* When */
             rest
                     .put()
@@ -563,7 +559,7 @@ class PodcastHandlerTest(
         fun `a podcast without tags`() {
             /* Given */
             val podcastWithoutTags = p.copy(tags = emptyList())
-            whenever(podcastService.update(any())).thenReturn(podcastWithoutTags.toMono())
+            whenever(podcastService.update(any())).thenReturn(podcastWithoutTags)
             /* When */
             rest
                     .put()
@@ -613,7 +609,7 @@ class PodcastHandlerTest(
         fun `a podcast by id`() {
             /* Given */
             val id = UUID.randomUUID()
-            whenever(podcastService.deleteById(id)).thenReturn(Mono.empty())
+            doNothing().whenever(podcastService).deleteById(id)
             /* When */
             rest
                     .delete()
@@ -633,7 +629,7 @@ class PodcastHandlerTest(
         fun `by redirecting to local file server if cover exists locally`() {
             /* Given */
             val host = URI.create("https://localhost:8080/")
-            whenever(podcastService.findById(podcast.id)).thenReturn(podcast.toMono())
+            whenever(podcastService.findById(podcast.id)).thenReturn(podcast)
             whenever(fileService.coverExists(podcast)).thenReturn(
                 Path(podcast.cover.url.toASCIIString().substringAfterLast("/")).toMono()
             )
@@ -653,7 +649,7 @@ class PodcastHandlerTest(
         @Test
         fun `by redirecting to external file if cover does not exist locally`() {
             /* Given */
-            whenever(podcastService.findById(podcast.id)).thenReturn(podcast.toMono())
+            whenever(podcastService.findById(podcast.id)).thenReturn(podcast)
             whenever(fileService.coverExists(podcast)).thenReturn(Mono.empty())
 
             /* When */
@@ -694,7 +690,7 @@ class PodcastHandlerTest(
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-02-12"), 8),
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-02-28"), 1))
                     )
-                    whenever(podcastService.findStatByTypeAndCreationDate(1)).thenReturn(Flux.just(youtube, rss))
+                    whenever(podcastService.findStatByTypeAndCreationDate(1)).thenReturn(listOf(youtube, rss))
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/stats/byCreationDate").build() }
@@ -732,7 +728,7 @@ class PodcastHandlerTest(
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-02-12"), 8),
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-02-28"), 1))
                     )
-                    whenever(podcastService.findStatByTypeAndCreationDate(3)).thenReturn(Flux.just(youtube, rss))
+                    whenever(podcastService.findStatByTypeAndCreationDate(3)).thenReturn(listOf(youtube, rss))
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/stats/byCreationDate")
@@ -763,7 +759,7 @@ class PodcastHandlerTest(
                 @Test
                 fun `with no data`() {
                     /* Given */
-                    whenever(podcastService.findStatByTypeAndCreationDate(3)).thenReturn(Flux.empty())
+                    whenever(podcastService.findStatByTypeAndCreationDate(3)).thenReturn(emptyList())
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/stats/byCreationDate")
@@ -795,7 +791,7 @@ class PodcastHandlerTest(
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-02-12"), 8),
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-02-28"), 1))
                     )
-                    whenever(podcastService.findStatByTypeAndPubDate(1)).thenReturn(Flux.just(youtube, rss))
+                    whenever(podcastService.findStatByTypeAndPubDate(1)).thenReturn(listOf(youtube, rss))
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/stats/byPubDate").build() }
@@ -833,7 +829,7 @@ class PodcastHandlerTest(
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-02-12"), 8),
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-02-28"), 1))
                     )
-                    whenever(podcastService.findStatByTypeAndPubDate(3)).thenReturn(Flux.just(youtube, rss))
+                    whenever(podcastService.findStatByTypeAndPubDate(3)).thenReturn(listOf(youtube, rss))
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/stats/byPubDate")
@@ -864,7 +860,7 @@ class PodcastHandlerTest(
                 @Test
                 fun `with no data`() {
                     /* Given */
-                    whenever(podcastService.findStatByTypeAndPubDate(3)).thenReturn(Flux.empty())
+                    whenever(podcastService.findStatByTypeAndPubDate(3)).thenReturn(emptyList())
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/stats/byPubDate")
@@ -896,7 +892,7 @@ class PodcastHandlerTest(
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-02-12"), 8),
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-02-28"), 1))
                     )
-                    whenever(podcastService.findStatByTypeAndDownloadDate(1)).thenReturn(Flux.just(youtube, rss))
+                    whenever(podcastService.findStatByTypeAndDownloadDate(1)).thenReturn(listOf(youtube, rss))
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/stats/byDownloadDate").build() }
@@ -934,7 +930,7 @@ class PodcastHandlerTest(
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-02-12"), 8),
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-02-28"), 1))
                     )
-                    whenever(podcastService.findStatByTypeAndDownloadDate(3)).thenReturn(Flux.just(youtube, rss))
+                    whenever(podcastService.findStatByTypeAndDownloadDate(3)).thenReturn(listOf(youtube, rss))
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/stats/byDownloadDate")
@@ -965,7 +961,7 @@ class PodcastHandlerTest(
                 @Test
                 fun `with no data`() {
                     /* Given */
-                    whenever(podcastService.findStatByTypeAndDownloadDate(3)).thenReturn(Flux.empty())
+                    whenever(podcastService.findStatByTypeAndDownloadDate(3)).thenReturn(emptyList())
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/stats/byDownloadDate")
@@ -999,7 +995,7 @@ class PodcastHandlerTest(
                         NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
                         NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
                     )
-                    whenever(podcastService.findStatByPodcastIdAndPubDate(podcast.id, 1)).thenReturn(r.toFlux())
+                    whenever(podcastService.findStatByPodcastIdAndPubDate(podcast.id, 1)).thenReturn(r)
                     /* When */
                     rest.get()
                         .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byPubDate").build() }
@@ -1022,7 +1018,7 @@ class PodcastHandlerTest(
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
                     )
-                    whenever(podcastService.findStatByPodcastIdAndPubDate(podcast.id, 3)).thenReturn(r.toFlux())
+                    whenever(podcastService.findStatByPodcastIdAndPubDate(podcast.id, 3)).thenReturn(r)
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byPubDate")
@@ -1043,7 +1039,7 @@ class PodcastHandlerTest(
                 @Test
                 fun `with no data`() {
                     /* Given */
-                    whenever(podcastService.findStatByPodcastIdAndPubDate(podcast.id, 3)).thenReturn(Flux.empty())
+                    whenever(podcastService.findStatByPodcastIdAndPubDate(podcast.id, 3)).thenReturn(emptyList())
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byPubDate")
@@ -1070,7 +1066,7 @@ class PodcastHandlerTest(
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
                     )
-                    whenever(podcastService.findStatByPodcastIdAndDownloadDate(podcast.id, 1)).thenReturn(r.toFlux())
+                    whenever(podcastService.findStatByPodcastIdAndDownloadDate(podcast.id, 1)).thenReturn(r)
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byDownloadDate").build() }
@@ -1093,7 +1089,7 @@ class PodcastHandlerTest(
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
                     )
-                    whenever(podcastService.findStatByPodcastIdAndDownloadDate(podcast.id, 3)).thenReturn(r.toFlux())
+                    whenever(podcastService.findStatByPodcastIdAndDownloadDate(podcast.id, 3)).thenReturn(r)
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byDownloadDate")
@@ -1114,7 +1110,7 @@ class PodcastHandlerTest(
                 @Test
                 fun `with no data`() {
                     /* Given */
-                    whenever(podcastService.findStatByPodcastIdAndDownloadDate(podcast.id, 3)).thenReturn(Flux.empty())
+                    whenever(podcastService.findStatByPodcastIdAndDownloadDate(podcast.id, 3)).thenReturn(emptyList())
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byDownloadDate")
@@ -1141,7 +1137,7 @@ class PodcastHandlerTest(
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
                     )
-                    whenever(podcastService.findStatByPodcastIdAndCreationDate(podcast.id, 1)).thenReturn(r.toFlux())
+                    whenever(podcastService.findStatByPodcastIdAndCreationDate(podcast.id, 1)).thenReturn(r)
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byCreationDate").build() }
@@ -1164,7 +1160,7 @@ class PodcastHandlerTest(
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-01-12"), 2),
                             NumberOfItemByDateWrapper(LocalDate.parse("2019-01-28"), 6)
                     )
-                    whenever(podcastService.findStatByPodcastIdAndCreationDate(podcast.id, 3)).thenReturn(r.toFlux())
+                    whenever(podcastService.findStatByPodcastIdAndCreationDate(podcast.id, 3)).thenReturn(r)
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byCreationDate")
@@ -1185,7 +1181,7 @@ class PodcastHandlerTest(
                 @Test
                 fun `with no data`() {
                     /* Given */
-                    whenever(podcastService.findStatByPodcastIdAndCreationDate(podcast.id, 3)).thenReturn(Flux.empty())
+                    whenever(podcastService.findStatByPodcastIdAndCreationDate(podcast.id, 3)).thenReturn(emptyList())
                     /* When */
                     rest.get()
                             .uri { it.path("/api/v1/podcasts/${podcast.id}/stats/byCreationDate")

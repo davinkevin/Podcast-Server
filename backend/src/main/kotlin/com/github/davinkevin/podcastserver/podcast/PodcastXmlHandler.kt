@@ -30,7 +30,7 @@ class PodcastXmlHandler(
     fun opml(r: ServerRequest): ServerResponse {
         val host = r.extractHost()
 
-        val podcasts = podcastService.findAll().collectList().block()!!
+        val podcasts = podcastService.findAll()
 
         val outlines = podcasts
             .map { OpmlOutline(OpmlOutline.Podcast(it.id, it.title, it.description), host) }
@@ -59,7 +59,8 @@ class PodcastXmlHandler(
             page = itemPageable,
             podcastId = podcastId
         )
-        val podcast = podcastService.findById(podcastId).block()!!
+        val podcast = podcastService.findById(podcastId)
+            ?: return ServerResponse.notFound().build()
 
         val items = page.content.map { it.toRssItem(host) }
         val rss = podcast.toRssChannel(callUrl)
