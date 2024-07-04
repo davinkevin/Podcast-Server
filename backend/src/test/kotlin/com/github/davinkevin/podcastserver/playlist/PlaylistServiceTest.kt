@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import org.assertj.core.api.Assertions.assertThat
 import org.mockito.kotlin.whenever
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -34,29 +35,32 @@ class PlaylistServiceTest(
         fun `with no watch list`() {
             /* Given */
             whenever(repository.findAll()).thenReturn(Flux.empty())
+
             /* When */
-            StepVerifier.create(service.findAll())
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            val items = service.findAll()
+
+            /* Then */
+            assertThat(items).isEmpty()
         }
 
         @Test
         fun `with watch lists in results`() {
             /* Given */
             whenever(repository.findAll()).thenReturn(Flux.just(
-                    Playlist(UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"), "first"),
-                    Playlist(UUID.fromString("6e15b195-7a1f-43e8-bc06-bf88b7f865f8"), "second"),
-                    Playlist(UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"), "third")
+                Playlist(UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"), "first"),
+                Playlist(UUID.fromString("6e15b195-7a1f-43e8-bc06-bf88b7f865f8"), "second"),
+                Playlist(UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"), "third")
             ))
+
             /* When */
-            StepVerifier.create(service.findAll())
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(Playlist(UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"), "first"))
-                    .expectNext(Playlist(UUID.fromString("6e15b195-7a1f-43e8-bc06-bf88b7f865f8"), "second"))
-                    .expectNext(Playlist(UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"), "third"))
-                    .verifyComplete()
+            val items = service.findAll()
+
+            /* Then */
+            assertThat(items).containsExactly(
+                Playlist(UUID.fromString("05621536-b211-4736-a1ed-94d7ad494fe0"), "first"),
+                Playlist(UUID.fromString("6e15b195-7a1f-43e8-bc06-bf88b7f865f8"), "second"),
+                Playlist(UUID.fromString("37d09949-6ae0-4b8b-8cc9-79ffd541e51b"), "third"),
+            )
         }
     }
 
@@ -69,11 +73,12 @@ class PlaylistServiceTest(
             /* Given */
             val id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
             whenever(repository.findById(id)).thenReturn(Mono.empty())
+
             /* When */
-            StepVerifier.create(service.findById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+            val playlist = service.findById(id)
+
+            /* Then */
+            assertThat(playlist).isNull()
         }
 
         @Test
@@ -84,11 +89,10 @@ class PlaylistServiceTest(
             whenever(repository.findById(id)).thenReturn(playlist.toMono())
 
             /* When */
-            StepVerifier.create(service.findById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(playlist)
-                    .verifyComplete()
+            val foundPlaylist = service.findById(id)
+
+            /* Then */
+            assertThat(foundPlaylist).isSameAs(playlist)
         }
     }
 
@@ -105,10 +109,10 @@ class PlaylistServiceTest(
 
             /* When */
             StepVerifier.create(repository.save("foo"))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(playlist)
-                    .verifyComplete()
+                /* Then */
+                .expectSubscription()
+                .expectNext(playlist)
+                .verifyComplete()
         }
 
     }
@@ -124,12 +128,12 @@ class PlaylistServiceTest(
             val itemId = UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
             val playlist = PlaylistWithItems(id = playlistId, name = "foo", items = emptyList())
             whenever(repository.addToPlaylist(playlistId, itemId)).thenReturn(playlist.toMono())
+
             /* When */
-            StepVerifier.create(service.addToPlaylist(playlistId, itemId))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(playlist)
-                    .verifyComplete()
+            val p = service.addToPlaylist(playlistId, itemId)
+
+            /* Then */
+            assertThat(playlist).isSameAs(p)
         }
 
     }
@@ -145,12 +149,12 @@ class PlaylistServiceTest(
             val itemId = UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
             val playlist = PlaylistWithItems(id = playlistId, name = "foo", items = emptyList())
             whenever(repository.removeFromPlaylist(playlistId, itemId)).thenReturn(playlist.toMono())
+
             /* When */
-            StepVerifier.create(service.addToPlaylist(playlistId, itemId))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNext(playlist)
-                    .verifyComplete()
+            val p = service.removeFromPlaylist(playlistId, itemId)
+
+            /* Then */
+            assertThat(playlist).isEqualTo(p)
         }
 
     }
@@ -165,9 +169,9 @@ class PlaylistServiceTest(
             whenever(repository.deleteById(id)).thenReturn(Mono.empty())
             /* When */
             StepVerifier.create(repository.deleteById(id))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                /* Then */
+                .expectSubscription()
+                .verifyComplete()
         }
     }
 }
