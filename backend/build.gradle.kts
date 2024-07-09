@@ -76,7 +76,7 @@ dependencies {
 
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
-	testImplementation("org.mockito.kotlin:mockito-kotlin:5.3.1")
+	testImplementation("org.mockito.kotlin:mockito-kotlin:5.4.0")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:3.4.0")
 	testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:3.0.1")
 }
