@@ -29,8 +29,6 @@ import org.springframework.context.annotation.Import
 import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toFlux
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.*
 import java.util.*
@@ -117,7 +115,7 @@ class UpdateServiceTest(
             val p = podcast.copy(
                 url = null
             )
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(p.toMono())
+            whenever(podcastRepository.findById(podcast.id)).thenReturn(p)
 
             /* When */
             service.update(p.id)
@@ -143,7 +141,7 @@ class UpdateServiceTest(
         @Test
         fun `on a podcast without any item to force signature reset`() {
             /* Given */
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast.toMono())
+            whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast)
             val fakeUpdater = mock<FakeUpdater> {
                 on { signatureOf(any()) } doReturn "another-signature"
                 on { findItems(any()) } doReturn emptyList()
@@ -151,7 +149,7 @@ class UpdateServiceTest(
             }
             val uri = URI(podcast.url!!)
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
-            whenever(podcastRepository.updateSignature(eq(podcast.id), any())).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateSignature(eq(podcast.id), any())
 
             /* When */
             service.update(podcast.id)
@@ -185,7 +183,7 @@ class UpdateServiceTest(
         @Test
         fun `on a podcast with 2 new items`() {
             /* Given */
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast.toMono())
+            whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast)
             val uri = URI(podcast.url!!)
             val fakeUpdater = mock<FakeUpdater> {
                 on { signatureOf(any()) } doReturn "another-signature"
@@ -193,13 +191,13 @@ class UpdateServiceTest(
                 on { update(any()) }.thenCallRealMethod()
             }
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
-            whenever(podcastRepository.updateSignature(eq(podcast.id), any())).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateSignature(eq(podcast.id), any())
             whenever(itemRepository.create(any<List<ItemForCreation>>())).then { args ->
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast) }
             }
             whenever(fileService.downloadItemCover(any())).thenReturn(Mono.empty())
-            whenever(podcastRepository.updateLastUpdate(eq(podcast.id))).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateLastUpdate(eq(podcast.id))
 
             /* When */
             service.update(podcast.id)
@@ -238,7 +236,7 @@ class UpdateServiceTest(
         @Test
         fun `on a podcast with 1 new item but with a problematic cover`() {
             /* Given */
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast.toMono())
+            whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast)
             val uri = URI(podcast.url!!)
             val fakeUpdater = mock<FakeUpdater> {
                 on { signatureOf(any()) } doReturn "another-signature"
@@ -246,13 +244,13 @@ class UpdateServiceTest(
                 on { update(any()) }.thenCallRealMethod()
             }
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
-            whenever(podcastRepository.updateSignature(eq(podcast.id), any())).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateSignature(eq(podcast.id), any())
             whenever(itemRepository.create(any<List<ItemForCreation>>())).then { args ->
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast) }
             }
             whenever(fileService.downloadItemCover(any())).thenReturn(Mono.error(RuntimeException("error during cover download")))
-            whenever(podcastRepository.updateLastUpdate(eq(podcast.id))).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateLastUpdate(eq(podcast.id))
 
             /* When */
             service.update(podcast.id)
@@ -291,7 +289,7 @@ class UpdateServiceTest(
         @Test
         fun `on a podcast with 1 already existing item `() {
             /* Given */
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast.toMono())
+            whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast)
             val uri = URI(podcast.url!!)
             val fakeUpdater = mock<FakeUpdater> {
                 on { signatureOf(any()) } doReturn "another-signature"
@@ -299,7 +297,7 @@ class UpdateServiceTest(
                 on { update(any()) }.thenCallRealMethod()
             }
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
-            whenever(podcastRepository.updateSignature(eq(podcast.id), any())).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateSignature(eq(podcast.id), any())
             whenever(itemRepository.create(any<List<ItemForCreation>>())).thenReturn(emptyList())
 
             /* When */
@@ -339,7 +337,7 @@ class UpdateServiceTest(
         fun `on a podcast with an updater returning no data after the update`() {
             /* Given */
             val p = podcast.copy(signature = "a specific signature")
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(p.toMono())
+            whenever(podcastRepository.findById(podcast.id)).thenReturn(p)
             val uri = URI(p.url!!)
             val fakeUpdater = mock<FakeUpdater> {
                 on { signatureOf(any()) }.then { error("error during signature check") }
@@ -362,9 +360,7 @@ class UpdateServiceTest(
                     verify().signatureOf(any())
                     return@inOrder ""
                 }
-                podcastRepository.inOrder {
-                    verify().findById(p.id)
-                }
+                verify(podcastRepository).findById(p.id)
                 verify(updaters).of(uri)
                 verifyNoMoreInteractions(
                     podcastRepository,
@@ -445,7 +441,7 @@ class UpdateServiceTest(
         @Test
         fun `with a result with 2 items for the only podcast able to be updated`() {
             /* Given */
-            whenever(podcastRepository.findAll()).thenReturn(listOf(podcast1, podcast2).toFlux())
+            whenever(podcastRepository.findAll()).thenReturn(listOf(podcast1, podcast2))
             val fakeUpdater = mock<FakeUpdater> {
                 on { signatureOf(any()) } doReturn "another-signature"
                 on { findItems(any()) } doReturn items
@@ -453,13 +449,13 @@ class UpdateServiceTest(
             }
             val uri = URI(podcast1.url!!)
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
-            whenever(podcastRepository.updateSignature(eq(podcast1.id), any())).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateSignature(eq(podcast1.id), any())
             whenever(itemRepository.create(any<List<ItemForCreation>>())).then { args ->
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast1) }
             }
             whenever(fileService.downloadItemCover(any())).thenReturn(Mono.empty())
-            whenever(podcastRepository.updateLastUpdate(podcast1.id)).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateLastUpdate(podcast1.id)
 
             /* When */
             service.updateAll(force = false, download = false)
@@ -498,7 +494,7 @@ class UpdateServiceTest(
         @Test
         fun `with a result with 2 items and download mode activated`() {
             /* Given */
-            whenever(podcastRepository.findAll()).thenReturn(listOf(podcast1, podcast2).toFlux())
+            whenever(podcastRepository.findAll()).thenReturn(listOf(podcast1, podcast2))
             val fakeUpdater = mock<FakeUpdater> {
                 on { signatureOf(any()) } doReturn "another-signature"
                 on { findItems(any()) } doReturn items
@@ -506,13 +502,13 @@ class UpdateServiceTest(
             }
             val uri = URI(podcast1.url!!)
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
-            whenever(podcastRepository.updateSignature(eq(podcast1.id), any())).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateSignature(eq(podcast1.id), any())
             whenever(itemRepository.create(any<List<ItemForCreation>>())).then { args ->
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast1) }
             }
             whenever(fileService.downloadItemCover(any())).thenReturn(Mono.empty())
-            whenever(podcastRepository.updateLastUpdate(podcast1.id)).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateLastUpdate(podcast1.id)
             whenever(idm.launchDownload()).thenReturn(Mono.empty())
 
             /* When */
@@ -553,7 +549,7 @@ class UpdateServiceTest(
         @Test
         fun `with a result with 2 items and force mode activated`() {
             /* Given */
-            whenever(podcastRepository.findAll()).thenReturn(listOf(podcast1, podcast2).toFlux())
+            whenever(podcastRepository.findAll()).thenReturn(listOf(podcast1, podcast2))
             val fakeUpdater = mock<FakeUpdater> {
                 on { signatureOf(any()) } doReturn "another-signature"
                 on { findItems(any()) } doReturn items
@@ -561,13 +557,13 @@ class UpdateServiceTest(
             }
             val uri = URI(podcast1.url!!)
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
-            whenever(podcastRepository.updateSignature(eq(podcast1.id), any())).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateSignature(eq(podcast1.id), any())
             whenever(itemRepository.create(any<List<ItemForCreation>>())).then { args ->
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast1) }
             }
             whenever(fileService.downloadItemCover(any())).thenReturn(Mono.empty())
-            whenever(podcastRepository.updateLastUpdate(podcast1.id)).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateLastUpdate(podcast1.id)
 
             /* When */
             service.updateAll(force = true, download = false)
@@ -604,10 +600,10 @@ class UpdateServiceTest(
         }
 
         @Test
-        fun `with a podacst with a signature null due to previous error`() {
+        fun `with a podcast with a signature null due to previous error`() {
             /* Given */
             val p = podcast1.copy(signature = null)
-            whenever(podcastRepository.findAll()).thenReturn(listOf(p).toFlux())
+            whenever(podcastRepository.findAll()).thenReturn(listOf(p))
             val fakeUpdater = mock<FakeUpdater> {
                 on { signatureOf(any()) } doReturn "another-signature"
                 on { findItems(any()) } doReturn items
@@ -615,13 +611,13 @@ class UpdateServiceTest(
             }
             val uri = URI(p.url!!)
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
-            whenever(podcastRepository.updateSignature(eq(p.id), any())).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateSignature(eq(p.id), any())
             whenever(itemRepository.create(any<List<ItemForCreation>>())).then { args ->
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(p) }
             }
             whenever(fileService.downloadItemCover(any())).thenReturn(Mono.empty())
-            whenever(podcastRepository.updateLastUpdate(p.id)).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateLastUpdate(p.id)
 
             /* When */
             service.updateAll(force = false, download = false)

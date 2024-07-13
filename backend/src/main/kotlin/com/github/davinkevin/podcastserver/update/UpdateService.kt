@@ -43,8 +43,6 @@ class UpdateService(
             liveUpdate.isUpdating(true)
 
             val allRequests = podcastRepository.findAll()
-                .collectList()
-                .block()!!
                 .filter { it.url != null }
                 .map {
                     val signature = when {
@@ -77,7 +75,7 @@ class UpdateService(
     fun update(podcastId: UUID) = updateExecutor.execute {
         liveUpdate.isUpdating(true)
 
-        val podcast = podcastRepository.findById(podcastId).block()!!
+        val podcast = podcastRepository.findById(podcastId)!!
         if (podcast.url == null) {
             liveUpdate.isUpdating(false)
             return@execute
@@ -102,7 +100,7 @@ class UpdateService(
         signature: String,
     ) {
         val realSignature = if (items.isEmpty()) "" else signature
-        podcastRepository.updateSignature(podcast.id, realSignature).block()
+        podcastRepository.updateSignature(podcast.id, realSignature)
 
         if (items.isEmpty()) {
             return
@@ -123,7 +121,7 @@ class UpdateService(
                 .block()
         }
 
-        podcastRepository.updateLastUpdate(podcast.id).block()
+        podcastRepository.updateLastUpdate(podcast.id)
     }
 }
 

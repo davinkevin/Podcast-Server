@@ -16,9 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Flux
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toFlux
 import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.LocalDate
@@ -61,7 +59,7 @@ class PodcastServiceTest(
     @Test
     fun `should find by id`() {
         /* Given */
-        whenever(repository.findById(podcast.id)).thenReturn(podcast.toMono())
+        whenever(repository.findById(podcast.id)).thenReturn(podcast)
 
         /* When */
         val p = service.findById(podcast.id)
@@ -130,7 +128,7 @@ class PodcastServiceTest(
         fun `with 3 podcasts`() {
             /* Given */
             val podcasts = listOf(podcast1, podcast2, podcast3)
-            whenever(repository.findAll()).thenReturn(podcasts.toFlux())
+            whenever(repository.findAll()).thenReturn(podcasts)
 
             /* When */
             val p = service.findAll()
@@ -142,7 +140,7 @@ class PodcastServiceTest(
         @Test
         fun `with 0 podcast`() {
             /* Given */
-            whenever(repository.findAll()).thenReturn(Flux.empty())
+            whenever(repository.findAll()).thenReturn(emptyList())
 
             /* When */
             val p = service.findAll()
@@ -170,7 +168,7 @@ class PodcastServiceTest(
             @Test
             fun `by pubDate`() {
                 /* Given */
-                whenever(repository.findStatByPodcastIdAndPubDate(podcast.id, 3)).thenReturn(r.toFlux())
+                whenever(repository.findStatByPodcastIdAndPubDate(podcast.id, 3)).thenReturn(r)
 
                 /* When */
                 val stats = service.findStatByPodcastIdAndPubDate(podcast.id, 3)
@@ -182,7 +180,7 @@ class PodcastServiceTest(
             @Test
             fun `by downloadDate`() {
                 /* Given */
-                whenever(repository.findStatByPodcastIdAndDownloadDate(podcast.id, 3)).thenReturn(r.toFlux())
+                whenever(repository.findStatByPodcastIdAndDownloadDate(podcast.id, 3)).thenReturn(r)
 
                 /* When */
                 val stats = service.findStatByPodcastIdAndDownloadDate(podcast.id, 3)
@@ -194,7 +192,7 @@ class PodcastServiceTest(
             @Test
             fun `by creationDate`() {
                 /* Given */
-                whenever(repository.findStatByPodcastIdAndCreationDate(podcast.id, 3)).thenReturn(r.toFlux())
+                whenever(repository.findStatByPodcastIdAndCreationDate(podcast.id, 3)).thenReturn(r)
 
                 /* When */
                 val stats = service.findStatByPodcastIdAndCreationDate(podcast.id, 3)
@@ -220,7 +218,7 @@ class PodcastServiceTest(
             @Test
             fun `by pubDate`() {
                 /* Given */
-                whenever(repository.findStatByTypeAndPubDate(3)).thenReturn(Flux.just(youtube, rss))
+                whenever(repository.findStatByTypeAndPubDate(3)).thenReturn(listOf(youtube, rss))
 
                 /* When */
                 val stats = service.findStatByTypeAndPubDate(3)
@@ -235,7 +233,7 @@ class PodcastServiceTest(
             @Test
             fun `by downloadDate`() {
                 /* Given */
-                whenever(repository.findStatByTypeAndDownloadDate(3)).thenReturn(Flux.just(youtube, rss))
+                whenever(repository.findStatByTypeAndDownloadDate(3)).thenReturn(listOf(youtube, rss))
 
                 /* When */
                 val stats = service.findStatByTypeAndDownloadDate(3)
@@ -250,7 +248,7 @@ class PodcastServiceTest(
             @Test
             fun `by creationDate`() {
                 /* Given */
-                whenever(repository.findStatByTypeAndCreationDate(3)).thenReturn(Flux.just(youtube, rss))
+                whenever(repository.findStatByTypeAndCreationDate(3)).thenReturn(listOf(youtube, rss))
 
                 /* When */
                 val stats = service.findStatByTypeAndCreationDate(3)
@@ -308,7 +306,7 @@ class PodcastServiceTest(
                 val savedCover = pBeforeUpdate.cover.toCover()
                 whenever(coverRepository.save(pBeforeUpdate.cover)).thenReturn(savedCover.toMono())
                 whenever(repository.save(eq(pBeforeUpdate.title), eq(pBeforeUpdate.url!!.toASCIIString()), eq(pBeforeUpdate.hasToBeDeleted), eq(pBeforeUpdate.type), argThat { isEmpty() }, eq(savedCover)))
-                        .thenReturn(podcast.toMono())
+                        .thenReturn(podcast)
 
                 /* When */
                 val savedPodcast = service.save(pBeforeUpdate)
@@ -337,7 +335,7 @@ class PodcastServiceTest(
                         argThat { map { it.id }.containsAll(tags.map { it.id }) && size == 2 },
                         eq(savedCover)
                 ))
-                        .thenReturn(podcast.toMono())
+                        .thenReturn(podcast)
 
                 /* When */
                 val savedPodcast = service.save(p)
@@ -368,7 +366,7 @@ class PodcastServiceTest(
                         argThat { map { it.id }.containsAll(listOf(newTagId, oldTagId)) && size == 2 },
                         eq(savedCover)
                 ))
-                        .thenReturn(podcast.toMono())
+                        .thenReturn(podcast)
 
                 /* When */
                 val savedPodcast = service.save(p)
@@ -406,7 +404,7 @@ class PodcastServiceTest(
         fun `with same data`() {
             /* Given */
             val p = podcast
-            whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+            whenever(repository.findById(p.id)).thenReturn(podcast)
             whenever(repository.update(
                     id = eq(p.id),
                     title = eq(p.title),
@@ -418,7 +416,7 @@ class PodcastServiceTest(
                                 url == URI("https://external.domain.tld/cover.png") &&
                                 height == 200 && width == 200
                     }
-            )).thenReturn(p.toMono())
+            )).thenReturn(p)
 
             /* When */
             val podcastAfterUpdate = service.update(podcastForUpdate)
@@ -449,7 +447,7 @@ class PodcastServiceTest(
                 val p = podcast.copy(tags = setOf(newTagsInDb))
 
                 whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb)
-                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(repository.findById(p.id)).thenReturn(podcast)
                 whenever(repository.update(
                         id = eq(p.id),
                         title = eq(p.title),
@@ -461,7 +459,7 @@ class PodcastServiceTest(
                                     url == URI("https://external.domain.tld/cover.png") &&
                                     height == 200 && width == 200
                         }
-                )).thenReturn(p.toMono())
+                )).thenReturn(p)
 
                 /* When */
                 val podcastAfterUpdate = service.update(pToUpdate)
@@ -478,7 +476,7 @@ class PodcastServiceTest(
                 val p = podcast.copy(tags = setOf(newTagsInDb, oldTagInDb))
 
                 whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb)
-                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(repository.findById(p.id)).thenReturn(podcast)
                 whenever(repository.update(
                         id = eq(p.id),
                         title = eq(p.title),
@@ -486,7 +484,7 @@ class PodcastServiceTest(
                         hasToBeDeleted = eq(p.hasToBeDeleted),
                         tags = argThat { containsAll(listOf(newTagsInDb, oldTagInDb)) && size == 2 },
                         cover = any()
-                )).thenReturn(p.toMono())
+                )).thenReturn(p)
 
                 /* When */
                 val podcastAfterUpdate = service.update(pToUpdate)
@@ -503,7 +501,7 @@ class PodcastServiceTest(
                 val p = podcast.copy(tags = setOf(oldTagInDb))
 
                 whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb)
-                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(repository.findById(p.id)).thenReturn(podcast)
                 whenever(repository.update(
                         id = eq(p.id),
                         title = eq(p.title),
@@ -511,7 +509,7 @@ class PodcastServiceTest(
                         hasToBeDeleted = eq(p.hasToBeDeleted),
                         tags = argThat { containsAll(listOf(oldTagInDb)) && size == 1 },
                         cover = any()
-                )).thenReturn(p.toMono())
+                )).thenReturn(p)
 
                 /* When */
                 val podcastAfterUpdate = service.update(pToUpdate)
@@ -540,7 +538,7 @@ class PodcastServiceTest(
 
                 whenever(tagRepository.save(argThat { this in listOfNewTags.map { it.name } }))
                         .then { allTagsInDb.first { t -> t.name == it.getArgument<String>(0) } }
-                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(repository.findById(p.id)).thenReturn(podcast)
                 whenever(repository.update(
                         id = eq(p.id),
                         title = eq(p.title),
@@ -548,7 +546,7 @@ class PodcastServiceTest(
                         hasToBeDeleted = eq(p.hasToBeDeleted),
                         tags = argThat { containsAll(allTagsInDb) && size == allTagsInDb.size },
                         cover = any()
-                )).thenReturn(p.toMono())
+                )).thenReturn(p)
 
                 /* When */
                 val podcastAfterUpdate = service.update(pToUpdate)
@@ -579,7 +577,7 @@ class PodcastServiceTest(
                 )
                 val p = podcast
 
-                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(repository.findById(p.id)).thenReturn(podcast)
                 whenever(repository.update(
                         id = eq(p.id),
                         title = eq(p.title),
@@ -591,7 +589,7 @@ class PodcastServiceTest(
                                     url == URI("https://external.domain.tld/cover.png") &&
                                     height == 200 && width == 200
                         }
-                )).thenReturn(p.toMono())
+                )).thenReturn(p)
 
                 /* When */
                 val podcastAfterUpdate = service.update(pToUpdate)
@@ -609,7 +607,7 @@ class PodcastServiceTest(
                         cover = CoverForCreation(200, 200, p.cover.url)
                 )
 
-                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(repository.findById(p.id)).thenReturn(podcast)
                 whenever(repository.update(
                         id = eq(p.id),
                         title = eq(p.title),
@@ -621,7 +619,7 @@ class PodcastServiceTest(
                                     url == URI("https://external.domain.tld/cover.png") &&
                                     height == 200 && width == 200
                         }
-                )).thenReturn(p.toMono())
+                )).thenReturn(p)
 
                 /* When */
                 val podcastAfterUpdate = service.update(pToUpdate)
@@ -639,7 +637,7 @@ class PodcastServiceTest(
                 val pToUpdate = podcastForUpdate.copy(cover = newCover)
                 val p = podcast
 
-                whenever(repository.findById(p.id)).thenReturn(podcast.toMono())
+                whenever(repository.findById(p.id)).thenReturn(podcast)
                 whenever(coverRepository.save(newCover)).thenReturn(coverInDb.toMono())
                 whenever(fileService.downloadPodcastCover(argThat { title == p.title && cover.url == newCover.url }))
                         .thenReturn(Mono.empty())
@@ -650,7 +648,7 @@ class PodcastServiceTest(
                         hasToBeDeleted = eq(p.hasToBeDeleted),
                         tags = any(),
                         cover = eq(coverInDb)
-                )).thenReturn(p.toMono())
+                )).thenReturn(p)
 
                 /* When */
                 val podcastAfterUpdate = service.update(pToUpdate)
@@ -680,7 +678,7 @@ class PodcastServiceTest(
                 val p = podcast.copy(title = "oldName")
                 val pToUpdate = podcastForUpdate.copy(title = "newName")
                 val pAfterUpdate = p.copy(title = "newName")
-                whenever(repository.findById(p.id)).thenReturn(p.toMono())
+                whenever(repository.findById(p.id)).thenReturn(p)
                 whenever(repository.update(
                         id = eq(p.id),
                         title = eq(pToUpdate.title),
@@ -688,7 +686,7 @@ class PodcastServiceTest(
                         hasToBeDeleted = eq(p.hasToBeDeleted),
                         tags = any(),
                         cover = any()
-                )).thenReturn(pAfterUpdate.toMono())
+                )).thenReturn(pAfterUpdate)
                 val moveOperation = MovePodcastRequest(
                         id = p.id,
                         from = p.title,
@@ -722,7 +720,7 @@ class PodcastServiceTest(
             /* Given */
             val id = UUID.randomUUID()
             val information = DeletePodcastRequest(id, "foo")
-            whenever(repository.deleteById(id)).thenReturn(information.toMono())
+            whenever(repository.deleteById(id)).thenReturn(information)
             whenever(fileService.deletePodcast(information)).thenReturn(Mono.empty())
 
             /* When */
@@ -736,7 +734,7 @@ class PodcastServiceTest(
         fun `a podcast which should not be deleted`() {
             /* Given */
             val id = UUID.randomUUID()
-            whenever(repository.deleteById(id)).thenReturn(Mono.empty())
+            whenever(repository.deleteById(id)).thenReturn(null)
 
             /* When */
             service.deleteById(id)
