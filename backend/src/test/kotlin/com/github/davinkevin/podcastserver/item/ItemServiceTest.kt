@@ -407,14 +407,14 @@ class ItemServiceTest(
             val fileName = "Podcast Name - 2020-01-02 - title.mp3"
             val normalizedFileName = Paths.get(fileName.replace("[^a-zA-Z0-9.-]".toRegex(), "_"))
             whenever(file.filename()).thenReturn(fileName)
-            whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast.toMono())
+            whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast)
             whenever(fileService.cache(file, normalizedFileName)).thenReturn(normalizedFileName.toMono())
             whenever(fileService.upload(podcast.title, normalizedFileName)).thenReturn(Mono.empty())
             whenever(fileService.metadata(podcast.title, normalizedFileName)).thenReturn(
                 FileMetaData("audio/mp3", 1234L).toMono()
             )
             whenever(repository.create(itemToCreate)).thenReturn(itemCreated)
-            whenever(podcastRepository.updateLastUpdate(podcast.id)).thenReturn(Mono.empty())
+            doNothing().whenever(podcastRepository).updateLastUpdate(podcast.id)
 
             /* When */
             val item = itemService.upload(podcast.id, file)

@@ -15,22 +15,22 @@ class PodcastService(
     private val fileService: FileStorageService
 ) {
 
-    fun findAll(): List<Podcast> = repository.findAll().collectList().block()!!
-    fun findById(id: UUID): Podcast? = repository.findById(id).block()
+    fun findAll(): List<Podcast> = repository.findAll()
+    fun findById(id: UUID): Podcast? = repository.findById(id)
 
     fun findStatByPodcastIdAndPubDate(id: UUID, numberOfMonths: Int): List<NumberOfItemByDateWrapper> =
-        repository.findStatByPodcastIdAndPubDate(id, numberOfMonths).collectList().block()!!
+        repository.findStatByPodcastIdAndPubDate(id, numberOfMonths)
     fun findStatByPodcastIdAndDownloadDate(id: UUID, numberOfMonths: Int): List<NumberOfItemByDateWrapper> =
-        repository.findStatByPodcastIdAndDownloadDate(id, numberOfMonths).collectList().block()!!
+        repository.findStatByPodcastIdAndDownloadDate(id, numberOfMonths)
     fun findStatByPodcastIdAndCreationDate(id: UUID, numberOfMonths: Int): List<NumberOfItemByDateWrapper> =
-        repository.findStatByPodcastIdAndCreationDate(id, numberOfMonths).collectList().block()!!
+        repository.findStatByPodcastIdAndCreationDate(id, numberOfMonths)
 
     fun findStatByTypeAndCreationDate(numberOfMonths: Int): List<StatsPodcastType> =
-        repository.findStatByTypeAndCreationDate(numberOfMonths).collectList().block()!!
+        repository.findStatByTypeAndCreationDate(numberOfMonths)
     fun findStatByTypeAndPubDate(numberOfMonths: Int): List<StatsPodcastType> =
-        repository.findStatByTypeAndPubDate(numberOfMonths).collectList().block()!!
+        repository.findStatByTypeAndPubDate(numberOfMonths)
     fun findStatByTypeAndDownloadDate(numberOfMonths: Int): List<StatsPodcastType> =
-        repository.findStatByTypeAndDownloadDate(numberOfMonths).collectList().block()!!
+        repository.findStatByTypeAndDownloadDate(numberOfMonths)
 
     fun save(p: PodcastForCreation): Podcast {
         val oldTags = p.tags.filter { it.id != null }.map { Tag(it.id!!, it.name) }
@@ -46,7 +46,7 @@ class PodcastService(
             type = p.type,
             tags = tags,
             cover = cover
-        ).block()!!
+        )
 
         fileService.downloadPodcastCover(podcast).block()
 
@@ -81,7 +81,7 @@ class PodcastService(
             hasToBeDeleted = updatePodcast.hasToBeDeleted,
             tags = tags,
             cover = cover
-        ).block()!!
+        )
 
         val podcastTitleHasChanged = p.title != updatePodcast.title
         if (podcastTitleHasChanged) {
@@ -97,10 +97,9 @@ class PodcastService(
     }
 
     fun deleteById(id: UUID) {
-        repository
-            .deleteById(id)
-            .delayUntil { fileService.deletePodcast(it) }
-            .block()
+        val request = repository.deleteById(id) ?: return
+
+        fileService.deletePodcast(request).block()
     }
 }
 

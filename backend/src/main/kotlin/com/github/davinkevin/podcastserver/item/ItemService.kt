@@ -78,7 +78,7 @@ class ItemService(
         val filename = Paths.get(filePart.filename().replace("[^a-zA-Z0-9.-]".toRegex(), "_"))
 
         val path = file.cache(filePart, filename).block()!!
-        val podcast = podcastRepository.findById(podcastId).block()!!
+        val podcast = podcastRepository.findById(podcastId)!!
 
         file.upload(podcast.title, path).block()
         val metadata = file.metadata(podcast.title, path).block()!!
@@ -109,7 +109,7 @@ class ItemService(
         )
 
         val createdItem = repository.create(item)!!
-        podcastRepository.updateLastUpdate(podcastId).block()
+        podcastRepository.updateLastUpdate(podcastId)
 
         return createdItem
     }
