@@ -631,7 +631,7 @@ class PodcastHandlerTest(
             val host = URI.create("https://localhost:8080/")
             whenever(podcastService.findById(podcast.id)).thenReturn(podcast)
             whenever(fileService.coverExists(podcast)).thenReturn(
-                Path(podcast.cover.url.toASCIIString().substringAfterLast("/")).toMono()
+                Path(podcast.cover.url.toASCIIString().substringAfterLast("/"))
             )
             whenever(fileService.toExternalUrl(FileDescriptor(podcast.title, Path("cover.png")), host))
                 .thenReturn(URI.create("https://localhost:8080/data/Podcast%20title/cover.png"))
@@ -650,7 +650,7 @@ class PodcastHandlerTest(
         fun `by redirecting to external file if cover does not exist locally`() {
             /* Given */
             whenever(podcastService.findById(podcast.id)).thenReturn(podcast)
-            whenever(fileService.coverExists(podcast)).thenReturn(Mono.empty())
+            whenever(fileService.coverExists(podcast)).thenReturn(null)
 
             /* When */
             rest

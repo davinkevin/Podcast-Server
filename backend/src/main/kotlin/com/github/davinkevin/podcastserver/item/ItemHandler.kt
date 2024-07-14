@@ -90,7 +90,7 @@ class ItemHandler(
     }
 
     private fun findCoverURIOf(item: Item, host: URI): URI {
-        val coverPath = fileService.coverExists(item).block()
+        val coverPath = fileService.coverExists(item)
             ?: return item.cover.url
 
         val fileDescriptor = FileDescriptor(item.podcast.title, coverPath)

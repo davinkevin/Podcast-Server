@@ -36,7 +36,7 @@ class ItemService(
         log.info("Deletion of items older than {}", date)
         val items = repository.findAllToDelete(date)
 
-        items.forEach { file.deleteItem(it).block() }
+        items.forEach { file.deleteItem(it) }
 
         repository.updateAsDeleted(items.map { it.id })
     }
@@ -58,7 +58,7 @@ class ItemService(
             ?: return null
 
         if (item.isDownloaded() && item.fileName != Path("")) {
-            file.deleteItem(DeleteItemRequest(item.id, item.fileName!!, item.podcast.title)).block()
+            file.deleteItem(DeleteItemRequest(item.id, item.fileName!!, item.podcast.title))
         }
 
         return repository.resetById(id)!!
@@ -77,11 +77,11 @@ class ItemService(
     fun upload(podcastId: UUID, filePart: FilePart): Item {
         val filename = Paths.get(filePart.filename().replace("[^a-zA-Z0-9.-]".toRegex(), "_"))
 
-        val path = file.cache(filePart, filename).block()!!
+        val path = file.cache(filePart, filename)
         val podcast = podcastRepository.findById(podcastId)!!
 
-        file.upload(podcast.title, path).block()
-        val metadata = file.metadata(podcast.title, path).block()!!
+        file.upload(podcast.title, path)
+        val metadata = file.metadata(podcast.title, path)!!
 
         val (_, p2, p3) = filePart.filename().split(" - ")
         val title = p3.substringBeforeLast(".")
@@ -122,7 +122,7 @@ class ItemService(
         val item = repository.deleteById(itemId)
 
         if (item !== null) {
-            file.deleteItem(item).block()
+            file.deleteItem(item)
         }
     }
 }

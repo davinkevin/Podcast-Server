@@ -45,16 +45,13 @@ class FfmpegDownloader(
 
         val multiDownloads = downloadingInformation.urls.map { download(it.toASCIIString()) }
 
-        Result.runCatching {
-            if (multiDownloads.any { it.isFailure }) {
-                val cause = multiDownloads.first { it.isFailure }.exceptionOrNull()
-                throw RuntimeException("Error during download of a part", cause)
-            }
+        if (multiDownloads.any { it.isFailure }) {
+            val cause = multiDownloads.first { it.isFailure }.exceptionOrNull()
+            throw RuntimeException("Error during download of a part", cause)
+        }
 
-            ffmpegService.concat(
-                target,
-                    *multiDownloads.map { it.getOrNull()!! }.toTypedArray()
-            )
+        runCatching {
+            ffmpegService.concat(target, *multiDownloads.map { it.getOrNull()!! }.toTypedArray())
         }
 
         multiDownloads

@@ -48,7 +48,7 @@ class PodcastService(
             cover = cover
         )
 
-        fileService.downloadPodcastCover(podcast).block()
+        fileService.downloadPodcastCover(podcast)
 
         return podcast
     }
@@ -70,7 +70,6 @@ class PodcastService(
             coverRepository.save(newCover).block()!!.also {
                 fileService
                     .downloadPodcastCover(p.copy(cover = Cover(it.id, it.url, it.height, it.width)))
-                    .block()
             }
         else Cover(oldCover.id, oldCover.url, oldCover.height, oldCover.width)
 
@@ -90,7 +89,7 @@ class PodcastService(
                 from = p.title,
                 to = updatePodcast.title
             )
-            fileService.movePodcast(movePodcastDetails).block()
+            fileService.movePodcast(movePodcastDetails)
         }
 
         return podcast
@@ -99,7 +98,7 @@ class PodcastService(
     fun deleteById(id: UUID) {
         val request = repository.deleteById(id) ?: return
 
-        fileService.deletePodcast(request).block()
+        fileService.deletePodcast(request)
     }
 }
 

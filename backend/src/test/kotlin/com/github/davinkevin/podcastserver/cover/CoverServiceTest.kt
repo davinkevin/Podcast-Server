@@ -61,8 +61,8 @@ class CoverServiceTest (
                     randomCover("item3", "podcast3")
             )
             whenever(cover.findCoverOlderThan(date)).thenReturn(covers)
-            whenever(file.coverExists(any(), any(), any())).thenReturn(Mono.just(Path("file.mp3")))
-            whenever(file.deleteCover(any())).thenReturn(Mono.empty())
+            whenever(file.coverExists(any(), any(), any())).thenReturn(Path("file.mp3"))
+            whenever(file.deleteCover(any())).thenReturn(true)
 
             /* When */
             service.deleteCoversInFileSystemOlderThan(date)
@@ -77,7 +77,7 @@ class CoverServiceTest (
             val covers = listOf(randomCover("item1", "podcast1"))
 
             whenever(cover.findCoverOlderThan(date)).thenReturn(covers)
-            whenever(file.coverExists(any(), any(), any())).thenReturn(Mono.empty())
+            whenever(file.coverExists(any(), any(), any())).thenReturn(null)
 
             /* When */
             service.deleteCoversInFileSystemOlderThan(date)

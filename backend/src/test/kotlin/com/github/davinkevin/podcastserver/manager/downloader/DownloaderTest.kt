@@ -98,13 +98,13 @@ class DownloaderTest {
 
         @Test
         @Suppress("UnassignedFluxMonoInstance")
-        fun `should failed if error occurs during finish method`() {
+        fun `should fail if error occurs during finish method`() {
             /* Given */
             val information = DownloadingInformation(item, listOf(), Path("file.mp4"), null)
             downloader.with(information, itemDownloadManager)
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
-            whenever(file.upload(any(), any())).thenReturn(RuntimeException("not expected error").toMono())
-            whenever(file.metadata(any(), any())).thenReturn(RuntimeException("not expected error").toMono())
+            whenever(file.upload(any(), any())).thenThrow(RuntimeException("not expected error"))
+            whenever(file.metadata(any(), any())).thenThrow(RuntimeException("not expected error"))
 
             /* When */
             downloader.apply {

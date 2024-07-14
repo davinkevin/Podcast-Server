@@ -289,7 +289,7 @@ class PodcastServiceTest(
 
             @BeforeEach
             fun beforeEach() {
-                whenever(fileService.downloadPodcastCover(podcast)).thenReturn(Mono.empty())
+                doNothing().whenever(fileService).downloadPodcastCover(podcast)
             }
 
             @AfterEach
@@ -639,8 +639,7 @@ class PodcastServiceTest(
 
                 whenever(repository.findById(p.id)).thenReturn(podcast)
                 whenever(coverRepository.save(newCover)).thenReturn(coverInDb.toMono())
-                whenever(fileService.downloadPodcastCover(argThat { title == p.title && cover.url == newCover.url }))
-                        .thenReturn(Mono.empty())
+                doNothing().whenever(fileService).downloadPodcastCover(argThat { title == p.title && cover.url == newCover.url })
                 whenever(repository.update(
                         id = eq(p.id),
                         title = eq(p.title),
@@ -656,7 +655,7 @@ class PodcastServiceTest(
                 /* Then */
                 assertThat(podcastAfterUpdate).isEqualTo(p)
                 verify(coverRepository, times(1)).save(any())
-                verify(fileService, times(1)).downloadPodcastCover(any())
+                verify(fileService).downloadPodcastCover(any())
             }
 
 
@@ -692,7 +691,7 @@ class PodcastServiceTest(
                         from = p.title,
                         to = pToUpdate.title
                 )
-                whenever(fileService.movePodcast(moveOperation)).thenReturn(Mono.empty())
+                doNothing().whenever(fileService).movePodcast(moveOperation)
 
                 /* When */
                 val podcastAfterUpdate = service.update(pToUpdate)
@@ -702,7 +701,7 @@ class PodcastServiceTest(
                 verify(tagRepository, never()).save(any())
                 verify(coverRepository, never()).save(any())
                 verify(fileService, never()).downloadPodcastCover(any())
-                verify(fileService, times(1)).movePodcast(moveOperation)
+                verify(fileService).movePodcast(moveOperation)
             }
 
         }
@@ -721,7 +720,7 @@ class PodcastServiceTest(
             val id = UUID.randomUUID()
             val information = DeletePodcastRequest(id, "foo")
             whenever(repository.deleteById(id)).thenReturn(information)
-            whenever(fileService.deletePodcast(information)).thenReturn(Mono.empty())
+            whenever(fileService.deletePodcast(information)).thenReturn(true)
 
             /* When */
             service.deleteById(id)

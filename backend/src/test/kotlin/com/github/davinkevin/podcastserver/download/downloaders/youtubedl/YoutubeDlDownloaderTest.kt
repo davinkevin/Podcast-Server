@@ -28,7 +28,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.net.URI
 import java.nio.file.Files
@@ -97,8 +96,8 @@ class YoutubeDlDownloaderTest(
             downloader.itemDownloadManager = idm
 
             whenever(file.upload(eq(dItem.item.podcast.title), any()))
-                .thenReturn(PutObjectResponse.builder().build().toMono())
-            whenever(file.metadata(eq(dItem.item.podcast.title), any())).thenReturn(FileMetaData("foo/bar", 123L).toMono())
+                .thenReturn(PutObjectResponse.builder().build())
+            whenever(file.metadata(eq(dItem.item.podcast.title), any())).thenReturn(FileMetaData("foo/bar", 123L))
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
             whenever(downloadRepository.finishDownload(any(), any(), anyOrNull(), any(), any()))
                     .thenReturn(Mono.empty())
@@ -129,7 +128,7 @@ class YoutubeDlDownloaderTest(
         @DisplayName("but fails due to error")
         inner class ButFailsDueToError {
 
-            val url = URI.create("https://foo.bar.com/one.mp3")
+            val url: URI = URI.create("https://foo.bar.com/one.mp3")
 
             @Nested
             @DisplayName("DuringDownload")

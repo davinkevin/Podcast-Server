@@ -112,9 +112,9 @@ class FfmpegDownloaderTest {
                 doAnswer { writeEmptyFileTo(it.getArgument<Path>(0).toString()); null
                 }.whenever(ffmpegService).concat(any(), anyVararg())
                 whenever(file.upload(eq(item.podcast.title), any()))
-                    .thenReturn(PutObjectResponse.builder().build().toMono())
+                    .thenReturn(PutObjectResponse.builder().build())
                 whenever(file.metadata(eq(item.podcast.title), any()))
-                    .thenReturn(FileMetaData("video/mp4", 123L).toMono())
+                    .thenReturn(FileMetaData("video/mp4", 123L))
                 whenever(downloadRepository.finishDownload(
                         id = item.id,
                         length = 123L,
@@ -132,7 +132,7 @@ class FfmpegDownloaderTest {
             }
 
             @Test
-            fun `should ends on FAILED if one of download failed`() {
+            fun `should end on FAILED if a download has failed`() {
                 /* Given */
                 whenever(ffmpegService.getDurationOf(any(), any())).thenReturn(500.0)
 
@@ -142,7 +142,7 @@ class FfmpegDownloaderTest {
                 }.whenever(ffmpegService).download(eq(item.url.toASCIIString()), any(), any())
 
                 doAnswer { throw RuntimeException("Error during download of other url") }
-                        .whenever(ffmpegService).download(eq("http://foo.bar.com/end.mp4"), any(), any())
+                    .whenever(ffmpegService).download(eq("http://foo.bar.com/end.mp4"), any(), any())
 
                 whenever(processService.waitFor(any())).thenReturn(Result.success(1))
 

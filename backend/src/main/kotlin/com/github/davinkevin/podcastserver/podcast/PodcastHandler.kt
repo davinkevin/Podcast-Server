@@ -83,7 +83,7 @@ class PodcastHandler(
 
         log.debug("the url of the podcast cover is {}", podcast.cover.url)
 
-        val uri = when(val coverPath = fileService.coverExists(podcast).block()) {
+        val uri = when(val coverPath = fileService.coverExists(podcast)) {
             is Path -> fileService.toExternalUrl(FileDescriptor(podcast.title, coverPath), host)
             else -> podcast.cover.url
         }

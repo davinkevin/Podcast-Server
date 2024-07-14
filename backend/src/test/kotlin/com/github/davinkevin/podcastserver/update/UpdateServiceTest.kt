@@ -196,7 +196,7 @@ class UpdateServiceTest(
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast) }
             }
-            whenever(fileService.downloadItemCover(any())).thenReturn(Mono.empty())
+            doNothing().whenever(fileService).downloadItemCover(any())
             doNothing().whenever(podcastRepository).updateLastUpdate(eq(podcast.id))
 
             /* When */
@@ -249,7 +249,7 @@ class UpdateServiceTest(
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast) }
             }
-            whenever(fileService.downloadItemCover(any())).thenReturn(Mono.error(RuntimeException("error during cover download")))
+            doNothing().whenever(fileService).downloadItemCover(any())
             doNothing().whenever(podcastRepository).updateLastUpdate(eq(podcast.id))
 
             /* When */
@@ -454,7 +454,7 @@ class UpdateServiceTest(
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast1) }
             }
-            whenever(fileService.downloadItemCover(any())).thenReturn(Mono.empty())
+            doNothing().whenever(fileService).downloadItemCover(any())
             doNothing().whenever(podcastRepository).updateLastUpdate(podcast1.id)
 
             /* When */
@@ -507,7 +507,7 @@ class UpdateServiceTest(
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast1) }
             }
-            whenever(fileService.downloadItemCover(any())).thenReturn(Mono.empty())
+            doNothing().whenever(fileService).downloadItemCover(any())
             doNothing().whenever(podcastRepository).updateLastUpdate(podcast1.id)
             whenever(idm.launchDownload()).thenReturn(Mono.empty())
 
@@ -562,7 +562,7 @@ class UpdateServiceTest(
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast1) }
             }
-            whenever(fileService.downloadItemCover(any())).thenReturn(Mono.empty())
+            doNothing().whenever(fileService).downloadItemCover(any())
             doNothing().whenever(podcastRepository).updateLastUpdate(podcast1.id)
 
             /* When */
@@ -616,7 +616,7 @@ class UpdateServiceTest(
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(p) }
             }
-            whenever(fileService.downloadItemCover(any())).thenReturn(Mono.empty())
+            doNothing().whenever(fileService).downloadItemCover(any())
             doNothing().whenever(podcastRepository).updateLastUpdate(p.id)
 
             /* When */

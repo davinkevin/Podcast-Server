@@ -114,11 +114,8 @@ class UpdateService(
         }
 
         createdItems.forEach { item ->
-            fileService.downloadItemCover(item).onErrorResume {
-                log.error("Error during download of cover ${item.cover.url}")
-                Mono.empty()
-            }
-                .block()
+            runCatching { fileService.downloadItemCover(item) }
+                .onFailure { log.error("Error during download of cover ${item.cover.url}") }
         }
 
         podcastRepository.updateLastUpdate(podcast.id)
