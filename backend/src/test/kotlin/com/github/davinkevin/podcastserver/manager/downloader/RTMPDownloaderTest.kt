@@ -191,9 +191,9 @@ class RTMPDownloaderTest {
             fun `and save file to disk`() {
                 /* Given */
                 whenever(file.upload(eq(item.podcast.title), any()))
-                    .thenReturn(PutObjectResponse.builder().build().toMono())
+                    .thenReturn(PutObjectResponse.builder().build())
                 whenever(file.metadata(eq(item.podcast.title), any()))
-                    .thenReturn(FileMetaData("video/mp4", 123L).toMono())
+                    .thenReturn(FileMetaData("video/mp4", 123L))
                 whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
                 whenever(downloadRepository.finishDownload(
                         id = item.id,
@@ -226,9 +226,9 @@ class RTMPDownloaderTest {
                 fun stop() {
                     /* GIVEN */
                     whenever(file.upload(eq(item.podcast.title), any()))
-                        .thenReturn(PutObjectResponse.builder().build().toMono())
+                        .thenReturn(PutObjectResponse.builder().build())
                     whenever(file.metadata(eq(item.podcast.title), any()))
-                        .thenReturn(FileMetaData("video/mp4", 123L).toMono())
+                        .thenReturn(FileMetaData("video/mp4", 123L))
                     whenever(downloadRepository.finishDownload(
                             id = item.id,
                             length = 123L,

@@ -11,8 +11,8 @@ class CoverService(
         cover
             .findCoverOlderThan(date)
             .asSequence()
-            .filter { file.coverExists(it.podcast.title, it.item.id, it.extension).hasElement().block()!! }
-            .forEach { file.deleteCover(it).block() }
+            .filter { file.coverExists(it.podcast.title, it.item.id, it.extension) != null }
+            .forEach { file.deleteCover(it) }
     }
 
 }

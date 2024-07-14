@@ -179,7 +179,7 @@ class ItemHandlerTest(
             /* Given */
             val host = URI.create("https://localhost:8080/")
             whenever(itemService.findById(item.id)).thenReturn(item)
-            whenever(fileService.coverExists(any<Item>())).thenReturn(Path("${item.id}.png").toMono())
+            whenever(fileService.coverExists(any<Item>())).thenReturn(Path("${item.id}.png"))
             whenever(fileService.toExternalUrl(FileDescriptor(item.podcast.title, Path("${item.id}.png")), host))
                 .thenReturn(URI.create("https://localhost:8080/data/Podcast%20Bar/27184b1a-7642-4ffd-ac7e-14fb36f7f15c.png"))
 
@@ -198,7 +198,7 @@ class ItemHandlerTest(
         fun `by redirecting to external file if cover does not exist locally`() {
             /* Given */
             whenever(itemService.findById(item.id)).thenReturn(item)
-            whenever(fileService.coverExists(item)).thenReturn(Mono.empty())
+            whenever(fileService.coverExists(item)).thenReturn(null)
 
             /* When */
             rest

@@ -85,7 +85,7 @@ class ItemServiceTest(
                 DeleteItemRequest(UUID.fromString("40430ce3-b421-4c82-b34d-2deb4c46b1cd"), Path("itemT"), "podcastT")
         )
         whenever(repository.findAllToDelete(limit)).thenReturn(items)
-        whenever(fileService.deleteItem(any())).thenReturn(Mono.empty())
+        whenever(fileService.deleteItem(any())).thenReturn(true)
         doNothing().whenever(repository).updateAsDeleted(any())
 
         /* When */
@@ -206,7 +206,7 @@ class ItemServiceTest(
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(true)
             whenever(repository.findById(item.id)).thenReturn(currentItem)
-            whenever(fileService.deleteItem(deleteItemInformation)).thenReturn(Mono.empty())
+            whenever(fileService.deleteItem(deleteItemInformation)).thenReturn(true)
 
             /* When */
             val resetItem = itemService.reset(item.id)!!
@@ -328,14 +328,14 @@ class ItemServiceTest(
             val id = UUID.randomUUID()
             val deleteItem = DeleteItemRequest(id, Path("foo"), "bar")
             whenever(repository.deleteById(id)).thenReturn(deleteItem)
-            whenever(fileService.deleteItem(deleteItem)).thenReturn(Mono.empty())
+            whenever(fileService.deleteItem(deleteItem)).thenReturn(true)
             whenever(idm.removeItemFromQueueAndDownload(id)).thenReturn(Mono.empty())
 
             /* When */
             itemService.deleteById(id)
 
             /* Then */
-            verify(fileService, times(1)).deleteItem(deleteItem)
+            verify(fileService).deleteItem(deleteItem)
         }
     }
 
@@ -408,10 +408,10 @@ class ItemServiceTest(
             val normalizedFileName = Paths.get(fileName.replace("[^a-zA-Z0-9.-]".toRegex(), "_"))
             whenever(file.filename()).thenReturn(fileName)
             whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast)
-            whenever(fileService.cache(file, normalizedFileName)).thenReturn(normalizedFileName.toMono())
-            whenever(fileService.upload(podcast.title, normalizedFileName)).thenReturn(Mono.empty())
+            whenever(fileService.cache(file, normalizedFileName)).thenReturn(normalizedFileName)
+            whenever(fileService.upload(podcast.title, normalizedFileName)).thenReturn(null)
             whenever(fileService.metadata(podcast.title, normalizedFileName)).thenReturn(
-                FileMetaData("audio/mp3", 1234L).toMono()
+                FileMetaData("audio/mp3", 1234L)
             )
             whenever(repository.create(itemToCreate)).thenReturn(itemCreated)
             doNothing().whenever(podcastRepository).updateLastUpdate(podcast.id)

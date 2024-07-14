@@ -7,6 +7,8 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.slf4j.LoggerFactory
+import reactor.core.publisher.Mono
+import reactor.kotlin.core.publisher.toMono
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Clock
@@ -73,8 +75,11 @@ abstract class AbstractDownloader(
     override fun finishDownload() {
         itemDownloadManager.removeACurrentDownload(downloadingInformation.item.id)
 
-        file.upload(downloadingInformation.item.podcast.title, target)
-            .then(file.metadata(downloadingInformation.item.podcast.title, target))
+        val upload = Mono.defer { file.upload(downloadingInformation.item.podcast.title, target).toMono() }
+        val metadata = Mono.defer { file.metadata(downloadingInformation.item.podcast.title, target).toMono() }
+
+        upload
+            .then(metadata)
             .flatMap { (mimeType, size) ->
                 downloadRepository.finishDownload(
                     id = downloadingInformation.item.id,

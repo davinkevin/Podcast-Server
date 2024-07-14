@@ -11,8 +11,6 @@ import com.github.davinkevin.podcastserver.podcast.DeletePodcastRequest
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import com.github.tomakehurst.wiremock.common.ConsoleNotifier
-import com.github.tomakehurst.wiremock.common.Slf4jNotifier
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
@@ -28,14 +26,13 @@ import org.mockito.kotlin.mock
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
+import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.DigestUtils
-import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.Hooks
+import org.springframework.web.client.RestClient
 import reactor.kotlin.core.publisher.toMono
 import reactor.test.StepVerifier
 import java.net.URI
@@ -45,8 +42,8 @@ import java.nio.file.Paths
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
-import kotlin.io.path.writeText
 import kotlin.io.path.Path
+import kotlin.io.path.writeText
 
 /**
  * Created by kevin on 2019-02-12
@@ -62,19 +59,10 @@ const val s3MockBackendPort = 1234
     "podcastserver.storage.url=http://localhost:$s3MockBackendPort/",
 ])
 @ExtendWith(SpringExtension::class)
-@ImportAutoConfiguration(WebClientAutoConfiguration::class)
+@ImportAutoConfiguration(RestClientAutoConfiguration::class)
 class FileStorageServiceTest(
     @Autowired val fileService: FileStorageService
 ) {
-
-    @JvmField
-    @RegisterExtension
-    val s3Backend: WireMockExtension = WireMockExtension.newInstance()
-        .options(wireMockConfig()
-            .port(s3MockBackendPort)
-//            .notifier(ConsoleNotifier(true))
-        )
-        .build()
 
     @Nested
     @DisplayName("should delete podcast")
@@ -102,11 +90,10 @@ class FileStorageServiceTest(
             s3Backend.stubFor(delete("/data/podcast-title/second.mp3").willReturn(ok()))
 
             /* When */
-            StepVerifier.create(fileService.deletePodcast(request))
-                /* Then */
-                .expectSubscription()
-                .expectNext(true)
-                .verifyComplete()
+            val result = fileService.deletePodcast(request)
+
+            /* Then */
+            assertThat(result).isTrue()
         }
 
         @Test
@@ -129,11 +116,10 @@ class FileStorageServiceTest(
             s3Backend.stubFor(delete("/data/podcast-title/second.mp3").willReturn(notFound()))
 
             /* When */
-            StepVerifier.create(fileService.deletePodcast(request))
-                /* Then */
-                .expectSubscription()
-                .expectNext(false)
-                .verifyComplete()
+            val result = fileService.deletePodcast(request)
+
+            /* Then */
+            assertThat(result).isFalse()
         }
 
         @Test
@@ -142,12 +128,10 @@ class FileStorageServiceTest(
             s3Backend.stubFor(get("/data?prefix=podcast-title").willReturn(notFound()))
 
             /* When */
-            StepVerifier.create(fileService.deletePodcast(request))
-                /* Then */
-                .expectSubscription()
-                .expectNext(false)
-                .verifyComplete()
+            val result = fileService.deletePodcast(request)
 
+            /* Then */
+            assertThat(result).isFalse()
         }
 
     }
@@ -164,11 +148,10 @@ class FileStorageServiceTest(
             s3Backend.stubFor(delete("/data/podcast-title/foo.txt").willReturn(ok()))
 
             /* When */
-            StepVerifier.create(fileService.deleteItem(request))
-                .expectSubscription()
-                /* Then */
-                .expectNext(true)
-                .verifyComplete()
+            val isDeleted = fileService.deleteItem(request)
+
+            /* Then */
+            assertThat(isDeleted).isTrue()
         }
 
         @Test
@@ -177,11 +160,10 @@ class FileStorageServiceTest(
             s3Backend.stubFor(delete("/data/podcast-title/foo.txt").willReturn(notFound()))
 
             /* When */
-            StepVerifier.create(fileService.deleteItem(request))
-                .expectSubscription()
-                /* Then */
-                .expectNext(false)
-                .verifyComplete()
+            val isDeleted = fileService.deleteItem(request)
+
+            /* Then */
+            assertThat(isDeleted).isFalse()
         }
     }
 
@@ -202,11 +184,10 @@ class FileStorageServiceTest(
                 .willReturn(ok()))
 
             /* When */
-            StepVerifier.create(fileService.deleteCover(request))
-                .expectSubscription()
-                /* Then */
-                .expectNext(true)
-                .verifyComplete()
+            val isDeleted = fileService.deleteCover(request)
+
+            /* Then */
+            assertThat(isDeleted).isTrue()
         }
 
         @Test
@@ -216,11 +197,10 @@ class FileStorageServiceTest(
                 .willReturn(notFound()))
 
             /* When */
-            StepVerifier.create(fileService.deleteCover(request))
-                .expectSubscription()
-                /* Then */
-                .expectNext(false)
-                .verifyComplete()
+            val isDeleted = fileService.deleteCover(request)
+
+            /* Then */
+            assertThat(isDeleted).isFalse()
         }
     }
 
@@ -257,11 +237,10 @@ class FileStorageServiceTest(
                     .willReturn(ok()))
 
                 /* When */
-                StepVerifier.create(fileService.coverExists(podcast))
-                    .expectSubscription()
-                    /* Then */
-                    .expectNext(Path("dd16b2eb-657e-4064-b470-5b99397ce729.png"))
-                    .verifyComplete()
+                val coverPath = fileService.coverExists(podcast)
+
+                /* Then */
+                assertThat(coverPath).isEqualTo(Path("dd16b2eb-657e-4064-b470-5b99397ce729.png"))
             }
 
             @Test
@@ -274,11 +253,10 @@ class FileStorageServiceTest(
                     .willReturn(ok()))
 
                 /* When */
-                StepVerifier.create(fileService.coverExists(specificPodcast))
-                    .expectSubscription()
-                    /* Then */
-                    .expectNext(Path("dd16b2eb-657e-4064-b470-5b99397ce729.jpg"))
-                    .verifyComplete()
+                val coverPath = fileService.coverExists(specificPodcast)
+
+                /* Then */
+                assertThat(coverPath).isEqualTo(Path("dd16b2eb-657e-4064-b470-5b99397ce729.jpg"))
             }
 
             @Test
@@ -286,11 +264,12 @@ class FileStorageServiceTest(
                 /* Given */
                 s3Backend.stubFor(head(urlEqualTo("/data/podcast-title/dd16b2eb-657e-4064-b470-5b99397ce729.png"))
                     .willReturn(notFound()))
+
                 /* When */
-                StepVerifier.create(fileService.coverExists(podcast))
-                    .expectSubscription()
-                    /* Then */
-                    .verifyComplete()
+                val coverPath = fileService.coverExists(podcast)
+
+                /* Then */
+                assertThat(coverPath).isNull()
             }
 
         }
@@ -334,11 +313,10 @@ class FileStorageServiceTest(
                     .willReturn(ok()))
 
                 /* When */
-                StepVerifier.create(fileService.coverExists(item))
-                    .expectSubscription()
-                    /* Then */
-                    .expectNext(Path("27184b1a-7642-4ffd-ac7e-14fb36f7f15c.png"))
-                    .verifyComplete()
+                val coverPath = fileService.coverExists(item)
+
+                /* Then */
+                assertThat(coverPath).isEqualTo(Path("27184b1a-7642-4ffd-ac7e-14fb36f7f15c.png"))
             }
 
             @Test
@@ -353,11 +331,10 @@ class FileStorageServiceTest(
                     .willReturn(ok()))
 
                 /* When */
-                StepVerifier.create(fileService.coverExists(specificItem))
-                    .expectSubscription()
-                    /* Then */
-                    .expectNext(Path("27184b1a-7642-4ffd-ac7e-14fb36f7f15c.jpg"))
-                    .verifyComplete()
+                val coverPath = fileService.coverExists(specificItem)
+
+                /* Then */
+                assertThat(coverPath).isEqualTo(Path("27184b1a-7642-4ffd-ac7e-14fb36f7f15c.jpg"))
             }
 
             @Test
@@ -365,11 +342,12 @@ class FileStorageServiceTest(
                 /* Given */
                 s3Backend.stubFor(head(urlEqualTo("/data/podcast-title/27184b1a-7642-4ffd-ac7e-14fb36f7f15c.png"))
                     .willReturn(notFound()))
+
                 /* When */
-                StepVerifier.create(fileService.coverExists(item))
-                    .expectSubscription()
-                    /* Then */
-                    .verifyComplete()
+                val coverPath = fileService.coverExists(item)
+
+                /* Then */
+                assertThat(coverPath).isEqualTo(null)
             }
         }
     }
@@ -411,12 +389,11 @@ class FileStorageServiceTest(
                 /* Given */
                 externalBackend.stubFor(get("/img/image.png").willReturn(ok().withBody(fileAsByteArray("/__files/img/image.png"))))
                 s3Backend.stubFor(put("/data/podcast-title/dd16b2eb-657e-4064-b470-5b99397ce729.png").willReturn(ok()))
-                /* When */
-                StepVerifier.create(fileService.downloadPodcastCover(podcast))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
 
+                /* When */
+                fileService.downloadPodcastCover(podcast)
+
+                /* Then */
                 val bodyDigest = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlEqualTo("/data/podcast-title/dd16b2eb-657e-4064-b470-5b99397ce729.png")))
                     .first().body
                     .let(DigestUtils::md5DigestAsHex)
@@ -466,18 +443,9 @@ class FileStorageServiceTest(
                 s3Backend.stubFor(put(urlInBucket).willReturn(ok()))
 
                 /* When */
-                StepVerifier.create(fileService.downloadItemCover(item))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                fileService.downloadItemCover(item)
 
-//                val resultingFile = dir
-//                    .resolve(item.podcast.title)
-//                    .resolve("${item.id}.png")
-//
-//                assertThat(resultingFile)
-//                    .exists()
-//                    .hasDigest("MD5", "1cc21d3dce8bfedbda2d867a3238e8db")
+                /* Then */
                 val bodyDigest = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlEqualTo(urlInBucket)))
                     .first().body
                     .let(DigestUtils::md5DigestAsHex)
@@ -527,10 +495,18 @@ class FileStorageServiceTest(
             }
 
             /* When */
-            StepVerifier.create(fileService.movePodcast(moveOperation))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            fileService.movePodcast(moveOperation)
+
+            /* Then */
+            s3Backend.apply {
+                verify(putRequestedFor(urlEqualTo("/data/destination/first.mp3"))
+                    .withHeader("x-amz-copy-source", equalTo("data/origin/first.mp3")))
+                verify(putRequestedFor(urlEqualTo("/data/destination/second.mp3"))
+                    .withHeader("x-amz-copy-source", equalTo("data/origin/second.mp3")))
+                verify(deleteRequestedFor(urlEqualTo("/data/origin/first.mp3")))
+                verify(deleteRequestedFor(urlEqualTo("/data/origin/second.mp3")))
+
+            }
         }
     }
 
@@ -546,11 +522,10 @@ class FileStorageServiceTest(
                 .then { Files.createFile(it.getArgument(0)).toMono().then() }
 
             /* When */
-            StepVerifier.create(fileService.cache(file, Paths.get("foo.mp3")))
-                /* Then */
-                .expectSubscription()
-                .assertNext { assertThat(it).exists() }
-                .verifyComplete()
+            val path = fileService.cache(file, Paths.get("foo.mp3"))
+
+            /* Then */
+            assertThat(path).exists()
         }
 
     }
@@ -564,18 +539,58 @@ class FileStorageServiceTest(
             /* Given */
             val file = dir.resolve("toUpload.txt").apply { writeText("text is here !") }
             s3Backend.stubFor(put("/data/podcast-title/toUpload.txt").willReturn(ok()))
+
             /* When */
-            StepVerifier.create(fileService.upload("podcast-title", file))
-                /* Then */
-                .expectSubscription()
-                .expectNextCount(1)
-                .verifyComplete()
+            val result = fileService.upload("podcast-title", file)
+
+            /* Then */
+            assertThat(result).isNotNull()
 
             val textContent = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlEqualTo("/data/podcast-title/toUpload.txt")))
                 .first().body
                 .decodeToString()
 
             assertThat(textContent).isEqualTo("text is here !")
+        }
+
+        @Test
+        fun `with success after second retry`(@TempDir dir: Path) {
+            /* Given */
+            val file = dir.resolve("toUpload.txt").apply { writeText("text is here !") }
+            s3Backend.apply {
+                stubFor(put("/data/podcast-title/toUpload.txt").willReturn(badRequest()))
+                stubFor(put("/data/podcast-title/toUpload.txt").willReturn(ok()))
+            }
+
+            /* When */
+            val result = fileService.upload("podcast-title", file)
+
+            /* Then */
+            assertThat(result).isNotNull()
+
+            val textContent = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlEqualTo("/data/podcast-title/toUpload.txt")))
+                .first().body
+                .decodeToString()
+
+            assertThat(textContent).isEqualTo("text is here !")
+        }
+
+        @Test
+        fun `with failure after all retries`(@TempDir dir: Path) {
+            /* Given */
+            val file = dir.resolve("toUpload.txt").apply { writeText("text is here !") }
+            s3Backend.apply {
+                stubFor(put("/data/podcast-title/toUpload.txt").willReturn(badRequest()))
+                stubFor(put("/data/podcast-title/toUpload.txt").willReturn(badRequest()))
+                stubFor(put("/data/podcast-title/toUpload.txt").willReturn(badRequest()))
+                stubFor(put("/data/podcast-title/toUpload.txt").willReturn(badRequest()))
+            }
+
+            /* When */
+            val result = fileService.upload("podcast-title", file)
+
+            /* Then */
+            assertThat(result).isNull()
         }
 
     }
@@ -593,16 +608,13 @@ class FileStorageServiceTest(
                     .withHeader("Content-Length", "123")
                 ))
             /* When */
-            StepVerifier.create(fileService.metadata("podcast-title", Paths.get("dd16b2eb-657e-4064-b470-5b99397ce729.png")))
-                /* Then */
-                .expectSubscription()
-                .expectNext(
-                    FileMetaData(
-                    contentType = "image/png",
-                    size = 123L
-                )
-                )
-                .verifyComplete()
+            val result = fileService.metadata("podcast-title", Paths.get("dd16b2eb-657e-4064-b470-5b99397ce729.png"))
+
+            /* Then */
+            assertThat(result).isEqualTo(FileMetaData(
+                contentType = "image/png",
+                size = 123L
+            ))
         }
 
     }
@@ -618,22 +630,30 @@ class FileStorageServiceTest(
                 stubFor(head(urlEqualTo("/data")).willReturn(notFound()))
                 stubFor(put("/data").willReturn(ok()))
             }
+
             /* When */
-            StepVerifier.create(fileService.initBucket())
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            fileService.initBucket()
+
+            /* Then */
+            s3Backend.apply {
+                verify(headRequestedFor(urlEqualTo("/data")))
+                verify(putRequestedFor(urlEqualTo("/data")))
+            }
         }
 
         @Test
         fun `with an already existing bucket`() {
             /* Given */
             s3Backend.stubFor(head(urlEqualTo("/data")).willReturn(ok()))
+
             /* When */
-            StepVerifier.create(fileService.initBucket())
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            fileService.initBucket()
+
+            /* Then */
+            s3Backend.apply {
+                verify(headRequestedFor(urlEqualTo("/data")))
+                verify(0, putRequestedFor(urlEqualTo("/data")))
+            }
         }
 
     }
@@ -654,7 +674,7 @@ class FileStorageServiceTest(
         fun `with domain from user request`() {
             /* Given */
             val onDemandFileStorageService = FileStorageConfig().fileStorageService(
-                WebClient.builder(),
+                RestClient.builder(),
                 storageProperties.copy(isInternal = true)
             )
 
@@ -672,7 +692,7 @@ class FileStorageServiceTest(
         fun `with domain from external storage system`() {
             /* Given */
             val onDemandFileStorageService = FileStorageConfig().fileStorageService(
-                WebClient.builder(),
+                RestClient.builder(),
                 storageProperties.copy(isInternal = false)
             )
 
@@ -686,5 +706,16 @@ class FileStorageServiceTest(
             assertThat(uri.host).isEqualTo("storage.local")
         }
 
+    }
+
+    companion object {
+        @JvmField
+        @RegisterExtension
+        val s3Backend: WireMockExtension = WireMockExtension.newInstance()
+            .options(wireMockConfig()
+                .port(s3MockBackendPort)
+                //            .notifier(ConsoleNotifier(true))
+            )
+            .build()
     }
 }

@@ -2,10 +2,7 @@ package com.github.davinkevin.podcastserver.service.storage
 
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.times
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import reactor.core.publisher.Mono
@@ -25,7 +22,7 @@ class FileStorageConfigTest {
     fun `should init bucket`() {
         /* Given */
         val service: FileStorageService = mock()
-        whenever(service.initBucket()).thenReturn(Mono.empty())
+        doNothing().whenever(service).initBucket()
 
         /* When */
         context.withPropertyValues(
@@ -43,7 +40,7 @@ class FileStorageConfigTest {
                 it.getBean(CommandLineRunner::class.java)
                     .run()
 
-                verify(service, times(1)).initBucket()
+                verify(service).initBucket()
             }
     }
 }

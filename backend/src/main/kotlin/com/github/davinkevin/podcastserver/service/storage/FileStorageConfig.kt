@@ -5,9 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import org.springframework.http.client.reactive.ReactorClientHttpConnector
-import org.springframework.web.reactive.function.client.WebClient
-import reactor.netty.http.client.HttpClient
+import org.springframework.web.client.RestClient
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3AsyncClient
@@ -24,7 +22,7 @@ class FileStorageConfig {
 
     @Bean
     fun fileStorageService(
-        webClientBuilder: WebClient.Builder,
+        rcb: RestClient.Builder,
         properties: StorageProperties,
     ): FileStorageService {
         val s3conf = S3Configuration.builder()
@@ -38,6 +36,7 @@ class FileStorageConfig {
             .serviceConfiguration(s3conf)
             .endpointOverride(properties.url)
             .region(Region.AWS_GLOBAL)
+            .asyncConfiguration {  }
             .build()
 
         val preSignerBuilder = S3Presigner.builder()
@@ -51,12 +50,8 @@ class FileStorageConfig {
 
         val preSigner = if (properties.isInternal) requestSpecificPreSigner else externalPreSigner
 
-        val wcb = webClientBuilder
-            .clone()
-            .clientConnector(ReactorClientHttpConnector(HttpClient.create().followRedirect(true)))
-
         return FileStorageService(
-            wcb = wcb,
+            rcb = rcb.clone(),
             bucket = bucketClient,
             preSignerBuilder = preSigner,
             properties = properties,
@@ -65,7 +60,7 @@ class FileStorageConfig {
 
     @Bean
     fun createBucket(file: FileStorageService) = CommandLineRunner {
-        file.initBucket().blockOptional()
+        file.initBucket()
     }
 }
 
