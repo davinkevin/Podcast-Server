@@ -13,7 +13,7 @@ RUN echo "install dependencies" && \
   echo "Print content of downloader folder" && \
   tree /opt/
 
-FROM bellsoft/liberica-openjdk-debian:21.0.3 as base-image
+FROM bellsoft/liberica-openjdk-debian:21.0.4 as base-image
 
 COPY --from=downloader /opt/ /opt/
 
