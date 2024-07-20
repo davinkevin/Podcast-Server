@@ -33,6 +33,7 @@ import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.io.path.Path
 
@@ -131,24 +132,27 @@ class ItemDownloadManagerTest(
         fun `with no item`() {
             /* Given */
             whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
+
             /* When */
-            StepVerifier.create(idm.queue)
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            val queue = idm.queue
+
+            /* Then */
+            assertThat(queue).isEmpty()
         }
 
         @Test
         fun `with items`() {
             /* Given */
             whenever(repository.findAllWaiting()).thenReturn(Flux.just(item1, item2))
+
             /* When */
-            StepVerifier.create(idm.queue)
-                /* Then */
-                .expectSubscription()
-                .expectNext(item1)
-                .expectNext(item2)
-                .verifyComplete()
+            val queue = idm.queue
+
+            /* Then */
+            assertThat(queue).containsExactly(
+                item1,
+                item2
+            )
         }
 
     }
@@ -195,24 +199,27 @@ class ItemDownloadManagerTest(
         fun `with no item`() {
             /* Given */
             whenever(repository.findAllDownloading()).thenReturn(Flux.empty())
+
             /* When */
-            StepVerifier.create(idm.downloading)
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            val downloading = idm.downloading
+
+            /* Then */
+            assertThat(downloading).isEmpty()
         }
 
         @Test
         fun `with items`() {
             /* Given */
             whenever(repository.findAllDownloading()).thenReturn(Flux.just(item1, item2))
+
             /* When */
-            StepVerifier.create(idm.downloading)
-                /* Then */
-                .expectSubscription()
-                .expectNext(item1)
-                .expectNext(item2)
-                .verifyComplete()
+            val downloading = idm.downloading
+
+            /* Then */
+            assertThat(downloading).containsExactly(
+                item1,
+                item2
+            )
         }
 
     }
@@ -265,17 +272,17 @@ class ItemDownloadManagerTest(
             whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
 
             /* When */
-            StepVerifier.create(idm.launchDownload())
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            idm.launchDownload()
 
-            verify(repository, times(1)).initQueue(date, 10)
-            verify(repository, times(1)).findAllToDownload(1)
-            verify(messaging, times(1)).sendWaitingQueue(emptyList())
+            /* Then */
+            await().atMost(5, SECONDS).untilAsserted {
+                verify(repository).initQueue(date, 10)
+                verify(repository).findAllToDownload(1)
+                verify(messaging).sendWaitingQueue(emptyList())
 
-            verify(repository, never()).startItem(any())
-            verify(downloadExecutor, never()).execute(any())
+                verify(repository, never()).startItem(any())
+                verify(downloadExecutor, never()).execute(any())
+            }
         }
 
         @Test
@@ -292,18 +299,18 @@ class ItemDownloadManagerTest(
             whenever(repository.startItem(item1.id)).thenReturn(Mono.empty())
 
             /* When */
-            StepVerifier.create(idm.launchDownload())
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            idm.launchDownload()
 
-            verify(repository, times(1)).initQueue(date, 10)
-            verify(repository, times(1)).findAllToDownload(1)
-            verify(messaging, atLeast(1)).sendWaitingQueue(listOf(item1))
+            /* Then */
+            await().atMost(5, SECONDS).untilAsserted {
+                verify(repository).initQueue(date, 10)
+                verify(repository).findAllToDownload(1)
+                verify(messaging, atLeast(1)).sendWaitingQueue(listOf(item1))
 
-            assertThat(downloader.itemDownloadManager).isEqualTo(idm)
-            assertThat(downloader.downloadingInformation).isEqualTo(information)
-            verify(downloadExecutor, times(1)).execute(downloader)
+                assertThat(downloader.itemDownloadManager).isEqualTo(idm)
+                assertThat(downloader.downloadingInformation).isEqualTo(information)
+                verify(downloadExecutor).execute(downloader)
+            }
         }
 
         @Test
@@ -325,22 +332,22 @@ class ItemDownloadManagerTest(
             whenever(repository.startItem(item2.id)).thenReturn(Mono.empty())
 
             /* When */
-            StepVerifier.create(idm.launchDownload())
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            idm.launchDownload()
 
-            verify(repository, times(1)).initQueue(date, 10)
-            verify(repository, times(1)).findAllToDownload(1)
-            verify(messaging, atLeast(1)).sendWaitingQueue(listOf(item1, item2))
+            /* Then */
+            await().atMost(5, SECONDS).untilAsserted {
+                verify(repository).initQueue(date, 10)
+                verify(repository).findAllToDownload(1)
+                verify(messaging, atLeast(1)).sendWaitingQueue(listOf(item1, item2))
 
-            assertThat(downloader1.itemDownloadManager).isEqualTo(idm)
-            assertThat(downloader1.downloadingInformation).isEqualTo(information1)
-            assertThat(downloader2.itemDownloadManager).isEqualTo(idm)
-            assertThat(downloader2.downloadingInformation).isEqualTo(information2)
+                assertThat(downloader1.itemDownloadManager).isEqualTo(idm)
+                assertThat(downloader1.downloadingInformation).isEqualTo(information1)
+                assertThat(downloader2.itemDownloadManager).isEqualTo(idm)
+                assertThat(downloader2.downloadingInformation).isEqualTo(information2)
 
-            verify(downloadExecutor, times(1)).execute(downloader1)
-            verify(downloadExecutor, times(1)).execute(downloader2)
+                verify(downloadExecutor).execute(downloader1)
+                verify(downloadExecutor).execute(downloader2)
+            }
         }
 
     }
@@ -410,14 +417,21 @@ class ItemDownloadManagerTest(
             whenever(repository.startItem(item2.id)).thenReturn(Mono.empty())
             whenever(downloader1.with(any(), any())).thenCallRealMethod()
             whenever(downloader2.with(any(), any())).thenCallRealMethod()
-            idm.launchDownload().block()
+
+            /* And */
+            idm.launchDownload()
+            await().atMost(5, SECONDS).untilAsserted {
+                verify(repository, atLeastOnce()).findAllToDownload(any())
+            }
 
             /* When */
             idm.stopAllDownload()
 
             /* Then */
-            verify(downloader1, times(1)).stopDownload()
-            verify(downloader2, times(1)).stopDownload()
+            await().atMost(5, SECONDS).untilAsserted {
+                verify(downloader1).stopDownload()
+                verify(downloader2).stopDownload()
+            }
         }
 
     }
@@ -449,13 +463,12 @@ class ItemDownloadManagerTest(
             whenever(repository.addItemToQueue(item1.id)).thenReturn(Mono.empty())
             whenever(repository.findAllToDownload(1)).thenReturn(Flux.empty())
             whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
-            /* When */
-            StepVerifier.create(idm.addItemToQueue(item1.id))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
 
-            verify(repository, times(1)).addItemToQueue(item1.id)
+            /* When */
+            idm.addItemToQueue(item1.id)
+
+            /* Then */
+            verify(repository).addItemToQueue(item1.id)
         }
     }
 
@@ -491,7 +504,7 @@ class ItemDownloadManagerTest(
             idm.removeItemFromQueue(item1.id, true)
 
             /* Then */
-            verify(repository, times(1)).remove(item1.id, true)
+            verify(repository).remove(item1.id, true)
         }
     }
 
@@ -527,7 +540,7 @@ class ItemDownloadManagerTest(
             idm.removeACurrentDownload(item1.id)
 
             /* Then */
-            verify(repository, times(1)).remove(item1.id, false)
+            verify(repository).remove(item1.id, false)
         }
     }
 
@@ -560,12 +573,10 @@ class ItemDownloadManagerTest(
             whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
 
             /* When */
-            StepVerifier.create(idm.removeItemFromQueueAndDownload(item1.id))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            idm.removeItemFromQueueAndDownload(item1.id)
 
-            verify(repository, times(1)).remove(item1.id, false)
+            /* Then */
+            verify(repository).remove(item1.id, false)
         }
 
         @Test
@@ -574,16 +585,17 @@ class ItemDownloadManagerTest(
             val downloader = SimpleDownloader()
             whenever(downloaders.of(any())).thenReturn(downloader)
             whenever(repository.addItemToQueue(item1.id)).thenReturn(Mono.empty())
+            whenever(repository.remove(item1.id, false)).thenReturn(Mono.empty())
             whenever(repository.findAllToDownload(1)).thenReturn(Flux.just(item1))
             whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
             whenever(repository.startItem(item1.id)).thenReturn(Mono.empty())
-            idm.addItemToQueue(item1.id).block()
+            idm.addItemToQueue(item1.id)
 
             /* When */
-            StepVerifier.create(idm.removeItemFromQueueAndDownload(item1.id))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            idm.removeItemFromQueueAndDownload(item1.id)
+
+            /* Then */
+            // Nothing to verify…
         }
     }
 
@@ -617,25 +629,24 @@ class ItemDownloadManagerTest(
             whenever(repository.findAllToDownload(1)).thenReturn(Flux.just(item1))
             whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
             whenever(repository.startItem(item1.id)).thenReturn(Mono.empty())
-            idm.addItemToQueue(item1.id).block()
+            idm.addItemToQueue(item1.id)
 
             /* When */
-            StepVerifier.create(idm.isInDownloadingQueueById(item1.id))
-                /* Then */
-                .expectSubscription()
-                .expectNext(true)
-                .verifyComplete()
+            val isInDownloadingQueue = idm.isInDownloadingQueueById(item1.id)
+
+            /* Then */
+            assertThat(isInDownloadingQueue).isTrue()
         }
 
         @Test
         fun `with element not in downloading queue`() {
             /* Given */
+
             /* When */
-            StepVerifier.create(idm.isInDownloadingQueueById(UUID.fromString("3372d87e-30a0-4517-ba1f-bfd31e3555cb")))
-                /* Then */
-                .expectSubscription()
-                .expectNext(false)
-                .verifyComplete()
+            val isInDownloadingQueue = idm.isInDownloadingQueueById(UUID.fromString("3372d87e-30a0-4517-ba1f-bfd31e3555cb"))
+
+            /* Then */
+            assertThat(isInDownloadingQueue).isFalse()
         }
     }
 
@@ -650,10 +661,9 @@ class ItemDownloadManagerTest(
             whenever(repository.moveItemInQueue(UUID.fromString("b768eb50-64d2-4707-8da6-6672cc69a4ca"), 3)).thenReturn(Mono.empty())
             whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
             /* When */
-            StepVerifier.create(idm.moveItemInQueue(UUID.fromString("b768eb50-64d2-4707-8da6-6672cc69a4ca"), 3))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            idm.moveItemInQueue(UUID.fromString("b768eb50-64d2-4707-8da6-6672cc69a4ca"), 3)
+            /* Then */
+            // Nothing to verify…?
         }
 
     }
@@ -667,6 +677,7 @@ class ItemDownloadManagerTest(
             ThreadPoolTaskExecutor().apply {
                 corePoolSize = 1
                 setThreadNamePrefix("Downloader-")
+                newThread(Thread::ofVirtual)
                 initialize()
             }
         )

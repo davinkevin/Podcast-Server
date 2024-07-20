@@ -44,7 +44,7 @@ class ItemService(
     fun findById(id: UUID): Item? = repository.findById(id)
 
     fun reset(id: UUID): Item? {
-        val isDownloading = idm.isInDownloadingQueueById(id).block()!!
+        val isDownloading = idm.isInDownloadingQueueById(id)
         if (isDownloading) {
             return findById(id)
         }
@@ -117,7 +117,7 @@ class ItemService(
     fun findPlaylistsContainingItem(itemId: UUID) = repository.findPlaylistsContainingItem(itemId)
 
     fun deleteById(itemId: UUID) {
-        idm.removeItemFromQueueAndDownload(itemId).block()
+        idm.removeItemFromQueueAndDownload(itemId)
 
         val item = repository.deleteById(itemId)
 

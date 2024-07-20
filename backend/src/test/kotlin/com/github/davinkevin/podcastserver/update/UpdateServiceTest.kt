@@ -509,7 +509,7 @@ class UpdateServiceTest(
             }
             doNothing().whenever(fileService).downloadItemCover(any())
             doNothing().whenever(podcastRepository).updateLastUpdate(podcast1.id)
-            whenever(idm.launchDownload()).thenReturn(Mono.empty())
+            doNothing().whenever(idm).launchDownload()
 
             /* When */
             service.updateAll(force = false, download = true)

@@ -19,19 +19,15 @@ class DownloadHandler(private val downloadService: ItemDownloadManager) {
     fun download(r: ServerRequest): ServerResponse {
         val id = UUID.fromString(r.pathVariable("id"))
 
-        downloadService.addItemToQueue(id).block()
+        downloadService.addItemToQueue(id)
 
         return ServerResponse.noContent().build()
     }
 
     fun downloading(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
-        val downloadingItems = downloadService.downloading.collectList().block()!!
-
-        val body = downloadingItems
-            .asSequence()
+        val body = downloadService.downloading
             .map(::toDownloadingItem)
-            .toList()
-            .let { DownloadingItemsHAL(it) }
+            .let(::DownloadingItemsHAL)
 
         return ServerResponse.ok().body(body)
     }
@@ -55,15 +51,13 @@ class DownloadHandler(private val downloadService: ItemDownloadManager) {
     fun stopOne(r: ServerRequest): ServerResponse {
         val id = UUID.fromString(r.pathVariable("id"))
 
-        downloadService.removeItemFromQueueAndDownload(id).block()
+        downloadService.removeItemFromQueueAndDownload(id)
 
         return ServerResponse.noContent().build()
     }
 
     fun queue(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
         val queue = downloadService.queue
-            .collectList()
-            .block()!!
             .map(::toDownloadingItem)
 
         val response = QueueItemsHAL(queue)
@@ -75,7 +69,7 @@ class DownloadHandler(private val downloadService: ItemDownloadManager) {
     fun moveInQueue(r: ServerRequest): ServerResponse {
         val form = r.body<MovingItemInQueueForm>()
 
-        downloadService.moveItemInQueue(form.id, form.position).block()
+        downloadService.moveItemInQueue(form.id, form.position)
 
         return ServerResponse.noContent().build()
     }
