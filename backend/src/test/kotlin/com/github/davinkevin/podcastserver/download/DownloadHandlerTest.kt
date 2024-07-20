@@ -7,6 +7,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
@@ -73,7 +74,7 @@ class DownloadHandlerTest(
         fun `with success`() {
             /* Given */
             val id = UUID.randomUUID()
-            whenever(idm.addItemToQueue(id)).thenReturn(Mono.empty())
+            doNothing().whenever(idm).addItemToQueue(id)
             /* When */
             rest
                     .post()
@@ -82,7 +83,7 @@ class DownloadHandlerTest(
                     /* Then */
                     .expectStatus().isNoContent
 
-            verify(idm, times(1)).addItemToQueue(id)
+            verify(idm).addItemToQueue(id)
         }
 
     }
@@ -94,7 +95,7 @@ class DownloadHandlerTest(
         @Test
         fun `with success`() {
             /* Given */
-            whenever(idm.downloading).thenReturn(Flux.just(item1, item2))
+            whenever(idm.downloading).thenReturn(listOf(item1, item2))
 
             /* When */
             rest
@@ -160,7 +161,7 @@ class DownloadHandlerTest(
                     )
             )
 
-            whenever(idm.downloading).thenReturn(Flux.just(dlItem))
+            whenever(idm.downloading).thenReturn(listOf(dlItem))
 
             /* When */
             rest
@@ -212,7 +213,7 @@ class DownloadHandlerTest(
                     )
             )
 
-            whenever(idm.downloading).thenReturn(Flux.just(dlItem))
+            whenever(idm.downloading).thenReturn(listOf(dlItem))
 
             /* When */
             rest
@@ -326,7 +327,7 @@ class DownloadHandlerTest(
         fun `with success`() {
             /* Given */
             val id = UUID.randomUUID()
-            whenever(idm.removeItemFromQueueAndDownload(id)).thenReturn(Mono.empty())
+            doNothing().whenever(idm).removeItemFromQueueAndDownload(id)
             /* When */
             rest
                     .post()
@@ -336,7 +337,7 @@ class DownloadHandlerTest(
                     .expectStatus().isNoContent
                     .expectBody().isEmpty
 
-            verify(idm, times(1)).removeItemFromQueueAndDownload(id)
+            verify(idm).removeItemFromQueueAndDownload(id)
         }
     }
 
@@ -347,7 +348,7 @@ class DownloadHandlerTest(
         @Test
         fun `with success`() {
             /* Given */
-            whenever(idm.queue).thenReturn(Flux.just(item1, item2))
+            whenever(idm.queue).thenReturn(listOf(item1, item2))
 
             /* When */
             rest
@@ -402,7 +403,7 @@ class DownloadHandlerTest(
         fun `with success`() {
             /* Given */
             val operation = MovingItemInQueueForm(UUID.randomUUID(), 5)
-            whenever(idm.moveItemInQueue(operation.id, operation.position)).thenReturn(Mono.empty())
+            doNothing().whenever(idm).moveItemInQueue(operation.id, operation.position)
             /* When */
             rest
                     .post()
@@ -418,6 +419,7 @@ class DownloadHandlerTest(
     @Nested
     @DisplayName("should remove from queue")
     inner class ShouldRemoveFromQueue {
+
         @Test
         fun `and totally stop the item`() {
             /* Given */
@@ -431,7 +433,7 @@ class DownloadHandlerTest(
                     .expectStatus().isNoContent
                     .expectBody().isEmpty
 
-            verify(idm, times(1)).removeItemFromQueue(id, true)
+            verify(idm).removeItemFromQueue(id, true)
         }
 
         @Test
@@ -447,7 +449,7 @@ class DownloadHandlerTest(
                     .expectStatus().isNoContent
                     .expectBody().isEmpty
 
-            verify(idm, times(1)).removeItemFromQueue(id, false)
+            verify(idm).removeItemFromQueue(id, false)
         }
 
         @Test
@@ -463,7 +465,7 @@ class DownloadHandlerTest(
                     .expectStatus().isNoContent
                     .expectBody().isEmpty
 
-            verify(idm, times(1)).removeItemFromQueue(id, false)
+            verify(idm).removeItemFromQueue(id, false)
         }
 
     }

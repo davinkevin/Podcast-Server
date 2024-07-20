@@ -25,8 +25,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.codec.multipart.FilePart
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.nio.file.Paths
 import java.time.*
@@ -118,7 +116,7 @@ class ItemServiceTest(
         @Test
         fun `and do nothing because item is currently downloading`() {
             /* Given */
-            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(true.toMono())
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(true)
             whenever(repository.findById(item.id)).thenReturn(item)
 
             /* When */
@@ -134,7 +132,7 @@ class ItemServiceTest(
         @Test
         fun `and do nothing because the podcast is delete protected`() {
             /* Given */
-            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
             whenever(repository.findById(item.id)).thenReturn(item)
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(false)
 
@@ -151,7 +149,7 @@ class ItemServiceTest(
         fun `and do nothing because element is not downloaded`() {
             /* Given */
             whenever(repository.resetById(item.id)).thenReturn(item)
-            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(true)
             whenever(repository.findById(item.id)).thenReturn(item)
 
@@ -168,7 +166,7 @@ class ItemServiceTest(
             /* Given */
             val currentItem = item.copy(status = FINISH, fileName = null)
             whenever(repository.resetById(item.id)).thenReturn(item)
-            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(true)
             whenever(repository.findById(item.id)).thenReturn(currentItem)
 
@@ -185,7 +183,7 @@ class ItemServiceTest(
             /* Given */
             val currentItem = item.copy(status = FINISH, fileName = Path(""))
             whenever(repository.resetById(item.id)).thenReturn(item)
-            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(true)
             whenever(repository.findById(item.id)).thenReturn(currentItem)
 
@@ -203,7 +201,7 @@ class ItemServiceTest(
             val currentItem = item.copy(status = FINISH, fileName = Path("foo.mp4"))
             val deleteItemInformation = DeleteItemRequest(currentItem.id, currentItem.fileName!!, currentItem.podcast.title)
             whenever(repository.resetById(item.id)).thenReturn(item)
-            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false.toMono())
+            whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(true)
             whenever(repository.findById(item.id)).thenReturn(currentItem)
             whenever(fileService.deleteItem(deleteItemInformation)).thenReturn(true)
@@ -313,7 +311,7 @@ class ItemServiceTest(
             /* Given */
             val id = UUID.randomUUID()
             whenever(repository.deleteById(id)).thenReturn(null)
-            whenever(idm.removeItemFromQueueAndDownload(id)).thenReturn(Mono.empty())
+            doNothing().whenever(idm).removeItemFromQueueAndDownload(id)
 
             /* When */
             itemService.deleteById(id)
@@ -329,7 +327,7 @@ class ItemServiceTest(
             val deleteItem = DeleteItemRequest(id, Path("foo"), "bar")
             whenever(repository.deleteById(id)).thenReturn(deleteItem)
             whenever(fileService.deleteItem(deleteItem)).thenReturn(true)
-            whenever(idm.removeItemFromQueueAndDownload(id)).thenReturn(Mono.empty())
+            doNothing().whenever(idm).removeItemFromQueueAndDownload(id)
 
             /* When */
             itemService.deleteById(id)

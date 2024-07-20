@@ -14,7 +14,6 @@ import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import org.slf4j.LoggerFactory
 import org.springframework.core.task.SimpleAsyncTaskExecutor
-import reactor.core.publisher.Mono
 import java.net.URI
 import java.time.OffsetDateTime.now
 import java.util.*
@@ -64,7 +63,7 @@ class UpdateService(
             liveUpdate.isUpdating(false)
 
             if (download) {
-                updateExecutor.execute { idm.launchDownload().block() }
+                updateExecutor.execute { idm.launchDownload() }
             }
 
             return@measureTimedValue results
