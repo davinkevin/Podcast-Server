@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.database.enums.DownloadingState
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.toDb
+import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.r2dbc
 import org.assertj.core.api.Assertions.assertThat
@@ -17,7 +18,6 @@ import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
-import reactor.test.StepVerifier
 import java.net.URI
 import java.time.Clock
 import java.time.OffsetDateTime
@@ -64,11 +64,9 @@ class DownloadRepositoryTest(
         fun `but found no item because item list is empty`() {
             /* Given */
             /* When */
-            StepVerifier.create(repo.initQueue(OffsetDateTime.now(fixedDate), 5))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            repo.initQueue(OffsetDateTime.now(fixedDate), 5)
 
+            /* Then */
             val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
             assertThat(items).hasSize(0)
         }
@@ -154,10 +152,8 @@ class DownloadRepositoryTest(
                 fun `set to yesterday`() {
                     /* Given */
                     /* When */
-                    StepVerifier.create(repo.initQueue(oneDayAgo, 999))
-                        /* Then */
-                        .expectSubscription()
-                        .verifyComplete()
+                    repo.initQueue(oneDayAgo, 999)
+                    /* Then */
 
                     val (first) = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                     first.apply {
@@ -171,11 +167,9 @@ class DownloadRepositoryTest(
                 fun `set to two days ago`() {
                     /* Given */
                     /* When */
-                    StepVerifier.create(repo.initQueue(twoDaysAgo, 999))
-                        /* Then */
-                        .expectSubscription()
-                        .verifyComplete()
+                    repo.initQueue(twoDaysAgo, 999)
 
+                    /* Then */
                     val (first, second) = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId2)
@@ -193,11 +187,9 @@ class DownloadRepositoryTest(
                 fun `set to three days ago`() {
                     /* Given */
                     /* When */
-                    StepVerifier.create(repo.initQueue(threeDaysAgo, 999))
-                        /* Then */
-                        .expectSubscription()
-                        .verifyComplete()
+                    repo.initQueue(threeDaysAgo, 999)
 
+                    /* Then */
                     val (first, second, third) = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId3)
@@ -241,11 +233,9 @@ class DownloadRepositoryTest(
                 fun `up to 0 max`() {
                     /* Given */
                     /* When */
-                    StepVerifier.create(repo.initQueue(now.minusYears(1) , 0))
-                        /* Then */
-                        .expectSubscription()
-                        .verifyComplete()
+                    repo.initQueue(now.minusYears(1) , 0)
 
+                    /* Then */
                     val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                     assertThat(items).isEmpty()
                 }
@@ -254,11 +244,9 @@ class DownloadRepositoryTest(
                 fun `up to 5 max`() {
                     /* Given */
                     /* When */
-                    StepVerifier.create(repo.initQueue(now.minusYears(1) , 5+1))
-                        /* Then */
-                        .expectSubscription()
-                        .verifyComplete()
+                    repo.initQueue(now.minusYears(1) , 5+1)
 
+                    /* Then */
                     val (first) = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId1)
@@ -271,11 +259,9 @@ class DownloadRepositoryTest(
                 fun `up to 10 max`() {
                     /* Given */
                     /* When */
-                    StepVerifier.create(repo.initQueue(now.minusYears(1) , 10+1))
-                        /* Then */
-                        .expectSubscription()
-                        .verifyComplete()
+                    repo.initQueue(now.minusYears(1) , 10+1)
 
+                    /* Then */
                     val (first, second) = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId2)
@@ -293,11 +279,9 @@ class DownloadRepositoryTest(
                 fun `up to 20 max`() {
                     /* Given */
                     /* When */
-                    StepVerifier.create(repo.initQueue(now.minusYears(1) , 20+1))
-                        /* Then */
-                        .expectSubscription()
-                        .verifyComplete()
+                    repo.initQueue(now.minusYears(1) , 20+1)
 
+                    /* Then */
                     val (first, second, third) = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId3)
@@ -391,11 +375,9 @@ class DownloadRepositoryTest(
             fun `and a downloading list empty`() {
                 /* Given */
                 /* When */
-                StepVerifier.create(repo.addItemToQueue(itemId1))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                repo.addItemToQueue(itemId1)
 
+                /* Then */
                 val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                 assertThat(items).hasSize(1)
                 items.last().apply {
@@ -417,11 +399,9 @@ class DownloadRepositoryTest(
                     .r2dbc().execute()
 
                 /* When */
-                StepVerifier.create(repo.addItemToQueue(itemId1))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                repo.addItemToQueue(itemId1)
 
+                /* Then */
                 val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                 assertThat(items).hasSize(2)
                 items.last().apply {
@@ -443,11 +423,9 @@ class DownloadRepositoryTest(
                     .r2dbc().execute()
 
                 /* When */
-                StepVerifier.create(repo.addItemToQueue(itemId1))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                repo.addItemToQueue(itemId1)
 
+                /* Then */
                 val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                 assertThat(items).hasSize(2)
                 items.last().apply {
@@ -470,11 +448,9 @@ class DownloadRepositoryTest(
                     .r2dbc().execute()
 
                 /* When */
-                StepVerifier.create(repo.addItemToQueue(itemId1))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                repo.addItemToQueue(itemId1)
 
+                /* Then */
                 val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                 assertThat(items).hasSize(3)
                 items.last().apply {
@@ -497,11 +473,9 @@ class DownloadRepositoryTest(
                     .r2dbc().execute()
 
                 /* When */
-                StepVerifier.create(repo.addItemToQueue(itemId3))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                repo.addItemToQueue(itemId3)
 
+                /* Then */
                 val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                 assertThat(items).hasSize(2)
                 items.last().apply {
@@ -524,11 +498,9 @@ class DownloadRepositoryTest(
                     .r2dbc().execute()
 
                 /* When */
-                StepVerifier.create(repo.addItemToQueue(itemId2))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                repo.addItemToQueue(itemId2)
 
+                /* Then */
                 val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                 assertThat(items).hasSize(2)
                 items.first().apply {
@@ -550,11 +522,9 @@ class DownloadRepositoryTest(
                 )
                     .r2dbc().execute()
                 /* When */
-                StepVerifier.create(repo.addItemToQueue(UUID.fromString("65a10b6e-5474-4e1c-9697-eba5330aee1d")))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                repo.addItemToQueue(UUID.fromString("65a10b6e-5474-4e1c-9697-eba5330aee1d"))
 
+                /* Then */
                 val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                 assertThat(items).hasSize(2)
             }
@@ -625,11 +595,9 @@ class DownloadRepositoryTest(
         fun `but found no item because download list is empty`() {
             /* Given */
             /* When */
-            StepVerifier.create(repo.findAllToDownload(5))
-                /* Then */
-                .expectSubscription()
-                .expectNextCount(0)
-                .verifyComplete()
+            val items = repo.findAllToDownload(5)
+            /* Then */
+            assertThat(items).isEmpty()
         }
 
         @Nested
@@ -651,14 +619,17 @@ class DownloadRepositoryTest(
                     .r2dbc()
                     .execute()
                 /* When */
-                StepVerifier.create(repo.findAllToDownload(30))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext { assertThat(it.id).isEqualTo(itemId1) }
-                    .assertNext { assertThat(it.id).isEqualTo(itemId2) }
-                    .assertNext { assertThat(it.id).isEqualTo(itemId3) }
-                    .assertNext { assertThat(it.id).isEqualTo(itemId4) }
-                    .verifyComplete()
+                val items = repo.findAllToDownload(30)
+
+                /* Then */
+                assertThat(items).hasSize(4)
+                val (first, second, third, fourth) = items
+                assertAll {
+                    assertThat(first.id).isEqualTo(itemId1)
+                    assertThat(second.id).isEqualTo(itemId2)
+                    assertThat(third.id).isEqualTo(itemId3)
+                    assertThat(fourth.id).isEqualTo(itemId4)
+                }
             }
 
             @Test
@@ -676,11 +647,11 @@ class DownloadRepositoryTest(
                     .r2dbc()
                     .execute()
                 /* When */
-                StepVerifier.create(repo.findAllToDownload(1))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext { assertThat(it.id).isEqualTo(itemId1) }
-                    .verifyComplete()
+                val items = repo.findAllToDownload(1)
+
+                /* Then */
+                assertThat(items).hasSize(1)
+                assertThat(items.first().id).isEqualTo(itemId1)
             }
 
             @Test
@@ -698,12 +669,14 @@ class DownloadRepositoryTest(
                     .r2dbc()
                     .execute()
                 /* When */
-                StepVerifier.create(repo.findAllToDownload(2))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext { assertThat(it.id).isEqualTo(itemId1) }
-                    .assertNext { assertThat(it.id).isEqualTo(itemId2) }
-                    .verifyComplete()
+                val items = repo.findAllToDownload(2)
+
+                /* Then */
+
+                assertThat(items).hasSize(2)
+                val (first, second) = items
+                assertThat(first.id).isEqualTo(itemId1)
+                assertThat(second.id).isEqualTo(itemId2)
             }
         }
 
@@ -726,12 +699,13 @@ class DownloadRepositoryTest(
                     .r2dbc()
                     .execute()
                 /* When */
-                StepVerifier.create(repo.findAllToDownload(3))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext { assertThat(it.id).isEqualTo(itemId2) }
-                    .assertNext { assertThat(it.id).isEqualTo(itemId3) }
-                    .verifyComplete()
+                val items = repo.findAllToDownload(3)
+
+                /* Then */
+                assertThat(items).hasSize(2)
+                val (first, second) = items
+                assertThat(first.id).isEqualTo(itemId2)
+                assertThat(second.id).isEqualTo(itemId3)
             }
 
             @Test
@@ -748,12 +722,13 @@ class DownloadRepositoryTest(
                 )
                     .r2dbc()
                     .execute()
+
                 /* When */
-                StepVerifier.create(repo.findAllToDownload(3))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext { assertThat(it.id).isEqualTo(itemId3) }
-                    .verifyComplete()
+                val items = repo.findAllToDownload(3)
+
+                /* Then */
+                assertThat(items).hasSize(1)
+                assertThat(items.first().id).isEqualTo(itemId3)
             }
 
             @Test
@@ -771,11 +746,10 @@ class DownloadRepositoryTest(
                     .r2dbc()
                     .execute()
                 /* When */
-                StepVerifier.create(repo.findAllToDownload(3))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(0)
-                    .verifyComplete()
+                val items = repo.findAllToDownload(3)
+
+                /* Then */
+                assertThat(items).isEmpty()
             }
 
             @Test
@@ -792,12 +766,12 @@ class DownloadRepositoryTest(
                 )
                     .r2dbc()
                     .execute()
+
                 /* When */
-                StepVerifier.create(repo.findAllToDownload(3))
-                    /* Then */
-                    .expectSubscription()
-                    .expectNextCount(0)
-                    .verifyComplete()
+                val items = repo.findAllToDownload(3)
+
+                /* Then */
+                assertThat(items).isEmpty()
             }
         }
     }
@@ -869,10 +843,9 @@ class DownloadRepositoryTest(
         fun `with no items`() {
             /* Given */
             /* When */
-            StepVerifier.create(repo.findAllDownloading())
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            val items = repo.findAllDownloading()
+            /* Then */
+            assertThat(items).isEmpty()
         }
 
         @Test
@@ -885,11 +858,12 @@ class DownloadRepositoryTest(
                     .values(itemId2, DownloadingState.WAITING, 123)
             )
                 .r2dbc().execute()
+
             /* When */
-            StepVerifier.create(repo.findAllDownloading())
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            val items = repo.findAllDownloading()
+
+            /* Then */
+            assertThat(items).isEmpty()
         }
 
         @Test
@@ -904,28 +878,28 @@ class DownloadRepositoryTest(
                 .r2dbc().execute()
 
             /* When */
-            StepVerifier.create(repo.findAllDownloading())
-                /* Then */
-                .expectSubscription()
-                .expectNext(DownloadingItem(
-                    id = itemId2,
-                    title = "item_2",
-                    status = Status.NOT_DOWNLOADED,
-                    url = URI.create("https://foo.bar.com/item/2"),
-                    numberOfFail = 10,
-                    progression = 0,
+            val items = repo.findAllDownloading()
 
-                    podcast = DownloadingItem.Podcast(
-                        id = podcastId,
-                        title = "Podcast-Title"
-                    ),
+            /* Then */
+            assertThat(items).hasSize(1)
+            assertThat(items.first()).isEqualTo(DownloadingItem(
+                id = itemId2,
+                title = "item_2",
+                status = Status.NOT_DOWNLOADED,
+                url = URI.create("https://foo.bar.com/item/2"),
+                numberOfFail = 10,
+                progression = 0,
 
-                    cover = DownloadingItem.Cover(
-                        id = itemCoverId2,
-                        url = URI.create("https://foo.bac.com/item/cover.jpg")
-                    )
-                ))
-                .verifyComplete()
+                podcast = DownloadingItem.Podcast(
+                    id = podcastId,
+                    title = "Podcast-Title"
+                ),
+
+                cover = DownloadingItem.Cover(
+                    id = itemCoverId2,
+                    url = URI.create("https://foo.bac.com/item/cover.jpg")
+                )
+            ))
         }
 
         @Test
@@ -941,10 +915,13 @@ class DownloadRepositoryTest(
                 .r2dbc().execute()
 
             /* When */
-            StepVerifier.create(repo.findAllDownloading())
-                /* Then */
-                .expectSubscription()
-                .expectNext(DownloadingItem(
+            val items = repo.findAllDownloading()
+
+            /* Then */
+            assertThat(items).hasSize(2)
+            val (first, second) = items
+            assertAll {
+                assertThat(first).isEqualTo(DownloadingItem(
                     id = itemId2,
                     title = "item_2",
                     status = Status.NOT_DOWNLOADED,
@@ -962,7 +939,7 @@ class DownloadRepositoryTest(
                         url = URI.create("https://foo.bac.com/item/cover.jpg")
                     )
                 ))
-                .expectNext(DownloadingItem(
+                assertThat(second).isEqualTo(DownloadingItem(
                     id = itemId3,
                     title = "item_3",
                     status = Status.NOT_DOWNLOADED,
@@ -980,7 +957,7 @@ class DownloadRepositoryTest(
                         url = URI.create("https://foo.bac.com/item/cover.jpg")
                     )
                 ))
-                .verifyComplete()
+            }
         }
     }
 
@@ -1051,10 +1028,10 @@ class DownloadRepositoryTest(
         fun `with no items`() {
             /* Given */
             /* When */
-            StepVerifier.create(repo.findAllWaiting())
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            val items = repo.findAllWaiting()
+
+            /* Then */
+            assertThat(items).isEmpty()
         }
 
         @Test
@@ -1067,11 +1044,12 @@ class DownloadRepositoryTest(
                     .values(itemId2, DownloadingState.DOWNLOADING, 123)
             )
                 .r2dbc().execute()
+
             /* When */
-            StepVerifier.create(repo.findAllWaiting())
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            val items = repo.findAllWaiting()
+
+            /* Then */
+            assertThat(items).isEmpty()
         }
 
         @Test
@@ -1086,28 +1064,28 @@ class DownloadRepositoryTest(
                 .r2dbc().execute()
 
             /* When */
-            StepVerifier.create(repo.findAllWaiting())
-                /* Then */
-                .expectSubscription()
-                .expectNext(DownloadingItem(
-                    id = itemId2,
-                    title = "item_2",
-                    status = Status.NOT_DOWNLOADED,
-                    url = URI.create("https://foo.bar.com/item/2"),
-                    numberOfFail = 10,
-                    progression = 0,
+            val items = repo.findAllWaiting()
 
-                    podcast = DownloadingItem.Podcast(
-                        id = podcastId,
-                        title = "Podcast-Title"
-                    ),
+            /* Then */
+            assertThat(items).hasSize(1)
+            assertThat(items.first()).isEqualTo(DownloadingItem(
+                id = itemId2,
+                title = "item_2",
+                status = Status.NOT_DOWNLOADED,
+                url = URI.create("https://foo.bar.com/item/2"),
+                numberOfFail = 10,
+                progression = 0,
 
-                    cover = DownloadingItem.Cover(
-                        id = itemCoverId2,
-                        url = URI.create("https://foo.bac.com/item/cover.jpg")
-                    )
-                ))
-                .verifyComplete()
+                podcast = DownloadingItem.Podcast(
+                    id = podcastId,
+                    title = "Podcast-Title"
+                ),
+
+                cover = DownloadingItem.Cover(
+                    id = itemCoverId2,
+                    url = URI.create("https://foo.bac.com/item/cover.jpg")
+                )
+            ))
         }
 
         @Test
@@ -1123,10 +1101,13 @@ class DownloadRepositoryTest(
                 .r2dbc().execute()
 
             /* When */
-            StepVerifier.create(repo.findAllWaiting())
-                /* Then */
-                .expectSubscription()
-                .expectNext(DownloadingItem(
+            val items = repo.findAllWaiting()
+
+            /* Then */
+            assertThat(items).hasSize(2)
+            val (first, second) = items
+            assertAll {
+                assertThat(first).isEqualTo(DownloadingItem(
                     id = itemId2,
                     title = "item_2",
                     status = Status.NOT_DOWNLOADED,
@@ -1144,7 +1125,7 @@ class DownloadRepositoryTest(
                         url = URI.create("https://foo.bac.com/item/cover.jpg")
                     )
                 ))
-                .expectNext(DownloadingItem(
+                assertThat(second).isEqualTo(DownloadingItem(
                     id = itemId3,
                     title = "item_3",
                     status = Status.NOT_DOWNLOADED,
@@ -1162,7 +1143,7 @@ class DownloadRepositoryTest(
                         url = URI.create("https://foo.bac.com/item/cover.jpg")
                     )
                 ))
-                .verifyComplete()
+            }
         }
 
     }
@@ -1223,13 +1204,11 @@ class DownloadRepositoryTest(
         @Test
         fun `with success`() {
             /* Given */
-            /* When */
-            StepVerifier.create(repo.stopItem(itemId1))
-                /* Then */
-                .expectSubscription()
-                .expectNext(1)
-                .verifyComplete()
 
+            /* When */
+            repo.stopItem(itemId1)
+
+            /* Then */
             val numberOfStoppedItems = query.selectCount().from(ITEM).where(ITEM.STATUS.eq(ItemStatus.STOPPED))
                 .r2dbc().fetchOne(count())
 
@@ -1241,13 +1220,11 @@ class DownloadRepositoryTest(
         @Test
         fun `and let others in same state as before`() {
             /* Given */
-            /* When */
-            StepVerifier.create(repo.stopItem(itemId1))
-                /* Then */
-                .expectSubscription()
-                .expectNext(1)
-                .verifyComplete()
 
+            /* When */
+            repo.stopItem(itemId1)
+
+            /* Then */
             val notStoppedItems = query
                 .selectFrom(ITEM)
                 .where(ITEM.STATUS.notEqual(ItemStatus.STOPPED))
@@ -1336,13 +1313,11 @@ class DownloadRepositoryTest(
         fun `with status`(status: Status) {
             /* Given */
             val withStatus = downloadingItem.copy(status = status)
-            /* When */
-            StepVerifier.create(repo.updateDownloadItem(withStatus))
-                /* Then */
-                .expectSubscription()
-                .expectNext(1)
-                .verifyComplete()
 
+            /* When */
+            repo.updateDownloadItem(withStatus)
+
+            /* Then */
             val item = query.selectFrom(i).where(i.ID.eq(downloadingItem.id)).r2dbc().fetchOne() ?: error("item not found")
             assertThat(item[ITEM.STATUS]).isEqualTo(status.toDb())
             val others = query.selectFrom(i).where(i.ID.notEqual(downloadingItem.id)).r2dbc().fetch()
@@ -1354,13 +1329,11 @@ class DownloadRepositoryTest(
         fun `with fail`(numberOfFails: Int) {
             /* Given */
             val withFails = downloadingItem.copy(numberOfFail = numberOfFails)
-            /* When */
-            StepVerifier.create(repo.updateDownloadItem(withFails))
-                /* Then */
-                .expectSubscription()
-                .expectNext(1)
-                .verifyComplete()
 
+            /* When */
+            repo.updateDownloadItem(withFails)
+
+            /* Then */
             val item = query.selectFrom(i).where(i.ID.eq(downloadingItem.id)).r2dbc().fetchOne() ?: error("item not found")
             assertThat(item[i.NUMBER_OF_FAIL]).isEqualTo(numberOfFails)
             val others = query.selectFrom(i).where(i.ID.notEqual(downloadingItem.id)).r2dbc().fetch()
@@ -1435,19 +1408,17 @@ class DownloadRepositoryTest(
         fun `with success`() {
             /* Given */
             val now = OffsetDateTime.now(fixedDate)
+
             /* When */
-            StepVerifier.create(repo.finishDownload(
+            repo.finishDownload(
                 id = itemId1,
                 length = 100L,
                 mimeType = "video/avi",
                 fileName = Path("filename.mp4"),
                 downloadDate = now
-            ))
-                /* Then */
-                .expectSubscription()
-                .expectNext(1)
-                .verifyComplete()
+            )
 
+            /* Then */
             val item = query.selectFrom(i).where(i.ID.eq(itemId1)).r2dbc().fetchOne() ?: error("item not found")
             assertThat(item[i.STATUS]).isEqualTo(ItemStatus.FINISH)
             assertThat(item[i.LENGTH]).isEqualTo(100L)
@@ -1461,19 +1432,17 @@ class DownloadRepositoryTest(
             /* Given */
             val now = OffsetDateTime.now(fixedDate)
             val itemsBefore = query.selectFrom(i).where(i.ID.notEqual(itemId1)).r2dbc().fetch()
+
             /* When */
-            StepVerifier.create(repo.finishDownload(
+            repo.finishDownload(
                 id = itemId1,
                 length = 100L,
                 mimeType = "video/avi",
                 fileName = Path("filename.mp4"),
                 downloadDate = now
-            ))
-                /* Then */
-                .expectSubscription()
-                .expectNext(1)
-                .verifyComplete()
+            )
 
+            /* Then */
             val itemsAfter = query.selectFrom(i).where(i.ID.notEqual(itemId1)).r2dbc().fetch()
             assertThat(itemsBefore).containsAll(itemsAfter)
         }
@@ -1552,12 +1521,11 @@ class DownloadRepositoryTest(
         @Test
         fun `with success`() {
             /* Given */
-            /* When */
-            StepVerifier.create(repo.remove(id = itemId1, hasToBeStopped = false))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
 
+            /* When */
+            repo.remove(id = itemId1, hasToBeStopped = false)
+
+            /* Then */
             val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                 .map { it[DOWNLOADING_ITEM.ITEM_ID] to it[DOWNLOADING_ITEM.POSITION] }
             assertThat(items).contains(itemId2 to 2)
@@ -1567,11 +1535,9 @@ class DownloadRepositoryTest(
         fun `with stop action on the item`() {
             /* Given */
             /* When */
-            StepVerifier.create(repo.remove(id = itemId1, hasToBeStopped = true))
-                /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            repo.remove(id = itemId1, hasToBeStopped = true)
 
+            /* Then */
             val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
                 .map { it[DOWNLOADING_ITEM.ITEM_ID] to it[DOWNLOADING_ITEM.POSITION] }
             assertThat(items).contains(itemId2 to 2)
@@ -1658,13 +1624,11 @@ class DownloadRepositoryTest(
                 )
                     .r2dbc()
                     .execute()
+
                 /* When */
-                StepVerifier.create(repo.moveItemInQueue(itemId3, 0))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                repo.moveItemInQueue(itemId3, 0)
 
-
+                /* Then */
                 val items = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION).r2dbc().fetch()
                 assertThat(items[0].itemId).isEqualTo(itemId1)
                 assertThat(items[1].itemId).isEqualTo(itemId3)
@@ -1686,12 +1650,11 @@ class DownloadRepositoryTest(
                 )
                     .r2dbc()
                     .execute()
-                /* When */
-                StepVerifier.create(repo.moveItemInQueue(itemId2, 1))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
 
+                /* When */
+                repo.moveItemInQueue(itemId2, 1)
+
+                /* Then */
                 val items = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION).r2dbc().fetch()
                 assertThat(items[0].itemId).isEqualTo(itemId1)
                 assertThat(items[1].itemId).isEqualTo(itemId3)
@@ -1714,11 +1677,9 @@ class DownloadRepositoryTest(
                     .r2dbc()
                     .execute()
                 /* When */
-                StepVerifier.create(repo.moveItemInQueue(itemId2, 2))
-                    /* Then */
-                    .expectSubscription()
-                    .verifyComplete()
+                repo.moveItemInQueue(itemId2, 2)
 
+                /* Then */
                 val items = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION).r2dbc().fetch()
                 assertThat(items[0].itemId).isEqualTo(itemId1)
                 assertThat(items[1].itemId).isEqualTo(itemId3)
@@ -1800,11 +1761,9 @@ class DownloadRepositoryTest(
         fun `with success`() {
             /* Given */
             /* When */
-            StepVerifier.create(repo.startItem(itemId2))
-            /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            repo.startItem(itemId2)
 
+            /* Then */
             val item = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION)
                 .r2dbc().fetch()
                 .first { it.itemId == itemId2 }
@@ -1816,11 +1775,9 @@ class DownloadRepositoryTest(
         fun `with one item not in the list`() {
             /* Given */
             /* When */
-            StepVerifier.create(repo.startItem(UUID.fromString("1811fadd-45e6-4761-8ad0-6a72951cb255")))
-            /* Then */
-                .expectSubscription()
-                .verifyComplete()
+            repo.startItem(UUID.fromString("1811fadd-45e6-4761-8ad0-6a72951cb255"))
 
+            /* Then */
             val (first, second, third, fourth) = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION)
                 .r2dbc().fetch()
 
@@ -1913,12 +1870,9 @@ class DownloadRepositoryTest(
         fun `with 0 item in downloading state`() {
             /* Given */
             /* When */
-            StepVerifier.create(repo.resetToWaitingStateAllDownloadingItems())
-                /* Then */
-                .expectSubscription()
-                .expectNext(0)
-                .verifyComplete()
+            repo.resetToWaitingStateAllDownloadingItems()
 
+            /* Then */
             val items = query
                 .selectFrom(DOWNLOADING_ITEM)
                 .r2dbc().fetch()
@@ -1939,11 +1893,10 @@ class DownloadRepositoryTest(
                 .execute()
 
             /* When */
-            StepVerifier.create(repo.resetToWaitingStateAllDownloadingItems())
-                /* Then */
-                .expectSubscription()
-                .expectNext(1)
-                .verifyComplete()
+            val result = repo.resetToWaitingStateAllDownloadingItems()
+
+            /* Then */
+            assertThat(result).isEqualTo(1)
 
             val items = query
                 .selectFrom(DOWNLOADING_ITEM)
@@ -1965,12 +1918,10 @@ class DownloadRepositoryTest(
                 .execute()
 
             /* When */
-            StepVerifier.create(repo.resetToWaitingStateAllDownloadingItems())
-                /* Then */
-                .expectSubscription()
-                .expectNext(2)
-                .verifyComplete()
+            val result = repo.resetToWaitingStateAllDownloadingItems()
 
+            /* Then */
+            assertThat(result).isEqualTo(2)
             val items = query
                 .selectFrom(DOWNLOADING_ITEM)
                 .r2dbc().fetch()
@@ -1991,12 +1942,10 @@ class DownloadRepositoryTest(
                 .execute()
 
             /* When */
-            StepVerifier.create(repo.resetToWaitingStateAllDownloadingItems())
-                /* Then */
-                .expectSubscription()
-                .expectNext(3)
-                .verifyComplete()
+            val result = repo.resetToWaitingStateAllDownloadingItems()
 
+            /* Then */
+            assertThat(result).isEqualTo(3)
             val items = query
                 .selectFrom(DOWNLOADING_ITEM)
                 .r2dbc().fetch()
@@ -2016,12 +1965,10 @@ class DownloadRepositoryTest(
                 .execute()
 
             /* When */
-            StepVerifier.create(repo.resetToWaitingStateAllDownloadingItems())
-                /* Then */
-                .expectSubscription()
-                .expectNext(4)
-                .verifyComplete()
+            val result = repo.resetToWaitingStateAllDownloadingItems()
 
+            /* Then */
+            assertThat(result).isEqualTo(4)
             val items = query
                 .selectFrom(DOWNLOADING_ITEM)
                 .r2dbc().fetch()

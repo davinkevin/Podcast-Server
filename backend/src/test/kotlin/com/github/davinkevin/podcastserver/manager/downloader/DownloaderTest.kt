@@ -6,12 +6,11 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.assertj.core.api.Assertions.assertThat
+import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.io.IOException
 import java.net.URI
 import java.nio.file.Files
@@ -20,6 +19,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.io.path.Path
 import kotlin.io.path.writeText
 
@@ -69,7 +69,7 @@ class DownloaderTest {
             downloader
                     .with(DownloadingInformation(item,  listOf(), Path("filename.mp4"), null), itemDownloadManager)
 
-            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
+            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(1)
 
             /* When */
             downloader.run()
@@ -87,13 +87,15 @@ class DownloaderTest {
             /* Given */
             val information = DownloadingInformation(item, listOf(), Path("file.mp4"), null)
             downloader.with(information, itemDownloadManager)
-            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
+            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(1)
 
             /* When */
             downloader.saveStateOfItem(information.item)
 
             /* Then */
-            verify(downloadRepository, times(1)).updateDownloadItem(information.item)
+            await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                verify(downloadRepository, times(1)).updateDownloadItem(information.item)
+            }
         }
 
         @Test
@@ -102,7 +104,7 @@ class DownloaderTest {
             /* Given */
             val information = DownloadingInformation(item, listOf(), Path("file.mp4"), null)
             downloader.with(information, itemDownloadManager)
-            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
+            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(1)
             whenever(file.upload(any(), any())).thenThrow(RuntimeException("not expected error"))
             whenever(file.metadata(any(), any())).thenThrow(RuntimeException("not expected error"))
 
@@ -114,10 +116,10 @@ class DownloaderTest {
             }
 
             /* Then */
-            assertThat(downloader.target).doesNotExist()
+            await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                assertThat(downloader.target).doesNotExist()
+            }
         }
-
-
     }
 
     @Nested
@@ -134,7 +136,7 @@ class DownloaderTest {
             /* Given */
             val d = AlwaysFailingDownloader(downloadRepository, template, clock, file)
             d.with(DownloadingInformation(item,  listOf(), Path("filename.mp4"), null), itemDownloadManager)
-            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.just(1))
+            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(1)
 
             /* When */
             d.run()

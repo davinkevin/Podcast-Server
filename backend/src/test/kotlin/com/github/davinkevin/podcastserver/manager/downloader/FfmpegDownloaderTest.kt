@@ -6,8 +6,8 @@ import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.ffmpeg.FfmpegService
 import com.github.davinkevin.podcastserver.service.ProcessService
+import com.github.davinkevin.podcastserver.service.ffmpeg.FfmpegService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
@@ -25,8 +25,6 @@ import org.mockito.Spy
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.net.URI
 import java.nio.file.Files
@@ -96,7 +94,7 @@ class FfmpegDownloaderTest {
 
             @BeforeEach
             fun beforeEach() {
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
             }
 
             @Test
@@ -121,14 +119,16 @@ class FfmpegDownloaderTest {
                         mimeType = "video/mp4",
                         fileName = Path("file-${item.id}.mp4"),
                         downloadDate = fixedDate
-                )).thenReturn(Mono.empty())
+                )).thenReturn(0)
 
                 /* When */
                 downloader.run()
 
                 /* Then */
-                assertThat(downloader.downloadingInformation.item.status).isEqualTo(FINISH)
-                assertThat(downloader.downloadingInformation.item.progression).isEqualTo(100)
+                await().atMost(5, SECONDS).untilAsserted {
+                    assertThat(downloader.downloadingInformation.item.status).isEqualTo(FINISH)
+                    assertThat(downloader.downloadingInformation.item.progression).isEqualTo(100)
+                }
             }
 
             @Test
@@ -217,7 +217,7 @@ class FfmpegDownloaderTest {
                 /* Given */
                 downloader.downloadingInformation = downloader.downloadingInformation.status(STARTED)
                 downloader.process = mock()
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
 
                 /* When */
                 downloader.stopDownload()
@@ -236,7 +236,7 @@ class FfmpegDownloaderTest {
                 downloader.process = mock()
                 doAnswer { throw RuntimeException("Error when executing process") }
                         .whenever(downloader.process).destroy()
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
                 /* When */
                 downloader.stopDownload()
 

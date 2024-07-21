@@ -20,8 +20,6 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.io.ByteArrayInputStream
 import java.io.File
@@ -35,6 +33,7 @@ import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.*
 import java.util.concurrent.CompletableFuture.runAsync
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.io.path.Path
 
@@ -118,7 +117,7 @@ class RTMPDownloaderTest {
                     any<String>(),
                 )).then { pb }
                 whenever(processService.start(any())).then { throw RuntimeException("Error occur during shell execution")}
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
 
                 /* When */
                 downloader.run()
@@ -143,7 +142,7 @@ class RTMPDownloaderTest {
                 )).then { pb }
                 whenever(processService.start(any())).then { p }
                 whenever(processService.pidOf(p)).then { throw RuntimeException("Error during pid fetching") }
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
 
                 /* When */
                 downloader.run()
@@ -194,20 +193,22 @@ class RTMPDownloaderTest {
                     .thenReturn(PutObjectResponse.builder().build())
                 whenever(file.metadata(eq(item.podcast.title), any()))
                     .thenReturn(FileMetaData("video/mp4", 123L))
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
                 whenever(downloadRepository.finishDownload(
                         id = item.id,
                         length = 123L,
                         mimeType = "video/mp4",
                         fileName = Path("file-${item.id}.mp4"),
                         downloadDate = fixedDate
-                )).thenReturn(Mono.empty())
+                )).thenReturn(0)
 
                 /* When */
                 downloader.run()
 
                 /* Then */
-                assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FINISH)
+                await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                    assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FINISH)
+                }
             }
 
             @Nested
@@ -219,7 +220,7 @@ class RTMPDownloaderTest {
                 @BeforeEach
                 fun beforeEach() {
                     whenever(p.waitFor()).then { isWaiting = true; SECONDS.sleep(4); 0 }
-                    whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
+                    whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
                 }
 
                 @Test
@@ -235,7 +236,7 @@ class RTMPDownloaderTest {
                             mimeType = "video/mp4",
                             fileName = Path("file-${item.id}.mp4"),
                             downloadDate = fixedDate
-                    )).thenReturn(Mono.empty())
+                    )).thenReturn(0)
 
                     /* WHEN  */
                     runAsync { downloader.run() }
@@ -243,8 +244,10 @@ class RTMPDownloaderTest {
                     downloader.stopDownload()
 
                     /* THEN  */
-                    assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.STOPPED)
-                    verify(p).destroy()
+                    await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                        assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.STOPPED)
+                        verify(p).destroy()
+                    }
                 }
 
             }
@@ -261,7 +264,7 @@ class RTMPDownloaderTest {
                         .trimIndent()
                         .toByteArray()
                         .inputStream()
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
+                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
                 whenever(p.inputStream).then { executionLogs }
 
                 /* When */

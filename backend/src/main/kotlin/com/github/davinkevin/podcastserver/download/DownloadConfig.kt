@@ -60,8 +60,6 @@ class DownloadConfig {
 
     @Bean
     fun onStartupCleanInvalidDownloadingItemsState(download: DownloadRepository) = CommandLineRunner {
-        download
-            .resetToWaitingStateAllDownloadingItems()
-            .block()
+        download.resetToWaitingStateAllDownloadingItems()
     }
 }
