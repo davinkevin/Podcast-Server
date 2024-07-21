@@ -12,6 +12,7 @@ import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
 import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLResponse
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
+import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -27,7 +28,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Mono
 import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.net.URI
 import java.nio.file.Files
@@ -37,6 +37,7 @@ import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.io.path.Path
 
 private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
@@ -98,9 +99,9 @@ class YoutubeDlDownloaderTest(
             whenever(file.upload(eq(dItem.item.podcast.title), any()))
                 .thenReturn(PutObjectResponse.builder().build())
             whenever(file.metadata(eq(dItem.item.podcast.title), any())).thenReturn(FileMetaData("foo/bar", 123L))
-            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(Mono.empty())
+            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
             whenever(downloadRepository.finishDownload(any(), any(), anyOrNull(), any(), any()))
-                    .thenReturn(Mono.empty())
+                    .thenReturn(0)
         }
 
         @Test
@@ -120,8 +121,10 @@ class YoutubeDlDownloaderTest(
             downloader.download()
 
             /* Then */
-            verify(file, times(1)).upload(dItem.item.podcast.title, finalFile)
-            verify(file, times(1)).metadata(dItem.item.podcast.title, finalFile)
+            await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                verify(file, times(1)).upload(dItem.item.podcast.title, finalFile)
+                verify(file, times(1)).metadata(dItem.item.podcast.title, finalFile)
+            }
         }
 
         @Nested
@@ -217,12 +220,11 @@ class YoutubeDlDownloaderTest(
                 callback.onProgressUpdate(1f, 2)
 
                 /* Then */
-                verify(template, times(1)).sendItem(any())
+                await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                    verify(template, times(1)).sendItem(any())
+                }
             }
-
-
         }
-
     }
 
     @Nested

@@ -2,7 +2,6 @@ package com.github.davinkevin.podcastserver.manager.downloader
 
 
 import com.github.davinkevin.podcastserver.download.DownloadRepository
-import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
@@ -68,11 +67,12 @@ class RTMPDownloader(
 
     fun listenLogs(process: Process) {
         log.debug("Reading output of RTMPDump")
-
+        var endReached = false
         process.inputStream
             .bufferedReader()
             .lines()
             .forEach {
+                log.info("log is: $it")
                 val (isProgression, progression) = isProgressionLine(it)
                 if (isProgression) {
                     broadcastProgression(downloadingInformation.item, progression)
@@ -80,13 +80,13 @@ class RTMPDownloader(
                 }
 
                 if (isDownloadComplete(it)) {
-                    log.info("End of download")
+                    endReached = true
                     finishDownload()
                     return@forEach
                 }
             }
 
-        if (downloadingInformation.item.status != Status.FINISH && !stopDownloading.get()) {
+        if (!endReached && !stopDownloading.get()) {
             throw RuntimeException("Unexpected ending, failed download")
         }
     }

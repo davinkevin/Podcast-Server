@@ -25,13 +25,9 @@ class ItemDownloadManager (
 
     val queue: List<DownloadingItem>
         get() = repository.findAllWaiting()
-            .collectList()
-            .block()!!
 
     val downloading: List<DownloadingItem>
         get() = repository.findAllDownloading()
-            .collectList()
-            .block()!!
 
     var limitParallelDownload: Int
         get() = downloadExecutor.corePoolSize
@@ -41,14 +37,13 @@ class ItemDownloadManager (
         }
 
     fun launchDownload() {
-        repository.initQueue(parameters.limitDownloadDate(), parameters.numberOfTry).block()
+        repository.initQueue(parameters.limitDownloadDate(), parameters.numberOfTry)
         manageInBackground()
     }
 
     private fun manageDownload() {
         val allToDownload = repository
             .findAllToDownload(limitParallelDownload)
-            .collectList().block()!!
 
         allToDownload.forEach(::launchDownloadFor)
 
@@ -63,7 +58,7 @@ class ItemDownloadManager (
 
         downloaders[item.id] = downloader
 
-        repository.startItem(item.id).block()
+        repository.startItem(item.id)
         downloadExecutor.execute(downloader)
     }
 
@@ -72,18 +67,18 @@ class ItemDownloadManager (
     }
 
     fun addItemToQueue(id: UUID) {
-        repository.addItemToQueue(id).block()
+        repository.addItemToQueue(id)
         manageInBackground()
     }
 
     fun removeItemFromQueue(id: UUID, stopItem: Boolean) {
-        repository.remove(id, stopItem).block()
+        repository.remove(id, stopItem)
         manageInBackground()
     }
 
     fun removeACurrentDownload(id: UUID) {
         downloaders.remove(id)
-        repository.remove(id, false).block()
+        repository.remove(id, false)
         manageInBackground()
     }
 
@@ -94,7 +89,7 @@ class ItemDownloadManager (
             return
         }
 
-        repository.remove(id, false).block()
+        repository.remove(id, false)
         manageInBackground()
     }
 
@@ -108,7 +103,6 @@ class ItemDownloadManager (
 
     private fun convertAndSendWaitingQueue() {
         val list = repository.findAllWaiting()
-            .collectList().block()!!
 
         template.sendWaitingQueue(list)
     }
@@ -118,7 +112,7 @@ class ItemDownloadManager (
     }
 
     fun moveItemInQueue(id: UUID, position: Int) {
-        repository.moveItemInQueue(id, position).block()
+        repository.moveItemInQueue(id, position)
 
         convertAndSendWaitingQueueInBackground()
     }

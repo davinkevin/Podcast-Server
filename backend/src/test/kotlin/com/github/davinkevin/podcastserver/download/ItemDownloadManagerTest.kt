@@ -7,14 +7,9 @@ import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import org.apache.commons.io.FilenameUtils
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility.await
-import org.junit.jupiter.api.AfterEach
-import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Nested
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.Timeout
+import org.junit.jupiter.api.*
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.mockito.kotlin.*
@@ -26,14 +21,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.test.StepVerifier
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
-import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.io.path.Path
 
@@ -66,10 +57,9 @@ class ItemDownloadManagerTest(
         @Test
         fun `and change its value`() {
             /* Given */
-            whenever(repository.initQueue(date, 1))
-                .thenReturn(Mono.empty())
-            whenever(repository.findAllToDownload(3)).thenReturn(Flux.empty())
-            whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
+            doNothing().whenever(repository).initQueue(date, 1)
+            whenever(repository.findAllToDownload(3)).thenReturn(emptyList())
+            whenever(repository.findAllWaiting()).thenReturn(emptyList())
 
             /* When */
             idm.limitParallelDownload = 3
@@ -131,7 +121,7 @@ class ItemDownloadManagerTest(
         @Test
         fun `with no item`() {
             /* Given */
-            whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
+            whenever(repository.findAllWaiting()).thenReturn(emptyList())
 
             /* When */
             val queue = idm.queue
@@ -143,7 +133,7 @@ class ItemDownloadManagerTest(
         @Test
         fun `with items`() {
             /* Given */
-            whenever(repository.findAllWaiting()).thenReturn(Flux.just(item1, item2))
+            whenever(repository.findAllWaiting()).thenReturn(listOf(item1, item2))
 
             /* When */
             val queue = idm.queue
@@ -198,7 +188,7 @@ class ItemDownloadManagerTest(
         @Test
         fun `with no item`() {
             /* Given */
-            whenever(repository.findAllDownloading()).thenReturn(Flux.empty())
+            whenever(repository.findAllDownloading()).thenReturn(emptyList())
 
             /* When */
             val downloading = idm.downloading
@@ -210,7 +200,7 @@ class ItemDownloadManagerTest(
         @Test
         fun `with items`() {
             /* Given */
-            whenever(repository.findAllDownloading()).thenReturn(Flux.just(item1, item2))
+            whenever(repository.findAllDownloading()).thenReturn(listOf(item1, item2))
 
             /* When */
             val downloading = idm.downloading
@@ -267,9 +257,9 @@ class ItemDownloadManagerTest(
             /* Given */
             whenever(parameters.limitDownloadDate()).thenReturn(date)
             whenever(parameters.numberOfTry).thenReturn(10)
-            whenever(repository.initQueue(date, 10)).thenReturn(Mono.empty())
-            whenever(repository.findAllToDownload(any())).thenReturn(Flux.empty())
-            whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
+            doNothing().whenever(repository).initQueue(date, 10)
+            whenever(repository.findAllToDownload(any())).thenReturn(emptyList())
+            whenever(repository.findAllWaiting()).thenReturn(emptyList())
 
             /* When */
             idm.launchDownload()
@@ -292,11 +282,11 @@ class ItemDownloadManagerTest(
             val information = item1.toInformation()
             whenever(parameters.limitDownloadDate()).thenReturn(date)
             whenever(parameters.numberOfTry).thenReturn(10)
-            whenever(repository.initQueue(date, 10)).thenReturn(Mono.empty())
-            whenever(repository.findAllToDownload(any())).thenReturn(Flux.just(item1))
-            whenever(repository.findAllWaiting()).thenReturn(Flux.just(item1))
+            doNothing().whenever(repository).initQueue(date, 10)
+            whenever(repository.findAllToDownload(any())).thenReturn(listOf(item1))
+            whenever(repository.findAllWaiting()).thenReturn(listOf(item1))
             whenever(downloaders.of(information)).thenReturn(downloader)
-            whenever(repository.startItem(item1.id)).thenReturn(Mono.empty())
+            doNothing().whenever(repository).startItem(item1.id)
 
             /* When */
             idm.launchDownload()
@@ -322,14 +312,14 @@ class ItemDownloadManagerTest(
             val information2 = item2.toInformation()
             whenever(parameters.limitDownloadDate()).thenReturn(date)
             whenever(parameters.numberOfTry).thenReturn(10)
-            whenever(repository.initQueue(date, 10)).thenReturn(Mono.empty())
-            whenever(repository.findAllToDownload(any())).thenReturn(Flux.just(item1, item2))
-            whenever(repository.findAllWaiting()).thenReturn(Flux.just(item1, item2))
+            doNothing().whenever(repository).initQueue(date, 10)
+            whenever(repository.findAllToDownload(any())).thenReturn(listOf(item1, item2))
+            whenever(repository.findAllWaiting()).thenReturn(listOf(item1, item2))
             whenever(downloaders.of(information1)).thenReturn(downloader1)
             whenever(downloaders.of(information2)).thenReturn(downloader2)
 
-            whenever(repository.startItem(item1.id)).thenReturn(Mono.empty())
-            whenever(repository.startItem(item2.id)).thenReturn(Mono.empty())
+            doNothing().whenever(repository).startItem(item1.id)
+            doNothing().whenever(repository).startItem(item2.id)
 
             /* When */
             idm.launchDownload()
@@ -408,13 +398,13 @@ class ItemDownloadManagerTest(
             val information2 = item2.toInformation()
             whenever(parameters.limitDownloadDate()).thenReturn(date)
             whenever(parameters.numberOfTry).thenReturn(10)
-            whenever(repository.initQueue(date, 10)).thenReturn(Mono.empty())
-            whenever(repository.findAllToDownload(any())).thenReturn(Flux.just(item1, item2))
-            whenever(repository.findAllWaiting()).thenReturn(Flux.just(item1, item2))
+            doNothing().whenever(repository).initQueue(date, 10)
+            whenever(repository.findAllToDownload(any())).thenReturn(listOf(item1, item2))
+            whenever(repository.findAllWaiting()).thenReturn(listOf(item1, item2))
             whenever(downloaders.of(information1)).thenReturn(downloader1)
             whenever(downloaders.of(information2)).thenReturn(downloader2)
-            whenever(repository.startItem(item1.id)).thenReturn(Mono.empty())
-            whenever(repository.startItem(item2.id)).thenReturn(Mono.empty())
+            doNothing().whenever(repository).startItem(item1.id)
+            doNothing().whenever(repository).startItem(item2.id)
             whenever(downloader1.with(any(), any())).thenCallRealMethod()
             whenever(downloader2.with(any(), any())).thenCallRealMethod()
 
@@ -460,9 +450,9 @@ class ItemDownloadManagerTest(
         @Test
         fun `with success`() {
             /* Given */
-            whenever(repository.addItemToQueue(item1.id)).thenReturn(Mono.empty())
-            whenever(repository.findAllToDownload(1)).thenReturn(Flux.empty())
-            whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
+            doNothing().whenever(repository).addItemToQueue(item1.id)
+            whenever(repository.findAllToDownload(1)).thenReturn(emptyList())
+            whenever(repository.findAllWaiting()).thenReturn(emptyList())
 
             /* When */
             idm.addItemToQueue(item1.id)
@@ -496,9 +486,9 @@ class ItemDownloadManagerTest(
         @Test
         fun `with success`() {
             /* Given */
-            whenever(repository.remove(item1.id, true)).thenReturn(Mono.empty())
-            whenever(repository.findAllToDownload(1)).thenReturn(Flux.empty())
-            whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
+            doNothing().whenever(repository).remove(item1.id, true)
+            whenever(repository.findAllToDownload(1)).thenReturn(emptyList())
+            whenever(repository.findAllWaiting()).thenReturn(emptyList())
 
             /* When */
             idm.removeItemFromQueue(item1.id, true)
@@ -532,9 +522,9 @@ class ItemDownloadManagerTest(
         @Test
         fun `with success`() {
             /* Given */
-            whenever(repository.remove(item1.id, false)).thenReturn(Mono.empty())
-            whenever(repository.findAllToDownload(1)).thenReturn(Flux.empty())
-            whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
+            doNothing().whenever(repository).remove(item1.id, false)
+            whenever(repository.findAllToDownload(1)).thenReturn(emptyList())
+            whenever(repository.findAllWaiting()).thenReturn(emptyList())
 
             /* When */
             idm.removeACurrentDownload(item1.id)
@@ -568,9 +558,9 @@ class ItemDownloadManagerTest(
         @Test
         fun `with item only in waiting list`() {
             /* Given */
-            whenever(repository.remove(item1.id, false)).thenReturn(Mono.empty())
-            whenever(repository.findAllToDownload(1)).thenReturn(Flux.empty())
-            whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
+            doNothing().whenever(repository).remove(item1.id, false)
+            whenever(repository.findAllToDownload(1)).thenReturn(emptyList())
+            whenever(repository.findAllWaiting()).thenReturn(emptyList())
 
             /* When */
             idm.removeItemFromQueueAndDownload(item1.id)
@@ -584,11 +574,11 @@ class ItemDownloadManagerTest(
             /* Given */
             val downloader = SimpleDownloader()
             whenever(downloaders.of(any())).thenReturn(downloader)
-            whenever(repository.addItemToQueue(item1.id)).thenReturn(Mono.empty())
-            whenever(repository.remove(item1.id, false)).thenReturn(Mono.empty())
-            whenever(repository.findAllToDownload(1)).thenReturn(Flux.just(item1))
-            whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
-            whenever(repository.startItem(item1.id)).thenReturn(Mono.empty())
+            doNothing().whenever(repository).addItemToQueue(item1.id)
+            doNothing().whenever(repository).remove(item1.id, false)
+            whenever(repository.findAllToDownload(1)).thenReturn(listOf(item1))
+            whenever(repository.findAllWaiting()).thenReturn(emptyList())
+            doNothing().whenever(repository).startItem(item1.id)
             idm.addItemToQueue(item1.id)
 
             /* When */
@@ -625,10 +615,10 @@ class ItemDownloadManagerTest(
             /* Given */
             val downloader = SimpleDownloader()
             whenever(downloaders.of(any())).thenReturn(downloader)
-            whenever(repository.addItemToQueue(item1.id)).thenReturn(Mono.empty())
-            whenever(repository.findAllToDownload(1)).thenReturn(Flux.just(item1))
-            whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
-            whenever(repository.startItem(item1.id)).thenReturn(Mono.empty())
+            doNothing().whenever(repository).addItemToQueue(item1.id)
+            whenever(repository.findAllToDownload(1)).thenReturn(listOf(item1))
+            whenever(repository.findAllWaiting()).thenReturn(emptyList())
+            doNothing().whenever(repository).startItem(item1.id)
             idm.addItemToQueue(item1.id)
 
             /* When */
@@ -658,8 +648,8 @@ class ItemDownloadManagerTest(
         @Timeout(5)
         fun `with success`() {
             /* Given */
-            whenever(repository.moveItemInQueue(UUID.fromString("b768eb50-64d2-4707-8da6-6672cc69a4ca"), 3)).thenReturn(Mono.empty())
-            whenever(repository.findAllWaiting()).thenReturn(Flux.empty())
+            doNothing().whenever(repository).moveItemInQueue(UUID.fromString("b768eb50-64d2-4707-8da6-6672cc69a4ca"), 3)
+            whenever(repository.findAllWaiting()).thenReturn(emptyList())
             /* When */
             idm.moveItemInQueue(UUID.fromString("b768eb50-64d2-4707-8da6-6672cc69a4ca"), 3)
             /* Then */
