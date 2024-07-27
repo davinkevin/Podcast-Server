@@ -1,24 +1,39 @@
 package com.github.davinkevin.podcastserver.messaging
 
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
+import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.context.ApplicationEventPublisher
+import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.context.annotation.Primary
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.test.StepVerifier
 import java.net.URI
 import java.util.*
+import java.util.concurrent.TimeUnit
 
 /**
  * Created by kevin on 02/05/2020
  */
 @ExtendWith(SpringExtension::class)
-@Import(MessagingTemplate::class)
 class MessagingTemplateTest(
-        @Autowired private val messages: MessagingTemplate
+        @Autowired private val messages: MessagingTemplate,
+        @Autowired private val event: ApplicationEventPublisher,
 ) {
+
+    @TestConfiguration
+    @Import(MessagingTemplate::class)
+    class TestConfig {
+        @Bean
+        @Primary
+        fun event(): ApplicationEventPublisher = mock()
+    }
 
     private val item1 = DownloadingItem(
             id = UUID.randomUUID(),
@@ -64,52 +79,172 @@ class MessagingTemplateTest(
     @Test
     fun `should send waiting queue`() {
         /* Given */
+        doNothing().whenever(event).publishEvent(any<WaitingQueueMessage>())
+
         /* When */
-        StepVerifier.create(messages.messages.asFlux().take(4))
-                /* Then */
-                .expectSubscription()
-                .then { messages.sendWaitingQueue(listOf(item1, item2, item3)) }
-                .expectNextMatches { it is WaitingQueueMessage && it.value.containsAll(listOf(item1, item2, item3)) }
-                .then { messages.sendWaitingQueue(listOf(item1, item3, item4)) }
-                .expectNextMatches { it is WaitingQueueMessage && it.value.containsAll(listOf(item1, item3, item4)) }
-                .then { messages.sendWaitingQueue(listOf(item1, item2)) }
-                .expectNextMatches { it is WaitingQueueMessage && it.value.containsAll(listOf(item1, item2)) }
-                .then { messages.sendWaitingQueue(listOf(item4)) }
-                .expectNextMatches { it is WaitingQueueMessage && it.value.containsAll(listOf(item4)) }
-                .verifyComplete()
+        messages.sendWaitingQueue(listOf(item1, item2, item3))
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            val captor = argumentCaptor<WaitingQueueMessage>()
+            verify(event).publishEvent(captor.capture())
+
+            assertAll {
+                assertThat(captor.firstValue.topic).isEqualTo("waiting")
+                assertThat(captor.firstValue.value).isEqualTo(listOf(item1, item2, item3))
+            }
+        }
+
+        /* When */
+        messages.sendWaitingQueue(listOf(item1, item3, item4))
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            val captor = argumentCaptor<WaitingQueueMessage>()
+            verify(event, times(2)).publishEvent(captor.capture())
+
+            assertAll {
+                assertThat(captor.secondValue.topic).isEqualTo("waiting")
+                assertThat(captor.secondValue.value).isEqualTo(listOf(item1, item3, item4))
+            }
+        }
+
+        /* When */
+        messages.sendWaitingQueue(listOf(item1, item2))
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            val captor = argumentCaptor<WaitingQueueMessage>()
+            verify(event, times(3)).publishEvent(captor.capture())
+
+            assertAll {
+                assertThat(captor.thirdValue.topic).isEqualTo("waiting")
+                assertThat(captor.thirdValue.value).isEqualTo(listOf(item1, item2))
+            }
+        }
+
+        /* When */
+        messages.sendWaitingQueue(listOf(item4))
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            val captor = argumentCaptor<WaitingQueueMessage>()
+            verify(event, times(4)).publishEvent(captor.capture())
+
+            assertAll {
+                assertThat(captor.allValues[3].topic).isEqualTo("waiting")
+                assertThat(captor.allValues[3].value).isEqualTo(listOf(item4))
+            }
+        }
     }
 
     @Test
     fun `should send downloading item`() {
         /* Given */
+        doNothing().whenever(event).publishEvent(any<DownloadingItemMessage>())
+
         /* When */
-        StepVerifier.create(messages.messages.asFlux().take(4))
-                /* Then */
-                .expectSubscription()
-                .then { messages.sendItem(item1) }
-                .expectNextMatches { it is DownloadingItemMessage && it.value == item1 }
-                .then { messages.sendItem(item2) }
-                .expectNextMatches { it is DownloadingItemMessage && it.value == item2 }
-                .then { messages.sendItem(item3) }
-                .expectNextMatches { it is DownloadingItemMessage && it.value == item3 }
-                .then { messages.sendItem(item4) }
-                .expectNextMatches { it is DownloadingItemMessage && it.value == item4 }
-                .verifyComplete()
+        messages.sendItem(item1)
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            val captor = argumentCaptor<DownloadingItemMessage>()
+            verify(event).publishEvent(captor.capture())
+
+            assertAll {
+                assertThat(captor.firstValue.topic).isEqualTo("downloading")
+                assertThat(captor.firstValue.value).isEqualTo(item1)
+            }
+        }
+
+        /* When */
+        messages.sendItem(item2)
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            val captor = argumentCaptor<DownloadingItemMessage>()
+            verify(event, times(2)).publishEvent(captor.capture())
+
+            assertAll {
+                assertThat(captor.secondValue.topic).isEqualTo("downloading")
+                assertThat(captor.secondValue.value).isEqualTo(item2)
+            }
+        }
+
+        /* When */
+        messages.sendItem(item3)
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            val captor = argumentCaptor<DownloadingItemMessage>()
+            verify(event, times(3)).publishEvent(captor.capture())
+
+            assertAll {
+                assertThat(captor.thirdValue.topic).isEqualTo("downloading")
+                assertThat(captor.thirdValue.value).isEqualTo(item3)
+            }
+        }
+
+        /* When */
+        messages.sendItem(item4)
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            val captor = argumentCaptor<DownloadingItemMessage>()
+            verify(event, times(4)).publishEvent(captor.capture())
+
+            assertAll {
+                assertThat(captor.allValues[3].topic).isEqualTo("downloading")
+                assertThat(captor.allValues[3].value).isEqualTo(item4)
+            }
+        }
     }
 
     @Test
     fun `should update`() {
         /* Given */
+        doNothing().whenever(event).publishEvent(any<UpdateMessage>())
+
         /* When */
-        StepVerifier.create(messages.messages.asFlux().take(3))
-                /* Then */
-                .expectSubscription()
-                .then { messages.isUpdating(true) }
-                .expectNextMatches { it is UpdateMessage && it.value }
-                .then { messages.isUpdating(false) }
-                .expectNextMatches { it is UpdateMessage && !it.value }
-                .then { messages.isUpdating(true) }
-                .expectNextMatches { it is UpdateMessage && it.value }
-                .verifyComplete()
+        messages.isUpdating(true)
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            val captor = argumentCaptor<UpdateMessage>()
+            verify(event).publishEvent(captor.capture())
+
+            assertAll {
+                assertThat(captor.firstValue.topic).isEqualTo("updating")
+                assertThat(captor.firstValue.value).isEqualTo(true)
+            }
+        }
+
+        /* When */
+        messages.isUpdating(false)
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            val captor = argumentCaptor<UpdateMessage>()
+            verify(event, times(2)).publishEvent(captor.capture())
+
+            assertAll {
+                assertThat(captor.secondValue.topic).isEqualTo("updating")
+                assertThat(captor.secondValue.value).isEqualTo(false)
+            }
+        }
+
+        /* When */
+        messages.isUpdating(true)
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            val captor = argumentCaptor<UpdateMessage>()
+            verify(event, times(3)).publishEvent(captor.capture())
+
+            assertAll {
+                assertThat(captor.thirdValue.topic).isEqualTo("updating")
+                assertThat(captor.thirdValue.value).isEqualTo(true)
+            }
+        }
     }
 }

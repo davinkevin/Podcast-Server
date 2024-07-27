@@ -4,16 +4,19 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.google.common.annotations.VisibleForTesting
-import org.slf4j.LoggerFactory
+import org.springframework.context.event.EventListener
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 import reactor.core.publisher.Flux
+import reactor.core.publisher.Sinks
 import java.net.URI
 import java.time.Duration.ZERO
 import java.time.Duration.ofSeconds
 import java.util.*
 
-class MessageHandler(private val mt: MessagingTemplate) {
+class MessageHandler {
+
+    private val messages: Sinks.Many<Message<out Any>> = Sinks.many().multicast().directBestEffort()
 
     fun sseMessages(@Suppress("UNUSED_PARAMETER") s: ServerRequest): ServerResponse {
         var stopped = false
@@ -29,16 +32,22 @@ class MessageHandler(private val mt: MessagingTemplate) {
         }
     }
 
-    @VisibleForTesting()
+    @VisibleForTesting
     internal fun streamingMessages(): Flux<ServerSentEvent<out Any>> {
         val heartBeat = Flux.interval(ZERO, ofSeconds(1))
             .map(::toHeartBeat)
 
-        val messages = mt.messagesAsFlux()
+        val m = messages.asFlux()
             .map { toSSE(it) }
             .share()
 
-        return Flux.merge(heartBeat, messages)
+        return Flux.merge(heartBeat, m)
+    }
+
+    @EventListener
+    @VisibleForTesting
+    internal fun receive(m: Message<out Any>) {
+        messages.tryEmitNext(m)
     }
 }
 

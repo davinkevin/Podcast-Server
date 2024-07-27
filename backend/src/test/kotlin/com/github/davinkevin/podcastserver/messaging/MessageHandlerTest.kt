@@ -24,7 +24,6 @@ import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.web.servlet.function.ServerResponse.SseBuilder
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Sinks
-import reactor.kotlin.core.publisher.toFlux
 import reactor.test.StepVerifier
 import java.net.URI
 import java.time.Duration
@@ -96,7 +95,6 @@ class MessageHandlerTest(
             fun `should receive items`() {
                 /* Given */
                 val messages = Sinks.many().multicast().directBestEffort<Message<out Any>>()
-                whenever(messageTemplate.messages).thenReturn(messages)
 
                 /* When */
                 StepVerifier.create(rest
@@ -157,7 +155,6 @@ class MessageHandlerTest(
             fun `should receive updates`() {
                 /* Given */
                 val messages = Sinks.many().multicast().directBestEffort<Message<out Any>>()
-                whenever(messageTemplate.messages).thenReturn(messages)
 
                 /* When */
                 StepVerifier.create(rest
@@ -199,7 +196,6 @@ class MessageHandlerTest(
             fun `should receive new waiting list`() {
                 /* Given */
                 val messages = Sinks.many().multicast().directBestEffort<Message<out Any>>()
-                whenever(messageTemplate.messages).thenReturn(messages)
 
                 /* When */
                 StepVerifier.create(rest
@@ -253,9 +249,6 @@ class MessageHandlerTest(
         @Test
         fun `should receive heartbeat`() {
             /* Given */
-            whenever(messageTemplate.messages)
-                .thenReturn(Sinks.many().multicast().directBestEffort())
-
             /* When */
             StepVerifier.create(
                 rest
@@ -282,7 +275,7 @@ class MessageHandlerTest(
     }
 
     @Nested
-    @Suppress("UNCHECKED_CAST")
+    @Suppress("UNCHECKED_CAST", "UNUSED_PARAMETER")
     @DisplayName("Using implementation details")
     inner class UsingHandlerImplementationDetails {
 
@@ -312,7 +305,7 @@ class MessageHandlerTest(
 
         @Suppress("UNCHECKED_CAST")
         fun startConsumer(m: MessagingTemplate, sse: SseBuilder) {
-            val sseAnswer = MessageHandler(m).sseMessages(mock())
+            val sseAnswer = MessageHandler().sseMessages(mock())
             val eventConsumer: Consumer<SseBuilder> = ReflectionTestUtils.getField(sseAnswer,"sseConsumer") as Consumer<SseBuilder>
             eventConsumer.accept(sse)
         }
@@ -370,12 +363,6 @@ class MessageHandlerTest(
                 @Test
                 fun `should receive items`() {
                     /* Given */
-                    val downloadingItems = listOf(DownloadingItemMessage(item1), DownloadingItemMessage(item4))
-                        .toFlux()
-                        .delayElements(Duration.ofSeconds(1)) as Flux<Message<out Any>>
-
-                    whenever(messageTemplate.messagesAsFlux()).thenReturn(downloadingItems)
-
                     val (sse, events) = sseBuilderToFlux()
                     startConsumer(messageTemplate, sse)
 
@@ -425,12 +412,6 @@ class MessageHandlerTest(
                 @Test
                 fun `should receive updates`() {
                     /* Given */
-                    val updateMessages: Flux<Message<out Any>> = listOf(UpdateMessage(true), UpdateMessage(false))
-                        .toFlux()
-                        .delayElements(Duration.ofSeconds(1)) as Flux<Message<out Any>>
-
-                    whenever(messageTemplate.messagesAsFlux()).thenReturn(updateMessages)
-
                     val (sse, events) = sseBuilderToFlux()
                     startConsumer(messageTemplate, sse)
 
@@ -460,17 +441,6 @@ class MessageHandlerTest(
                 @Test
                 fun `should receive new waiting list`() {
                     /* Given */
-                    val watchListUpdate: Flux<Message<out Any>> = listOf(
-                        WaitingQueueMessage(listOf(item1, item2, item3)),
-                        WaitingQueueMessage(listOf(item2, item3)),
-                        WaitingQueueMessage(listOf(item3)),
-                        WaitingQueueMessage(emptyList())
-                    )
-                        .toFlux()
-                        .delayElements(Duration.ofMillis(500)) as Flux<Message<out Any>>
-
-                    whenever(messageTemplate.messagesAsFlux()).thenReturn(watchListUpdate)
-
                     val (sse, events) = sseBuilderToFlux()
                     startConsumer(messageTemplate, sse)
 
@@ -513,8 +483,6 @@ class MessageHandlerTest(
         @Test
         fun `should receive heartbeat`() {
             /* Given */
-            whenever(messageTemplate.messagesAsFlux()).thenReturn(Flux.empty())
-
             val (sse, events) = sseBuilderToFlux()
             startConsumer(messageTemplate, sse)
 
@@ -585,18 +553,20 @@ class MessageHandlerTest(
                 @Test
                 fun `should receive items`() {
                     /* Given */
-                    whenever(messageTemplate.messagesAsFlux())
-                        .thenReturn(listOf(DownloadingItemMessage(item1), DownloadingItemMessage(item4)).toFlux())
-
+                    val handler = MessageHandler()
                     /* When */
                     StepVerifier.create(
-                        MessageHandler(messageTemplate).streamingMessages()
+                        handler.streamingMessages()
                             .filter { it.event != "heartbeat" }
                             .map { it.event to it.body as DownloadingItemHAL }
                             .take(2)
                     )
                         /* Then */
                         .expectSubscription()
+                        .then {
+                            listOf(DownloadingItemMessage(item1), DownloadingItemMessage(item4))
+                                .forEach(handler::receive)
+                        }
                         .assertNext { (event, body) ->
                             assertThat(event).isEqualTo("downloading")
                             assertThat(body.id).isEqualTo(item1.id)
@@ -634,17 +604,19 @@ class MessageHandlerTest(
                 @Test
                 fun `should receive updates`() {
                     /* Given */
-                    whenever(messageTemplate.messagesAsFlux())
-                        .thenReturn(listOf(UpdateMessage(true), UpdateMessage(false)).toFlux())
-
+                    val handler = MessageHandler()
                     /* When */
                     StepVerifier.create(
-                        MessageHandler(messageTemplate).streamingMessages()
+                        handler.streamingMessages()
                             .filter { it.event != "heartbeat" }
                             .take(2)
                     )
                         /* Then */
                         .expectSubscription()
+                        .then {
+                            listOf(UpdateMessage(true), UpdateMessage(false))
+                                .forEach(handler::receive)
+                        }
                         .assertNext {
                             assertThat(it.event).isEqualTo("updating")
                             assertThat(it.body).isEqualTo(true)
@@ -664,26 +636,26 @@ class MessageHandlerTest(
                 @Test
                 fun `should receive new waiting list`() {
                     /* Given */
-                    whenever(messageTemplate.messagesAsFlux())
-                        .thenReturn(
-                            listOf(
-                                WaitingQueueMessage(listOf(item1, item2, item3)),
-                                WaitingQueueMessage(listOf(item2, item3)),
-                                WaitingQueueMessage(listOf(item3)),
-                                WaitingQueueMessage(emptyList())
-                            )
-                                .toFlux()
-                        )
+                    val handler = MessageHandler()
 
                     /* When */
                     StepVerifier.create(
-                        MessageHandler(messageTemplate).streamingMessages()
+                        handler.streamingMessages()
                             .filter { it.event != "heartbeat" }
                             .map { it.event to it.body as List<DownloadingItemHAL> }
                             .take(4)
                     )
                         /* Then */
                         .expectSubscription()
+                        .then {
+                            listOf(
+                                WaitingQueueMessage(listOf(item1, item2, item3)),
+                                WaitingQueueMessage(listOf(item2, item3)),
+                                WaitingQueueMessage(listOf(item3)),
+                                WaitingQueueMessage(emptyList())
+                            )
+                                .forEach(handler::receive)
+                        }
                         .assertNext { (event, body) ->
                             assertThat(event).isEqualTo("waiting")
                             assertThat(body).hasSize(3)
@@ -714,10 +686,8 @@ class MessageHandlerTest(
         @Test
         fun `should receive heartbeat`() {
             /* Given */
-            whenever(messageTemplate.messagesAsFlux()).thenReturn(Flux.empty())
-
             /* When */
-            StepVerifier.withVirtualTime { MessageHandler(messageTemplate).streamingMessages().take(2) }
+            StepVerifier.withVirtualTime { MessageHandler().streamingMessages().take(2) }
                 .expectSubscription()
                 .thenAwait(Duration.ofSeconds(1))
                 .assertNext { assertThat(it.event).isEqualTo("heartbeat") }
