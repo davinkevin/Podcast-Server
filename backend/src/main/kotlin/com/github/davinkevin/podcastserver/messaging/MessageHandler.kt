@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.google.common.annotations.VisibleForTesting
+import org.slf4j.LoggerFactory
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 import reactor.core.publisher.Flux
@@ -14,16 +15,19 @@ import java.util.*
 
 class MessageHandler(private val mt: MessagingTemplate) {
 
-    fun sseMessages(@Suppress("UNUSED_PARAMETER") s: ServerRequest): ServerResponse =
-        ServerResponse.sse { sse ->
+    fun sseMessages(@Suppress("UNUSED_PARAMETER") s: ServerRequest): ServerResponse {
+        var stopped = false
+        return ServerResponse.sse { sse ->
             streamingMessages()
+                .takeUntil { stopped }
                 .subscribe {
                     sse.apply {
                         event(it.event)
-                        runCatching { send(it.body) }
+                        stopped = runCatching { send(it.body) }.isFailure
                     }
                 }
         }
+    }
 
     @VisibleForTesting()
     internal fun streamingMessages(): Flux<ServerSentEvent<out Any>> {

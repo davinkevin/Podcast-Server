@@ -23,7 +23,6 @@ import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
 import org.springframework.web.servlet.function.ServerResponse.SseBuilder
 import reactor.core.publisher.Flux
-import reactor.core.publisher.Hooks
 import reactor.core.publisher.Sinks
 import reactor.kotlin.core.publisher.toFlux
 import reactor.test.StepVerifier
@@ -726,8 +725,6 @@ class MessageHandlerTest(
                 .assertNext { assertThat(it.event).isEqualTo("heartbeat") }
                 .verifyComplete()
         }
-
-
     }
 }
 
