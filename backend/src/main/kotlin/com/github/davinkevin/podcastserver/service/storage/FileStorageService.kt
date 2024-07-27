@@ -4,12 +4,12 @@ import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest
 import com.github.davinkevin.podcastserver.item.DeleteItemRequest
 import com.github.davinkevin.podcastserver.item.Item
+import com.github.davinkevin.podcastserver.item.UploadedFile
 import com.github.davinkevin.podcastserver.podcast.DeletePodcastRequest
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
-import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import software.amazon.awssdk.core.async.AsyncRequestBody
@@ -145,11 +145,11 @@ class FileStorageService(
         }
     }
 
-    fun cache(filePart: FilePart, destination: Path): Path {
+    fun cache(filePart: UploadedFile, destination: Path): Path {
         val tmpDirectory = Files.createTempDirectory("upload-temp")
         val dest = tmpDirectory.resolve(destination.fileName)
 
-        filePart.transferTo(dest).block()
+        Files.copy(filePart.inputStream(), dest)
 
         return dest
     }

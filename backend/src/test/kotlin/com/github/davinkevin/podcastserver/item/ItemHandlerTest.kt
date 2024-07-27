@@ -16,18 +16,11 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
-import org.springframework.core.io.buffer.DataBuffer
-import org.springframework.core.io.buffer.DefaultDataBufferFactory
-import org.springframework.http.HttpHeaders
+import org.springframework.http.HttpEntity
 import org.springframework.http.client.MultipartBodyBuilder
-import org.springframework.http.codec.multipart.FilePart
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.web.reactive.function.BodyInserters
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
-import java.nio.file.Path
 import java.time.Clock
 import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
@@ -1452,21 +1445,12 @@ class ItemHandlerTest(
             cover = Item.Cover(UUID.fromString("337edcd5-97d3-4f78-9a5b-1c14c999883b"), URI("https://foo.bar.com/cover.png"), 100, 100)
         )
 
-
-        inner class TestFilePart: FilePart {
-            override fun content(): Flux<DataBuffer> = Flux.just(DefaultDataBufferFactory().wrap(("data".toByteArray())))
-            override fun headers(): HttpHeaders = HttpHeaders.EMPTY
-            override fun filename(): String = "data.mp3"
-            override fun name(): String = TODO("Not yet implemented")
-            override fun transferTo(dest: Path): Mono<Void> = TODO("Not yet implemented")
-        }
-
         @Test
         fun `with success`() {
             /* Given */
-            val filePart = TestFilePart()
+            val filePart = HttpEntity("foo")
             val podcastId = UUID.fromString("7e90ebf0-bc4d-451a-82e1-e9ce3fb3fe73")
-            val body = MultipartBodyBuilder().apply { part("file", filePart).filename(filePart.filename()) }.build()
+            val body = MultipartBodyBuilder().apply { part("file", filePart).filename("data.mp3") }.build()
             whenever(itemService.upload(eq(podcastId), any())).thenReturn(item1)
 
             /* When */
