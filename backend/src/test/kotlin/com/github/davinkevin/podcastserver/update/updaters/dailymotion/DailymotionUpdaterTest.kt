@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters.dailymotion
 
 import com.github.davinkevin.podcastserver.MockServer
-import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.remapRestClientToMockServer
@@ -40,7 +39,6 @@ class DailymotionUpdaterTest(
     @TestConfiguration
     @Import(
             RestClientAutoConfiguration::class,
-            WebClientConfig::class,
             DailymotionUpdaterConfig::class,
             JacksonAutoConfiguration::class
     )

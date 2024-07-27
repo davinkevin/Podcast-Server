@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.find.finders.youtube
 
 import com.github.davinkevin.podcastserver.MockServer
-import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
@@ -154,7 +153,6 @@ class YoutubeFinderTest(
         YoutubeFinderConfig::class,
         RestClientAutoConfiguration::class,
         JacksonAutoConfiguration::class,
-        WebClientConfig::class
     )
     class LocalTestConfiguration
 }

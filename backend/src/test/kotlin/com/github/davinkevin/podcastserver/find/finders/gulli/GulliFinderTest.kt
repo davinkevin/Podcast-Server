@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.find.finders.gulli
 
 import com.github.davinkevin.podcastserver.MockServer
-import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
@@ -174,7 +173,6 @@ class GulliFinderTest(
         GulliFinderConfig::class,
         RestClientAutoConfiguration::class,
         JacksonAutoConfiguration::class,
-        WebClientConfig::class
     )
     class LocalTestConfiguration {
         @Bean fun remapGulliToMockServer() = remapRestClientToMockServer("replay.gulli.fr")
