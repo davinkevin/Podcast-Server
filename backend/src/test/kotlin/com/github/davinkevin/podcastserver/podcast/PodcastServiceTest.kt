@@ -16,8 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -304,7 +302,7 @@ class PodcastServiceTest(
                 val tags = emptySet<TagForCreation>()
                 val pBeforeUpdate = podcastForCreation.copy(tags = tags)
                 val savedCover = pBeforeUpdate.cover.toCover()
-                whenever(coverRepository.save(pBeforeUpdate.cover)).thenReturn(savedCover.toMono())
+                whenever(coverRepository.save(pBeforeUpdate.cover)).thenReturn(savedCover)
                 whenever(repository.save(eq(pBeforeUpdate.title), eq(pBeforeUpdate.url!!.toASCIIString()), eq(pBeforeUpdate.hasToBeDeleted), eq(pBeforeUpdate.type), argThat { isEmpty() }, eq(savedCover)))
                         .thenReturn(podcast)
 
@@ -326,7 +324,7 @@ class PodcastServiceTest(
                 val p = podcastForCreation.copy(tags = tags)
                 val savedCover = p.cover.toCover()
 
-                whenever(coverRepository.save(p.cover)).thenReturn(savedCover.toMono())
+                whenever(coverRepository.save(p.cover)).thenReturn(savedCover)
                 whenever(repository.save(
                         eq(p.title),
                         eq(p.url!!.toASCIIString()),
@@ -356,7 +354,7 @@ class PodcastServiceTest(
                 val p = podcastForCreation.copy(tags = tags)
                 val savedCover = p.cover.toCover()
 
-                whenever(coverRepository.save(p.cover)).thenReturn(savedCover.toMono())
+                whenever(coverRepository.save(p.cover)).thenReturn(savedCover)
                 whenever(tagRepository.save("Sport")).thenReturn(Tag(newTagId, "Sport"))
                 whenever(repository.save(
                         eq(p.title),
@@ -638,7 +636,7 @@ class PodcastServiceTest(
                 val p = podcast
 
                 whenever(repository.findById(p.id)).thenReturn(podcast)
-                whenever(coverRepository.save(newCover)).thenReturn(coverInDb.toMono())
+                whenever(coverRepository.save(newCover)).thenReturn(coverInDb)
                 doNothing().whenever(fileService).downloadPodcastCover(argThat { title == p.title && cover.url == newCover.url })
                 whenever(repository.update(
                         id = eq(p.id),
@@ -654,7 +652,7 @@ class PodcastServiceTest(
 
                 /* Then */
                 assertThat(podcastAfterUpdate).isEqualTo(p)
-                verify(coverRepository, times(1)).save(any())
+                verify(coverRepository).save(any())
                 verify(fileService).downloadPodcastCover(any())
             }
 
