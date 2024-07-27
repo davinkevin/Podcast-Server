@@ -25,7 +25,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -82,7 +81,7 @@ class GulliUpdaterTest(
         fun `with empty answer for page of the only returned item`(backend: WireMockServer) {
             /* Given */
             whenever(imageService.fetchCoverInformation(any()))
-                .thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
+                .thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")))
 
             backend.apply {
                 stubFor(get("/dessins-animes/Pokemon7")
@@ -102,7 +101,7 @@ class GulliUpdaterTest(
         fun `with 1 item`(backend: WireMockServer) {
             /* Given */
             whenever(imageService.fetchCoverInformation(any()))
-                .thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
+                .thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")))
 
             backend.apply {
                 stubFor(get("/dessins-animes/Pokemon7")
@@ -130,7 +129,7 @@ class GulliUpdaterTest(
         fun `with all items`(backend: WireMockServer) {
             /* Given */
             whenever(imageService.fetchCoverInformation(any()))
-                .thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
+                .thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")))
 
             backend.apply {
                 stubFor(get("/dessins-animes/Pokemon7")

@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.find.finders.rss
 
-import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
@@ -9,7 +8,6 @@ import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.*
-import org.mockito.kotlin.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
@@ -18,6 +16,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
@@ -25,7 +24,6 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
 @ExtendWith(SpringExtension::class)
@@ -49,7 +47,7 @@ class RSSFinderTest(
             backend.stubFor(get("/rss.xml")
                     .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.xml")))))
             whenever(image.fetchCoverInformation(URI(coverUrl)))
-                .thenReturn(CoverInformation(100, 100, URI(coverUrl)).toMono())
+                .thenReturn(CoverInformation(100, 100, URI(coverUrl)))
 
             /* When */
             val podcast = finder.findPodcastInformation(podcastUrl)!!
@@ -73,7 +71,7 @@ class RSSFinderTest(
                 stubFor(get("/rss-after-redirect.xml")
                         .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.xml")))))
             }
-            whenever(image.fetchCoverInformation(URI(coverUrl))).thenReturn(CoverInformation(100, 100, URI(coverUrl)).toMono())
+            whenever(image.fetchCoverInformation(URI(coverUrl))).thenReturn(CoverInformation(100, 100, URI(coverUrl)))
 
             /* When */
             val podcast = finder.findPodcastInformation(podcastUrl)!!
@@ -91,7 +89,7 @@ class RSSFinderTest(
         @Test
         fun `information with itunes cover`(backend: WireMockServer) {
             /* Given */
-            whenever(image.fetchCoverInformation(URI(coverUrl))).thenReturn(CoverInformation(100, 100, URI(coverUrl)).toMono())
+            whenever(image.fetchCoverInformation(URI(coverUrl))).thenReturn(CoverInformation(100, 100, URI(coverUrl)))
             backend.stubFor(get("/rss.xml")
                     .willReturn(okXml(fileAsString(from("rss.lesGrandesGueules.withItunesCover.xml")))))
 

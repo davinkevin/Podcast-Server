@@ -29,8 +29,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.DigestUtils
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.*
 import java.util.*
@@ -75,14 +73,14 @@ class FranceTvUpdaterTest(
                 .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/videos/${path.substringAfterLast("/")}"))))
 
             if (coverPath.isEmpty()) {
-                whenever(imageService.fetchCoverInformation(any<URI>())).thenReturn(Mono.empty())
+                whenever(imageService.fetchCoverInformation(any<URI>())).thenReturn(null)
                 return
             }
 
             val uri = URI("https://www.france.tv$coverPath")
             whenever(imageService.fetchCoverInformation(uri)).thenReturn(CoverInformation(
                 width = 256, height = 300, url = uri
-            ).toMono())
+            ))
         }
 
         @Test
@@ -271,7 +269,7 @@ class FranceTvUpdaterTest(
 
                 val uri = URI("https://www.france.tv/image/carre/1024/1024/q/4/c/1ae0e33f-phpg7tc4q.jpg")
                 whenever(imageService.fetchCoverInformation(uri))
-                    .thenReturn(CoverInformation(width = 256, height = 300, url = uri).toMono())
+                    .thenReturn(CoverInformation(width = 256, height = 300, url = uri))
             }
 
             /* When */

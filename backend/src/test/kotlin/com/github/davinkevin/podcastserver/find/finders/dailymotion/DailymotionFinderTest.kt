@@ -28,8 +28,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
 @ExtendWith(SpringExtension::class)
@@ -58,7 +56,7 @@ class DailymotionFinderTest(
                                 url = URI("http://s2.dmcdn.net/PB4mc/720x720-AdY.jpg"),
                                 height = 123,
                                 width = 456
-                        ).toMono())
+                        ))
 
                 backend.stubFor(get(urlPathEqualTo("/user/karimdebbache"))
                         .withQueryParam("fields", equalTo("avatar_720_url,description,username"))
@@ -86,7 +84,7 @@ class DailymotionFinderTest(
                 /* Given */
                 val url = "https://www.dailymotion.com/karimdebbache"
 
-                whenever(image.fetchCoverInformation(any())).thenReturn(Mono.empty())
+                whenever(image.fetchCoverInformation(any())).thenReturn(null)
 
                 backend.stubFor(get(urlPathEqualTo("/user/karimdebbache"))
                         .withQueryParam("fields", equalTo("avatar_720_url,description,username"))
@@ -109,7 +107,7 @@ class DailymotionFinderTest(
                 /* Given */
                 val url = "https://www.dailymotion.com/karimdebbache"
 
-                whenever(image.fetchCoverInformation(any())).thenReturn(Mono.empty())
+                whenever(image.fetchCoverInformation(any())).thenReturn(null)
 
                 backend.stubFor(get(urlPathEqualTo("/user/karimdebbache"))
                         .withQueryParam("fields", equalTo("avatar_720_url,description,username"))

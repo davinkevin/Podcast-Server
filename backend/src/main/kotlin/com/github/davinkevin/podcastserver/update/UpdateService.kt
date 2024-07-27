@@ -146,7 +146,7 @@ private fun ItemFromUpdate.toCreation(podcastId: UUID): ItemForCreation {
 private fun ItemFromUpdate.Cover.toCreation() = CoverForCreation(width, height, url)
 
 fun ImageService.fetchCoverUpdateInformation(url: URI): ItemFromUpdate.Cover? {
-    val coverInformation = fetchCoverInformation(url).block()
+    val coverInformation = fetchCoverInformation(url)
         ?: return null
 
     return ItemFromUpdate

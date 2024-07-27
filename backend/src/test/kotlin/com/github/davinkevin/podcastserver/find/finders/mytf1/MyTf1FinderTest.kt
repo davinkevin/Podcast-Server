@@ -26,7 +26,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
 /**
@@ -64,7 +63,7 @@ class MyTf1FinderTest(
                     url = coverUrl,
                     height = 123,
                     width = 456
-            ).toMono())
+            ))
 
             backend.stubFor(get("/tmc/quotidien-avec-yann-barthes")
                 .willReturn(ok(fileAsString("/remote/podcast/mytf1/quotidien.root.html"))))
@@ -144,7 +143,7 @@ class MyTf1FinderTest(
                         url = coverUrl,
                         height = 123,
                         width = 456
-                ).toMono())
+                ))
 
                 backend.stubFor(get("/tmc/quotidien-avec-yann-barthes").willReturn(
                         ok(fileAsString("/remote/podcast/mytf1/quotidien.root-with-picture-url-relative.html"))

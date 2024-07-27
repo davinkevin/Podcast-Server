@@ -29,8 +29,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
 /**
@@ -58,7 +56,7 @@ class FranceTvFinderTest(
                 url = URI("https://foo.bar.com"),
                 height = 123,
                 width = 456
-            ).toMono())
+            ))
 
             backend.stubFor(get("/france-3/secrets-d-histoire/")
                 .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/secrets-d-histoire.html"))))
@@ -85,7 +83,7 @@ class FranceTvFinderTest(
             /* Given */
             val url = "https://www.france.tv/france-3/secrets-d-histoire/"
 
-            whenever(image.fetchCoverInformation(any())).thenReturn(Mono.empty())
+            whenever(image.fetchCoverInformation(any())).thenReturn(null)
             backend.stubFor(get("/france-3/secrets-d-histoire/")
                 .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/secrets-d-histoire.html"))))
 
@@ -110,7 +108,7 @@ class FranceTvFinderTest(
                 url = URI("https://foo.bar.com"),
                 height = 123,
                 width = 456
-            ).toMono())
+            ))
 
             backend.stubFor(get("/france-3/secrets-d-histoire/")
                 .willReturn(ok()))
