@@ -1,11 +1,9 @@
 package com.github.davinkevin.podcastserver.podcast
 
-import com.github.davinkevin.podcastserver.JooqR2DBCTest
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
-import com.github.davinkevin.podcastserver.r2dbc
 import com.github.davinkevin.podcastserver.tag.Tag
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
@@ -16,6 +14,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import java.net.URI
 import java.time.LocalDate
@@ -28,7 +27,7 @@ import kotlin.io.path.Path
 /**
  * Created by kevin on 2019-02-16
  */
-@JooqR2DBCTest
+@JooqTest
 @Import(PodcastRepository::class)
 class PodcastRepositoryTest(
     @Autowired val repository: PodcastRepository,
@@ -44,7 +43,7 @@ class PodcastRepositoryTest(
             truncate(TAG).cascade(),
             truncate(WATCH_LIST).cascade(),
             truncate(WATCH_LIST_ITEMS).cascade()
-        ).r2dbc().execute()
+        ).execute()
     }
 
     @Nested
@@ -68,7 +67,7 @@ class PodcastRepositoryTest(
                     .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
                     .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("df801a7a-5630-4442-8b83-0cb36ae94981"))
                     .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
-            ).r2dbc().execute()
+            ).execute()
         }
 
         @Test
@@ -136,7 +135,7 @@ class PodcastRepositoryTest(
                     .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
                     .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("df801a7a-5630-4442-8b83-0cb36ae94981"))
                     .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
-            ).r2dbc().execute()
+            ).execute()
         }
 
         @Test
@@ -216,7 +215,7 @@ class PodcastRepositoryTest(
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"))
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56")),
-            ).r2dbc().execute()
+            ).execute()
         }
 
         @Nested
@@ -352,7 +351,7 @@ class PodcastRepositoryTest(
                     .values(fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar"),
                 insertInto(COVER, COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                     .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/a-podcast-to-save/cover.png", 100, 100),
-            ).r2dbc().execute()
+            ).execute()
         }
 
         @Nested
@@ -445,7 +444,7 @@ class PodcastRepositoryTest(
                 insertInto(PODCAST_TAGS, PODCAST_TAGS.PODCASTS_ID, PODCAST_TAGS.TAGS_ID)
                     .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
                     .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
-            ).r2dbc().execute()
+            ).execute()
         }
 
         @Test
@@ -641,16 +640,16 @@ class PodcastRepositoryTest(
                         .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.COVER_ID, PODCAST.HAS_TO_BE_DELETED, PODCAST.TYPE)
                         .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "Appload", "http://fake.url.com/appload.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e1"), false, "RSS")
                         .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/geekinc.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2"), true, "RSS"))
-                .r2dbc().execute()
+                .execute()
 
             /* When */
             repository.deleteById(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"))
 
             /* Then */
-            assertThat(query.selectFrom(COVER).r2dbc().fetch().map { it[COVER.ID] }).containsOnly(
+            assertThat(query.selectFrom(COVER).fetch().map { it[COVER.ID] }).containsOnly(
                 fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2")
             )
-            assertThat(query.selectFrom(PODCAST).r2dbc().fetch().map { it[PODCAST.ID] }).containsOnly(
+            assertThat(query.selectFrom(PODCAST).fetch().map { it[PODCAST.ID] }).containsOnly(
                 fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d")
             )
         }
@@ -667,7 +666,7 @@ class PodcastRepositoryTest(
                     .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.COVER_ID, PODCAST.HAS_TO_BE_DELETED, PODCAST.TYPE)
                     .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), "Appload", "http://fake.url.com/appload.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e1"), false, "RSS")
                     .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD", "http://fake.url.com/geekinc.rss", fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2"), true, "RSS")
-            ).r2dbc().execute()
+            ).execute()
 
             /* When */
             val deletionRequest = repository.deleteById(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"))
@@ -698,13 +697,13 @@ class PodcastRepositoryTest(
                     .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), fromString("1c526048-f240-4db9-9526-6cc037fdc851"))
                     .values(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), fromString("2c526048-f240-4db9-9526-6cc037fdc851"))
                     .values(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("3c526048-f240-4db9-9526-6cc037fdc851"))
-            ).r2dbc().execute()
+            ).execute()
 
             /* When */
             repository.deleteById(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"))
 
             /* Then */
-            assertThat(query.selectFrom(PODCAST_TAGS).r2dbc().fetch().map { it[PODCAST_TAGS.PODCASTS_ID] to it[PODCAST_TAGS.TAGS_ID]  }).containsOnly(
+            assertThat(query.selectFrom(PODCAST_TAGS).fetch().map { it[PODCAST_TAGS.PODCASTS_ID] to it[PODCAST_TAGS.TAGS_ID]  }).containsOnly(
                 fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d") to fromString("3c526048-f240-4db9-9526-6cc037fdc851")
             )
         }
@@ -730,13 +729,13 @@ class PodcastRepositoryTest(
                     .values(fromString("1b83a383-25ec-4aeb-8e82-f317449da37b"), "Item 1", "http://fakeurl.com/item.1.mp3", "http://fakeurl.com/item.1.mp3", fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e3"), "audio/mp3")
                     .values(fromString("2b83a383-25ec-4aeb-8e82-f317449da37b"), "Item 2", "http://fakeurl.com/item.2.mp3", "http://fakeurl.com/item.2.mp3", fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e4"), "audio/mp3")
 
-            ).r2dbc().execute()
+            ).execute()
 
             /* When */
             repository.deleteById(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"))
 
             /* Then */
-            assertThat(query.selectFrom(ITEM).r2dbc().fetch().map { it[ITEM.ID] }).containsOnly(
+            assertThat(query.selectFrom(ITEM).fetch().map { it[ITEM.ID] }).containsOnly(
                 fromString("2b83a383-25ec-4aeb-8e82-f317449da37b")
             )
         }
@@ -772,13 +771,13 @@ class PodcastRepositoryTest(
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("1b83a383-25ec-4aeb-8e82-f317449da37b"))
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("1b83a383-25ec-4aeb-8e82-f317449da37b"))
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("2b83a383-25ec-4aeb-8e82-f317449da37b"))
-            ).r2dbc().execute()
+            ).execute()
 
             /* When */
             repository.deleteById(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"))
 
             /* Then */
-            assertThat(query.selectFrom(WATCH_LIST_ITEMS).r2dbc().fetch().map{ it[WATCH_LIST_ITEMS.WATCH_LISTS_ID] to it[WATCH_LIST_ITEMS.ITEMS_ID] }).containsOnly(
+            assertThat(query.selectFrom(WATCH_LIST_ITEMS).fetch().map{ it[WATCH_LIST_ITEMS.WATCH_LISTS_ID] to it[WATCH_LIST_ITEMS.ITEMS_ID] }).containsOnly(
                 fromString("dc024a30-bd02-11e5-a837-0800200c9a66") to fromString("2b83a383-25ec-4aeb-8e82-f317449da37b")
             )
         }

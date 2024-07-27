@@ -12,8 +12,6 @@ import org.jooq.*
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
 import org.slf4j.LoggerFactory
-import reactor.core.publisher.Flux
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.nio.file.Path
 import java.time.OffsetDateTime
@@ -29,59 +27,56 @@ class ItemRepository(private val query: DSLContext) {
     fun findById(id: UUID): Item? = findById(listOf(id)).firstOrNull()
 
     private fun findById(ids: List<UUID>): List<Item> {
-        return Flux.from(
-            query
-                .select(
-                    ITEM.ID, ITEM.TITLE, ITEM.URL,
-                    ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
-                    ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.FILE_NAME, ITEM.STATUS,
+        return query
+            .select(
+                ITEM.ID, ITEM.TITLE, ITEM.URL,
+                ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE,
+                ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.FILE_NAME, ITEM.STATUS,
 
-                    PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
-                    COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT
-                )
-                .from(
-                    ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
-                        .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
-                )
-                .where(ITEM.ID.`in`(ids))
-        )
+                PODCAST.ID, PODCAST.TITLE, PODCAST.URL,
+                COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT
+            )
+            .from(
+                ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
+                    .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
+            )
+            .where(ITEM.ID.`in`(ids))
+            .fetch()
             .map(::toItem)
-            .collectList()
-            .block()!!
     }
 
     fun findAllToDelete(date: OffsetDateTime): List<DeleteItemRequest> {
-        return Flux.from(
-            query
-                .select(ITEM.ID, ITEM.FILE_NAME, PODCAST.TITLE)
-                .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
-                .where(ITEM.DOWNLOAD_DATE.lessOrEqual(date))
-                .and(ITEM.STATUS.eq(FINISH))
-                .and(PODCAST.HAS_TO_BE_DELETED.isTrue)
-                .and(ITEM.ID.notIn(query.select(WATCH_LIST_ITEMS.ITEMS_ID).from(WATCH_LIST_ITEMS)))
-        )
+        return query
+            .select(ITEM.ID, ITEM.FILE_NAME, PODCAST.TITLE)
+            .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
+            .where(ITEM.DOWNLOAD_DATE.lessOrEqual(date))
+            .and(ITEM.STATUS.eq(FINISH))
+            .and(PODCAST.HAS_TO_BE_DELETED.isTrue)
+            .and(ITEM.ID.notIn(query.select(WATCH_LIST_ITEMS.ITEMS_ID).from(WATCH_LIST_ITEMS)))
+            .fetch()
             .map { DeleteItemRequest(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
-            .collectList()
-            .block()!!
     }
 
     fun deleteById(id: UUID): DeleteItemRequest? {
         query
             .delete(WATCH_LIST_ITEMS)
             .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(id))
-            .toMono()
-            .block()
+            .execute()
 
-        return query
+        val result = query
             .select(ITEM.ID, ITEM.FILE_NAME, ITEM.STATUS, PODCAST.TITLE, PODCAST.HAS_TO_BE_DELETED)
             .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
             .where(ITEM.ID.eq(id))
-            .toMono()
-            .delayUntil { query.delete(ITEM).where(ITEM.ID.eq(id)).toMono() }
+            .fetch()
+
+        query.delete(ITEM).where(ITEM.ID.eq(id))
+            .execute()
+
+        return result
             .filter { it[PODCAST.HAS_TO_BE_DELETED] }
             .filter { it[ITEM.STATUS] == FINISH }
             .map { DeleteItemRequest(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
-            .block()
+            .firstOrNull()
     }
 
     fun updateAsDeleted(items: Collection<UUID>) {
@@ -90,8 +85,7 @@ class ItemRepository(private val query: DSLContext) {
             .set(ITEM.STATUS, DELETED)
             .set(ITEM.FILE_NAME, null as Path?)
             .where(ITEM.ID.`in`(items))
-            .toMono()
-            .block()
+            .execute()
     }
 
     fun hasToBeDeleted(id: UUID): Boolean {
@@ -99,9 +93,9 @@ class ItemRepository(private val query: DSLContext) {
             .select(PODCAST.HAS_TO_BE_DELETED)
             .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
             .where(ITEM.ID.eq(id))
-            .toMono()
-            .map { it[PODCAST.HAS_TO_BE_DELETED] }
-            .block() ?: false
+            .fetchOne()
+            ?.let { (it) -> it }
+            ?: false
     }
 
     fun resetById(id: UUID): Item? {
@@ -112,8 +106,7 @@ class ItemRepository(private val query: DSLContext) {
             .set(ITEM.FILE_NAME, null as Path?)
             .set(ITEM.NUMBER_OF_FAIL, 0)
             .where(ITEM.ID.eq(id))
-            .toMono()
-            .block()!!
+            .execute()
 
         return findById(id)
     }
@@ -154,7 +147,7 @@ class ItemRepository(private val query: DSLContext) {
                 .limit((page.size * page.page), page.size)
         )
 
-        val content = Flux.from(query
+        val content = query
             .with(fi)
             .select(
                 fi.field(ITEM.ID), fi.field(ITEM.TITLE), fi.field(ITEM.URL),
@@ -171,7 +164,7 @@ class ItemRepository(private val query: DSLContext) {
                     .innerJoin(PODCAST).on(fi.field(ITEM.PODCAST_ID)?.eq(PODCAST.ID))
             )
             .orderBy(page.sort.toOrderBy(fi.field(ITEM.DOWNLOAD_DATE)!!, fi.field(ITEM.PUB_DATE)!!), fi.field(ITEM.ID))
-        )
+            .fetch()
             .map { (
                        id, title, url,
                        pubDate, downloadDate, creationDate,
@@ -190,16 +183,13 @@ class ItemRepository(private val query: DSLContext) {
                     Item.Cover(coverId, URI(coverUrl), coverWidth, coverHeight)
                 )
             }
-            .collectList()
-            .block()!!
 
         val totalElements = query
             .select(countDistinct(ITEM.ID))
             .from(ITEM)
             .where(filterConditions)
-            .toMono()
-            .map { (v) -> v }
-            .block()!!
+            .fetchOne()!!
+            .let { (v) -> v }
 
         return PageItem.of(content, totalElements, page)
     }
@@ -290,9 +280,8 @@ class ItemRepository(private val query: DSLContext) {
                 .set(ITEM.URL, item.url)
         }
 
-        val ids: List<UUID> = Flux.from(query.batch(queries))
-            .collectList()
-            .block()!!
+        val ids: List<UUID> = query.batch(queries)
+            .execute()
             .withIndex()
             .filter { (_, isCreated) -> isCreated >= 1 }
             .map { (idx, _) -> itemsWithIds[idx].id }
@@ -305,26 +294,22 @@ class ItemRepository(private val query: DSLContext) {
             .update(ITEM)
             .set(ITEM.STATUS, NOT_DOWNLOADED)
             .where(ITEM.STATUS.`in`(STARTED, PAUSED))
-            .toMono()
-            .block()!!
+            .execute()
 
         log.info("Reset of item with downloading state done")
     }
 
     fun findPlaylistsContainingItem(itemId: UUID): List<ItemPlaylist> {
-        return Flux.from(
-                query
-                    .select(WATCH_LIST.ID, WATCH_LIST.NAME)
-                    .from(
-                        WATCH_LIST
-                            .innerJoin(WATCH_LIST_ITEMS)
-                            .on(WATCH_LIST.ID.eq(WATCH_LIST_ITEMS.WATCH_LISTS_ID))
-                    )
-                    .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(itemId))
-                    .orderBy(WATCH_LIST.ID)
-            )
-            .collectList()
-            .block()!!
+        return query
+                .select(WATCH_LIST.ID, WATCH_LIST.NAME)
+                .from(
+                    WATCH_LIST
+                        .innerJoin(WATCH_LIST_ITEMS)
+                        .on(WATCH_LIST.ID.eq(WATCH_LIST_ITEMS.WATCH_LISTS_ID))
+                )
+                .where(WATCH_LIST_ITEMS.ITEMS_ID.eq(itemId))
+                .orderBy(WATCH_LIST.ID)
+            .fetch()
             .map { (id, name) -> ItemPlaylist(id, name) }
     }
 }

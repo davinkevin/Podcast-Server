@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.download
 
-import com.github.davinkevin.podcastserver.JooqR2DBCTest
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.DownloadingState
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
@@ -8,7 +7,6 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.toDb
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
-import com.github.davinkevin.podcastserver.r2dbc
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
@@ -17,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import java.net.URI
 import java.time.Clock
@@ -31,7 +30,7 @@ private val fixedDate = Clock.fixed(OffsetDateTime.of(2022, 3, 4, 5, 6, 7, 0, Zo
 /**
  * Created by kevin on 27/06/2020
  */
-@JooqR2DBCTest
+@JooqTest
 @Import(DownloadRepository::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 class DownloadRepositoryTest(
@@ -51,7 +50,6 @@ class DownloadRepositoryTest(
             truncate(PODCAST).cascade(),
             truncate(COVER).cascade(),
         )
-            .r2dbc()
             .execute()
     }
 
@@ -67,7 +65,7 @@ class DownloadRepositoryTest(
             repo.initQueue(OffsetDateTime.now(fixedDate), 5)
 
             /* Then */
-            val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+            val items = query.selectFrom(DOWNLOADING_ITEM).fetch()
             assertThat(items).hasSize(0)
         }
 
@@ -114,7 +112,6 @@ class DownloadRepositoryTest(
                         .columns(p.ID, p.DESCRIPTION, p.HAS_TO_BE_DELETED, p.LAST_UPDATE, p.SIGNATURE, p.TITLE, p.TYPE, p.URL, p.COVER_ID)
                         .values(podcastId, "desc", true, OffsetDateTime.now(fixedDate), "sign", "Podcast-Title", "Youtube", "https://www.youtube.com/channel/UCx83f-KzDd3o1QK2AdJIftg", coverId),
                 )
-                    .r2dbc()
                     .execute()
             }
 
@@ -124,7 +121,6 @@ class DownloadRepositoryTest(
                     selectOne(),
                     truncate(DOWNLOADING_ITEM).cascade(),
                 )
-                    .r2dbc()
                     .execute()
             }
 
@@ -144,7 +140,6 @@ class DownloadRepositoryTest(
                             .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
                             .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
                     )
-                        .r2dbc()
                         .execute()
                 }
 
@@ -155,7 +150,7 @@ class DownloadRepositoryTest(
                     repo.initQueue(oneDayAgo, 999)
                     /* Then */
 
-                    val (first) = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                    val (first) = query.selectFrom(DOWNLOADING_ITEM).fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId1)
                         assertThat(position).isEqualTo(1)
@@ -170,7 +165,7 @@ class DownloadRepositoryTest(
                     repo.initQueue(twoDaysAgo, 999)
 
                     /* Then */
-                    val (first, second) = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                    val (first, second) = query.selectFrom(DOWNLOADING_ITEM).fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId2)
                         assertThat(position).isEqualTo(1)
@@ -190,7 +185,7 @@ class DownloadRepositoryTest(
                     repo.initQueue(threeDaysAgo, 999)
 
                     /* Then */
-                    val (first, second, third) = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                    val (first, second, third) = query.selectFrom(DOWNLOADING_ITEM).fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId3)
                         assertThat(position).isEqualTo(1)
@@ -225,7 +220,7 @@ class DownloadRepositoryTest(
                             .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
                             .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
                     )
-                        .r2dbc()
+
                         .execute()
                 }
 
@@ -236,7 +231,7 @@ class DownloadRepositoryTest(
                     repo.initQueue(now.minusYears(1) , 0)
 
                     /* Then */
-                    val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                    val items = query.selectFrom(DOWNLOADING_ITEM).fetch()
                     assertThat(items).isEmpty()
                 }
 
@@ -247,7 +242,7 @@ class DownloadRepositoryTest(
                     repo.initQueue(now.minusYears(1) , 5+1)
 
                     /* Then */
-                    val (first) = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                    val (first) = query.selectFrom(DOWNLOADING_ITEM).fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId1)
                         assertThat(position).isEqualTo(1)
@@ -262,7 +257,7 @@ class DownloadRepositoryTest(
                     repo.initQueue(now.minusYears(1) , 10+1)
 
                     /* Then */
-                    val (first, second) = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                    val (first, second) = query.selectFrom(DOWNLOADING_ITEM).fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId2)
                         assertThat(position).isEqualTo(1)
@@ -282,7 +277,7 @@ class DownloadRepositoryTest(
                     repo.initQueue(now.minusYears(1) , 20+1)
 
                     /* Then */
-                    val (first, second, third) = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                    val (first, second, third) = query.selectFrom(DOWNLOADING_ITEM).fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId3)
                         assertThat(position).isEqualTo(1)
@@ -353,7 +348,7 @@ class DownloadRepositoryTest(
                     .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
                     .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -363,7 +358,7 @@ class DownloadRepositoryTest(
                 selectOne(),
                 truncate(DOWNLOADING_ITEM).cascade(),
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -378,7 +373,7 @@ class DownloadRepositoryTest(
                 repo.addItemToQueue(itemId1)
 
                 /* Then */
-                val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                val items = query.selectFrom(DOWNLOADING_ITEM).fetch()
                 assertThat(items).hasSize(1)
                 items.last().apply {
                     assertThat(itemId).isEqualTo(itemId1)
@@ -396,13 +391,13 @@ class DownloadRepositoryTest(
                         .columns(DOWNLOADING_ITEM.ITEM_ID, DOWNLOADING_ITEM.STATE, DOWNLOADING_ITEM.POSITION)
                         .values(itemId2, DownloadingState.WAITING, 1)
                 )
-                    .r2dbc().execute()
+                    .execute()
 
                 /* When */
                 repo.addItemToQueue(itemId1)
 
                 /* Then */
-                val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                val items = query.selectFrom(DOWNLOADING_ITEM).fetch()
                 assertThat(items).hasSize(2)
                 items.last().apply {
                     assertThat(itemId).isEqualTo(itemId1)
@@ -420,13 +415,13 @@ class DownloadRepositoryTest(
                         .columns(DOWNLOADING_ITEM.ITEM_ID, DOWNLOADING_ITEM.STATE, DOWNLOADING_ITEM.POSITION)
                         .values(itemId2, DownloadingState.WAITING, 123)
                 )
-                    .r2dbc().execute()
+                    .execute()
 
                 /* When */
                 repo.addItemToQueue(itemId1)
 
                 /* Then */
-                val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                val items = query.selectFrom(DOWNLOADING_ITEM).fetch()
                 assertThat(items).hasSize(2)
                 items.last().apply {
                     assertThat(itemId).isEqualTo(itemId1)
@@ -445,13 +440,13 @@ class DownloadRepositoryTest(
                         .values(itemId2, DownloadingState.WAITING, 128)
                         .values(itemId3, DownloadingState.WAITING, 256)
                 )
-                    .r2dbc().execute()
+                    .execute()
 
                 /* When */
                 repo.addItemToQueue(itemId1)
 
                 /* Then */
-                val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                val items = query.selectFrom(DOWNLOADING_ITEM).fetch()
                 assertThat(items).hasSize(3)
                 items.last().apply {
                     assertThat(itemId).isEqualTo(itemId1)
@@ -470,13 +465,13 @@ class DownloadRepositoryTest(
                         .values(itemId2, DownloadingState.WAITING, 128)
                         .values(itemId3, DownloadingState.WAITING, 256)
                 )
-                    .r2dbc().execute()
+                    .execute()
 
                 /* When */
                 repo.addItemToQueue(itemId3)
 
                 /* Then */
-                val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                val items = query.selectFrom(DOWNLOADING_ITEM).fetch()
                 assertThat(items).hasSize(2)
                 items.last().apply {
                     assertThat(itemId).isEqualTo(itemId3)
@@ -495,13 +490,13 @@ class DownloadRepositoryTest(
                         .values(itemId2, DownloadingState.DOWNLOADING, 128)
                         .values(itemId3, DownloadingState.WAITING, 256)
                 )
-                    .r2dbc().execute()
+                    .execute()
 
                 /* When */
                 repo.addItemToQueue(itemId2)
 
                 /* Then */
-                val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                val items = query.selectFrom(DOWNLOADING_ITEM).fetch()
                 assertThat(items).hasSize(2)
                 items.first().apply {
                     assertThat(itemId).isEqualTo(itemId2)
@@ -520,12 +515,12 @@ class DownloadRepositoryTest(
                         .values(itemId2, DownloadingState.DOWNLOADING, 128)
                         .values(itemId3, DownloadingState.WAITING, 256)
                 )
-                    .r2dbc().execute()
+                    .execute()
                 /* When */
                 repo.addItemToQueue(UUID.fromString("65a10b6e-5474-4e1c-9697-eba5330aee1d"))
 
                 /* Then */
-                val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+                val items = query.selectFrom(DOWNLOADING_ITEM).fetch()
                 assertThat(items).hasSize(2)
             }
         }
@@ -578,7 +573,7 @@ class DownloadRepositoryTest(
                     .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
 
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -587,7 +582,7 @@ class DownloadRepositoryTest(
             query.batch(
                 truncate(DOWNLOADING_ITEM).cascade()
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -616,7 +611,7 @@ class DownloadRepositoryTest(
                         .values(itemId3, 3)
                         .values(itemId4, 4)
                 )
-                    .r2dbc()
+
                     .execute()
                 /* When */
                 val items = repo.findAllToDownload(30)
@@ -644,7 +639,7 @@ class DownloadRepositoryTest(
                         .values(itemId3, 3)
                         .values(itemId4, 4)
                 )
-                    .r2dbc()
+
                     .execute()
                 /* When */
                 val items = repo.findAllToDownload(1)
@@ -666,7 +661,7 @@ class DownloadRepositoryTest(
                         .values(itemId3, 3)
                         .values(itemId4, 4)
                 )
-                    .r2dbc()
+
                     .execute()
                 /* When */
                 val items = repo.findAllToDownload(2)
@@ -696,7 +691,7 @@ class DownloadRepositoryTest(
                         .values(itemId3, 3, DownloadingState.WAITING)
                         .values(itemId4, 4, DownloadingState.WAITING)
                 )
-                    .r2dbc()
+
                     .execute()
                 /* When */
                 val items = repo.findAllToDownload(3)
@@ -720,7 +715,7 @@ class DownloadRepositoryTest(
                         .values(itemId3, 3, DownloadingState.WAITING)
                         .values(itemId4, 4, DownloadingState.WAITING)
                 )
-                    .r2dbc()
+
                     .execute()
 
                 /* When */
@@ -743,7 +738,7 @@ class DownloadRepositoryTest(
                         .values(itemId3, 3, DownloadingState.DOWNLOADING)
                         .values(itemId4, 4, DownloadingState.WAITING)
                 )
-                    .r2dbc()
+
                     .execute()
                 /* When */
                 val items = repo.findAllToDownload(3)
@@ -764,7 +759,7 @@ class DownloadRepositoryTest(
                         .values(itemId3, 3, DownloadingState.DOWNLOADING)
                         .values(itemId4, 4, DownloadingState.DOWNLOADING)
                 )
-                    .r2dbc()
+
                     .execute()
 
                 /* When */
@@ -825,7 +820,7 @@ class DownloadRepositoryTest(
                     .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
                     .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -835,7 +830,7 @@ class DownloadRepositoryTest(
                 selectOne(),
                 truncate(DOWNLOADING_ITEM).cascade(),
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -857,7 +852,7 @@ class DownloadRepositoryTest(
                     .columns(DOWNLOADING_ITEM.ITEM_ID, DOWNLOADING_ITEM.STATE, DOWNLOADING_ITEM.POSITION)
                     .values(itemId2, DownloadingState.WAITING, 123)
             )
-                .r2dbc().execute()
+                .execute()
 
             /* When */
             val items = repo.findAllDownloading()
@@ -875,7 +870,7 @@ class DownloadRepositoryTest(
                     .columns(DOWNLOADING_ITEM.ITEM_ID, DOWNLOADING_ITEM.STATE, DOWNLOADING_ITEM.POSITION)
                     .values(itemId2, DownloadingState.DOWNLOADING, 123)
             )
-                .r2dbc().execute()
+                .execute()
 
             /* When */
             val items = repo.findAllDownloading()
@@ -912,7 +907,7 @@ class DownloadRepositoryTest(
                     .values(itemId2, DownloadingState.DOWNLOADING, 128)
                     .values(itemId3, DownloadingState.DOWNLOADING, 256)
             )
-                .r2dbc().execute()
+                .execute()
 
             /* When */
             val items = repo.findAllDownloading()
@@ -1010,7 +1005,7 @@ class DownloadRepositoryTest(
                     .values(itemId3, twoDaysAgo, twoDaysAgo, twoDaysAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
                     .values(itemId4, threeDaysAgo, threeDaysAgo, threeDaysAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -1020,7 +1015,7 @@ class DownloadRepositoryTest(
                 selectOne(),
                 truncate(DOWNLOADING_ITEM).cascade(),
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -1043,7 +1038,7 @@ class DownloadRepositoryTest(
                     .columns(DOWNLOADING_ITEM.ITEM_ID, DOWNLOADING_ITEM.STATE, DOWNLOADING_ITEM.POSITION)
                     .values(itemId2, DownloadingState.DOWNLOADING, 123)
             )
-                .r2dbc().execute()
+                .execute()
 
             /* When */
             val items = repo.findAllWaiting()
@@ -1061,7 +1056,7 @@ class DownloadRepositoryTest(
                     .columns(DOWNLOADING_ITEM.ITEM_ID, DOWNLOADING_ITEM.STATE, DOWNLOADING_ITEM.POSITION)
                     .values(itemId2, DownloadingState.WAITING, 123)
             )
-                .r2dbc().execute()
+                .execute()
 
             /* When */
             val items = repo.findAllWaiting()
@@ -1098,7 +1093,7 @@ class DownloadRepositoryTest(
                     .values(itemId2, DownloadingState.WAITING, 128)
                     .values(itemId3, DownloadingState.WAITING, 256)
             )
-                .r2dbc().execute()
+                .execute()
 
             /* When */
             val items = repo.findAllWaiting()
@@ -1197,7 +1192,7 @@ class DownloadRepositoryTest(
                     .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 20, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
                     .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -1210,7 +1205,7 @@ class DownloadRepositoryTest(
 
             /* Then */
             val numberOfStoppedItems = query.selectCount().from(ITEM).where(ITEM.STATUS.eq(ItemStatus.STOPPED))
-                .r2dbc().fetchOne(count())
+                .fetchOne(count())
 
             assertThat(numberOfStoppedItems).isEqualTo(1)
         }
@@ -1228,7 +1223,7 @@ class DownloadRepositoryTest(
             val notStoppedItems = query
                 .selectFrom(ITEM)
                 .where(ITEM.STATUS.notEqual(ItemStatus.STOPPED))
-                .r2dbc()
+
                 .fetch()
 
             assertThat(notStoppedItems).hasSize(3)
@@ -1242,7 +1237,7 @@ class DownloadRepositoryTest(
                 truncate(PODCAST).cascade(),
                 truncate(COVER).cascade(),
             )
-                .r2dbc()
+
                 .execute()
         }
     }
@@ -1292,7 +1287,7 @@ class DownloadRepositoryTest(
                     .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 6, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
                     .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 6, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
             )
-                .r2dbc()
+
                 .execute()
 
         }
@@ -1318,9 +1313,9 @@ class DownloadRepositoryTest(
             repo.updateDownloadItem(withStatus)
 
             /* Then */
-            val item = query.selectFrom(i).where(i.ID.eq(downloadingItem.id)).r2dbc().fetchOne() ?: error("item not found")
+            val item = query.selectFrom(i).where(i.ID.eq(downloadingItem.id)).fetchOne() ?: error("item not found")
             assertThat(item[ITEM.STATUS]).isEqualTo(status.toDb())
-            val others = query.selectFrom(i).where(i.ID.notEqual(downloadingItem.id)).r2dbc().fetch()
+            val others = query.selectFrom(i).where(i.ID.notEqual(downloadingItem.id)).fetch()
             assertThat(others.map { it[i.STATUS] }).containsOnly(ItemStatus.NOT_DOWNLOADED)
         }
 
@@ -1334,9 +1329,9 @@ class DownloadRepositoryTest(
             repo.updateDownloadItem(withFails)
 
             /* Then */
-            val item = query.selectFrom(i).where(i.ID.eq(downloadingItem.id)).r2dbc().fetchOne() ?: error("item not found")
+            val item = query.selectFrom(i).where(i.ID.eq(downloadingItem.id)).fetchOne() ?: error("item not found")
             assertThat(item[i.NUMBER_OF_FAIL]).isEqualTo(numberOfFails)
-            val others = query.selectFrom(i).where(i.ID.notEqual(downloadingItem.id)).r2dbc().fetch()
+            val others = query.selectFrom(i).where(i.ID.notEqual(downloadingItem.id)).fetch()
             assertThat(others.map { it[i.NUMBER_OF_FAIL] }).containsOnly(6)
         }
 
@@ -1347,7 +1342,7 @@ class DownloadRepositoryTest(
                 truncate(PODCAST).cascade(),
                 truncate(COVER).cascade(),
             )
-                .r2dbc()
+
                 .execute()
         }
     }
@@ -1400,7 +1395,7 @@ class DownloadRepositoryTest(
                     .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 6, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
                     .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 6, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -1419,7 +1414,7 @@ class DownloadRepositoryTest(
             )
 
             /* Then */
-            val item = query.selectFrom(i).where(i.ID.eq(itemId1)).r2dbc().fetchOne() ?: error("item not found")
+            val item = query.selectFrom(i).where(i.ID.eq(itemId1)).fetchOne() ?: error("item not found")
             assertThat(item[i.STATUS]).isEqualTo(ItemStatus.FINISH)
             assertThat(item[i.LENGTH]).isEqualTo(100L)
             assertThat(item[i.MIME_TYPE]).isEqualTo("video/avi")
@@ -1431,7 +1426,7 @@ class DownloadRepositoryTest(
         fun `without changing other elements`() {
             /* Given */
             val now = OffsetDateTime.now(fixedDate)
-            val itemsBefore = query.selectFrom(i).where(i.ID.notEqual(itemId1)).r2dbc().fetch()
+            val itemsBefore = query.selectFrom(i).where(i.ID.notEqual(itemId1)).fetch()
 
             /* When */
             repo.finishDownload(
@@ -1443,7 +1438,7 @@ class DownloadRepositoryTest(
             )
 
             /* Then */
-            val itemsAfter = query.selectFrom(i).where(i.ID.notEqual(itemId1)).r2dbc().fetch()
+            val itemsAfter = query.selectFrom(i).where(i.ID.notEqual(itemId1)).fetch()
             assertThat(itemsBefore).containsAll(itemsAfter)
         }
 
@@ -1454,7 +1449,7 @@ class DownloadRepositoryTest(
                 truncate(PODCAST).cascade(),
                 truncate(COVER).cascade(),
             )
-                .r2dbc()
+
                 .execute()
         }
     }
@@ -1514,7 +1509,7 @@ class DownloadRepositoryTest(
                     .values(itemId1, 1)
                     .values(itemId2, 2)
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -1526,7 +1521,7 @@ class DownloadRepositoryTest(
             repo.remove(id = itemId1, hasToBeStopped = false)
 
             /* Then */
-            val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+            val items = query.selectFrom(DOWNLOADING_ITEM).fetch()
                 .map { it[DOWNLOADING_ITEM.ITEM_ID] to it[DOWNLOADING_ITEM.POSITION] }
             assertThat(items).contains(itemId2 to 2)
         }
@@ -1538,10 +1533,10 @@ class DownloadRepositoryTest(
             repo.remove(id = itemId1, hasToBeStopped = true)
 
             /* Then */
-            val items = query.selectFrom(DOWNLOADING_ITEM).r2dbc().fetch()
+            val items = query.selectFrom(DOWNLOADING_ITEM).fetch()
                 .map { it[DOWNLOADING_ITEM.ITEM_ID] to it[DOWNLOADING_ITEM.POSITION] }
             assertThat(items).contains(itemId2 to 2)
-            val status = query.selectFrom(i).where(i.ID.eq(itemId1)).r2dbc().fetchOne(i.STATUS)
+            val status = query.selectFrom(i).where(i.ID.eq(itemId1)).fetchOne(i.STATUS)
             assertThat(status).isEqualTo(ItemStatus.STOPPED)
         }
     }
@@ -1593,7 +1588,7 @@ class DownloadRepositoryTest(
                     .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
 
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -1602,7 +1597,7 @@ class DownloadRepositoryTest(
             query.batch(
                 truncate(DOWNLOADING_ITEM).cascade()
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -1622,14 +1617,14 @@ class DownloadRepositoryTest(
                         .values(itemId3, 3, DownloadingState.WAITING)
                         .values(itemId4, 4, DownloadingState.WAITING)
                 )
-                    .r2dbc()
+
                     .execute()
 
                 /* When */
                 repo.moveItemInQueue(itemId3, 0)
 
                 /* Then */
-                val items = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION).r2dbc().fetch()
+                val items = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION).fetch()
                 assertThat(items[0].itemId).isEqualTo(itemId1)
                 assertThat(items[1].itemId).isEqualTo(itemId3)
                 assertThat(items[2].itemId).isEqualTo(itemId2)
@@ -1648,14 +1643,14 @@ class DownloadRepositoryTest(
                         .values(itemId3, 3, DownloadingState.WAITING)
                         .values(itemId4, 4, DownloadingState.WAITING)
                 )
-                    .r2dbc()
+
                     .execute()
 
                 /* When */
                 repo.moveItemInQueue(itemId2, 1)
 
                 /* Then */
-                val items = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION).r2dbc().fetch()
+                val items = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION).fetch()
                 assertThat(items[0].itemId).isEqualTo(itemId1)
                 assertThat(items[1].itemId).isEqualTo(itemId3)
                 assertThat(items[2].itemId).isEqualTo(itemId2)
@@ -1674,13 +1669,13 @@ class DownloadRepositoryTest(
                         .values(itemId3, 3, DownloadingState.WAITING)
                         .values(itemId4, 4, DownloadingState.WAITING)
                 )
-                    .r2dbc()
+
                     .execute()
                 /* When */
                 repo.moveItemInQueue(itemId2, 2)
 
                 /* Then */
-                val items = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION).r2dbc().fetch()
+                val items = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION).fetch()
                 assertThat(items[0].itemId).isEqualTo(itemId1)
                 assertThat(items[1].itemId).isEqualTo(itemId3)
                 assertThat(items[2].itemId).isEqualTo(itemId4)
@@ -1738,7 +1733,7 @@ class DownloadRepositoryTest(
                     .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
 
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -1753,7 +1748,7 @@ class DownloadRepositoryTest(
                     .values(itemId3, 3, DownloadingState.WAITING)
                     .values(itemId4, 4, DownloadingState.WAITING)
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -1765,7 +1760,7 @@ class DownloadRepositoryTest(
 
             /* Then */
             val item = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION)
-                .r2dbc().fetch()
+                .fetch()
                 .first { it.itemId == itemId2 }
             assertThat(item.state).isEqualTo(DownloadingState.DOWNLOADING)
             assertThat(item.position).isEqualTo(2)
@@ -1779,7 +1774,7 @@ class DownloadRepositoryTest(
 
             /* Then */
             val (first, second, third, fourth) = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION)
-                .r2dbc().fetch()
+                .fetch()
 
             assertThat(first.itemId).isEqualTo(itemId1)
             assertThat(first.position).isEqualTo(1)
@@ -1847,7 +1842,7 @@ class DownloadRepositoryTest(
                     .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 30, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId)
 
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -1862,7 +1857,7 @@ class DownloadRepositoryTest(
                     .values(itemId3, 3, DownloadingState.WAITING)
                     .values(itemId4, 4, DownloadingState.WAITING)
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -1875,7 +1870,7 @@ class DownloadRepositoryTest(
             /* Then */
             val items = query
                 .selectFrom(DOWNLOADING_ITEM)
-                .r2dbc().fetch()
+                .fetch()
 
             assertThat(items.all { it.state == DownloadingState.WAITING }).isTrue()
         }
@@ -1889,7 +1884,7 @@ class DownloadRepositoryTest(
                     .set(DOWNLOADING_ITEM.STATE, DownloadingState.DOWNLOADING)
                     .where(DOWNLOADING_ITEM.POSITION.`in`(1))
             )
-                .r2dbc()
+
                 .execute()
 
             /* When */
@@ -1900,7 +1895,7 @@ class DownloadRepositoryTest(
 
             val items = query
                 .selectFrom(DOWNLOADING_ITEM)
-                .r2dbc().fetch()
+                .fetch()
 
             assertThat(items.all { it.state == DownloadingState.WAITING }).isTrue()
         }
@@ -1914,7 +1909,7 @@ class DownloadRepositoryTest(
                     .set(DOWNLOADING_ITEM.STATE, DownloadingState.DOWNLOADING)
                     .where(DOWNLOADING_ITEM.POSITION.`in`(1, 2))
             )
-                .r2dbc()
+
                 .execute()
 
             /* When */
@@ -1924,7 +1919,7 @@ class DownloadRepositoryTest(
             assertThat(result).isEqualTo(2)
             val items = query
                 .selectFrom(DOWNLOADING_ITEM)
-                .r2dbc().fetch()
+                .fetch()
 
             assertThat(items.all { it.state == DownloadingState.WAITING }).isTrue()
         }
@@ -1938,7 +1933,7 @@ class DownloadRepositoryTest(
                     .set(DOWNLOADING_ITEM.STATE, DownloadingState.DOWNLOADING)
                     .where(DOWNLOADING_ITEM.POSITION.`in`(1, 2, 3))
             )
-                .r2dbc()
+
                 .execute()
 
             /* When */
@@ -1948,7 +1943,7 @@ class DownloadRepositoryTest(
             assertThat(result).isEqualTo(3)
             val items = query
                 .selectFrom(DOWNLOADING_ITEM)
-                .r2dbc().fetch()
+                .fetch()
 
             assertThat(items.all { it.state == DownloadingState.WAITING }).isTrue()
         }
@@ -1961,7 +1956,7 @@ class DownloadRepositoryTest(
                 update(DOWNLOADING_ITEM)
                     .set(DOWNLOADING_ITEM.STATE, DownloadingState.DOWNLOADING)
             )
-                .r2dbc()
+
                 .execute()
 
             /* When */
@@ -1971,7 +1966,7 @@ class DownloadRepositoryTest(
             assertThat(result).isEqualTo(4)
             val items = query
                 .selectFrom(DOWNLOADING_ITEM)
-                .r2dbc().fetch()
+                .fetch()
 
             assertThat(items.all { it.state == DownloadingState.WAITING }).isTrue()
         }

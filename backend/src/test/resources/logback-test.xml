@@ -4,6 +4,4 @@
     <logger name="org.springframework" level="OFF"/>
     <logger name="org.eclipse.jetty" level="OFF"/>
     <logger name="org.jooq.Constants" level="warn" />
-    <logger name="io.r2dbc.postgresql.QUERY" level="debug" />
-    <logger name="io.r2dbc.postgresql.PARAM" level="debug" />
 </configuration>

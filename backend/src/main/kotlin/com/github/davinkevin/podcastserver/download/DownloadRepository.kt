@@ -14,8 +14,6 @@ import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem.Po
 import org.jooq.DSLContext
 import org.jooq.Record9
 import org.jooq.impl.DSL.*
-import reactor.core.publisher.Flux
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.nio.file.Path
 import java.time.OffsetDateTime
@@ -42,8 +40,7 @@ class DownloadRepository(private val query: DSLContext) {
                     .and(ITEM.ID.notIn(select(DOWNLOADING_ITEM.ITEM_ID).from(DOWNLOADING_ITEM)))
                     .orderBy(ITEM.PUB_DATE.asc())
             )
-            .toMono()
-            .block()
+            .execute()
     }
 
     fun addItemToQueue(id: UUID) {
@@ -56,8 +53,7 @@ class DownloadRepository(private val query: DSLContext) {
                     .where(ITEM.ID.eq(id))
                     .and(ITEM.ID.notIn(select(DOWNLOADING_ITEM.ITEM_ID).from(DOWNLOADING_ITEM)))
             )
-            .toMono()
-            .block()
+            .execute()
     }
 
     fun findAllToDownload(limit: Int): List<DownloadingItem> {
@@ -71,59 +67,52 @@ class DownloadRepository(private val query: DSLContext) {
 
         val item = DOWNLOADING_ITEM.item()
 
-        val items = Flux.from(
-            query.with(snapshot)
-                .select(
-                    item.ID, item.TITLE, item.STATUS, item.URL, item.NUMBER_OF_FAIL,
-                    item.podcast().ID, item.podcast().TITLE,
-                    item.cover().ID, item.cover().URL
-                )
-                .from(
-                    snapshot
-                        .innerJoin(DOWNLOADING_ITEM)
-                        .on(snapshot.field(DOWNLOADING_ITEM.ITEM_ID)!!.eq(DOWNLOADING_ITEM.ITEM_ID))
-                )
-                .where(snapshot.field(DOWNLOADING_ITEM.STATE)!!.eq(DownloadingState.WAITING))
-                .orderBy(snapshot.field(position))
-        )
-            .collectList()
-            .block()!!
+        val items = query.with(snapshot)
+            .select(
+                item.ID, item.TITLE, item.STATUS, item.URL, item.NUMBER_OF_FAIL,
+                item.podcast().ID, item.podcast().TITLE,
+                item.cover().ID, item.cover().URL
+            )
+            .from(
+                snapshot
+                    .innerJoin(DOWNLOADING_ITEM)
+                    .on(snapshot.field(DOWNLOADING_ITEM.ITEM_ID)!!.eq(DOWNLOADING_ITEM.ITEM_ID))
+            )
+            .where(snapshot.field(DOWNLOADING_ITEM.STATE)!!.eq(DownloadingState.WAITING))
+            .orderBy(snapshot.field(position))
+            .fetch()
 
         return items.map(::toDownloadingItem)
     }
 
     fun findAllDownloading(): List<DownloadingItem> {
         val item = DOWNLOADING_ITEM.item()
-        val items = Flux.from(
-            query
-                .select(
-                    item.ID, item.TITLE, item.STATUS, item.URL, item.NUMBER_OF_FAIL,
-                    item.podcast().ID, item.podcast().TITLE,
-                    item.cover().ID, item.cover().URL
-                )
-                .from(DOWNLOADING_ITEM)
-                .where(DOWNLOADING_ITEM.STATE.eq(DownloadingState.DOWNLOADING))
-                .orderBy(DOWNLOADING_ITEM.POSITION.asc())
-        )
-            .collectList().block()!!
+        val items = query
+            .select(
+                item.ID, item.TITLE, item.STATUS, item.URL, item.NUMBER_OF_FAIL,
+                item.podcast().ID, item.podcast().TITLE,
+                item.cover().ID, item.cover().URL
+            )
+            .from(DOWNLOADING_ITEM)
+            .where(DOWNLOADING_ITEM.STATE.eq(DownloadingState.DOWNLOADING))
+            .orderBy(DOWNLOADING_ITEM.POSITION.asc())
+            .fetch()
 
         return items.map(::toDownloadingItem)
     }
 
     fun findAllWaiting(): List<DownloadingItem> {
         val item = DOWNLOADING_ITEM.item()
-        val items = Flux.from(
-            query
-                .select(
-                    item.ID, item.TITLE, item.STATUS, item.URL, item.NUMBER_OF_FAIL,
-                    item.podcast().ID, item.podcast().TITLE,
-                    item.cover().ID, item.cover().URL
-                )
-                .from(DOWNLOADING_ITEM)
-                .where(DOWNLOADING_ITEM.STATE.eq(DownloadingState.WAITING))
-                .orderBy(DOWNLOADING_ITEM.POSITION.asc())
-        )
-            .collectList().block()!!
+        val items = query
+            .select(
+                item.ID, item.TITLE, item.STATUS, item.URL, item.NUMBER_OF_FAIL,
+                item.podcast().ID, item.podcast().TITLE,
+                item.cover().ID, item.cover().URL
+            )
+            .from(DOWNLOADING_ITEM)
+            .where(DOWNLOADING_ITEM.STATE.eq(DownloadingState.WAITING))
+            .orderBy(DOWNLOADING_ITEM.POSITION.asc())
+            .fetch()
 
         return items.map(::toDownloadingItem)
     }
@@ -133,16 +122,14 @@ class DownloadRepository(private val query: DSLContext) {
             .update(DOWNLOADING_ITEM)
             .set(DOWNLOADING_ITEM.STATE, DownloadingState.DOWNLOADING)
             .where(DOWNLOADING_ITEM.ITEM_ID.eq(id))
-            .toMono()
-            .block()
+            .execute()
     }
 
     fun remove(id: UUID, hasToBeStopped: Boolean) {
         query
             .deleteFrom(DOWNLOADING_ITEM)
             .where(DOWNLOADING_ITEM.ITEM_ID.eq(id))
-            .toMono()
-            .block()
+            .execute()
 
         if (hasToBeStopped) stopItem(id)
     }
@@ -191,8 +178,7 @@ class DownloadRepository(private val query: DSLContext) {
             .update(DOWNLOADING_ITEM)
             .set(DOWNLOADING_ITEM.POSITION, numberOfDownloadingItem + position + 1 )
             .where(DOWNLOADING_ITEM.ITEM_ID.eq(id))
-            .toMono()
-            .block()
+            .execute()
     }
 
     fun stopItem(id: UUID): Int {
@@ -200,8 +186,7 @@ class DownloadRepository(private val query: DSLContext) {
             .update(ITEM)
             .set(ITEM.STATUS, STOPPED)
             .where(ITEM.ID.eq(id))
-            .toMono()
-            .block() ?: 0
+            .execute()
     }
 
     fun updateDownloadItem(item: DownloadingItem): Int {
@@ -210,8 +195,7 @@ class DownloadRepository(private val query: DSLContext) {
             .set(ITEM.STATUS, item.status.toDb())
             .set(ITEM.NUMBER_OF_FAIL, item.numberOfFail)
             .where(ITEM.ID.eq(item.id))
-            .toMono()
-            .block() ?: 0
+            .execute()
     }
 
     fun finishDownload(id: UUID, length: Long, mimeType: String, fileName: Path, downloadDate: OffsetDateTime): Int {
@@ -223,17 +207,15 @@ class DownloadRepository(private val query: DSLContext) {
             .set(ITEM.FILE_NAME, fileName)
             .set(ITEM.DOWNLOAD_DATE, downloadDate)
             .where(ITEM.ID.eq(id))
-            .toMono()
-            .block() ?: 0
+            .execute()
     }
 
     fun resetToWaitingStateAllDownloadingItems(): Int {
         return query.
-          update(DOWNLOADING_ITEM)
+        update(DOWNLOADING_ITEM)
             .set(DOWNLOADING_ITEM.STATE, DownloadingState.WAITING)
             .where(DOWNLOADING_ITEM.STATE.eq(DownloadingState.DOWNLOADING))
-            .toMono()
-            .block() ?: 0
+            .execute()
     }
 }
 

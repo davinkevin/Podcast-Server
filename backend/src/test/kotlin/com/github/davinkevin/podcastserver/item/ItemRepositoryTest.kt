@@ -1,24 +1,22 @@
 package com.github.davinkevin.podcastserver.item
 
-import com.github.davinkevin.podcastserver.JooqR2DBCTest
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
-import com.github.davinkevin.podcastserver.r2dbc
 import org.assertj.core.api.Assertions.*
 import org.jooq.DSLContext
-import org.jooq.exception.DataAccessException
 import org.jooq.impl.DSL.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
+import org.springframework.dao.DataIntegrityViolationException
 import reactor.core.publisher.Flux
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
@@ -32,7 +30,7 @@ import kotlin.io.path.Path
 /**
  * Created by kevin on 2019-02-09
  */
-@JooqR2DBCTest
+@JooqTest
 @Import(ItemRepository::class)
 class ItemRepositoryTest(
     @Autowired val query: DSLContext,
@@ -51,7 +49,7 @@ class ItemRepositoryTest(
             truncate(WATCH_LIST).cascade(),
             truncate(WATCH_LIST_ITEMS).cascade(),
         )
-            .r2dbc()
+
             .execute()
     }
 
@@ -103,7 +101,7 @@ class ItemRepositoryTest(
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -180,7 +178,7 @@ class ItemRepositoryTest(
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
             )
-                .r2dbc()
+
                 .execute()
         }
 
@@ -249,8 +247,7 @@ class ItemRepositoryTest(
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
             )
-                .toMono()
-                .block()
+                .execute()
         }
 
 
@@ -368,8 +365,7 @@ class ItemRepositoryTest(
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
             )
-                .toMono()
-                .block()
+                .execute()
         }
 
 
@@ -443,8 +439,7 @@ class ItemRepositoryTest(
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
             )
-                .toMono()
-                .block()
+                .execute()
         }
 
 
@@ -466,7 +461,7 @@ class ItemRepositoryTest(
                 assertThat((it.downloadDate == null)).isEqualTo(true)
             }
             /* And */
-            val numberOfFail = query.selectFrom(ITEM).where(ITEM.ID.eq(id)).toMono().block()?.numberOfFail
+            val numberOfFail = query.selectFrom(ITEM).where(ITEM.ID.eq(id)).fetchOne()?.numberOfFail
             assertThat(numberOfFail).isEqualTo(0)
         }
 
@@ -520,8 +515,7 @@ class ItemRepositoryTest(
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
             )
-                .toMono()
-                .block()
+                .execute()
         }
 
         @Test
@@ -592,8 +586,8 @@ class ItemRepositoryTest(
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"))
                     .values(fromString("ccb75276-7a8c-4da9-b4fd-27ccec075c65"), fromString("6936b895-0de6-43f6-acaa-678511d3c37b"))
                     .values(fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
-            ).toMono()
-                .block()
+            )
+                .execute()
         }
 
         @Nested
@@ -1383,8 +1377,7 @@ class ItemRepositoryTest(
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
             )
-                .toMono()
-                .block()
+                .execute()
         }
 
         @Nested
@@ -1416,8 +1409,8 @@ class ItemRepositoryTest(
                         podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
                         cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
                     )
-                    val numberOfItem = query.selectCount().from(ITEM).r2dbc().fetchOne(count())
-                    val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())
+                    val numberOfItem = query.selectCount().from(ITEM).fetchOne(count()) ?: 0
+                    val numberOfCover = query.selectCount().from(COVER).fetchOne(count()) ?: 0
 
                     /* When */
                     val it = repository.create(item)!!
@@ -1443,8 +1436,8 @@ class ItemRepositoryTest(
                         assertThat(it.cover.width).isEqualTo(100)
                         assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
 
-                        assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
-                        assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
+                        assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+                        assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
                     }
 
                 }
@@ -1470,8 +1463,8 @@ class ItemRepositoryTest(
                         podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
                         cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
                     )
-                    val numberOfItem = query.selectCount().from(ITEM).r2dbc().fetchOne(count())!!
-                    val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())!!
+                    val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())!!
+                    val numberOfCover = query.selectCount().from(COVER).fetchOne(count())!!
 
                     /* When */
                     val it = repository.create(item)!!
@@ -1497,8 +1490,8 @@ class ItemRepositoryTest(
                         assertThat(it.cover.width).isEqualTo(100)
                         assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
 
-                        assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
-                        assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
+                        assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+                        assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
                     }
 
                 }
@@ -1524,15 +1517,15 @@ class ItemRepositoryTest(
                         podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
                         cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
                     )
-                    val numberOfItem = query.selectCount().from(ITEM).r2dbc().fetchOne(count())
-                    val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())
+                    val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())
+                    val numberOfCover = query.selectCount().from(COVER).fetchOne(count())
                     /* When */
                     val it = repository.create(item)
 
                     /* Then */
                     assertThat(it).isNull()
-                    assertThat(numberOfItem).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
-                    assertThat(numberOfCover).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
+                    assertThat(numberOfItem).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+                    assertThat(numberOfCover).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
                 }
 
                 @Test
@@ -1556,8 +1549,8 @@ class ItemRepositoryTest(
                         podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
                         cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
                     )
-                    val numberOfItem = query.selectCount().from(ITEM).r2dbc().fetchOne(count())
-                    val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())
+                    val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())
+                    val numberOfCover = query.selectCount().from(COVER).fetchOne(count())
 
                     /* When */
                     val it = repository.create(item)
@@ -1565,12 +1558,12 @@ class ItemRepositoryTest(
                     /* Then */
                     assertThat(it).isNull()
 
-                    assertThat(numberOfItem).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
-                    assertThat(numberOfCover).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
+                    assertThat(numberOfItem).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+                    assertThat(numberOfCover).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
 
                     val updatedItem = query.selectFrom(ITEM)
                         .where(ITEM.GUID.eq("geekinc.123.mp3"))
-                        .r2dbc().fetch()
+                        .fetch()
                         .firstOrNull() ?: error("item not found")
 
                     assertThat(updatedItem[ITEM.URL]).isEqualTo("http://another-url.com/geekinc.123.mp3")
@@ -1600,8 +1593,8 @@ class ItemRepositoryTest(
                         podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
                         cover = CoverForCreation(100, 100, URI("http://foo.bar.com/cover/item.jpg"))
                     )
-                    val numberOfItem = query.selectCount().from(ITEM).r2dbc().fetchOne(count())
-                    val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())
+                    val numberOfItem = query.selectCount().from(ITEM).fetchOne(count()) ?: 0
+                    val numberOfCover = query.selectCount().from(COVER).fetchOne(count()) ?: 0
 
                     /* When */
                     val it = repository.create(item)!!
@@ -1628,8 +1621,8 @@ class ItemRepositoryTest(
                         assertThat(it.cover.url).isEqualTo(URI("http://foo.bar.com/cover/item.jpg"))
                     }
 
-                    assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
-                    assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
+                    assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+                    assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
                 }
 
                 @Test
@@ -1654,8 +1647,8 @@ class ItemRepositoryTest(
                         podcastId = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
                         cover = null
                     )
-                    val numberOfItem = query.selectCount().from(ITEM).r2dbc().fetchOne(count())
-                    val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())
+                    val numberOfItem = query.selectCount().from(ITEM).fetchOne(count()) ?: 0
+                    val numberOfCover = query.selectCount().from(COVER).fetchOne(count()) ?: 0
 
                     /* When */
                     val it = repository.create(item)!!
@@ -1682,8 +1675,8 @@ class ItemRepositoryTest(
                         assertThat(it.cover.url).isEqualTo(URI("http://fake.url.com/geekinc/cover.png"))
                     }
 
-                    assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
-                    assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
+                    assertThat(numberOfItem + 1).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+                    assertThat(numberOfCover + 1).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
                 }
             }
 
@@ -1717,7 +1710,7 @@ class ItemRepositoryTest(
                     assertThatThrownBy { repository.create(item) }
 
                         /* Then */
-                        .isInstanceOf(DataAccessException::class.java)
+                        .isInstanceOf(DataIntegrityViolationException::class.java)
 
                 }
 
@@ -1747,7 +1740,7 @@ class ItemRepositoryTest(
                     assertThatThrownBy { repository.create(item) }
 
                         /* Then */
-                        .isInstanceOf(DataAccessException::class.java)
+                        .isInstanceOf(DataIntegrityViolationException::class.java)
                 }
 
             }
@@ -1819,8 +1812,8 @@ class ItemRepositoryTest(
                 @Test
                 fun `with no specificities`() {
                     /* Given */
-                    val numberOfItem = query.selectCount().from(ITEM).r2dbc().fetchOne(count())!!
-                    val numberOfCover = query.selectCount().from(COVER).r2dbc().fetchOne(count())!!
+                    val numberOfItem = query.selectCount().from(ITEM).fetchOne(count())!!
+                    val numberOfCover = query.selectCount().from(COVER).fetchOne(count())!!
 
                     /* When */
                     val items = repository.create(listOf(item1, item2, item3))
@@ -1828,8 +1821,8 @@ class ItemRepositoryTest(
                     /* Then */
                     assertThat(items).hasSize(3)
 
-                    assertThat(numberOfItem + 3).isEqualTo(query.selectCount().from(ITEM).r2dbc().fetchOne(count()))
-                    assertThat(numberOfCover + 3).isEqualTo(query.selectCount().from(COVER).r2dbc().fetchOne(count()))
+                    assertThat(numberOfItem + 3).isEqualTo(query.selectCount().from(ITEM).fetchOne(count()))
+                    assertThat(numberOfCover + 3).isEqualTo(query.selectCount().from(COVER).fetchOne(count()))
                 }
             }
         }
@@ -1892,8 +1885,7 @@ class ItemRepositoryTest(
                     .values(fromString("0a774613-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 141", "http://fakeurl.com/geekinc.141.mp3", "http://fakeurl.com/geekinc.141.mp3", Path("geekinc.141.mp3"), fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), ItemStatus.PAUSED, fixedDate.minusDays(1), null, fixedDate.minusWeeks(2), 3, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "video/mp4")
                     .values(fromString("0a674614-c867-44df-b7e0-5e5af31f7b56"), "Geek INC 142", "http://fakeurl.com/geekinc.142.mp3", "http://fakeurl.com/geekinc.142.mp3", Path("geekinc.142.mp3"), fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), ItemStatus.STARTED, fixedDate.minusDays(1), null, fixedDate.minusWeeks(1), 7, fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "desc", "video/mp4")
             )
-                .toMono()
-                .block()
+                .execute()
         }
 
         @Test
@@ -1909,13 +1901,13 @@ class ItemRepositoryTest(
 
             /* Then */
             val statuses = query.selectFrom(ITEM).where(ITEM.ID.`in`(ids))
-                .r2dbc()
+
                 .fetch()
                 .map { it[ITEM.STATUS] }
 
             val others = query
                 .selectFrom(ITEM).where(ITEM.ID.notIn(ids)).orderBy(ITEM.ID.asc())
-                .r2dbc()
+
                 .fetch()
                 .mapNotNull { it[ITEM.STATUS] }.toSet()
 
@@ -1973,8 +1965,7 @@ class ItemRepositoryTest(
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
             )
-                .toMono()
-                .block()
+                .execute()
         }
 
 
