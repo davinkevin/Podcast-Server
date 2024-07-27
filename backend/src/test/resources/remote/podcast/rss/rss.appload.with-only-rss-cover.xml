@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss xmlns:atom="http://www.w3.org/2005/Atom"
-     xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
-     xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0"
-     xmlns:media="http://search.yahoo.com/mrss/"
-     version="2.0">
+<rss
+        xmlns:itunes="http://www.itunes.com/dtds/podcast-1.0.dtd"
+        xmlns:feedburner="http://rssnamespace.org/feedburner/ext/1.0"
+        xmlns:media="http://search.yahoo.com/mrss/"
+        version="2.0">
     <channel>
         <title>AppLoad</title>
         <link>http://www.app-load.com/</link>

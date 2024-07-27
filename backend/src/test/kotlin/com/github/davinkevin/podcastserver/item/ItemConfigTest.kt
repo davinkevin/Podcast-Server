@@ -13,7 +13,6 @@ import org.springframework.boot.context.annotation.UserConfigurations
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Primary
-import reactor.core.publisher.Mono
 import java.time.Clock
 import java.time.OffsetDateTime
 import java.time.ZoneId
@@ -39,7 +38,7 @@ class ItemConfigTest {
                     clr.run()
 
 
-                    verify(repo, times(1)).resetItemWithDownloadingState()
+                    verify(repo).resetItemWithDownloadingState()
                 }
     }
 }

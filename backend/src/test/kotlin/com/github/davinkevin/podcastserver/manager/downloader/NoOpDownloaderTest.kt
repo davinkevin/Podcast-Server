@@ -64,6 +64,6 @@ class NoOpDownloaderTest {
         noOpDownloader.run()
 
         /* THEN  */
-        verify(idm, times(1)).removeACurrentDownload(any())
+        verify(idm).removeACurrentDownload(any())
     }
 }

@@ -122,8 +122,8 @@ class YoutubeDlDownloaderTest(
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
-                verify(file, times(1)).upload(dItem.item.podcast.title, finalFile)
-                verify(file, times(1)).metadata(dItem.item.podcast.title, finalFile)
+                verify(file).upload(dItem.item.podcast.title, finalFile)
+                verify(file).metadata(dItem.item.podcast.title, finalFile)
             }
         }
 
@@ -221,7 +221,7 @@ class YoutubeDlDownloaderTest(
 
                 /* Then */
                 await().atMost(5, TimeUnit.SECONDS).untilAsserted {
-                    verify(template, times(1)).sendItem(any())
+                    verify(template).sendItem(any())
                 }
             }
         }

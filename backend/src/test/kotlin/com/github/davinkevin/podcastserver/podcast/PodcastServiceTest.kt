@@ -464,7 +464,7 @@ class PodcastServiceTest(
 
                 /* Then */
                 assertThat(podcastAfterUpdate).isEqualTo(p)
-                verify(tagRepository, times(1)).save(any())
+                verify(tagRepository).save(any())
             }
 
             @Test
@@ -489,7 +489,7 @@ class PodcastServiceTest(
 
                 /* Then */
                 assertThat(podcastAfterUpdate).isEqualTo(p)
-                verify(tagRepository, times(1)).save(any())
+                verify(tagRepository).save(any())
             }
 
             @Test
@@ -724,7 +724,7 @@ class PodcastServiceTest(
             service.deleteById(id)
 
             /* Then */
-            verify(fileService, times(1)).deletePodcast(information)
+            verify(fileService).deletePodcast(information)
         }
 
         @Test

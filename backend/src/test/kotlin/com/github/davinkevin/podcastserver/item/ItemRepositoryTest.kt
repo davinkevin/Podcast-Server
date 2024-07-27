@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import org.springframework.dao.DataIntegrityViolationException
-import reactor.core.publisher.Flux
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
@@ -286,12 +285,12 @@ class ItemRepositoryTest(
 
                 /* When */
                 val response = repository.deleteById(id)
+
                 /* Then */
                 assertThat(response).isNull()
-                val items = Flux.from(query.select(ITEM.ID).from(ITEM))
-                    .map { it[ITEM.ID] }
-                    .collectList()
-                    .block()
+                val items = query.select(ITEM.ID).from(ITEM)
+                    .fetch { (id) -> id }
+
                 assertThat(items).hasSize(6).contains(
                     fromString("817a4626-6fd2-457e-8d27-69ea5acdc828"),
                     fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"),
@@ -380,9 +379,7 @@ class ItemRepositoryTest(
             repository.updateAsDeleted(ids)
 
             /* Then */
-            val items = Flux.from(query.selectFrom(ITEM).where(ITEM.ID.`in`(ids)))
-                .collectList()
-                .block()
+            val items = query.selectFrom(ITEM).where(ITEM.ID.`in`(ids)).fetch()
             assertThat(items).allSatisfy (Consumer {
                 assertThat(it.status).isEqualTo(ItemStatus.DELETED)
                 assertThat(it.fileName).isNull()
