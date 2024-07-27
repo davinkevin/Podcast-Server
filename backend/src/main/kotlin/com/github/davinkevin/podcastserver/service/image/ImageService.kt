@@ -3,28 +3,33 @@ package com.github.davinkevin.podcastserver.service.image
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
-import org.springframework.web.reactive.function.client.WebClient
-import reactor.core.publisher.Mono
+import org.springframework.web.client.RestClient
+import org.springframework.web.client.body
 import java.io.InputStream
 import java.net.URI
 import javax.imageio.ImageIO
 
-class ImageService (private val wcb: WebClient.Builder ) {
+class ImageService (private val rcb: RestClient.Builder ) {
 
     private val log = LoggerFactory.getLogger(ImageService::class.java)
 
-    fun fetchCoverInformation(url: URI): Mono<CoverInformation> {
+    fun fetchCoverInformation(url: URI): CoverInformation? {
         log.debug("fetch $url")
-        return wcb
-                .clone()
-                .baseUrl(url.toASCIIString()).build()
-                .get()
-                .accept(MediaType.APPLICATION_OCTET_STREAM)
-                .retrieve()
-                .bodyToMono(ByteArrayResource::class.java)
-                .map { it.inputStream.toBufferedImage() }
-                .map { CoverInformation(width = it.width, height = it.height, url = url) }
-                .onErrorResume { Mono.empty() }
+
+        val content = rcb
+            .clone()
+            .baseUrl(url.toASCIIString()).build()
+            .get()
+            .accept(MediaType.APPLICATION_OCTET_STREAM)
+            .runCatching {
+                retrieve().body<ByteArrayResource>()
+            }
+            .getOrNull()
+            ?: return null
+
+      val image = content.inputStream.toBufferedImage()
+
+      return CoverInformation(width = image.width, height = image.height, url = url)
     }
 }
 

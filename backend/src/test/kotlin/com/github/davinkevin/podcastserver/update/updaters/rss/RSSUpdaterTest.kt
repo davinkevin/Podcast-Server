@@ -23,8 +23,6 @@ import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.Duration
 import java.time.ZoneOffset
@@ -53,7 +51,7 @@ class RSSUpdaterTest(
 
         @BeforeEach
         fun beforeEach() {
-            whenever(image.fetchCoverInformation(any())).then { CoverInformation(100, 100, it.getArgument(0)).toMono() }
+            whenever(image.fetchCoverInformation(any())).then { CoverInformation(100, 100, it.getArgument(0)) }
         }
 
         @Test
@@ -115,7 +113,7 @@ class RSSUpdaterTest(
         fun `with success with podcast cover in error`(backend: WireMockServer) {
             /* Given */
             whenever(image.fetchCoverInformation(URI("http://app-load.com/audio/appload140.jpg")))
-                    .then { Mono.empty<CoverInformation>() }
+                .thenReturn(null)
             backend.stubFor(get("/rss.xml")
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
@@ -131,9 +129,9 @@ class RSSUpdaterTest(
         fun `with success with item cover and podcast cover in error`(backend: WireMockServer) {
             /* Given */
             whenever(image.fetchCoverInformation(URI("http://app-load.com/audio/appload1400.jpg")))
-                    .then { Mono.empty<CoverInformation>() }
+                .thenReturn(null)
             whenever(image.fetchCoverInformation(URI("http://app-load.com/audio/appload140.jpg")))
-                    .then { Mono.empty<CoverInformation>() }
+                .thenReturn(null)
             backend.stubFor(get("/rss.xml")
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 

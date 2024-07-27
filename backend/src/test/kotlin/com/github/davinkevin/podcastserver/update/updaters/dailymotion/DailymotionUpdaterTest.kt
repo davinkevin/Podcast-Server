@@ -27,7 +27,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -79,7 +78,7 @@ class DailymotionUpdaterTest(
         @Test
         fun `with 1 item`(backend: WireMockServer) {
             /* Given */
-            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
+            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")))
             backend.stubFor(get("/user/karimdebbache/videos?fields=created_time,description,id,thumbnail_720_url,title")
                     .willReturn(okJson(fileAsString("/remote/podcast/dailymotion/karimdebbache.1.item.json")))
             )
@@ -104,7 +103,7 @@ class DailymotionUpdaterTest(
         @Test
         fun `with 1 item without cover`(backend: WireMockServer) {
             /* Given */
-            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
+            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")))
             backend.stubFor(get("/user/karimdebbache/videos?fields=created_time,description,id,thumbnail_720_url,title")
                     .willReturn(okJson(fileAsString("/remote/podcast/dailymotion/karimdebbache.1.item-without-cover.json")))
             )
@@ -128,7 +127,7 @@ class DailymotionUpdaterTest(
         @Test
         fun `with 10 items`(backend: WireMockServer) {
             /* Given */
-            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
+            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")))
             backend.stubFor(get("/user/karimdebbache/videos?fields=created_time,description,id,thumbnail_720_url,title")
                     .willReturn(okJson(fileAsString("/remote/podcast/dailymotion/karimdebbache.10.items.json")))
             )

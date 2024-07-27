@@ -25,8 +25,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.time.ZoneId
 import java.time.ZonedDateTime
@@ -99,7 +97,7 @@ class MyTf1UpdaterTest(
             backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
                 .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
             )
-            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
+            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")))
 
             /* When */
             val items = updater.findItems(podcast)
@@ -114,7 +112,7 @@ class MyTf1UpdaterTest(
             backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
                 .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root-with-no-cover.json")))
             )
-            whenever(imageService.fetchCoverInformation(any())).thenReturn(Mono.empty())
+            whenever(imageService.fetchCoverInformation(any())).thenReturn(null)
 
             /* When */
             val items = updater.findItems(podcast)
@@ -130,7 +128,7 @@ class MyTf1UpdaterTest(
             backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
                 .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
             )
-            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
+            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")))
 
             /* When */
             val items = updater.findItems(podcast)
@@ -146,7 +144,7 @@ class MyTf1UpdaterTest(
             backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22REPLAY%22%5D%7D""")
                 .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
             )
-            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
+            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")))
 
             /* When */
             val items = updater.findItems(p)
@@ -162,7 +160,7 @@ class MyTf1UpdaterTest(
             backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22EXTRACT%22%5D%7D""")
                 .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
             )
-            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
+            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")))
 
             /* When */
             val items = updater.findItems(p)
@@ -178,7 +176,7 @@ class MyTf1UpdaterTest(
             backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3A%5B%22BONUS%22%5D%7D""")
                 .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
             )
-            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
+            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")))
 
             /* When */
             val items = updater.findItems(p)
@@ -193,7 +191,7 @@ class MyTf1UpdaterTest(
             backend.stubFor(get("""/graphql/web?id=87a97a3&variables=%7B%22programSlug%22%3A%22quotidien-avec-yann-barthes%22%2C%22offset%22%3A0%2C%22limit%22%3A50%2C%22sort%22%3A%7B%22type%22%3A%22DATE%22%2C%22order%22%3A%22DESC%22%7D%2C%22types%22%3Anull%7D""")
                 .willReturn(okJson(fileAsString("/remote/podcast/mytf1/quotidien.query.root.json")))
             )
-            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")).toMono())
+            whenever(imageService.fetchCoverInformation(any())).thenReturn(CoverInformation(100, 200, URI("https://fake.url.com/img.png")))
 
 
             /* When */

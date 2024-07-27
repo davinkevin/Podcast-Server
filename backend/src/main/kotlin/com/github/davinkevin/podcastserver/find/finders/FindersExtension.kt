@@ -6,7 +6,7 @@ import org.jsoup.nodes.Document
 import java.net.URI
 
 internal fun ImageService.fetchFindCoverInformation(url: URI): FindCoverInformation? {
-        val info = fetchCoverInformation(url).block()
+        val info = fetchCoverInformation(url)
                 ?: return null
 
         return FindCoverInformation(info.height, info.width, info.url)

@@ -27,7 +27,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
 @ExtendWith(SpringExtension::class)
@@ -49,7 +48,7 @@ class GulliFinderTest(
             val coverUrl = "https://resize-gulli.jnsmedia.fr/rcrop/1900,550,smartcrop,center-top/img//var/jeunesse/storage/images/gulli/chaine-tv/dessins-animes/pokemon/23289795-181-fre-FR/Pokemon.jpg"
 
             whenever(image.fetchCoverInformation(URI(coverUrl)))
-                .thenReturn(CoverInformation(123, 456, URI(coverUrl)).toMono())
+                .thenReturn(CoverInformation(123, 456, URI(coverUrl)))
 
             backend.stubFor(get("/dessins-animes/Pokemon3")
                 .willReturn(ok(fileAsString("/remote/podcast/gulli/pokemon.html"))))
@@ -98,7 +97,7 @@ class GulliFinderTest(
             val coverUrl = "https://resize-gulli.jnsmedia.fr/rcrop/1900,550,smartcrop,center-top/img//var/jeunesse/storage/images/gulli/chaine-tv/dessins-animes/pokemon/23289795-181-fre-FR/Pokemon.jpg"
 
             whenever(image.fetchCoverInformation(URI(coverUrl)))
-                .thenReturn(CoverInformation(123, 456, URI(coverUrl)).toMono())
+                .thenReturn(CoverInformation(123, 456, URI(coverUrl)))
 
             backend.stubFor(get("/dessins-animes/Pokemon3")
                 .willReturn(ok(fileAsString("/remote/podcast/gulli/pokemon.without-description.html"))))
@@ -127,7 +126,7 @@ class GulliFinderTest(
             val coverUrl = "https://resize-gulli.jnsmedia.fr/rcrop/1900,550,smartcrop,center-top/img//var/jeunesse/storage/images/gulli/chaine-tv/dessins-animes/pokemon/23289795-181-fre-FR/Pokemon.jpg"
 
             whenever(image.fetchCoverInformation(URI(coverUrl)))
-                .thenReturn(CoverInformation(123, 456, URI(coverUrl)).toMono())
+                .thenReturn(CoverInformation(123, 456, URI(coverUrl)))
 
             backend.stubFor(get("/dessins-animes/Pokemon3")
                 .willReturn(ok()))

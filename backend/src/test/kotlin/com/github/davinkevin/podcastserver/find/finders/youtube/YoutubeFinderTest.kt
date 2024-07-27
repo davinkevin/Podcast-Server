@@ -24,7 +24,6 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 
 @ExtendWith(SpringExtension::class)
@@ -46,7 +45,7 @@ class YoutubeFinderTest(
             val coverUrl = URI("https://yt3.ggpht.com/ytc/AAUvwnhJmYkW42zA0rx8V37HS_MbK_IX09HKCwaIsuU-=s900-c-k-c0x00ffffff-no-rj")
 
             whenever(image.fetchCoverInformation(coverUrl))
-                .thenReturn(CoverInformation(100, 100, coverUrl).toMono())
+                .thenReturn(CoverInformation(100, 100, coverUrl))
 
             backend.stubFor(get("/user/joueurdugrenier")
                 .withHeader("User-Agent", equalTo("curl/7.64.1"))
@@ -73,7 +72,7 @@ class YoutubeFinderTest(
             val coverUrl = URI("https://yt3.ggpht.com/ytc/AAUvwnhJmYkW42zA0rx8V37HS_MbK_IX09HKCwaIsuU-=s900-c-k-c0x00ffffff-no-rj")
 
             whenever(image.fetchCoverInformation(coverUrl))
-                .thenReturn(CoverInformation(100, 100, coverUrl).toMono())
+                .thenReturn(CoverInformation(100, 100, coverUrl))
 
             backend.apply {
                 stubFor(get("/user/joueurdugrenier")
