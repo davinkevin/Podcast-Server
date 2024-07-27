@@ -37,7 +37,7 @@ class PodcastService(
         val newTags = p.tags.filter { it.id == null }.map { tagRepository.save(it.name) }
 
         val tags = oldTags + newTags
-        val cover = coverRepository.save(p.cover).block()!!
+        val cover = coverRepository.save(p.cover)!!
 
         val podcast = repository.save(
             title = p.title,
@@ -67,7 +67,7 @@ class PodcastService(
         val isLocalCover = newCover.url.toASCIIString().startsWith("/")
         val coversAreIdentical = oldCover.url != newCover.url
         val cover = if (!isLocalCover && coversAreIdentical)
-            coverRepository.save(newCover).block()!!.also {
+            coverRepository.save(newCover)!!.also {
                 fileService
                     .downloadPodcastCover(p.copy(cover = Cover(it.id, it.url, it.height, it.width)))
             }

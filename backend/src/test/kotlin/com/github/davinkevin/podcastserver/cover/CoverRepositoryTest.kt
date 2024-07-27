@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Item
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Podcast
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
+import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.r2dbc
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
@@ -18,7 +19,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import org.springframework.transaction.annotation.Propagation.NEVER
 import org.springframework.transaction.annotation.Transactional
-import reactor.test.StepVerifier
 import java.net.URI
 import java.time.OffsetDateTime.now
 import java.util.UUID.fromString
@@ -106,17 +106,17 @@ class CoverRepositoryTest(
                     height = 200,
                     url = url
             )
+
             /* When */
-            StepVerifier.create(repository.save(cover))
-                    /* Then */
-                    .expectSubscription()
-                    .assertNext {
-                        assertThat(it.id).isNotNull
-                        assertThat(it.width).isEqualTo(100)
-                        assertThat(it.height).isEqualTo(200)
-                        assertThat(it.url).isEqualTo(url)
-                    }
-                    .verifyComplete()
+            val c = repository.save(cover)!!
+
+            /* Then */
+            assertAll {
+                assertThat(c.id).isNotNull()
+                assertThat(c.width).isEqualTo(100)
+                assertThat(c.height).isEqualTo(200)
+                assertThat(c.url).isEqualTo(url)
+            }
 
             val r = query.selectFrom(COVER).r2dbc().fetch()
             assertThat(r).hasSize(10)
