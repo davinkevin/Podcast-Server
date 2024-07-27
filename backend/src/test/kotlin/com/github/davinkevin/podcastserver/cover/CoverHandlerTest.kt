@@ -3,10 +3,8 @@ package com.github.davinkevin.podcastserver.cover
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
@@ -16,7 +14,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
-import reactor.core.publisher.Mono
 import java.time.Clock
 import java.time.OffsetDateTime
 import java.time.ZoneId
@@ -50,7 +47,7 @@ class CoverHandlerTest(
                     /* Then */
                     .expectStatus().isOk
 
-            verify(cover, times(1)).deleteCoversInFileSystemOlderThan(expectedDate)
+            verify(cover).deleteCoversInFileSystemOlderThan(expectedDate)
         }
 
         @Test
@@ -66,7 +63,7 @@ class CoverHandlerTest(
                     /* Then */
                     .expectStatus().isOk
 
-            verify(cover, times(1)).deleteCoversInFileSystemOlderThan(fixedDate.minusDays(365))
+            verify(cover).deleteCoversInFileSystemOlderThan(fixedDate.minusDays(365))
         }
 
 

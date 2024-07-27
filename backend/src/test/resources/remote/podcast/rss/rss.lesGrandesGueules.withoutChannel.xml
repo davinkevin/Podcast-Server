@@ -1,4 +1,5 @@
-<?xml version="1.0" encoding="UTF-8" ?><rss xmlns:msxsl="urn:schemas-microsoft-com:xslt" xmlns:itunes="http://www.itunes.com/DTDs/Podcast-1.0.dtd" version="2.0">
+<?xml version="1.0" encoding="UTF-8" ?>
+<rss xmlns:itunes="http://www.itunes.com/DTDs/Podcast-1.0.dtd" version="2.0">
     <element>
         <title>Les Grandes Gueules du Sport</title>
         <itunes:author>RMC</itunes:author>

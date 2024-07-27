@@ -2,9 +2,6 @@ package com.github.davinkevin.podcastserver.service.ffmpeg
 
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.ProcessListener
-import org.mockito.kotlin.any
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import net.bramp.ffmpeg.FFmpegExecutor
 import net.bramp.ffmpeg.FFprobe
 import net.bramp.ffmpeg.builder.FFmpegBuilder
@@ -21,6 +18,9 @@ import org.junit.jupiter.api.io.TempDir
 import org.mockito.*
 import org.mockito.Mockito.*
 import org.mockito.junit.jupiter.MockitoExtension
+import org.mockito.kotlin.any
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 import java.io.IOException
 import java.nio.file.AccessDeniedException
 import java.nio.file.Files
@@ -56,8 +56,8 @@ class FfmpegServiceTest {
         ffmpegService.concat(output, input1, input2, input3)
 
         /* Then */
-        verify(ffmpegExecutor, times(1)).createJob(executorBuilderCaptor.capture())
-        verify(job, times(1)).run()
+        verify(ffmpegExecutor).createJob(executorBuilderCaptor.capture())
+        verify(job).run()
         assertThat(executorBuilderCaptor.value.build()).contains(
                 "-f", "concat",
                 "-i",

@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
-import org.mockito.kotlin.*
 import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
 import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDL
 import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLRequest
@@ -16,6 +15,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.CsvSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
+import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import

@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.service.ffmpeg
 
-import com.github.davinkevin.podcastserver.service.ffmpeg.FfmpegConfig
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test

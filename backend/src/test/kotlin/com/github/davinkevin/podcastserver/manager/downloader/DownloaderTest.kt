@@ -94,7 +94,7 @@ class DownloaderTest {
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
-                verify(downloadRepository, times(1)).updateDownloadItem(information.item)
+                verify(downloadRepository).updateDownloadItem(information.item)
             }
         }
 

@@ -18,8 +18,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
 import java.net.URI
 import java.util.*
 
@@ -313,7 +311,7 @@ class DownloadHandlerTest(
                     .expectStatus().isNoContent
                     .expectBody().isEmpty
 
-            verify(idm, times(1)).stopAllDownload()
+            verify(idm).stopAllDownload()
         }
     }
 

@@ -1,13 +1,12 @@
 package com.github.davinkevin.podcastserver.service
 
 
-import org.mockito.kotlin.doThrow
-import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.verify
-import java.lang.RuntimeException
+import org.mockito.kotlin.doThrow
+import org.mockito.kotlin.mock
+import org.mockito.kotlin.whenever
 
 /**
  * Created by kevin on 31/03/2016 for Podcast Server

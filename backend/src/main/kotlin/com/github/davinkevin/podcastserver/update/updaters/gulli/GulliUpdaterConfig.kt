@@ -1,9 +1,9 @@
 package com.github.davinkevin.podcastserver.update.updaters.gulli
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.github.davinkevin.podcastserver.service.image.ImageService
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
-import com.github.davinkevin.podcastserver.service.image.ImageService
 import org.springframework.web.client.RestClient
 
 /**

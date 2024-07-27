@@ -14,10 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.kotlin.core.publisher.toFlux
-import reactor.test.StepVerifier
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID.randomUUID
@@ -48,7 +44,7 @@ class CoverServiceTest (
             service.deleteCoversInFileSystemOlderThan(date)
 
             /* Then */
-            verify(cover, times(1)).findCoverOlderThan(date)
+            verify(cover).findCoverOlderThan(date)
             verify(file, never()).deleteCover(any())
         }
 
