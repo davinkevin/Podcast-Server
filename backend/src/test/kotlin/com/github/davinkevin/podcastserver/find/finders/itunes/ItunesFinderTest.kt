@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.find.finders.itunes
 
 import com.github.davinkevin.podcastserver.MockServer
-import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.find.FindCoverInformation
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
@@ -140,7 +139,6 @@ class ItunesFinderTest(
         RestClientAutoConfiguration::class,
         WebClientAutoConfiguration::class,
         JacksonAutoConfiguration::class,
-        WebClientConfig::class
     )
     class LocalTestConfiguration {
         @Bean fun remapItunesAppleComToMockServer() = remapRestClientToMockServer("itunes.apple.com")

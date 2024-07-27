@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters.francetv
 
 import com.github.davinkevin.podcastserver.MockServer
-import com.github.davinkevin.podcastserver.config.WebClientConfig
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.remapRestClientToMockServer
@@ -46,8 +45,7 @@ class FranceTvUpdaterTest(
     @Import(
         FranceTvUpdaterConfig::class,
         RestClientAutoConfiguration::class,
-        WebClientConfig::class,
-        JacksonAutoConfiguration::class
+        JacksonAutoConfiguration::class,
     )
     class LocalTestConfiguration {
         @Bean fun remapFranceTvToMock() = remapRestClientToMockServer("www.france.tv")
