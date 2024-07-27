@@ -1,6 +1,5 @@
 import com.gitlab.davinkevin.podcastserver.database.DatabaseConfiguration
 import com.gitlab.davinkevin.podcastserver.dockerimages.DockerImagesConfiguration
-import com.gradle.enterprise.gradleplugin.testretry.retry
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.internal.deprecation.DeprecatableConfiguration
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -58,9 +57,7 @@ dependencies {
 	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 
-	implementation("org.springframework:spring-r2dbc")
 	implementation("org.postgresql:postgresql")
-	runtimeOnly("org.postgresql:r2dbc-postgresql")
 	implementation(project(":backend-lib-database"))
 
 	implementation("org.jdom:jdom2:2.0.6.1")
@@ -69,7 +66,6 @@ dependencies {
 	implementation(project(":backend-lib-youtubedl"))
 	implementation("net.bramp.ffmpeg:ffmpeg:0.8.0")
 
-	implementation("io.r2dbc:r2dbc-pool")
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 
@@ -119,9 +115,9 @@ tasks.test {
 
 	systemProperty("user.timezone", "UTC")
 	project.extensions.getByType<DatabaseConfiguration>().apply {
-		systemProperty("spring.r2dbc.url", r2dbc())
-		systemProperty("spring.r2dbc.username", user)
-		systemProperty("spring.r2dbc.password", password)
+		systemProperty("spring.datasource.url", jdbc())
+		systemProperty("spring.datasource.username", user)
+		systemProperty("spring.datasource.password", password)
 		dependsOn(migrateDbTask)
 	}
 	jvmArgs = listOf("--add-opens", "java.base/java.time=ALL-UNNAMED")

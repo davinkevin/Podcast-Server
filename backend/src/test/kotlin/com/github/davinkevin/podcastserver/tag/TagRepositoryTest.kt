@@ -1,8 +1,6 @@
 package com.github.davinkevin.podcastserver.tag
 
-import com.github.davinkevin.podcastserver.JooqR2DBCTest
 import com.github.davinkevin.podcastserver.database.tables.Tag.TAG
-import com.github.davinkevin.podcastserver.r2dbc
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
@@ -11,13 +9,14 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import java.util.UUID.fromString
 
 /**
  * Created by kevin on 2019-03-24
  */
-@JooqR2DBCTest
+@JooqTest
 @Import(TagRepository::class)
 class TagRepositoryTest(
     @Autowired val repository: TagRepository,
@@ -34,7 +33,7 @@ class TagRepositoryTest(
                 .values(fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6"), "bAr")
                 .values(fromString("ad109389-9568-4bdb-ae61-6f26bf6ffdf6"), "Another Bar")
         )
-            .r2dbc()
+
             .execute()
     }
 
@@ -111,7 +110,7 @@ class TagRepositoryTest(
             assertThat(tag.id).isNotNull()
             assertThat(tag.name).isEqualTo(name)
 
-            val numberOfTag = query.selectCount().from(TAG).r2dbc().fetchOne(count())
+            val numberOfTag = query.selectCount().from(TAG).fetchOne(count())
             assertThat(numberOfTag).isEqualTo(4)
         }
 
@@ -126,7 +125,7 @@ class TagRepositoryTest(
             assertThat(tag.id).isNotNull()
             assertThat(tag.name).isEqualTo(name)
 
-            val numberOfTag = query.selectCount().from(TAG).r2dbc().fetchOne(count())
+            val numberOfTag = query.selectCount().from(TAG).fetchOne(count())
             assertThat(numberOfTag).isEqualTo(3)
 
         }

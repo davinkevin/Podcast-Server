@@ -16,15 +16,15 @@ spring:
 server:
  port: 8080
 
-management:
 
+management:
  endpoint:
   health:
    probes:
     enabled: true
    show-details: always
    group:
-    liveness.include:  ["r2dbc", "ping"]
+    liveness.include:  ["db", "ping"]
     readiness.include: ["ping"]
  endpoints:
   web:

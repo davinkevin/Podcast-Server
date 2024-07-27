@@ -279,7 +279,6 @@ class DownloadHandlerTest(
         @Test
         fun `with success`() {
             /* Given */
-//            whenever(idm.setLimitParallelDownload(12)).thenReturn(Mono.empty())
             /* When */
             rest
                     .post()
@@ -294,7 +293,7 @@ class DownloadHandlerTest(
                         assertThat(limit).isEqualTo(12)
                     }
 
-//            verify(idm, times(1)).setLimitParallelDownload(12)
+            verify(idm).limitParallelDownload = 12
         }
     }
 

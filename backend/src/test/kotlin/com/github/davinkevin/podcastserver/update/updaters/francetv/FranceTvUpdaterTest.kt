@@ -4,7 +4,6 @@ import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.remapRestClientToMockServer
-import com.github.davinkevin.podcastserver.remapToMockServer
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
@@ -51,7 +50,6 @@ class FranceTvUpdaterTest(
         @Bean fun remapFranceTvToMock() = remapRestClientToMockServer("www.france.tv")
         @Bean fun remapApiToMock() = remapRestClientToMockServer("player.webservices.francetelevisions.fr")
         @Bean fun imageMockServer() = remapRestClientToMockServer("assets.webservices.francetelevisions.fr")
-        @Bean fun assetsOnFranceTv() = remapToMockServer("www.france.tv")
         @Bean fun fixedClock(): Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
     }
 

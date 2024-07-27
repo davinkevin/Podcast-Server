@@ -150,16 +150,16 @@ spec:
             - name: http-port
               containerPort: 8080
               protocol: TCP
-          livenessProbe:
-            failureThreshold: 10
-            timeoutSeconds: 6
-            httpGet:
-              path: /actuator/health/liveness
-              port: 8080
-          readinessProbe:
-            httpGet:
-              path: /actuator/health/readiness
-              port: 8080
+#          livenessProbe:
+#            failureThreshold: 10
+#            timeoutSeconds: 6
+#            httpGet:
+#              path: /actuator/health/liveness
+#              port: 8080
+#          readinessProbe:
+#            httpGet:
+#              path: /actuator/health/readiness
+#              port: 8080
 ---
 apiVersion: batch/v1
 kind: CronJob

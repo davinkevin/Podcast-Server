@@ -9,8 +9,6 @@ import org.jooq.Record13
 import org.jooq.Records.mapping
 import org.jooq.TableField
 import org.jooq.impl.DSL.*
-import reactor.core.publisher.Flux
-import reactor.kotlin.core.publisher.toMono
 import java.net.URI
 import java.sql.Date
 import java.time.Duration
@@ -39,13 +37,12 @@ class PodcastRepository(private val query: DSLContext) {
             )
             .from(PODCAST)
             .where(PODCAST.ID.eq(id))
-            .toMono()
-            .block()
+            .fetchOne()
             ?.let(::toPodcast)
     }
 
     fun findAll(): List<Podcast> {
-        val allPodcastQuery = Flux.from(query
+        val allPodcastQuery = query
             .select(
                 PODCAST.ID, PODCAST.TITLE, PODCAST.DESCRIPTION, PODCAST.SIGNATURE, PODCAST.URL,
                 PODCAST.HAS_TO_BE_DELETED, PODCAST.LAST_UPDATE,
@@ -62,9 +59,8 @@ class PodcastRepository(private val query: DSLContext) {
                     .convertFrom { r -> r.map(mapping(::Tag)) },
             )
             .from(PODCAST)
-            .orderBy(PODCAST.ID))
-            .collectList()
-            .block()!!
+            .orderBy(PODCAST.ID)
+            .fetch()
 
         return allPodcastQuery.map(::toPodcast)
     }
@@ -78,17 +74,14 @@ class PodcastRepository(private val query: DSLContext) {
         val startDate = ZonedDateTime.now().minusMonths(month.toLong())
         val numberOfDays = Duration.between(startDate, ZonedDateTime.now()).toDays()
 
-        val stats = Flux.from(
-            query
-                .select(PODCAST.TYPE, count(), date)
-                .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
-                .where(field.isNotNull)
-                .and(dateDiff(currentDate(), field.cast(Date::class.java)).lessThan(numberOfDays.toInt()))
-                .groupBy(PODCAST.TYPE, date)
-                .orderBy(date.desc())
-        )
-            .collectList()
-            .block()!!
+        val stats = query
+            .select(PODCAST.TYPE, count(), date)
+            .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
+            .where(field.isNotNull)
+            .and(dateDiff(currentDate(), field.cast(Date::class.java)).lessThan(numberOfDays.toInt()))
+            .groupBy(PODCAST.TYPE, date)
+            .orderBy(date.desc())
+            .fetch()
 
         return stats
             .groupBy { it[PODCAST.TYPE] }
@@ -108,18 +101,15 @@ class PodcastRepository(private val query: DSLContext) {
         val startDate = ZonedDateTime.now().minusMonths(month.toLong())
         val numberOfDays = Duration.between(startDate, ZonedDateTime.now()).toDays()
 
-        val results = Flux.from(
-            query
-                .select(count(), date)
-                .from(ITEM)
-                .where(ITEM.PODCAST_ID.eq(pid))
-                .and(field.isNotNull)
-                .and(dateDiff(currentDate(), field.cast(Date::class.java)).lessThan(numberOfDays.toInt()))
-                .groupBy(date)
-                .orderBy(date.desc())
-        )
-            .collectList()
-            .block()!!
+        val results = query
+            .select(count(), date)
+            .from(ITEM)
+            .where(ITEM.PODCAST_ID.eq(pid))
+            .and(field.isNotNull)
+            .and(dateDiff(currentDate(), field.cast(Date::class.java)).lessThan(numberOfDays.toInt()))
+            .groupBy(date)
+            .orderBy(date.desc())
+            .fetch()
 
         return results
             .map { (count, date) -> NumberOfItemByDateWrapper(date.toLocalDate(), count) }
@@ -131,14 +121,12 @@ class PodcastRepository(private val query: DSLContext) {
         query
             .insertInto(PODCAST, PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.HAS_TO_BE_DELETED, PODCAST.TYPE, PODCAST.COVER_ID)
             .values(id, title, url, hasToBeDeleted, type, cover.id)
-            .toMono()
-            .block()!!
+            .execute()
 
         if (!tags.isEmpty()) {
             query.insertInto(PODCAST_TAGS, PODCAST_TAGS.PODCASTS_ID, PODCAST_TAGS.TAGS_ID )
                 .apply { tags.forEach { values(id, it.id) } }
-                .toMono()
-                .block()!!
+                .execute()
         }
 
         return findById(id)!!
@@ -152,21 +140,18 @@ class PodcastRepository(private val query: DSLContext) {
             .set(PODCAST.HAS_TO_BE_DELETED, hasToBeDeleted)
             .set(PODCAST.COVER_ID, cover.id)
             .where(PODCAST.ID.eq(id))
-            .toMono()
-            .block()
+            .execute()
 
         query
             .delete(PODCAST_TAGS)
             .where(PODCAST_TAGS.PODCASTS_ID.eq(id))
-            .toMono()
-            .block()
+            .execute()
 
         if (tags.isNotEmpty()) {
             query
                 .insertInto(PODCAST_TAGS, PODCAST_TAGS.PODCASTS_ID, PODCAST_TAGS.TAGS_ID)
                 .apply { tags.forEach { values(id, it.id) } }
-                .toMono()
-                .block()
+                .execute()
         }
 
         return findById(id)!!
@@ -177,8 +162,7 @@ class PodcastRepository(private val query: DSLContext) {
             .update(PODCAST)
             .set(PODCAST.SIGNATURE, newSignature)
             .where(PODCAST.ID.eq(podcastId))
-            .toMono()
-            .block()
+            .execute()
     }
 
     fun updateLastUpdate(podcastId: UUID) {
@@ -186,8 +170,7 @@ class PodcastRepository(private val query: DSLContext) {
             .update(PODCAST)
             .set(PODCAST.LAST_UPDATE, now())
             .where(PODCAST.ID.eq(podcastId))
-            .toMono()
-            .block()
+            .execute()
     }
 
     fun deleteById(id: UUID): DeletePodcastRequest? {
@@ -201,35 +184,29 @@ class PodcastRepository(private val query: DSLContext) {
                         .where(ITEM.PODCAST_ID.eq(id))
                 )
             )
-            .toMono()
-            .block()
+            .execute()
 
         query
             .delete(PODCAST_TAGS)
             .where(PODCAST_TAGS.PODCASTS_ID.eq(id))
-            .toMono()
-            .block()
+            .execute()
 
         query
             .delete(ITEM)
             .where(ITEM.PODCAST_ID.eq(id))
-            .toMono()
-            .block()
+            .execute()
 
         val podcast = query
             .select(PODCAST.ID, PODCAST.TITLE, PODCAST.HAS_TO_BE_DELETED, PODCAST.COVER_ID)
             .from(PODCAST)
             .where(PODCAST.ID.eq(id))
-            .toMono()
-            .block()!!
+            .fetchOne()!!
 
         query.delete(PODCAST).where(PODCAST.ID.eq(id))
-            .toMono()
-            .block()
+            .execute()
 
         query.delete(COVER).where(COVER.ID.eq(podcast[PODCAST.COVER_ID]))
-            .toMono()
-            .block()
+            .execute()
 
         if (!podcast[PODCAST.HAS_TO_BE_DELETED]) {
             return null
