@@ -7,7 +7,6 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.slf4j.LoggerFactory
-import org.springframework.http.codec.multipart.FilePart
 import java.nio.file.Paths
 import java.time.*
 import java.time.format.DateTimeFormatter
@@ -74,16 +73,16 @@ class ItemService(
         return repository.search(q = q, tags = tags, status = status, page = page, podcastId = podcastId)
     }
 
-    fun upload(podcastId: UUID, filePart: FilePart): Item {
-        val filename = Paths.get(filePart.filename().replace("[^a-zA-Z0-9.-]".toRegex(), "_"))
+    fun upload(podcastId: UUID, uploadedFile: UploadedFile): Item {
+        val filename = Paths.get(uploadedFile.filename().replace("[^a-zA-Z0-9.-]".toRegex(), "_"))
 
-        val path = file.cache(filePart, filename)
+        val path = file.cache(uploadedFile, filename)
         val podcast = podcastRepository.findById(podcastId)!!
 
         file.upload(podcast.title, path)
         val metadata = file.metadata(podcast.title, path)!!
 
-        val (_, p2, p3) = filePart.filename().split(" - ")
+        val (_, p2, p3) = uploadedFile.filename().split(" - ")
         val title = p3.substringBeforeLast(".")
         val date = LocalDate.parse(p2, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         val time = LocalTime.of(0, 0)

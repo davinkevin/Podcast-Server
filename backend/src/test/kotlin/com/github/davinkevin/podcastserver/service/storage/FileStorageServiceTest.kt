@@ -7,6 +7,7 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.fileAsByteArray
 import com.github.davinkevin.podcastserver.item.DeleteItemRequest
 import com.github.davinkevin.podcastserver.item.Item
+import com.github.davinkevin.podcastserver.item.UploadedFile
 import com.github.davinkevin.podcastserver.podcast.DeletePodcastRequest
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.tag.Tag
@@ -22,21 +23,17 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
-import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
 import org.springframework.context.annotation.Import
-import org.springframework.http.codec.multipart.FilePart
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.DigestUtils
 import org.springframework.web.client.RestClient
-import reactor.kotlin.core.publisher.toMono
-import reactor.test.StepVerifier
 import java.net.URI
-import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.OffsetDateTime
@@ -517,15 +514,17 @@ class FileStorageServiceTest(
         @Test
         fun `with success`() {
             /* Given */
-            val file = mock<FilePart>()
-            whenever(file.transferTo(org.mockito.kotlin.any<Path>()))
-                .then { Files.createFile(it.getArgument(0)).toMono().then() }
+            val file: UploadedFile = mock {
+                on(it.inputStream()).doReturn("foo".toByteArray().inputStream())
+            }
 
             /* When */
             val path = fileService.cache(file, Paths.get("foo.mp3"))
 
             /* Then */
-            assertThat(path).exists()
+            assertThat(path)
+                .exists()
+                .hasContent("foo")
         }
 
     }

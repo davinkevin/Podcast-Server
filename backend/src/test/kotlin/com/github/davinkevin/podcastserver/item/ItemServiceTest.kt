@@ -23,7 +23,6 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
-import org.springframework.http.codec.multipart.FilePart
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
 import java.nio.file.Paths
@@ -344,7 +343,7 @@ class ItemServiceTest(
         @Test
         fun `with success`() {
             /* Given */
-            val file: FilePart = mock()
+            val file: UploadedFile = mock()
             val podcast = Podcast(
                     id = UUID.fromString("2cdae1af-f93f-47f2-9a09-a316f2732fc1"),
                     title = "podcast",

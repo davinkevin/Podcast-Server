@@ -8,21 +8,14 @@ import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import jakarta.servlet.http.Part
 import org.slf4j.LoggerFactory
-import org.springframework.core.io.buffer.DataBuffer
-import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
-import org.springframework.http.codec.multipart.FilePart
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.paramOrNull
 import org.springframework.web.util.UriComponentsBuilder
-import reactor.core.publisher.Flux
-import reactor.core.publisher.Mono
-import reactor.core.scheduler.Schedulers
-import reactor.kotlin.core.publisher.toMono
+import java.io.InputStream
 import java.net.URI
-import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Clock
 import java.time.OffsetDateTime
@@ -153,7 +146,7 @@ class ItemHandler(
 
         val parts = r.multipartData().toSingleValueMap()
         val file = parts["file"]
-            ?.let(::InternalFilePart)
+            ?.let(::UploadedFile)
             ?.also { log.info("upload of file ${it.filename()}") }
             ?: error("`file` field not available in upload request")
 
@@ -268,24 +261,13 @@ data class PlaylistsHAL(val content: Collection<PlaylistHAL>) {
     data class PlaylistHAL(val id: UUID, val name: String)
 }
 
-data class InternalFilePart(val part: Part): FilePart {
+data class UploadedFile(private val part: Part) {
 
-    override fun name(): String = part.submittedFileName
+    fun name(): String = part.submittedFileName
 
-    override fun headers(): HttpHeaders {
-        TODO("Not yet implemented")
-    }
+    fun filename(): String = part.submittedFileName
 
-    override fun content(): Flux<DataBuffer> {
-        TODO("Not yet implemented")
-    }
+    fun inputStream(): InputStream = part.inputStream
 
-    override fun filename(): String = part.submittedFileName
-
-    override fun transferTo(dest: Path): Mono<Void> = Mono.defer {
-        Files.copy(part.inputStream, dest)
-            .toMono()
-            .then()
-    }
-        .subscribeOn(Schedulers.parallel())
+    fun size(): Long = part.size
 }
