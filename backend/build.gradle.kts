@@ -34,7 +34,6 @@ tasks.withType<KotlinCompile> {
 	compilerOptions {
 		freeCompilerArgs = listOf(
 			"-Xjsr305=strict",
-			"-Xallow-result-return-type",
 		)
 		jvmTarget = JvmTarget.JVM_21
 	}

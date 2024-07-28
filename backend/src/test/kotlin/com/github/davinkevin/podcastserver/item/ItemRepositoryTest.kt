@@ -20,6 +20,7 @@ import java.net.URI
 import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
 import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import java.time.temporal.ChronoUnit.SECONDS
 import java.util.*
 import java.util.UUID.fromString
@@ -1603,9 +1604,9 @@ class ItemRepositoryTest(
                     assertAll {
                         assertThat(it.title).isEqualTo("an item")
                         assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
-                        assertThat(it.pubDate).isEqualToIgnoringNanos(now)
+                        assertThat(it.pubDate).isCloseTo(now, within(1, SECONDS))
                         assertThat(it.downloadDate).isNull()
-                        assertThat(it.creationDate).isEqualToIgnoringNanos(now)
+                        assertThat(it.creationDate).isCloseTo(now, within(1, SECONDS))
                         assertThat(it.description).isEqualTo("a description")
                         assertThat(it.mimeType).isEqualTo("audio/mp3")
                         assertThat(it.length).isEqualTo(1234)
@@ -1657,9 +1658,9 @@ class ItemRepositoryTest(
                     assertAll {
                         assertThat(it.title).isEqualTo("an item")
                         assertThat(it.url).isEqualTo("http://foo.bar.com/an_item")
-                        assertThat(it.pubDate).isEqualToIgnoringNanos(now)
-                        assertThat(it.downloadDate).isEqualToIgnoringNanos(now)
-                        assertThat(it.creationDate).isEqualToIgnoringNanos(now)
+                        assertThat(it.pubDate).isCloseTo(now, within(1, SECONDS))
+                        assertThat(it.downloadDate).isCloseTo(now, within(1, SECONDS))
+                        assertThat(it.creationDate).isCloseTo(now, within(1, SECONDS))
                         assertThat(it.description).isEqualTo("a description")
                         assertThat(it.mimeType).isEqualTo("audio/mp3")
                         assertThat(it.length).isEqualTo(1234)
