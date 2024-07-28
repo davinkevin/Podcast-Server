@@ -7,14 +7,12 @@ tasks:
       - k3d cluster get podcast-server
     cmds:
       - k3d cluster create podcast-server --port 80:80@loadbalancer --port 443:443@loadbalancer --k3s-arg "--disable=traefik@server:*"
-      - cmd: |
-          function install_contour() {
-            kubectl apply -k distribution/kubernetes/.infrastructure/contour/ --server-side=true
-          }
-          
-          set +e
-          install_contour
-          while [ $? -ne 0 ]; do install_contour; done
+      - kubectl apply -k distribution/kubernetes/.infrastructure/contour/ --server-side=true
+      - kubectl wait --for condition=established crd 
+          gatewayclasses.gateway.networking.k8s.io 
+          contourdeployments.projectcontour.io
+          gateways.gateway.networking.k8s.io
+      - kubectl apply -k distribution/kubernetes/.infrastructure/gateway/ --server-side=true
 
   skaffold:dev:
     dir: ~/Workspace/gitlab.com/davinkevin/Podcast-Server
@@ -116,12 +114,3 @@ tasks:
         git clone --bare git@gitlab.com:davinkevin/Podcast-Server.git
         cd Podcast-Server.git
         git push --mirror --repo git@github.com:davinkevin/Podcast-Server.git
-
-  update:flyway:
-    cmds:
-      - git fetch
-      - git co -B updates/all-flyway origin/main
-      - git rb origin/renovate/org.flywaydb-flyway-database-postgresql-10.x --no-update-refs
-      - git rb origin/renovate/flyway-flyway-10.x --no-update-refs
-      - git rb origin/renovate/org.flywaydb.flyway-10.x --no-update-refs
-      - git rb origin/main --no-update-refs
