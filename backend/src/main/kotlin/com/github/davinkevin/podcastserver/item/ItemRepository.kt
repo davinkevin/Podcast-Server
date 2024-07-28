@@ -278,6 +278,8 @@ class ItemRepository(private val query: DSLContext) {
                 .onConflictOnConstraint(Keys.ITEM_WITH_GUID_IS_UNIQUE_IN_PODCAST)
                 .doUpdate()
                 .set(ITEM.URL, item.url)
+                .set(ITEM.TITLE, item.title)
+                .set(ITEM.DESCRIPTION, item.description)
         }
 
         val ids: List<UUID> = query.batch(queries)
