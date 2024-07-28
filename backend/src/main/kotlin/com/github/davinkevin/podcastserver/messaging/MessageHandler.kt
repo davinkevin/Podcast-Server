@@ -16,7 +16,7 @@ import java.util.*
 
 class MessageHandler {
 
-    private val messages: Sinks.Many<Message<out Any>> = Sinks.many().multicast().directBestEffort()
+    private val messages: Sinks.Many<Message<out Any>> = Sinks.many().replay().limit(ofSeconds(20))
 
     fun sseMessages(@Suppress("UNUSED_PARAMETER") s: ServerRequest): ServerResponse {
         var stopped = false
