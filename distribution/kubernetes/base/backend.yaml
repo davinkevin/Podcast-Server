@@ -84,6 +84,18 @@ spec:
                 secretKeyRef:
                   name: database
                   key: password
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://$(DATABASE_SERVICE_NAME):5432/$(DATABASE_NAME)
+            - name: SPRING_DATASOURCE_USERNAME
+              valueFrom:
+                configMapKeyRef:
+                  name: database
+                  key: username
+            - name: SPRING_DATASOURCE_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: database
+                  key: password
             - name: PODCASTSERVER_API_YOUTUBE
               valueFrom:
                 secretKeyRef:
