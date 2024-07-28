@@ -1529,7 +1529,7 @@ class ItemRepositoryTest(
                 fun `but found an already existing item with same guid, so updates url with the new one`() {
                     /* Given */
                     val item = ItemForCreation(
-                        title = "an item",
+                        title = "another title",
                         url = "http://another-url.com/geekinc.123.mp3",
                         guid = "geekinc.123.mp3",
 
@@ -1537,7 +1537,7 @@ class ItemRepositoryTest(
                         downloadDate = now(),
                         creationDate = now(),
 
-                        description = "a description",
+                        description = "another description",
                         mimeType = "audio/mp3",
                         length = 1234,
                         fileName = Path("ofejeaoijefa.mp3"),
@@ -1563,8 +1563,11 @@ class ItemRepositoryTest(
                         .fetch()
                         .firstOrNull() ?: error("item not found")
 
-                    assertThat(updatedItem[ITEM.URL]).isEqualTo("http://another-url.com/geekinc.123.mp3")
-
+                    assertAll {
+                        assertThat(updatedItem[ITEM.URL]).isEqualTo("http://another-url.com/geekinc.123.mp3")
+                        assertThat(updatedItem[ITEM.TITLE]).isEqualTo("another title")
+                        assertThat(updatedItem[ITEM.DESCRIPTION]).isEqualTo("another description")
+                    }
                 }
 
 
