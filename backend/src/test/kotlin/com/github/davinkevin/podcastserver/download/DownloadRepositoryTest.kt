@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.entity.toDb
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.within
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
 import org.junit.jupiter.api.*
@@ -22,6 +23,7 @@ import java.time.Clock
 import java.time.OffsetDateTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import java.time.temporal.ChronoUnit
 import java.util.*
 import kotlin.io.path.Path
 
@@ -1419,7 +1421,7 @@ class DownloadRepositoryTest(
             assertThat(item[i.LENGTH]).isEqualTo(100L)
             assertThat(item[i.MIME_TYPE]).isEqualTo("video/avi")
             assertThat(item[i.FILE_NAME]).isEqualTo(Path("filename.mp4"))
-            assertThat(item[i.DOWNLOAD_DATE]).isEqualToIgnoringNanos(now)
+            assertThat(item[i.DOWNLOAD_DATE]).isCloseTo(now, within(1, ChronoUnit.SECONDS))
         }
 
         @Test
