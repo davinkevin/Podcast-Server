@@ -1,6 +1,6 @@
 {
   "name": "podcast-server",
-  "version": "2024.7.0",
+  "version": "2024.8.0",
   "dependencies": {
     "babel": {
       "version": "5.8.38",
