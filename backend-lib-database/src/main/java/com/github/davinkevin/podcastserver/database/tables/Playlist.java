@@ -6,6 +6,7 @@ package com.github.davinkevin.podcastserver.database.tables;
 
 import com.github.davinkevin.podcastserver.database.Keys;
 import com.github.davinkevin.podcastserver.database.Public;
+import com.github.davinkevin.podcastserver.database.tables.Cover.CoverPath;
 import com.github.davinkevin.podcastserver.database.tables.Item.ItemPath;
 import com.github.davinkevin.podcastserver.database.tables.PlaylistItems.PlaylistItemsPath;
 import com.github.davinkevin.podcastserver.database.tables.records.PlaylistRecord;
@@ -67,6 +68,11 @@ public class Playlist extends TableImpl<PlaylistRecord> {
      * The column <code>public.playlist.name</code>.
      */
     public final TableField<PlaylistRecord, String> NAME = createField(DSL.name("name"), SQLDataType.VARCHAR(255), this, "");
+
+    /**
+     * The column <code>public.playlist.cover_id</code>.
+     */
+    public final TableField<PlaylistRecord, UUID> COVER_ID = createField(DSL.name("cover_id"), SQLDataType.UUID.nullable(false), this, "");
 
     private Playlist(Name alias, Table<PlaylistRecord> aliased) {
         this(alias, aliased, (Field<?>[]) null, null);
@@ -143,6 +149,23 @@ public class Playlist extends TableImpl<PlaylistRecord> {
     @Override
     public List<UniqueKey<PlaylistRecord>> getUniqueKeys() {
         return Arrays.asList(Keys.PLAYLIST_NAME_KEY);
+    }
+
+    @Override
+    public List<ForeignKey<PlaylistRecord, ?>> getReferences() {
+        return Arrays.asList(Keys.PLAYLIST__PLAYLIST_COVER_ID_FK);
+    }
+
+    private transient CoverPath _cover;
+
+    /**
+     * Get the implicit join path to the <code>public.cover</code> table.
+     */
+    public CoverPath cover() {
+        if (_cover == null)
+            _cover = new CoverPath(this, Keys.PLAYLIST__PLAYLIST_COVER_ID_FK, null);
+
+        return _cover;
     }
 
     private transient PlaylistItemsPath _playlistItems;

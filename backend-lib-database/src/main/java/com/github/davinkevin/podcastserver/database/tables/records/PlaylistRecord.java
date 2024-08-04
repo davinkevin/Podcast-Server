@@ -48,6 +48,20 @@ public class PlaylistRecord extends UpdatableRecordImpl<PlaylistRecord> {
         return (String) get(1);
     }
 
+    /**
+     * Setter for <code>public.playlist.cover_id</code>.
+     */
+    public void setCoverId(UUID value) {
+        set(2, value);
+    }
+
+    /**
+     * Getter for <code>public.playlist.cover_id</code>.
+     */
+    public UUID getCoverId() {
+        return (UUID) get(2);
+    }
+
     // -------------------------------------------------------------------------
     // Primary key information
     // -------------------------------------------------------------------------
@@ -71,11 +85,12 @@ public class PlaylistRecord extends UpdatableRecordImpl<PlaylistRecord> {
     /**
      * Create a detached, initialised PlaylistRecord
      */
-    public PlaylistRecord(UUID id, String name) {
+    public PlaylistRecord(UUID id, String name, UUID coverId) {
         super(Playlist.PLAYLIST);
 
         setId(id);
         setName(name);
+        setCoverId(coverId);
         resetChangedOnNotNull();
     }
 }

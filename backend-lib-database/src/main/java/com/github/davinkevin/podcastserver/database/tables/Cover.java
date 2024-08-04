@@ -7,6 +7,7 @@ package com.github.davinkevin.podcastserver.database.tables;
 import com.github.davinkevin.podcastserver.database.Keys;
 import com.github.davinkevin.podcastserver.database.Public;
 import com.github.davinkevin.podcastserver.database.tables.Item.ItemPath;
+import com.github.davinkevin.podcastserver.database.tables.Playlist.PlaylistPath;
 import com.github.davinkevin.podcastserver.database.tables.Podcast.PodcastPath;
 import com.github.davinkevin.podcastserver.database.tables.records.CoverRecord;
 
@@ -158,6 +159,19 @@ public class Cover extends TableImpl<CoverRecord> {
             _item = new ItemPath(this, null, Keys.ITEM__ITEM_COVER_ID_FKEY.getInverseKey());
 
         return _item;
+    }
+
+    private transient PlaylistPath _playlist;
+
+    /**
+     * Get the implicit to-many join path to the <code>public.playlist</code>
+     * table
+     */
+    public PlaylistPath playlist() {
+        if (_playlist == null)
+            _playlist = new PlaylistPath(this, null, Keys.PLAYLIST__PLAYLIST_COVER_ID_FK.getInverseKey());
+
+        return _playlist;
     }
 
     private transient PodcastPath _podcast;
