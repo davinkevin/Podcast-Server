@@ -175,9 +175,9 @@ class PodcastRepository(private val query: DSLContext) {
 
     fun deleteById(id: UUID): DeletePodcastRequest? {
         query
-            .delete(WATCH_LIST_ITEMS)
+            .delete(PLAYLIST_ITEMS)
             .where(
-                WATCH_LIST_ITEMS.ITEMS_ID.`in`(
+                PLAYLIST_ITEMS.ITEMS_ID.`in`(
                     query
                         .select(ITEM.ID)
                         .from(ITEM)

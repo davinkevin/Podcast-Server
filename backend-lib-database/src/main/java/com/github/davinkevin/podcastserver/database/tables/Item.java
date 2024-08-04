@@ -10,9 +10,9 @@ import com.github.davinkevin.podcastserver.database.Public;
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus;
 import com.github.davinkevin.podcastserver.database.tables.Cover.CoverPath;
 import com.github.davinkevin.podcastserver.database.tables.DownloadingItem.DownloadingItemPath;
+import com.github.davinkevin.podcastserver.database.tables.Playlist.PlaylistPath;
+import com.github.davinkevin.podcastserver.database.tables.PlaylistItems.PlaylistItemsPath;
 import com.github.davinkevin.podcastserver.database.tables.Podcast.PodcastPath;
-import com.github.davinkevin.podcastserver.database.tables.WatchList.WatchListPath;
-import com.github.davinkevin.podcastserver.database.tables.WatchListItems.WatchListItemsPath;
 import com.github.davinkevin.podcastserver.database.tables.records.ItemRecord;
 
 import java.nio.file.Path;
@@ -268,25 +268,25 @@ public class Item extends TableImpl<ItemRecord> {
         return _downloadingItem;
     }
 
-    private transient WatchListItemsPath _watchListItems;
+    private transient PlaylistItemsPath _playlistItems;
 
     /**
      * Get the implicit to-many join path to the
-     * <code>public.watch_list_items</code> table
+     * <code>public.playlist_items</code> table
      */
-    public WatchListItemsPath watchListItems() {
-        if (_watchListItems == null)
-            _watchListItems = new WatchListItemsPath(this, null, Keys.WATCH_LIST_ITEMS__WATCH_LIST_ITEMS_ITEMS_ID_FKEY.getInverseKey());
+    public PlaylistItemsPath playlistItems() {
+        if (_playlistItems == null)
+            _playlistItems = new PlaylistItemsPath(this, null, Keys.PLAYLIST_ITEMS__PLAYLIST_ITEMS_ITEMS_ID_FKEY.getInverseKey());
 
-        return _watchListItems;
+        return _playlistItems;
     }
 
     /**
      * Get the implicit many-to-many join path to the
-     * <code>public.watch_list</code> table
+     * <code>public.playlist</code> table
      */
-    public WatchListPath watchList() {
-        return watchListItems().watchList();
+    public PlaylistPath playlist() {
+        return playlistItems().playlist();
     }
 
     @Override
