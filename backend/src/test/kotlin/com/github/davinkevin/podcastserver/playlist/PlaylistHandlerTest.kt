@@ -470,6 +470,12 @@ class PlaylistHandlerTest (
                               <channel>
                                 <title>foo</title>
                                 <link>https://foo.com/api/v1/playlists/9706ba78-2df2-4b37-a573-04367dc6f0ea/rss</link>
+                                <itunes:image>https://placehold.co/600x600?text=no+cover</itunes:image>
+                                <image>
+                                    <url>https://placehold.co/600x600?text=no+cover</url>
+                                    <height>600</height>
+                                    <width>600</width>
+                                </image>
                                 <item>
                                   <title>a title</title>
                                   <description>a desc</description>
@@ -488,7 +494,7 @@ class PlaylistHandlerTest (
             }
 
             @Test
-            fun `with 1 item without cover extention`() {
+            fun `with 1 item without cover extension`() {
                 /* Given */
                 val playlistWithItemWithoutCoverExtension = playlist.copy(
                     items = listOf(
@@ -520,6 +526,12 @@ class PlaylistHandlerTest (
                               <channel>
                                 <title>foo</title>
                                 <link>https://foo.com/api/v1/playlists/9706ba78-2df2-4b37-a573-04367dc6f0ea/rss</link>
+                                <itunes:image>https://placehold.co/600x600?text=no+cover</itunes:image>
+                                <image>
+                                    <url>https://placehold.co/600x600?text=no+cover</url>
+                                    <height>600</height>
+                                    <width>600</width>
+                                </image>
                                 <item>
                                   <title>a title</title>
                                   <description>a desc</description>

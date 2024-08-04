@@ -2,8 +2,10 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
+import com.github.davinkevin.podcastserver.extension.serverRequest.normalizedURI
 import com.github.davinkevin.podcastserver.rss.PlaylistChannel
 import com.github.davinkevin.podcastserver.rss.itunesNS
+import com.github.davinkevin.podcastserver.rss.rootRss
 import org.jdom2.Document
 import org.jdom2.Element
 import org.jdom2.output.Format
@@ -73,13 +75,17 @@ class PlaylistHandler(
 
     fun rss(r: ServerRequest): ServerResponse {
         val host = r.extractHost()
+        val callUrl = r.normalizedURI()
         val id = r.pathVariable("id")
             .let(UUID::fromString)
 
         val playlist = playlistService.findById(id)
             ?: return ServerResponse.notFound().build()
 
-        val rss = playlist.toRss(host)
+        val items = playlist.items.map { it.toRssItem(host) }
+        val rss = playlist.toRss(callUrl = callUrl)
+            .addContent(items)
+            .let(::rootRss)
 
         val body = XMLOutputter(Format.getPrettyFormat()).outputString(Document(rss))
 
@@ -179,24 +185,20 @@ private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
     )
 }
 
-private fun PlaylistWithItems.toRss(host: URI): Element {
-    val channel = PlaylistChannel(
+private fun PlaylistWithItems.toRss(callUrl: URI): Element {
+    return PlaylistChannel(
         playlist = PlaylistChannel.Playlist(
             id = id,
             name = name
         ),
-        host = host,
+        calledURI = callUrl,
+        cover = PlaylistChannel.Cover(
+            url =  this.cover.url,
+            height =  this.cover.height,
+            width =  this.cover.width,
+        )
     )
         .toElement()
-
-    this.items
-        .map { it.toRssItem(host) }
-        .apply(channel::addContent)
-
-    return Element("rss").apply {
-        addContent(channel)
-        addNamespaceDeclaration(itunesNS)
-    }
 }
 
 private fun PlaylistWithItems.Item.toRssItem(host: URI): Element = RssItem(

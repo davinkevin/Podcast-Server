@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.database.Tables.*
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.select
 import java.net.URI
 import java.util.*
 
@@ -77,11 +78,12 @@ class PlaylistRepository(
             .insertInto(PLAYLIST)
             .set(PLAYLIST.ID, id)
             .set(PLAYLIST.NAME, name)
+            .set(PLAYLIST.COVER_ID, select(COVER.ID).from(COVER).where(COVER.URL.eq("https://placehold.co/600x600?text=no+cover")))
             .onConflictDoNothing()
             .execute()
 
         if (numberOfRowInserted == 1) {
-            return PlaylistWithItems(id, name, emptyList())
+            return PlaylistWithItems(id = id, name = name, items = emptyList())
         }
 
         val playlist = query

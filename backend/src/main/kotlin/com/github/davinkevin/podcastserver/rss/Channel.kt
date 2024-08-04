@@ -12,20 +12,27 @@ import kotlin.io.path.extension
 
 data class PlaylistChannel(
     val playlist: Playlist,
-    val host: URI,
+    val cover: Cover,
+    val calledURI: URI,
 ) {
     data class Playlist(val id: UUID, val name: String)
+    data class Cover(val url: URI, val height: Int, val width: Int)
 
     fun toElement(): Element {
-        val url = UriComponentsBuilder
-            .fromUri(host)
-            .pathSegment("api", "v1", "playlists", playlist.id.toString(), "rss")
-            .build(true)
-            .toUriString()
+        val url = UriComponentsBuilder.fromUri(calledURI).build(true).toUriString()
+        val baseUrl = cover.url
 
         return Element("channel").apply {
             addContent(Element("title").addContent(playlist.name))
             addContent(Element("link").addContent(url))
+
+            addContent(Element("image", itunesNS).addContent(baseUrl.toASCIIString()))
+
+            addContent(Element("image").apply {
+                addContent(Element("height").addContent(cover.height.toString()))
+                addContent(Element("url").addContent(baseUrl.toASCIIString()))
+                addContent(Element("width").addContent(cover.width.toString()))
+            })
         }
     }
 }

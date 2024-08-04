@@ -503,9 +503,9 @@ class ItemRepositoryTest(
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")),
 
                 insertInto(PLAYLIST)
-                    .columns(PLAYLIST.ID, PLAYLIST.NAME)
-                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
-                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
+                    .columns(PLAYLIST.ID, PLAYLIST.NAME, PLAYLIST.COVER_ID)
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist", select(COVER.ID).from(COVER).where(COVER.URL.eq("https://placehold.co/600x600?text=no+cover")))
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind", select(COVER.ID).from(COVER).where(COVER.URL.eq("https://placehold.co/600x600?text=no+cover"))),
 
                 insertInto(PLAYLIST_ITEMS)
                     .columns(PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)
