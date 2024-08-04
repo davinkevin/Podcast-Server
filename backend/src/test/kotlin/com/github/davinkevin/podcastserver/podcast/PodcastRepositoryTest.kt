@@ -41,8 +41,8 @@ class PodcastRepositoryTest(
             truncate(PODCAST).cascade(),
             truncate(COVER).cascade(),
             truncate(TAG).cascade(),
-            truncate(WATCH_LIST).cascade(),
-            truncate(WATCH_LIST_ITEMS).cascade()
+            truncate(PLAYLIST).cascade(),
+            truncate(PLAYLIST_ITEMS).cascade()
         ).execute()
     }
 
@@ -208,10 +208,10 @@ class PodcastRepositoryTest(
                 insertInto(PODCAST_TAGS, PODCAST_TAGS.PODCASTS_ID, PODCAST_TAGS.TAGS_ID)
                     .values(fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")),
-                insertInto(WATCH_LIST, WATCH_LIST.ID, WATCH_LIST.NAME)
+                insertInto(PLAYLIST, PLAYLIST.ID, PLAYLIST.NAME)
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
-                insertInto(WATCH_LIST_ITEMS, WATCH_LIST_ITEMS.WATCH_LISTS_ID, WATCH_LIST_ITEMS.ITEMS_ID)
+                insertInto(PLAYLIST_ITEMS, PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"))
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56")),
@@ -761,13 +761,13 @@ class PodcastRepositoryTest(
                     .values(fromString("1b83a383-25ec-4aeb-8e82-f317449da37b"), "Item 1", "http://fakeurl.com/item.1.mp3", "http://fakeurl.com/item.1.mp3", fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"), fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e3"), "audio/mp3")
                     .values(fromString("2b83a383-25ec-4aeb-8e82-f317449da37b"), "Item 2", "http://fakeurl.com/item.2.mp3", "http://fakeurl.com/item.2.mp3", fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e4"), "audio/mp3"),
 
-                insertInto(WATCH_LIST)
-                    .columns(WATCH_LIST.ID, WATCH_LIST.NAME)
+                insertInto(PLAYLIST)
+                    .columns(PLAYLIST.ID, PLAYLIST.NAME)
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
 
-                insertInto(WATCH_LIST_ITEMS)
-                    .columns(WATCH_LIST_ITEMS.WATCH_LISTS_ID, WATCH_LIST_ITEMS.ITEMS_ID)
+                insertInto(PLAYLIST_ITEMS)
+                    .columns(PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("1b83a383-25ec-4aeb-8e82-f317449da37b"))
                     .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), fromString("1b83a383-25ec-4aeb-8e82-f317449da37b"))
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("2b83a383-25ec-4aeb-8e82-f317449da37b"))
@@ -777,7 +777,7 @@ class PodcastRepositoryTest(
             repository.deleteById(fromString("214be5e3-a9e0-4814-8ee1-c9b7986bac82"))
 
             /* Then */
-            assertThat(query.selectFrom(WATCH_LIST_ITEMS).fetch().map{ it[WATCH_LIST_ITEMS.WATCH_LISTS_ID] to it[WATCH_LIST_ITEMS.ITEMS_ID] }).containsOnly(
+            assertThat(query.selectFrom(PLAYLIST_ITEMS).fetch().map{ it[PLAYLIST_ITEMS.PLAYLISTS_ID] to it[PLAYLIST_ITEMS.ITEMS_ID] }).containsOnly(
                 fromString("dc024a30-bd02-11e5-a837-0800200c9a66") to fromString("2b83a383-25ec-4aeb-8e82-f317449da37b")
             )
         }

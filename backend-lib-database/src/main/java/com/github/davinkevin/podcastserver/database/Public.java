@@ -8,11 +8,11 @@ import com.github.davinkevin.podcastserver.database.tables.Cover;
 import com.github.davinkevin.podcastserver.database.tables.DownloadingItem;
 import com.github.davinkevin.podcastserver.database.tables.FlywaySchemaHistory;
 import com.github.davinkevin.podcastserver.database.tables.Item;
+import com.github.davinkevin.podcastserver.database.tables.Playlist;
+import com.github.davinkevin.podcastserver.database.tables.PlaylistItems;
 import com.github.davinkevin.podcastserver.database.tables.Podcast;
 import com.github.davinkevin.podcastserver.database.tables.PodcastTags;
 import com.github.davinkevin.podcastserver.database.tables.Tag;
-import com.github.davinkevin.podcastserver.database.tables.WatchList;
-import com.github.davinkevin.podcastserver.database.tables.WatchListItems;
 
 import java.util.Arrays;
 import java.util.List;
@@ -56,6 +56,16 @@ public class Public extends SchemaImpl {
     public final Item ITEM = Item.ITEM;
 
     /**
+     * The table <code>public.playlist</code>.
+     */
+    public final Playlist PLAYLIST = Playlist.PLAYLIST;
+
+    /**
+     * The table <code>public.playlist_items</code>.
+     */
+    public final PlaylistItems PLAYLIST_ITEMS = PlaylistItems.PLAYLIST_ITEMS;
+
+    /**
      * The table <code>public.podcast</code>.
      */
     public final Podcast PODCAST = Podcast.PODCAST;
@@ -69,16 +79,6 @@ public class Public extends SchemaImpl {
      * The table <code>public.tag</code>.
      */
     public final Tag TAG = Tag.TAG;
-
-    /**
-     * The table <code>public.watch_list</code>.
-     */
-    public final WatchList WATCH_LIST = WatchList.WATCH_LIST;
-
-    /**
-     * The table <code>public.watch_list_items</code>.
-     */
-    public final WatchListItems WATCH_LIST_ITEMS = WatchListItems.WATCH_LIST_ITEMS;
 
     /**
      * No further instances allowed
@@ -100,11 +100,11 @@ public class Public extends SchemaImpl {
             DownloadingItem.DOWNLOADING_ITEM,
             FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,
             Item.ITEM,
+            Playlist.PLAYLIST,
+            PlaylistItems.PLAYLIST_ITEMS,
             Podcast.PODCAST,
             PodcastTags.PODCAST_TAGS,
-            Tag.TAG,
-            WatchList.WATCH_LIST,
-            WatchListItems.WATCH_LIST_ITEMS
+            Tag.TAG
         );
     }
 }

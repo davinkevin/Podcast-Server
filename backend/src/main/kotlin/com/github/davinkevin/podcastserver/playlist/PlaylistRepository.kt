@@ -11,20 +11,20 @@ class PlaylistRepository(
 
     fun findAll(): List<Playlist> =
         query
-            .select(WATCH_LIST.ID, WATCH_LIST.NAME)
-            .from(WATCH_LIST)
-            .orderBy(WATCH_LIST.NAME)
+            .select(PLAYLIST.ID, PLAYLIST.NAME)
+            .from(PLAYLIST)
+            .orderBy(PLAYLIST.NAME)
             .fetch()
             .map { Playlist(
-                id = it[WATCH_LIST.ID],
-                name = it[WATCH_LIST.NAME]
+                id = it[PLAYLIST.ID],
+                name = it[PLAYLIST.NAME]
             ) }
 
     fun findById(id: UUID): PlaylistWithItems? {
         val playlist = query
-            .select(WATCH_LIST.ID, WATCH_LIST.NAME)
-            .from(WATCH_LIST)
-            .where(WATCH_LIST.ID.eq(id))
+            .select(PLAYLIST.ID, PLAYLIST.NAME)
+            .from(PLAYLIST)
+            .where(PLAYLIST.ID.eq(id))
             .fetchOne()
             ?: return null
 
@@ -36,12 +36,12 @@ class PlaylistRepository(
                     PODCAST.ID, PODCAST.TITLE,
                     COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                 .from(
-                    WATCH_LIST_ITEMS
-                        .innerJoin(ITEM).on(WATCH_LIST_ITEMS.ITEMS_ID.eq(ITEM.ID))
+                    PLAYLIST_ITEMS
+                        .innerJoin(ITEM).on(PLAYLIST_ITEMS.ITEMS_ID.eq(ITEM.ID))
                         .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
                         .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
                 )
-                .where(WATCH_LIST_ITEMS.WATCH_LISTS_ID.eq(id))
+                .where(PLAYLIST_ITEMS.PLAYLISTS_ID.eq(id))
             .fetch()
             .map { PlaylistWithItems.Item(
                 id = it[ITEM.ID],
@@ -64,8 +64,8 @@ class PlaylistRepository(
             ) }
 
         return PlaylistWithItems(
-            id = playlist[WATCH_LIST.ID],
-            name = playlist[WATCH_LIST.NAME],
+            id = playlist[PLAYLIST.ID],
+            name = playlist[PLAYLIST.NAME],
             items = items
         )
     }
@@ -74,9 +74,9 @@ class PlaylistRepository(
         val id = UUID.randomUUID()
 
         val numberOfRowInserted = query
-            .insertInto(WATCH_LIST)
-            .set(WATCH_LIST.ID, id)
-            .set(WATCH_LIST.NAME, name)
+            .insertInto(PLAYLIST)
+            .set(PLAYLIST.ID, id)
+            .set(PLAYLIST.NAME, name)
             .onConflictDoNothing()
             .execute()
 
@@ -85,20 +85,20 @@ class PlaylistRepository(
         }
 
         val playlist = query
-            .select(WATCH_LIST.ID)
-            .from(WATCH_LIST)
-            .where(WATCH_LIST.NAME.eq(name))
+            .select(PLAYLIST.ID)
+            .from(PLAYLIST)
+            .where(PLAYLIST.NAME.eq(name))
             .fetch()
             .first()
 
-        return findById(playlist[WATCH_LIST.ID])!!
+        return findById(playlist[PLAYLIST.ID])!!
     }
 
     fun addToPlaylist(playlistId: UUID, itemId: UUID): PlaylistWithItems {
         query
-            .insertInto(WATCH_LIST_ITEMS)
-            .set(WATCH_LIST_ITEMS.WATCH_LISTS_ID, playlistId)
-            .set(WATCH_LIST_ITEMS.ITEMS_ID, itemId)
+            .insertInto(PLAYLIST_ITEMS)
+            .set(PLAYLIST_ITEMS.PLAYLISTS_ID, playlistId)
+            .set(PLAYLIST_ITEMS.ITEMS_ID, itemId)
             .onConflictDoNothing()
             .execute()
 
@@ -107,9 +107,9 @@ class PlaylistRepository(
 
     fun removeFromPlaylist(playlistId: UUID, itemId: UUID): PlaylistWithItems {
         query
-            .deleteFrom(WATCH_LIST_ITEMS)
-            .where(WATCH_LIST_ITEMS.WATCH_LISTS_ID.eq(playlistId))
-            .and(WATCH_LIST_ITEMS.ITEMS_ID.eq(itemId))
+            .deleteFrom(PLAYLIST_ITEMS)
+            .where(PLAYLIST_ITEMS.PLAYLISTS_ID.eq(playlistId))
+            .and(PLAYLIST_ITEMS.ITEMS_ID.eq(itemId))
             .execute()
 
         return findById(playlistId)!!
@@ -117,13 +117,13 @@ class PlaylistRepository(
 
     fun deleteById(id: UUID) {
         query
-            .deleteFrom(WATCH_LIST_ITEMS)
-            .where(WATCH_LIST_ITEMS.WATCH_LISTS_ID.eq(id))
+            .deleteFrom(PLAYLIST_ITEMS)
+            .where(PLAYLIST_ITEMS.PLAYLISTS_ID.eq(id))
             .execute()
 
         query
-            .deleteFrom(WATCH_LIST)
-            .where(WATCH_LIST.ID.eq(id))
+            .deleteFrom(PLAYLIST)
+            .where(PLAYLIST.ID.eq(id))
             .execute()
     }
 
