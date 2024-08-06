@@ -147,7 +147,7 @@ class ItemHandler(
         val parts = r.multipartData().toSingleValueMap()
         val file = parts["file"]
             ?.let(::UploadedFile)
-            ?.also { log.info("upload of file ${it.filename()}") }
+            ?.also { log.info("upload of file ${it.filename}") }
             ?: error("`file` field not available in upload request")
 
         val item = itemService.upload(podcastId, file)
@@ -261,13 +261,10 @@ data class PlaylistsHAL(val content: Collection<PlaylistHAL>) {
     data class PlaylistHAL(val id: UUID, val name: String)
 }
 
-data class UploadedFile(private val part: Part) {
-
-    fun name(): String = part.submittedFileName
-
-    fun filename(): String = part.submittedFileName
-
-    fun inputStream(): InputStream = part.inputStream
-
-    fun size(): Long = part.size
+data class UploadedFile(val filename: String, val inputStream: InputStream, val size: Long) {
+    constructor(part: Part) : this(
+        filename = part.submittedFileName,
+        inputStream = part.inputStream,
+        size = part.size,
+    )
 }

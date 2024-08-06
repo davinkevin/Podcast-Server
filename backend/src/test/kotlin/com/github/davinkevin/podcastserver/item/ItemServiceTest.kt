@@ -401,15 +401,32 @@ class ItemServiceTest(
                             height = podcast.cover.height
                     )
             )
-            val fileName = "Podcast Name - 2020-01-02 - title.mp3"
-            val normalizedFileName = Paths.get(fileName.replace("[^a-zA-Z0-9.-]".toRegex(), "_"))
-            whenever(file.filename()).thenReturn(fileName)
+
+            // And
             whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast)
-            whenever(fileService.cache(file, normalizedFileName)).thenReturn(normalizedFileName)
-            whenever(fileService.upload(podcast.title, normalizedFileName)).thenReturn(null)
+
+            // And upload
+            val fileName = "Podcast Name - 2020-01-02 - title.mp3"
+            val normalizedFileName = fileName
+                .replace("[^a-zA-Z0-9.-]".toRegex(), "_")
+                .let(Paths::get)
+            val fileStream = "Foo".byteInputStream()
+
+            whenever(file.filename).thenReturn(fileName)
+            whenever(file.inputStream).thenReturn(fileStream)
+            val uploadRequest = FileStorageService.UploadFromStreamRequest(
+                podcastTitle = podcast.title,
+                fileName = normalizedFileName,
+                stream = fileStream
+            )
+            doNothing().whenever(fileService).upload(uploadRequest)
+
+            // and metadata
             whenever(fileService.metadata(podcast.title, normalizedFileName)).thenReturn(
                 FileMetaData("audio/mp3", 1234L)
             )
+
+            // and create / update
             whenever(repository.create(itemToCreate)).thenReturn(itemCreated)
             doNothing().whenever(podcastRepository).updateLastUpdate(podcast.id)
 
@@ -418,6 +435,7 @@ class ItemServiceTest(
 
             /* Then */
             assertThat(item).isSameAs(itemCreated)
+            verify(fileService).upload(uploadRequest)
         }
     }
 

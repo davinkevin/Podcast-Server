@@ -7,7 +7,6 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.fileAsByteArray
 import com.github.davinkevin.podcastserver.item.DeleteItemRequest
 import com.github.davinkevin.podcastserver.item.Item
-import com.github.davinkevin.podcastserver.item.UploadedFile
 import com.github.davinkevin.podcastserver.podcast.DeletePodcastRequest
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.tag.Tag
@@ -23,8 +22,6 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
-import org.mockito.kotlin.doReturn
-import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
@@ -34,12 +31,14 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.DigestUtils
 import org.springframework.web.client.RestClient
 import java.net.URI
+import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 import kotlin.io.path.Path
+import kotlin.io.path.inputStream
 import kotlin.io.path.writeText
 
 /**
@@ -508,30 +507,8 @@ class FileStorageServiceTest(
     }
 
     @Nested
-    @DisplayName("should cache")
-    inner class ShouldCache {
-
-        @Test
-        fun `with success`() {
-            /* Given */
-            val file: UploadedFile = mock {
-                on(it.inputStream()).doReturn("foo".toByteArray().inputStream())
-            }
-
-            /* When */
-            val path = fileService.cache(file, Paths.get("foo.mp3"))
-
-            /* Then */
-            assertThat(path)
-                .exists()
-                .hasContent("foo")
-        }
-
-    }
-
-    @Nested
-    @DisplayName("should upload file")
-    inner class ShouldUploadFile {
+    @DisplayName("should upload Path")
+    inner class ShouldUploadPath {
 
         @Test
         fun `with success`(@TempDir dir: Path) {
@@ -545,10 +522,12 @@ class FileStorageServiceTest(
             /* Then */
             assertThat(result).isNotNull()
 
-            val textContent = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlEqualTo("/data/podcast-title/toUpload.txt")))
-                .first().body
-                .decodeToString()
+            /* And */
+            val allRequests = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlEqualTo("/data/podcast-title/toUpload.txt")))
+            assertThat(allRequests).hasSize(1)
 
+            /* And */
+            val textContent = allRequests.first().body.decodeToString()
             assertThat(textContent).isEqualTo("text is here !")
         }
 
@@ -590,6 +569,33 @@ class FileStorageServiceTest(
 
             /* Then */
             assertThat(result).isNull()
+        }
+    }
+
+
+    @Nested
+    @DisplayName("should upload InputStream")
+    inner class ShouldUploadInputStream {
+
+        @Test
+        fun `with success`(@TempDir dir: Path) {
+            /* Given */
+            val file = dir.resolve("toUpload.txt").also(Files::createFile)
+            s3Backend.stubFor(put("/data/podcast-title/toUpload.txt").willReturn(ok()))
+
+            /* And */
+            val request = FileStorageService.UploadFromStreamRequest(
+                podcastTitle = "podcast-title",
+                fileName = file.fileName,
+                stream = file.inputStream()
+            )
+
+            /* When */
+            fileService.upload(request)
+
+            /* Then */
+            val wiremockRequest = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlEqualTo("/data/podcast-title/toUpload.txt")))
+            assertThat(wiremockRequest).isNotEmpty
         }
 
     }
@@ -704,7 +710,6 @@ class FileStorageServiceTest(
             /* Then */
             assertThat(uri.host).isEqualTo("storage.local")
         }
-
     }
 
     companion object {
@@ -713,7 +718,7 @@ class FileStorageServiceTest(
         val s3Backend: WireMockExtension = WireMockExtension.newInstance()
             .options(wireMockConfig()
                 .port(s3MockBackendPort)
-                //            .notifier(ConsoleNotifier(true))
+                //.notifier(ConsoleNotifier(true))
             )
             .build()
     }

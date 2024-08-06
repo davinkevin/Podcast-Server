@@ -4,7 +4,6 @@ import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest
 import com.github.davinkevin.podcastserver.item.DeleteItemRequest
 import com.github.davinkevin.podcastserver.item.Item
-import com.github.davinkevin.podcastserver.item.UploadedFile
 import com.github.davinkevin.podcastserver.podcast.DeletePodcastRequest
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import org.slf4j.LoggerFactory
@@ -16,11 +15,13 @@ import software.amazon.awssdk.core.async.AsyncRequestBody
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.model.*
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
+import java.io.InputStream
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Duration
 import java.util.*
+import java.util.concurrent.Executors
 import kotlin.io.path.Path
 import kotlin.io.path.extension
 import kotlin.random.Random
@@ -145,15 +146,6 @@ class FileStorageService(
         }
     }
 
-    fun cache(filePart: UploadedFile, destination: Path): Path {
-        val tmpDirectory = Files.createTempDirectory("upload-temp")
-        val dest = tmpDirectory.resolve(destination.fileName)
-
-        Files.copy(filePart.inputStream(), dest)
-
-        return dest
-    }
-
     fun upload(podcastTitle: String, file: Path): PutObjectResponse? {
         val request = PutObjectRequest.builder()
             .bucket(properties.bucket)
@@ -170,28 +162,40 @@ class FileStorageService(
         return response
     }
 
-    private fun <T> retry(block: () -> T): Result<T> {
-        val retries = 3
-        val delay = Duration.ofSeconds(1)
+    fun upload(request: UploadFromStreamRequest) {
+        val (podcastTitle, fileName, stream) = request
 
-        val all = (0 .. retries)
-            .asSequence()
-            .onEach {
-                if (it == 0) return@onEach
+        val putRequest = PutObjectRequest.builder()
+            .bucket(properties.bucket)
+            .acl(ObjectCannedACL.PUBLIC_READ)
+            .key("$podcastTitle/${fileName.fileName}")
+            .build()
 
-                val waitTime = delay.plusSeconds(Random.nextDouble(0.0, 0.5).toLong())
-
-                Thread.sleep(waitTime)
-            }
-            .map { runCatching { block() } }
-            .toList()
-
-        val firstSuccess = all.firstOrNull { it.isSuccess }
-        if (firstSuccess != null) {
-            return firstSuccess
+        val body = AsyncRequestBody.fromInputStream { it
+            .inputStream(stream)
+            .executor(Executors.newVirtualThreadPerTaskExecutor())
         }
 
-        return all.first { it.isFailure }
+        retry { bucket.putObject(putRequest, body).join() }
+    }
+
+    data class UploadFromStreamRequest(val podcastTitle: String, val fileName: Path, val stream: InputStream)
+
+    fun <T> retry(block: () -> T): Result<T> {
+        val retries = 3
+        val delay = Duration.ofSeconds(1)
+        val errors = mutableListOf<Result<T>>()
+
+        for (i in 1..retries) {
+            val result = runCatching { block() }
+            if (result.isSuccess) return result
+            errors += result
+
+            val waitTime = delay.plusSeconds(Random.nextDouble(0.0, 0.5).toLong())
+            Thread.sleep(waitTime)
+        }
+
+        return errors.first()
     }
 
     fun metadata(title: String, file: Path): FileMetaData? {

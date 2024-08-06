@@ -74,15 +74,23 @@ class ItemService(
     }
 
     fun upload(podcastId: UUID, uploadedFile: UploadedFile): Item {
-        val filename = Paths.get(uploadedFile.filename().replace("[^a-zA-Z0-9.-]".toRegex(), "_"))
-
-        val path = file.cache(uploadedFile, filename)
         val podcast = podcastRepository.findById(podcastId)!!
 
-        file.upload(podcast.title, path)
-        val metadata = file.metadata(podcast.title, path)!!
+        val filename = uploadedFile
+            .filename
+            .replace("[^a-zA-Z0-9.-]".toRegex(), "_")
+            .let(Paths::get)
 
-        val (_, p2, p3) = uploadedFile.filename().split(" - ")
+        val uploadRequest = FileStorageService.UploadFromStreamRequest(
+            podcastTitle = podcast.title,
+            fileName = filename,
+            stream = uploadedFile.inputStream,
+        )
+        file.upload(uploadRequest)
+
+        val metadata = file.metadata(podcast.title, filename)!!
+
+        val (_, p2, p3) = uploadedFile.filename.split(" - ")
         val title = p3.substringBeforeLast(".")
         val date = LocalDate.parse(p2, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         val time = LocalTime.of(0, 0)
