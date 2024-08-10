@@ -57,7 +57,12 @@ class PlaylistXmlHandlerTest (
             val playlist = PlaylistWithItems(
                 id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
                 name = "foo",
-                items = listOf(item)
+                items = listOf(item),
+                cover = PlaylistWithItems.Cover(
+                    width = 789,
+                    height = 141,
+                    url = URI("https://foo.com/bar/playlist/image.png")
+                ),
             )
 
             @Test
@@ -86,8 +91,8 @@ class PlaylistXmlHandlerTest (
                                 <itunes:image>https://foo.com/api/v1/playlists/9706ba78-2df2-4b37-a573-04367dc6f0ea/cover.png</itunes:image>
                                 <image>
                                     <url>https://foo.com/api/v1/playlists/9706ba78-2df2-4b37-a573-04367dc6f0ea/cover.png</url>
-                                    <height>600</height>
-                                    <width>600</width>
+                                    <height>141</height>
+                                    <width>789</width>
                                 </image>
                                 <item>
                                   <title>a title</title>
@@ -142,8 +147,8 @@ class PlaylistXmlHandlerTest (
                                 <itunes:image>https://foo.com/api/v1/playlists/9706ba78-2df2-4b37-a573-04367dc6f0ea/cover.png</itunes:image>
                                 <image>
                                     <url>https://foo.com/api/v1/playlists/9706ba78-2df2-4b37-a573-04367dc6f0ea/cover.png</url>
-                                    <height>600</height>
-                                    <width>600</width>
+                                    <height>141</height>
+                                    <width>789</width>
                                 </image>
                                 <item>
                                   <title>a title</title>

@@ -14,11 +14,7 @@ data class Playlist(val id: UUID, val name: String)
 data class PlaylistWithItems(
     val id: UUID,
     val name: String,
-    val cover: Cover = Cover(
-        url = URI("https://placehold.co/600x600.png?text=no+cover"),
-        height = 600,
-        width = 600,
-    ),
+    val cover: Cover,
     val items: Collection<Item>
 ) {
 

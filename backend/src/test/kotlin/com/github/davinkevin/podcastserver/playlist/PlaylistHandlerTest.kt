@@ -57,13 +57,27 @@ class PlaylistHandlerTest (
         val playlist = PlaylistWithItems(
             id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
             name = "foo",
-            items = listOf(item)
+            items = listOf(item),
+            cover = Cover(
+                width = 789,
+                height = 141,
+                url = URI("https://foo.com/bar/playlist/image.png")
+            ),
         )
 
         @Test
         fun `with a name`() {
             /* Given */
-            val playlist = PlaylistWithItems(id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), name = "foo", items = emptyList())
+            val playlist = PlaylistWithItems(
+                id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
+                name = "foo",
+                items = emptyList(),
+                cover = Cover(
+                    width = 789,
+                    height = 141,
+                    url = URI("https://foo.com/bar/playlist/image.png")
+                ),
+            )
             whenever(service.save("foo")).thenReturn(playlist)
             /* When */
             rest
@@ -238,7 +252,16 @@ class PlaylistHandlerTest (
             @Test
             fun `with no items`() {
                 /* Given */
-                val playlist = PlaylistWithItems(id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), name = "foo", items = emptyList())
+                val playlist = PlaylistWithItems(
+                    id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
+                    name = "foo",
+                    items = emptyList(),
+                    cover = Cover(
+                        width = 789,
+                        height = 141,
+                        url = URI("https://foo.com/bar/playlist/image.png")
+                    ),
+                )
                 whenever(service.findById(playlist.id)).thenReturn(playlist)
                 /* When */
                 rest
@@ -283,7 +306,12 @@ class PlaylistHandlerTest (
                                 url = URI("https://foo.com/bar/podcast/image.png")
                             )
                         )
-                    )
+                    ),
+                    cover = Cover(
+                        width = 789,
+                        height = 141,
+                        url = URI("https://foo.com/bar/playlist/image.png")
+                    ),
                 )
                 whenever(service.findById(playlist.id)).thenReturn(playlist)
                 /* When */
@@ -366,7 +394,12 @@ class PlaylistHandlerTest (
                                 url = URI("https://foo.com/bar/podcast/2/image.png")
                             )
                         )
-                    )
+                    ),
+                    cover = Cover(
+                        width = 789,
+                        height = 141,
+                        url = URI("https://foo.com/bar/playlist/image.png")
+                    ),
                 )
                 whenever(service.findById(playlist.id)).thenReturn(playlist)
                 /* When */
@@ -471,7 +504,12 @@ class PlaylistHandlerTest (
             val playlist = PlaylistWithItems(
                 id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
                 name = "foo",
-                items = listOf(item)
+                items = listOf(item),
+                cover = Cover(
+                    width = 789,
+                    height = 141,
+                    url = URI("https://foo.com/bar/playlist/image.png")
+                ),
             )
             whenever(service.addToPlaylist(playlist.id, item.id)).thenReturn(playlist)
 
@@ -521,7 +559,12 @@ class PlaylistHandlerTest (
             val playlist = PlaylistWithItems(
                 id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
                 name = "foo",
-                items = emptyList()
+                items = emptyList(),
+                cover = Cover(
+                    width = 789,
+                    height = 141,
+                    url = URI("https://foo.com/bar/playlist/image.png")
+                ),
             )
             val itemId = UUID.fromString("dd5b4b49-7fd8-4d7b-a406-e8e451ef7792")
             whenever(service.removeFromPlaylist(playlist.id, itemId))
@@ -556,7 +599,12 @@ class PlaylistHandlerTest (
             val playlist = PlaylistWithItems(
                 id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
                 name = "foo",
-                items = emptyList()
+                items = emptyList(),
+                cover = Cover(
+                    width = 789,
+                    height = 141,
+                    url = URI("https://foo.com/bar/playlist/image.png")
+                ),
             )
             whenever(service.findById(playlist.id))
                 .thenReturn(playlist)

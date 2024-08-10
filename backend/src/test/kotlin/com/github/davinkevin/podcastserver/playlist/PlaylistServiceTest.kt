@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import java.net.URI
 import java.util.*
 
 /**
@@ -83,7 +84,16 @@ class PlaylistServiceTest(
         fun `with one playlist`() {
             /* Given */
             val id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
-            val playlist = PlaylistWithItems(id = id, name = "foo", items = emptyList())
+            val playlist = PlaylistWithItems(
+                id = id,
+                name = "foo",
+                items = emptyList(),
+                cover = PlaylistWithItems.Cover(
+                    width = 789,
+                    height = 141,
+                    url = URI("https://foo.com/bar/playlist/image.png")
+                ),
+            )
             whenever(repository.findById(id)).thenReturn(playlist)
 
             /* When */
@@ -102,7 +112,16 @@ class PlaylistServiceTest(
         fun `with a name`() {
             /* Given */
             val id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
-            val playlist = PlaylistWithItems(id = id, name = "foo", items = emptyList())
+            val playlist = PlaylistWithItems(
+                id = id,
+                name = "foo",
+                items = emptyList(),
+                cover = PlaylistWithItems.Cover(
+                    width = 789,
+                    height = 141,
+                    url = URI("https://foo.com/bar/playlist/image.png")
+                ),
+            )
             whenever(repository.save("foo")).thenReturn(playlist)
 
             /* When */
@@ -123,7 +142,16 @@ class PlaylistServiceTest(
             /* Given */
             val playlistId = UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66")
             val itemId = UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
-            val playlist = PlaylistWithItems(id = playlistId, name = "foo", items = emptyList())
+            val playlist = PlaylistWithItems(
+                id = playlistId,
+                name = "foo",
+                items = emptyList(),
+                cover = PlaylistWithItems.Cover(
+                    width = 789,
+                    height = 141,
+                    url = URI("https://foo.com/bar/playlist/image.png")
+                ),
+            )
             whenever(repository.addToPlaylist(playlistId, itemId)).thenReturn(playlist)
 
             /* When */
@@ -144,7 +172,16 @@ class PlaylistServiceTest(
             /* Given */
             val playlistId = UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66")
             val itemId = UUID.fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd")
-            val playlist = PlaylistWithItems(id = playlistId, name = "foo", items = emptyList())
+            val playlist = PlaylistWithItems(
+                id = playlistId,
+                name = "foo",
+                items = emptyList(),
+                cover = PlaylistWithItems.Cover(
+                    width = 789,
+                    height = 141,
+                    url = URI("https://foo.com/bar/playlist/image.png")
+                ),
+            )
             whenever(repository.removeFromPlaylist(playlistId, itemId)).thenReturn(playlist)
 
             /* When */

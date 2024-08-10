@@ -67,7 +67,8 @@ class PlaylistRepository(
         return PlaylistWithItems(
             id = playlist[PLAYLIST.ID],
             name = playlist[PLAYLIST.NAME],
-            items = items
+            items = items,
+            cover = defaultCover,
         )
     }
 
@@ -82,7 +83,12 @@ class PlaylistRepository(
             .execute()
 
         if (numberOfRowInserted == 1) {
-            return PlaylistWithItems(id = id, name = name, items = emptyList())
+            return PlaylistWithItems(
+                id = id,
+                name = name,
+                items = emptyList(),
+                cover = defaultCover
+            )
         }
 
         val playlist = query
@@ -129,3 +135,10 @@ class PlaylistRepository(
     }
 
 }
+
+private val defaultCover = PlaylistWithItems.Cover(
+    url = URI("https://placehold.co/600x600?text=no+cover"),
+    height = 600,
+    width = 600,
+)
+
