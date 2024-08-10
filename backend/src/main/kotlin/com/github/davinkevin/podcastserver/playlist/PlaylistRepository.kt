@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import com.github.davinkevin.podcastserver.database.Keys
 import com.github.davinkevin.podcastserver.database.Tables.*
 import org.jooq.DSLContext
 import java.net.URI
@@ -85,8 +86,6 @@ class PlaylistRepository(
         val playlistId = UUID.randomUUID()
         val coverId = UUID.randomUUID()
 
-        var answerIfInsert: PlaylistWithItems? = null
-        var isInserted: Boolean = false
         query.transaction { trx ->
             trx.dsl()
                 .insertInto(COVER)
@@ -96,36 +95,23 @@ class PlaylistRepository(
                 .set(COVER.WIDTH, cover.width)
                 .execute()
 
-            isInserted = trx.dsl()
+            trx.dsl()
                 .insertInto(PLAYLIST)
                 .set(PLAYLIST.ID, playlistId)
                 .set(PLAYLIST.NAME, name)
                 .set(PLAYLIST.COVER_ID, coverId)
-                .onConflictDoNothing()
-                .execute() == 1
+                .onConflictOnConstraint(Keys.PLAYLIST_NAME_KEY)
+                .doUpdate()
+                .set(PLAYLIST.COVER_ID, coverId)
+                .execute()
         }
 
-        if(isInserted) {
-            return PlaylistWithItems(
-                id = playlistId,
-                name = name,
-                items = emptyList(),
-                cover = PlaylistWithItems.Cover(
-                    id = coverId,
-                    height = cover.height,
-                    width = cover.width,
-                    url = cover.url
-                )
-            )
-        }
-
-        val id = query
+        val (id) = query
                 .select(PLAYLIST.ID)
                 .from(PLAYLIST)
                 .where(PLAYLIST.NAME.eq(name))
                 .fetch()
                 .first()
-                .let { (v) -> v }
 
         return findById(id)!!
     }

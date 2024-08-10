@@ -130,7 +130,7 @@ class FileStorageService(
         val response = download(cover.url)
             ?: return
 
-        upload(""".playlist/${name}/${cover.id}.${cover.url.extension()}""", response)
+        upload(""".playlist/${name}/${cover.id}.${cover.url.extension().ifBlank { "jpg" }}""", response)
     }
     data class DownloadPlaylistCoverRequest(val name: String, val cover: Cover) {
         data class Cover(val id: UUID, val url: URI)
@@ -271,4 +271,3 @@ private fun Item.Cover.extension() = Path(url.path).extension.ifBlank { "jpg" }
 
 data class MovePodcastRequest(val id: UUID, val from: String, val to: String)
 data class FileMetaData(val contentType: String, val size: Long)
-data class FileDescriptor(val podcastTitle: String, val fileName: Path)
