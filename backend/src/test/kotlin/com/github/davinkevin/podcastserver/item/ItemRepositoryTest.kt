@@ -42,14 +42,13 @@ class ItemRepositoryTest(
     @BeforeEach
     fun beforeEach() {
         query.batch(
+            truncate(PLAYLIST_ITEMS).cascade(),
             truncate(PODCAST_TAGS).cascade(),
+            truncate(PLAYLIST).cascade(),
             truncate(PODCAST).cascade(),
             truncate(COVER).cascade(),
             truncate(TAG).cascade(),
-            truncate(PLAYLIST).cascade(),
-            truncate(PLAYLIST_ITEMS).cascade(),
         )
-
             .execute()
     }
 
@@ -63,7 +62,10 @@ class ItemRepositoryTest(
                 insertInto(COVER)
                     .columns(COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                     .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
-                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100),
+                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100)
+
+                    .values(fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"), "http://fake.url.com/playlist-1/cover.png", 100, 100)
+                    .values(fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"), "http://fake.url.com/playlist-2/cover.png", 100, 100),
 
                 insertInto(PODCAST)
                     .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED)
@@ -91,9 +93,9 @@ class ItemRepositoryTest(
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")),
 
                 insertInto(PLAYLIST)
-                    .columns(PLAYLIST.ID, PLAYLIST.NAME)
-                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
-                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
+                    .columns(PLAYLIST.ID, PLAYLIST.NAME, PLAYLIST.COVER_ID)
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist", fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"))
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind", fromString("51a51b22-4a6f-45df-8905-f5e691eafee4")),
 
                 insertInto(PLAYLIST_ITEMS)
                     .columns(PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)
@@ -118,7 +120,7 @@ class ItemRepositoryTest(
         }
 
         @Test
-        fun `by id and return empty mono if not find by id`() {
+        fun `by id and return empty if not find by id`() {
             /* Given */
             val id = fromString("98b33370-a976-4e4d-9ab8-57d47241e693")
 
@@ -140,7 +142,10 @@ class ItemRepositoryTest(
                 insertInto(COVER)
                     .columns(COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                     .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
-                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100),
+                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100)
+
+                    .values(fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"), "http://fake.url.com/playlist-1/cover.png", 100, 100)
+                    .values(fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"), "http://fake.url.com/playlist-2/cover.png", 100, 100),
 
                 insertInto(PODCAST)
                     .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED)
@@ -168,9 +173,9 @@ class ItemRepositoryTest(
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")),
 
                 insertInto(PLAYLIST)
-                    .columns(PLAYLIST.ID, PLAYLIST.NAME)
-                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
-                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
+                    .columns(PLAYLIST.ID, PLAYLIST.NAME, PLAYLIST.COVER_ID)
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist", fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"))
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind", fromString("51a51b22-4a6f-45df-8905-f5e691eafee4")),
 
                 insertInto(PLAYLIST_ITEMS)
                     .columns(PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)
@@ -209,7 +214,10 @@ class ItemRepositoryTest(
                 insertInto(COVER)
                     .columns(COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                     .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
-                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100),
+                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100)
+
+                    .values(fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"), "http://fake.url.com/playlist-1/cover.png", 100, 100)
+                    .values(fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"), "http://fake.url.com/playlist-2/cover.png", 100, 100),
 
                 insertInto(PODCAST)
                     .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED)
@@ -237,9 +245,9 @@ class ItemRepositoryTest(
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")),
 
                 insertInto(PLAYLIST)
-                    .columns(PLAYLIST.ID, PLAYLIST.NAME)
-                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
-                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
+                    .columns(PLAYLIST.ID, PLAYLIST.NAME, PLAYLIST.COVER_ID)
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist", fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"))
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind", fromString("51a51b22-4a6f-45df-8905-f5e691eafee4")),
 
                 insertInto(PLAYLIST_ITEMS)
                     .columns(PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)
@@ -327,7 +335,10 @@ class ItemRepositoryTest(
                 insertInto(COVER)
                     .columns(COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                     .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
-                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100),
+                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100)
+
+                    .values(fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"), "http://fake.url.com/playlist-1/cover.png", 100, 100)
+                    .values(fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"), "http://fake.url.com/playlist-2/cover.png", 100, 100),
 
                 insertInto(PODCAST)
                     .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED)
@@ -355,9 +366,9 @@ class ItemRepositoryTest(
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")),
 
                 insertInto(PLAYLIST)
-                    .columns(PLAYLIST.ID, PLAYLIST.NAME)
-                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
-                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
+                    .columns(PLAYLIST.ID, PLAYLIST.NAME, PLAYLIST.COVER_ID)
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist", fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"))
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind", fromString("51a51b22-4a6f-45df-8905-f5e691eafee4")),
 
                 insertInto(PLAYLIST_ITEMS)
                     .columns(PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)
@@ -399,7 +410,10 @@ class ItemRepositoryTest(
                 insertInto(COVER)
                     .columns(COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                     .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
-                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100),
+                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100)
+
+                    .values(fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"), "http://fake.url.com/playlist-1/cover.png", 100, 100)
+                    .values(fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"), "http://fake.url.com/playlist-2/cover.png", 100, 100),
 
                 insertInto(PODCAST)
                     .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED)
@@ -427,9 +441,9 @@ class ItemRepositoryTest(
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")),
 
                 insertInto(PLAYLIST)
-                    .columns(PLAYLIST.ID, PLAYLIST.NAME)
-                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
-                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
+                    .columns(PLAYLIST.ID, PLAYLIST.NAME, PLAYLIST.COVER_ID)
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist", fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"))
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind", fromString("51a51b22-4a6f-45df-8905-f5e691eafee4")),
 
                 insertInto(PLAYLIST_ITEMS)
                     .columns(PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)
@@ -475,7 +489,10 @@ class ItemRepositoryTest(
                 insertInto(COVER)
                     .columns(COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                     .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
-                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100),
+                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100)
+
+                    .values(fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"), "http://fake.url.com/playlist-1/cover.png", 100, 100)
+                    .values(fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"), "http://fake.url.com/playlist-2/cover.png", 100, 100),
 
                 insertInto(PODCAST)
                     .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED)
@@ -503,9 +520,9 @@ class ItemRepositoryTest(
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")),
 
                 insertInto(PLAYLIST)
-                    .columns(PLAYLIST.ID, PLAYLIST.NAME)
-                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
-                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
+                    .columns(PLAYLIST.ID, PLAYLIST.NAME, PLAYLIST.COVER_ID)
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist", fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"))
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind", fromString("51a51b22-4a6f-45df-8905-f5e691eafee4")),
 
                 insertInto(PLAYLIST_ITEMS)
                     .columns(PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)
@@ -552,7 +569,10 @@ class ItemRepositoryTest(
                     .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/Appload/cover.png", 100, 100)
                     .values(fromString("4b240b0a-516b-42e9-b9fc-e49b5f868045"), "http://fake.url.com/geekinchd/cover.png", 100, 100)
                     .values(fromString("a8eb1ea2-354c-4a8e-931a-dc0286a2a66e"), "http://fake.url.com/foopodcast/cover.png", 100, 100)
-                    .values(fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "http://fake.url.com/otherpodcast/cover.png", 100, 100),
+                    .values(fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "http://fake.url.com/otherpodcast/cover.png", 100, 100)
+
+                    .values(fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"), "http://fake.url.com/playlist-1/cover.png", 100, 100)
+                    .values(fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"), "http://fake.url.com/playlist-2/cover.png", 100, 100),
 
                 insertInto(PODCAST)
                     .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED)
@@ -1337,7 +1357,10 @@ class ItemRepositoryTest(
                 insertInto(COVER)
                     .columns(COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                     .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
-                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100),
+                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100)
+
+                    .values(fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"), "http://fake.url.com/playlist-1/cover.png", 100, 100)
+                    .values(fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"), "http://fake.url.com/playlist-2/cover.png", 100, 100),
 
                 insertInto(PODCAST)
                     .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED, PODCAST.COVER_ID)
@@ -1365,9 +1388,9 @@ class ItemRepositoryTest(
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")),
 
                 insertInto(PLAYLIST)
-                    .columns(PLAYLIST.ID, PLAYLIST.NAME)
-                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
-                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
+                    .columns(PLAYLIST.ID, PLAYLIST.NAME, PLAYLIST.COVER_ID)
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist", fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"))
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind", fromString("51a51b22-4a6f-45df-8905-f5e691eafee4")),
 
                 insertInto(PLAYLIST_ITEMS)
                     .columns(PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)
@@ -1842,7 +1865,10 @@ class ItemRepositoryTest(
                 insertInto(COVER)
                     .columns(COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                     .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
-                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100),
+                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100)
+
+                    .values(fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"), "http://fake.url.com/playlist-1/cover.png", 100, 100)
+                    .values(fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"), "http://fake.url.com/playlist-2/cover.png", 100, 100),
 
                 insertInto(PODCAST)
                     .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED)
@@ -1870,9 +1896,9 @@ class ItemRepositoryTest(
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")),
 
                 insertInto(PLAYLIST)
-                    .columns(PLAYLIST.ID, PLAYLIST.NAME)
-                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
-                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
+                    .columns(PLAYLIST.ID, PLAYLIST.NAME, PLAYLIST.COVER_ID)
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist", fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"))
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind", fromString("51a51b22-4a6f-45df-8905-f5e691eafee4")),
 
                 insertInto(PLAYLIST_ITEMS)
                     .columns(PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)
@@ -1928,7 +1954,10 @@ class ItemRepositoryTest(
                 insertInto(COVER)
                     .columns(COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                     .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
-                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100),
+                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100)
+
+                    .values(fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"), "http://fake.url.com/playlist-1/cover.png", 100, 100)
+                    .values(fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"), "http://fake.url.com/playlist-2/cover.png", 100, 100),
 
                 insertInto(PODCAST)
                     .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED)
@@ -1956,9 +1985,9 @@ class ItemRepositoryTest(
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")),
 
                 insertInto(PLAYLIST)
-                    .columns(PLAYLIST.ID, PLAYLIST.NAME)
-                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
-                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
+                    .columns(PLAYLIST.ID, PLAYLIST.NAME, PLAYLIST.COVER_ID)
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist", fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"))
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind", fromString("51a51b22-4a6f-45df-8905-f5e691eafee4")),
 
                 insertInto(PLAYLIST_ITEMS)
                     .columns(PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)

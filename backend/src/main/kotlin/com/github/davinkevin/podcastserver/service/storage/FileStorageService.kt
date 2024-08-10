@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.service.storage
 
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest
+import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.item.DeleteItemRequest
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.podcast.DeletePodcastRequest
@@ -122,6 +123,17 @@ class FileStorageService(
             ?: return
 
         upload("""${item.podcast.title}/${item.id}.${item.cover.extension()}""", response)
+    }
+
+    fun downloadPlaylistCover(request: DownloadPlaylistCoverRequest) {
+        val (name, cover) = request
+        val response = download(cover.url)
+            ?: return
+
+        upload(""".playlist/${name}/${cover.id}.${cover.url.extension()}""", response)
+    }
+    data class DownloadPlaylistCoverRequest(val name: String, val cover: Cover) {
+        data class Cover(val id: UUID, val url: URI)
     }
 
     fun movePodcast(request: MovePodcastRequest) {

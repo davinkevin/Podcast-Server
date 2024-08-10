@@ -19,9 +19,9 @@ class PlaylistHandler(
 ) {
 
     fun save(r: ServerRequest): ServerResponse {
-        val playlistSaveRequest = r.body<SavePlaylist>()
+        val request = r.body<SaveRequest>().toSaveRequest()
 
-        val playlist = playlistService.save(playlistSaveRequest.name)
+        val playlist = playlistService.save(request)
 
         val body = PlaylistWithItemsHAL(
             id = playlist.id,
@@ -122,7 +122,15 @@ class PlaylistHandler(
     }
 }
 
-private class SavePlaylist(val name: String)
+private data class SaveRequest(
+    val name: String,
+    val coverUrl: URI = URI.create("https://placehold.co/600x600.png?text=no+cover")
+)
+
+private fun SaveRequest.toSaveRequest() = PlaylistService.SaveRequest(
+    name = name,
+    coverUrl = coverUrl
+)
 
 private class FindAllPlaylistHAL(val content: Collection<PlaylistHAL>)
 private class PlaylistHAL(val id: UUID, val name: String)
@@ -179,7 +187,7 @@ private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
 }
 
 internal fun PlaylistWithItems.toCoverExistsRequest() = CoverExistsRequest.ForPlaylist(
-    id = id,
     name = name,
+    id = cover.id,
     coverExtension = cover.url.extension()
 )

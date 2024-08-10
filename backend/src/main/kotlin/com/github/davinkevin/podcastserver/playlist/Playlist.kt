@@ -18,7 +18,7 @@ data class PlaylistWithItems(
     val items: Collection<Item>
 ) {
 
-    data class Cover (val url: URI, val height: Int, val width: Int)
+    data class Cover(val id: UUID, val url: URI, val height: Int, val width: Int)
 
     data class Item(
         val id: UUID,
@@ -36,6 +36,6 @@ data class PlaylistWithItems(
     ): Sluggable {
 
         data class Podcast(val id: UUID, val title: String)
-        data class Cover (val id: UUID, val width: Int, val height: Int, val url: URI)
+        data class Cover(val id: UUID, val width: Int, val height: Int, val url: URI)
     }
 }

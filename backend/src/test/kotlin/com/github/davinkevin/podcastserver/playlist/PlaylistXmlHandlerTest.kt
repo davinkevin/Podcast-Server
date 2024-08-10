@@ -61,7 +61,8 @@ class PlaylistXmlHandlerTest (
                 cover = PlaylistWithItems.Cover(
                     width = 789,
                     height = 141,
-                    url = URI("https://foo.com/bar/playlist/image.png")
+                    url = URI("https://foo.com/bar/playlist/image.png"),
+                    id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
                 ),
             )
 

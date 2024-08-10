@@ -38,11 +38,11 @@ class PodcastRepositoryTest(
     fun beforeEach() {
         query.batch(
             truncate(PODCAST_TAGS).cascade(),
+            truncate(PLAYLIST_ITEMS).cascade(),
+            truncate(PLAYLIST).cascade(),
             truncate(PODCAST).cascade(),
             truncate(COVER).cascade(),
             truncate(TAG).cascade(),
-            truncate(PLAYLIST).cascade(),
-            truncate(PLAYLIST_ITEMS).cascade()
         ).execute()
     }
 
@@ -190,7 +190,9 @@ class PodcastRepositoryTest(
             query.batch(
                 insertInto(COVER, COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                     .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
-                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100),
+                    .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100)
+                    .values(fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"), "http://fake.url.com/playlist-1/cover.png", 100, 100)
+                    .values(fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"), "http://fake.url.com/playlist-2/cover.png", 100, 100),
                 insertInto(PODCAST, PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED)
                     .values(fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), "AppLoad", null, "RSS", false)
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), "Geek Inc HD", "http://fake.url.com/rss", "YOUTUBE", true),
@@ -208,9 +210,9 @@ class PodcastRepositoryTest(
                 insertInto(PODCAST_TAGS, PODCAST_TAGS.PODCASTS_ID, PODCAST_TAGS.TAGS_ID)
                     .values(fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), fromString("eb355a23-e030-4966-b75a-b70881a8bd08"))
                     .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")),
-                insertInto(PLAYLIST, PLAYLIST.ID, PLAYLIST.NAME)
-                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
-                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
+                insertInto(PLAYLIST, PLAYLIST.ID, PLAYLIST.NAME, PLAYLIST.COVER_ID)
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist", fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"))
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind", fromString("51a51b22-4a6f-45df-8905-f5e691eafee4")),
                 insertInto(PLAYLIST_ITEMS, PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"))
                     .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"))
@@ -749,7 +751,10 @@ class PodcastRepositoryTest(
                     .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e1"), "http://fake.url.com/a-podcast-to-update/cover_1.png", 100, 100)
                     .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e2"), "http://fake.url.com/a-podcast-to-update/cover_2.png", 100, 100)
                     .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e3"), "http://fake.url.com/a-podcast-to-update/cover_3.png", 100, 100)
-                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e4"), "http://fake.url.com/a-podcast-to-update/cover_4.png", 100, 100),
+                    .values(fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e4"), "http://fake.url.com/a-podcast-to-update/cover_4.png", 100, 100)
+
+                    .values(fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"), "http://fake.url.com/playlist-1/cover.png", 100, 100)
+                    .values(fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"), "http://fake.url.com/playlist-2/cover.png", 100, 100),
 
                 insertInto(PODCAST)
                     .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.COVER_ID, PODCAST.HAS_TO_BE_DELETED, PODCAST.TYPE)
@@ -762,9 +767,9 @@ class PodcastRepositoryTest(
                     .values(fromString("2b83a383-25ec-4aeb-8e82-f317449da37b"), "Item 2", "http://fakeurl.com/item.2.mp3", "http://fakeurl.com/item.2.mp3", fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), fromString("8ea0373e-7af7-4e15-b0fd-9ec4b10822e4"), "audio/mp3"),
 
                 insertInto(PLAYLIST)
-                    .columns(PLAYLIST.ID, PLAYLIST.NAME)
-                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
-                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
+                    .columns(PLAYLIST.ID, PLAYLIST.NAME, PLAYLIST.COVER_ID)
+                    .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist", fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"))
+                    .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind", fromString("51a51b22-4a6f-45df-8905-f5e691eafee4")),
 
                 insertInto(PLAYLIST_ITEMS)
                     .columns(PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)

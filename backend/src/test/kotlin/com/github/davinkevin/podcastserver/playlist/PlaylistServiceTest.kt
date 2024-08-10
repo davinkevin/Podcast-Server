@@ -1,13 +1,15 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import com.github.davinkevin.podcastserver.service.image.CoverInformation
+import com.github.davinkevin.podcastserver.service.image.ImageService
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.doNothing
-import org.mockito.kotlin.verify
-import org.mockito.kotlin.whenever
+import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
@@ -25,6 +27,8 @@ class PlaylistServiceTest(
 ) {
 
     @MockBean private lateinit var repository: PlaylistRepository
+    @MockBean private lateinit var image: ImageService
+    @MockBean private lateinit var fileService: FileStorageService
 
     @Nested
     @DisplayName("should find all")
@@ -91,7 +95,8 @@ class PlaylistServiceTest(
                 cover = PlaylistWithItems.Cover(
                     width = 789,
                     height = 141,
-                    url = URI("https://foo.com/bar/playlist/image.png")
+                    url = URI("https://foo.com/bar/playlist/image.png"),
+                    id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
                 ),
             )
             whenever(repository.findById(id)).thenReturn(playlist)
@@ -109,26 +114,62 @@ class PlaylistServiceTest(
     inner class ShouldSave {
 
         @Test
-        fun `with a name`() {
+        fun successfully() {
             /* Given */
-            val id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
+            whenever(image.fetchCoverInformation(URI("https://foo.com/bar/playlist/image.png")))
+                .thenReturn(CoverInformation(width = 789, height = 141, url = URI("https://foo.com/bar/playlist/image.png")))
+
+            /* And */
+            val saveRequest = PlaylistRepository.SaveRequest(
+                name = "foo",
+                cover = PlaylistRepository.SaveRequest.Cover(
+                    url = URI("https://foo.com/bar/playlist/image.png"),
+                    height = 141,
+                    width = 789,
+                )
+            )
             val playlist = PlaylistWithItems(
-                id = id,
+                id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
                 name = "foo",
                 items = emptyList(),
                 cover = PlaylistWithItems.Cover(
                     width = 789,
                     height = 141,
-                    url = URI("https://foo.com/bar/playlist/image.png")
+                    url = URI("https://foo.com/bar/playlist/image.png"),
+                    id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
                 ),
             )
-            whenever(repository.save("foo")).thenReturn(playlist)
+            whenever(repository.save(saveRequest)).thenReturn(playlist)
+
+            /* And */
+            val request = PlaylistService.SaveRequest(
+                name = "foo",
+                coverUrl = URI("https://foo.com/bar/playlist/image.png")
+            )
 
             /* When */
-            val p = repository.save("foo")
+            val p = service.save(request)
 
             /* Then */
             assertThat(p).isEqualTo(playlist)
+            verify(fileService).downloadPlaylistCover(playlist.toDownloadPlaylistCoverRequest())
+        }
+
+        @Test
+        fun `and fail because cover is not available`() {
+            /* Given */
+            whenever(image.fetchCoverInformation(URI("https://foo.com/bar/playlist/image.png")))
+                .thenReturn(null)
+
+            /* When */
+            val request = PlaylistService.SaveRequest(
+                name = "foo",
+                coverUrl = URI("https://foo.com/bar/playlist/image.png")
+            )
+
+            assertThatThrownBy { service.save(request) }
+            /* Then */
+                .hasMessageContaining("cover ${request.coverUrl} is not available")
         }
 
     }
@@ -149,7 +190,8 @@ class PlaylistServiceTest(
                 cover = PlaylistWithItems.Cover(
                     width = 789,
                     height = 141,
-                    url = URI("https://foo.com/bar/playlist/image.png")
+                    url = URI("https://foo.com/bar/playlist/image.png"),
+                    id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
                 ),
             )
             whenever(repository.addToPlaylist(playlistId, itemId)).thenReturn(playlist)
@@ -179,7 +221,8 @@ class PlaylistServiceTest(
                 cover = PlaylistWithItems.Cover(
                     width = 789,
                     height = 141,
-                    url = URI("https://foo.com/bar/playlist/image.png")
+                    url = URI("https://foo.com/bar/playlist/image.png"),
+                    id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
                 ),
             )
             whenever(repository.removeFromPlaylist(playlistId, itemId)).thenReturn(playlist)

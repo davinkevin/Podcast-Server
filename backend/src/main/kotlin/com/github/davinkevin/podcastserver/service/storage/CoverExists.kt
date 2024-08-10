@@ -8,7 +8,7 @@ interface CoverExists {
 }
 
 sealed class CoverExistsRequest {
-    data class ForPlaylist(val id: UUID, val name: String, val coverExtension: String): CoverExistsRequest()
-    data class ForPodcast(val id: UUID, val title: String, val coverExtension: String): CoverExistsRequest()
-    data class ForItem(val id: UUID, val podcastTitle: String, val coverExtension: String): CoverExistsRequest()
+    data class ForPlaylist  (val name: String,         val id: UUID, val coverExtension: String): CoverExistsRequest()
+    data class ForPodcast   (val title: String,        val id: UUID, val coverExtension: String): CoverExistsRequest()
+    data class ForItem      (val podcastTitle: String, val id: UUID, val coverExtension: String): CoverExistsRequest()
 }

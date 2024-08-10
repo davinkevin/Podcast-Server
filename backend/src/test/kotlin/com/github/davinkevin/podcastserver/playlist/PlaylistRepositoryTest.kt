@@ -44,7 +44,11 @@ class PlaylistRepositoryTest(
             insertInto(COVER)
                 .columns(COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
                 .values(fromString("9f050dc4-6a2e-46c3-8276-43098c011e68"), "http://fake.url.com/geekinc/cover.png", 100, 100)
-                .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100),
+                .values(fromString("8ea0373e-7af6-4e15-b0fd-9ec4b10822ec"), "http://fake.url.com/appload/cover.png", 100, 100)
+
+                .values(fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"), "http://fake.url.com/playlist-1/cover.png", 100, 100)
+                .values(fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"), "http://fake.url.com/playlist-2/cover.png", 100, 100)
+                .values(fromString("71775935-59dc-4e8f-9706-15877b27eec4"), "http://fake.url.com/playlist-3/cover.png", 100, 100),
 
             insertInto(PODCAST)
                 .columns(PODCAST.ID, PODCAST.TITLE, PODCAST.URL, PODCAST.TYPE, PODCAST.HAS_TO_BE_DELETED)
@@ -72,10 +76,10 @@ class PlaylistRepositoryTest(
                 .values(fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), fromString("ad109389-9568-4bdb-ae61-5f26bf6ffdf6")),
 
             insertInto(PLAYLIST)
-                .columns(PLAYLIST.ID, PLAYLIST.NAME)
-                .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist")
-                .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind")
-                .values(fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), "empty playlist"),
+                .columns(PLAYLIST.ID, PLAYLIST.NAME, PLAYLIST.COVER_ID)
+                .values(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist",   fromString("f496ffad-1bb6-44df-bbd1-bca9a2891918"))
+                .values(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind", fromString("51a51b22-4a6f-45df-8905-f5e691eafee4"))
+                .values(fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), "empty playlist",    fromString("71775935-59dc-4e8f-9706-15877b27eec4")),
 
             insertInto(PLAYLIST_ITEMS)
                 .columns(PLAYLIST_ITEMS.PLAYLISTS_ID, PLAYLIST_ITEMS.ITEMS_ID)
@@ -218,8 +222,17 @@ class PlaylistRepositoryTest(
         @Test
         fun `with a name`() {
             /* Given */
+            val saveRequest = PlaylistRepository.SaveRequest(
+                name = "foo",
+                cover = PlaylistRepository.SaveRequest.Cover(
+                    height = 100,
+                    width = 200,
+                    url = URI("https://fake.url.com/cover.png")
+                )
+            )
+
             /* When */
-            val playlist = repository.save("foo")
+            val playlist = repository.save(saveRequest)
 
             /* Then */
             assertAll {
@@ -235,9 +248,17 @@ class PlaylistRepositoryTest(
         @Test
         fun `with an already existing name`() {
             /* Given */
+            val saveRequest = PlaylistRepository.SaveRequest(
+                name = "Humour Playlist",
+                cover = PlaylistRepository.SaveRequest.Cover(
+                    height = 100,
+                    width = 200,
+                    url = URI("https://fake.url.com/cover.png")
+                )
+            )
 
             /* When */
-            val playlist = repository.save("Humour Playlist")
+            val playlist = repository.save(saveRequest)
 
             /* Then */
             assertAll {

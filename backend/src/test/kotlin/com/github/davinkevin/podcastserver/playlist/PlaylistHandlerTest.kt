@@ -61,13 +61,18 @@ class PlaylistHandlerTest (
             cover = Cover(
                 width = 789,
                 height = 141,
-                url = URI("https://foo.com/bar/playlist/image.png")
+                url = URI("https://foo.com/bar/playlist/image.png"),
+                id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
             ),
         )
 
         @Test
         fun `with a name`() {
             /* Given */
+            val saveRequest = PlaylistService.SaveRequest(
+                name = "foo",
+                coverUrl = URI("https://placehold.co/600x600.png?text=no+cover"),
+            )
             val playlist = PlaylistWithItems(
                 id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
                 name = "foo",
@@ -75,10 +80,11 @@ class PlaylistHandlerTest (
                 cover = Cover(
                     width = 789,
                     height = 141,
-                    url = URI("https://foo.com/bar/playlist/image.png")
+                    url = URI("https://placehold.co/600x600.png?text=no+cover"),
+                    id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
                 ),
             )
-            whenever(service.save("foo")).thenReturn(playlist)
+            whenever(service.save(saveRequest)).thenReturn(playlist)
             /* When */
             rest
                 .post()
@@ -101,7 +107,11 @@ class PlaylistHandlerTest (
         @Test
         fun `with 1 item`() {
             /* Given */
-            whenever(service.save("foo")).thenReturn(playlist)
+            val saveRequest = PlaylistService.SaveRequest(
+                name = "foo",
+                coverUrl = URI("https://placehold.co/600x600.png?text=no+cover"),
+            )
+            whenever(service.save(saveRequest)).thenReturn(playlist)
 
             /* When */
             rest
@@ -141,6 +151,10 @@ class PlaylistHandlerTest (
         @Test
         fun `with 1 item without cover extension`() {
             /* Given */
+            val saveRequest = PlaylistService.SaveRequest(
+                name = "foo",
+                coverUrl = URI("https://placehold.co/600x600.png?text=no+cover"),
+            )
             val playlistWithItemWithoutCoverExtension = playlist.copy(
                 items = listOf(
                     item.copy(
@@ -150,7 +164,7 @@ class PlaylistHandlerTest (
                     )
                 )
             )
-            whenever(service.save("foo"))
+            whenever(service.save(saveRequest))
                 .thenReturn(playlistWithItemWithoutCoverExtension)
 
             /* When */
@@ -259,7 +273,8 @@ class PlaylistHandlerTest (
                     cover = Cover(
                         width = 789,
                         height = 141,
-                        url = URI("https://foo.com/bar/playlist/image.png")
+                        url = URI("https://foo.com/bar/playlist/image.png"),
+                        id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
                     ),
                 )
                 whenever(service.findById(playlist.id)).thenReturn(playlist)
@@ -310,7 +325,8 @@ class PlaylistHandlerTest (
                     cover = Cover(
                         width = 789,
                         height = 141,
-                        url = URI("https://foo.com/bar/playlist/image.png")
+                        url = URI("https://foo.com/bar/playlist/image.png"),
+                        id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
                     ),
                 )
                 whenever(service.findById(playlist.id)).thenReturn(playlist)
@@ -398,7 +414,8 @@ class PlaylistHandlerTest (
                     cover = Cover(
                         width = 789,
                         height = 141,
-                        url = URI("https://foo.com/bar/playlist/image.png")
+                        url = URI("https://foo.com/bar/playlist/image.png"),
+                        id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
                     ),
                 )
                 whenever(service.findById(playlist.id)).thenReturn(playlist)
@@ -508,7 +525,8 @@ class PlaylistHandlerTest (
                 cover = Cover(
                     width = 789,
                     height = 141,
-                    url = URI("https://foo.com/bar/playlist/image.png")
+                    url = URI("https://foo.com/bar/playlist/image.png"),
+                    id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
                 ),
             )
             whenever(service.addToPlaylist(playlist.id, item.id)).thenReturn(playlist)
@@ -563,7 +581,8 @@ class PlaylistHandlerTest (
                 cover = Cover(
                     width = 789,
                     height = 141,
-                    url = URI("https://foo.com/bar/playlist/image.png")
+                    url = URI("https://foo.com/bar/playlist/image.png"),
+                    id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
                 ),
             )
             val itemId = UUID.fromString("dd5b4b49-7fd8-4d7b-a406-e8e451ef7792")
@@ -603,7 +622,8 @@ class PlaylistHandlerTest (
                 cover = Cover(
                     width = 789,
                     height = 141,
-                    url = URI("https://foo.com/bar/playlist/image.png")
+                    url = URI("https://foo.com/bar/playlist/image.png"),
+                    id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
                 ),
             )
             whenever(service.findById(playlist.id))
@@ -645,6 +665,7 @@ class PlaylistHandlerTest (
                     url = URI("https://foo.com/cover.png"),
                     height = 123,
                     width = 456,
+                    id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
                 ),
             )
             whenever(service.findById(playlist.id))

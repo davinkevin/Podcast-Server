@@ -2,7 +2,6 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.database.Tables.*
 import org.jooq.DSLContext
-import org.jooq.impl.DSL.select
 import java.net.URI
 import java.util.*
 
@@ -23,19 +22,23 @@ class PlaylistRepository(
 
     fun findById(id: UUID): PlaylistWithItems? {
         val playlist = query
-            .select(PLAYLIST.ID, PLAYLIST.NAME)
+            .select(
+                PLAYLIST.ID, PLAYLIST.NAME,
+                PLAYLIST.cover().ID, PLAYLIST.cover().HEIGHT, PLAYLIST.cover().WIDTH, PLAYLIST.cover().URL,
+            )
             .from(PLAYLIST)
             .where(PLAYLIST.ID.eq(id))
             .fetchOne()
             ?: return null
 
         val items = query
-                .select(ITEM.ID, ITEM.TITLE, ITEM.URL,
-
+                .select(
+                    ITEM.ID, ITEM.TITLE, ITEM.URL,
                     ITEM.FILE_NAME, ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.PUB_DATE,
 
                     PODCAST.ID, PODCAST.TITLE,
-                    COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT)
+                    COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT,
+                )
                 .from(
                     PLAYLIST_ITEMS
                         .innerJoin(ITEM).on(PLAYLIST_ITEMS.ITEMS_ID.eq(ITEM.ID))
@@ -68,37 +71,66 @@ class PlaylistRepository(
             id = playlist[PLAYLIST.ID],
             name = playlist[PLAYLIST.NAME],
             items = items,
-            cover = defaultCover,
+            cover = PlaylistWithItems.Cover(
+                id = playlist[COVER.ID],
+                height = playlist[COVER.HEIGHT],
+                width = playlist[COVER.WIDTH],
+                url = URI(playlist[COVER.URL]),
+            ),
         )
     }
 
-    fun save(name: String): PlaylistWithItems {
-        val id = UUID.randomUUID()
+    fun save(request: SaveRequest): PlaylistWithItems {
+        val (name, cover) = request
+        val playlistId = UUID.randomUUID()
+        val coverId = UUID.randomUUID()
 
-        val numberOfRowInserted = query
-            .insertInto(PLAYLIST)
-            .set(PLAYLIST.ID, id)
-            .set(PLAYLIST.NAME, name)
-            .onConflictDoNothing()
-            .execute()
+        var answerIfInsert: PlaylistWithItems? = null
+        var isInserted: Boolean = false
+        query.transaction { trx ->
+            trx.dsl()
+                .insertInto(COVER)
+                .set(COVER.ID, coverId)
+                .set(COVER.URL, cover.url.toASCIIString())
+                .set(COVER.HEIGHT, cover.height)
+                .set(COVER.WIDTH, cover.width)
+                .execute()
 
-        if (numberOfRowInserted == 1) {
+            isInserted = trx.dsl()
+                .insertInto(PLAYLIST)
+                .set(PLAYLIST.ID, playlistId)
+                .set(PLAYLIST.NAME, name)
+                .set(PLAYLIST.COVER_ID, coverId)
+                .onConflictDoNothing()
+                .execute() == 1
+        }
+
+        if(isInserted) {
             return PlaylistWithItems(
-                id = id,
+                id = playlistId,
                 name = name,
                 items = emptyList(),
-                cover = defaultCover
+                cover = PlaylistWithItems.Cover(
+                    id = coverId,
+                    height = cover.height,
+                    width = cover.width,
+                    url = cover.url
+                )
             )
         }
 
-        val playlist = query
-            .select(PLAYLIST.ID)
-            .from(PLAYLIST)
-            .where(PLAYLIST.NAME.eq(name))
-            .fetch()
-            .first()
+        val id = query
+                .select(PLAYLIST.ID)
+                .from(PLAYLIST)
+                .where(PLAYLIST.NAME.eq(name))
+                .fetch()
+                .first()
+                .let { (v) -> v }
 
-        return findById(playlist[PLAYLIST.ID])!!
+        return findById(id)!!
+    }
+    data class SaveRequest(val name: String, val cover: Cover) {
+        data class Cover(val url: URI, val height: Int, val width: Int)
     }
 
     fun addToPlaylist(playlistId: UUID, itemId: UUID): PlaylistWithItems {
@@ -135,10 +167,3 @@ class PlaylistRepository(
     }
 
 }
-
-private val defaultCover = PlaylistWithItems.Cover(
-    url = URI("https://placehold.co/600x600?text=no+cover"),
-    height = 600,
-    width = 600,
-)
-
