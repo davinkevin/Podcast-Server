@@ -4,7 +4,8 @@ import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.extension.serverRequest.*
-import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
+import com.github.davinkevin.podcastserver.service.storage.CoverExistsRequest
+import com.github.davinkevin.podcastserver.service.storage.ExternalUrlRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import jakarta.servlet.http.Part
 import org.slf4j.LoggerFactory
@@ -83,12 +84,16 @@ class ItemHandler(
     }
 
     private fun findCoverURIOf(item: Item, host: URI): URI {
-        val coverPath = fileService.coverExists(item)
+        val coverExistsRequest: CoverExistsRequest.ForItem = item.toCoverExistsRequest()
+        val coverPath = fileService.coverExists(coverExistsRequest)
             ?: return item.cover.url
 
-        val fileDescriptor = FileDescriptor(item.podcast.title, coverPath)
-
-        return fileService.toExternalUrl(fileDescriptor, host)
+        val request = ExternalUrlRequest.ForItem(
+            host = host,
+            podcastTitle = item.podcast.title,
+            file = coverPath
+        )
+        return fileService.toExternalUrl(request)
     }
 
     fun findById(s: ServerRequest): ServerResponse {
@@ -181,11 +186,22 @@ class ItemHandler(
     private fun findURIOf(item: Item, host: URI): URI {
         if (!item.isDownloaded()) return URI.create(item.url!!)
 
-        val descriptor = FileDescriptor(item.podcast.title, item.fileName!!)
-
-        return fileService.toExternalUrl(descriptor, host)
+        val request = ExternalUrlRequest.ForItem(
+            host = host,
+            podcastTitle = item.podcast.title,
+            file = item.fileName!!
+        )
+        return fileService.toExternalUrl(request)
     }
 
+}
+
+internal fun Item.toCoverExistsRequest(): CoverExistsRequest.ForItem {
+    return CoverExistsRequest.ForItem(
+        id = id,
+        podcastTitle = podcast.title,
+        coverExtension = cover.url.extension().ifBlank { "jpg" }
+    )
 }
 
 data class ItemHAL(

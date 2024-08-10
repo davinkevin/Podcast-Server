@@ -5,7 +5,7 @@ import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
 import com.github.davinkevin.podcastserver.item.ItemService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
-import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
+import com.github.davinkevin.podcastserver.service.storage.ExternalUrlRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.tag.Tag
 import org.junit.jupiter.api.DisplayName
@@ -628,11 +628,21 @@ class PodcastHandlerTest(
             /* Given */
             val host = URI.create("https://localhost:8080/")
             whenever(podcastService.findById(podcast.id)).thenReturn(podcast)
-            whenever(fileService.coverExists(podcast)).thenReturn(
-                Path(podcast.cover.url.toASCIIString().substringAfterLast("/"))
+
+            /* And */
+            val coverExistsRequest = podcast.toCoverExistsRequest()
+            val coverPath = Path(podcast.cover.url.toASCIIString().substringAfterLast("/"))
+            whenever(fileService.coverExists(coverExistsRequest)).thenReturn(coverPath)
+
+            /* And */
+            val request = ExternalUrlRequest.ForPodcast(
+                host = host,
+                podcastTitle = podcast.title,
+                file = coverPath,
             )
-            whenever(fileService.toExternalUrl(FileDescriptor(podcast.title, Path("cover.png")), host))
+            whenever(fileService.toExternalUrl(request))
                 .thenReturn(URI.create("https://localhost:8080/data/Podcast%20title/cover.png"))
+
             /* When */
             rest
                     .get()
@@ -648,7 +658,10 @@ class PodcastHandlerTest(
         fun `by redirecting to external file if cover does not exist locally`() {
             /* Given */
             whenever(podcastService.findById(podcast.id)).thenReturn(podcast)
-            whenever(fileService.coverExists(podcast)).thenReturn(null)
+
+            /* And */
+            val coverExistsRequest = podcast.toCoverExistsRequest()
+            whenever(fileService.coverExists(coverExistsRequest)).thenReturn(null)
 
             /* When */
             rest

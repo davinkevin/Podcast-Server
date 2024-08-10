@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -24,6 +25,7 @@ class PlaylistXmlHandlerTest (
 ) {
 
     @MockBean private lateinit var service: PlaylistService
+    @MockBean private lateinit var file: FileStorageService
 
     @Nested
     @DisplayName("should find by id")

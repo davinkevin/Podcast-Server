@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.cover
 
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Item
 import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Podcast
+import com.github.davinkevin.podcastserver.service.storage.CoverExistsRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
@@ -57,7 +58,7 @@ class CoverServiceTest (
                     randomCover("item3", "podcast3")
             )
             whenever(cover.findCoverOlderThan(date)).thenReturn(covers)
-            whenever(file.coverExists(any(), any(), any())).thenReturn(Path("file.mp3"))
+            whenever(file.coverExists(any<CoverExistsRequest.ForItem>())).thenReturn(Path("file.mp3"))
             whenever(file.deleteCover(any())).thenReturn(true)
 
             /* When */
@@ -73,7 +74,7 @@ class CoverServiceTest (
             val covers = listOf(randomCover("item1", "podcast1"))
 
             whenever(cover.findCoverOlderThan(date)).thenReturn(covers)
-            whenever(file.coverExists(any(), any(), any())).thenReturn(null)
+            whenever(file.coverExists(any<CoverExistsRequest.ForItem>())).thenReturn(null)
 
             /* When */
             service.deleteCoversInFileSystemOlderThan(date)

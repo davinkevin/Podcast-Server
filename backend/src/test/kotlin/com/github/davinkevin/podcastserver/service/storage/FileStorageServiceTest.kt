@@ -7,8 +7,10 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.fileAsByteArray
 import com.github.davinkevin.podcastserver.item.DeleteItemRequest
 import com.github.davinkevin.podcastserver.item.Item
+import com.github.davinkevin.podcastserver.item.toCoverExistsRequest
 import com.github.davinkevin.podcastserver.podcast.DeletePodcastRequest
 import com.github.davinkevin.podcastserver.podcast.Podcast
+import com.github.davinkevin.podcastserver.podcast.toCoverExistsRequest
 import com.github.davinkevin.podcastserver.tag.Tag
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
@@ -233,7 +235,7 @@ class FileStorageServiceTest(
                     .willReturn(ok()))
 
                 /* When */
-                val coverPath = fileService.coverExists(podcast)
+                val coverPath = fileService.coverExists(podcast.toCoverExistsRequest())
 
                 /* Then */
                 assertThat(coverPath).isEqualTo(Path("dd16b2eb-657e-4064-b470-5b99397ce729.png"))
@@ -249,7 +251,7 @@ class FileStorageServiceTest(
                     .willReturn(ok()))
 
                 /* When */
-                val coverPath = fileService.coverExists(specificPodcast)
+                val coverPath = fileService.coverExists(specificPodcast.toCoverExistsRequest())
 
                 /* Then */
                 assertThat(coverPath).isEqualTo(Path("dd16b2eb-657e-4064-b470-5b99397ce729.jpg"))
@@ -262,7 +264,7 @@ class FileStorageServiceTest(
                     .willReturn(notFound()))
 
                 /* When */
-                val coverPath = fileService.coverExists(podcast)
+                val coverPath = fileService.coverExists(podcast.toCoverExistsRequest())
 
                 /* Then */
                 assertThat(coverPath).isNull()
@@ -309,7 +311,7 @@ class FileStorageServiceTest(
                     .willReturn(ok()))
 
                 /* When */
-                val coverPath = fileService.coverExists(item)
+                val coverPath = fileService.coverExists(item.toCoverExistsRequest())
 
                 /* Then */
                 assertThat(coverPath).isEqualTo(Path("27184b1a-7642-4ffd-ac7e-14fb36f7f15c.png"))
@@ -327,7 +329,7 @@ class FileStorageServiceTest(
                     .willReturn(ok()))
 
                 /* When */
-                val coverPath = fileService.coverExists(specificItem)
+                val coverPath = fileService.coverExists(specificItem.toCoverExistsRequest())
 
                 /* Then */
                 assertThat(coverPath).isEqualTo(Path("27184b1a-7642-4ffd-ac7e-14fb36f7f15c.jpg"))
@@ -340,7 +342,7 @@ class FileStorageServiceTest(
                     .willReturn(notFound()))
 
                 /* When */
-                val coverPath = fileService.coverExists(item)
+                val coverPath = fileService.coverExists(item.toCoverExistsRequest())
 
                 /* Then */
                 assertThat(coverPath).isEqualTo(null)
@@ -675,40 +677,121 @@ class FileStorageServiceTest(
             isInternal = true
         )
 
-        @Test
-        fun `with domain from user request`() {
-            /* Given */
-            val onDemandFileStorageService = FileStorageConfig().fileStorageService(
+        @Nested
+        @DisplayName("with domain from user request")
+        inner class WithDomainFromUserRequest {
+
+            private val onDemandFileStorageService = FileStorageConfig().fileStorageService(
                 RestClient.builder(),
                 storageProperties.copy(isInternal = true)
             )
 
-            /* When */
-            val uri = onDemandFileStorageService.toExternalUrl(
-                FileDescriptor("bar", Path("zoo")),
-                URI.create("https://request.local/")
-            )
+            @Test
+            fun `should serve for podcast`() {
+                /* Given */
+                val r = ExternalUrlRequest.ForPodcast(
+                    host = URI.create("https://request.local/"),
+                    podcastTitle = "bar",
+                    file = Path("zoo")
+                )
 
-            /* Then */
-            assertThat(uri.host).isEqualTo("request.local")
+                /* When */
+                val uri = onDemandFileStorageService.toExternalUrl(r)
+
+                /* Then */
+                assertThat(uri.host).isEqualTo("request.local")
+            }
+
+            @Test
+            fun `should serve for item`() {
+                /* Given */
+                val r = ExternalUrlRequest.ForItem(
+                    host = URI.create("https://request.local/"),
+                    podcastTitle = "bar",
+                    file = Path("zoo")
+                )
+
+                /* When */
+                val uri = onDemandFileStorageService.toExternalUrl(r)
+
+                /* Then */
+                assertThat(uri.host).isEqualTo("request.local")
+            }
+
+            @Test
+            fun `should serve for Playlist`() {
+                /* Given */
+                val r = ExternalUrlRequest.ForPlaylist(
+                    host = URI.create("https://request.local/"),
+                    playlistName = "bar",
+                    file = Path("zoo")
+                )
+
+                /* When */
+                val uri = onDemandFileStorageService.toExternalUrl(r)
+
+                /* Then */
+                assertThat(uri.host).isEqualTo("request.local")
+            }
         }
 
-        @Test
-        fun `with domain from external storage system`() {
-            /* Given */
-            val onDemandFileStorageService = FileStorageConfig().fileStorageService(
+        @Nested
+        @DisplayName("with domain from user request")
+        inner class WithDomainFromExternalStorageSystem {
+
+            private val onDemandFileStorageService = FileStorageConfig().fileStorageService(
                 RestClient.builder(),
                 storageProperties.copy(isInternal = false)
             )
 
-            /* When */
-            val uri = onDemandFileStorageService.toExternalUrl(
-                FileDescriptor("bar", Path("zoo")),
-                URI.create("https://request.local/")
-            )
+            @Test
+            fun `should serve for podcast`() {
+                /* Given */
+                val r = ExternalUrlRequest.ForPodcast(
+                    host = URI.create("https://request.local/"),
+                    podcastTitle = "bar",
+                    file = Path("zoo")
+                )
 
-            /* Then */
-            assertThat(uri.host).isEqualTo("storage.local")
+                /* When */
+                val uri = onDemandFileStorageService.toExternalUrl(r)
+
+                /* Then */
+                assertThat(uri.host).isEqualTo("storage.local")
+            }
+
+            @Test
+            fun `should serve for item`() {
+                /* Given */
+                val r = ExternalUrlRequest.ForItem(
+                    host = URI.create("https://request.local/"),
+                    podcastTitle = "bar",
+                    file = Path("zoo")
+                )
+
+                /* When */
+                val uri = onDemandFileStorageService.toExternalUrl(r)
+
+                /* Then */
+                assertThat(uri.host).isEqualTo("storage.local")
+            }
+
+            @Test
+            fun `should serve for Playlist`() {
+                /* Given */
+                val r = ExternalUrlRequest.ForPlaylist(
+                    host = URI.create("https://request.local/"),
+                    playlistName = "bar",
+                    file = Path("zoo")
+                )
+
+                /* When */
+                val uri = onDemandFileStorageService.toExternalUrl(r)
+
+                /* Then */
+                assertThat(uri.host).isEqualTo("storage.local")
+            }
+
         }
     }
 

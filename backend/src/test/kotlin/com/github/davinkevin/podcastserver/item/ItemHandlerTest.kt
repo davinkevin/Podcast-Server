@@ -4,7 +4,8 @@ import com.github.davinkevin.podcastserver.config.JacksonConfig
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
-import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
+import com.github.davinkevin.podcastserver.service.storage.CoverExistsRequest
+import com.github.davinkevin.podcastserver.service.storage.ExternalUrlRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -114,7 +115,14 @@ class ItemHandlerTest(
                 status = Status.FINISH, fileName = Path("file_to_download.mp4")
             )
             whenever(itemService.findById(item.id)).thenReturn(itemDownloaded)
-            whenever(fileService.toExternalUrl(FileDescriptor(itemDownloaded.podcast.title, itemDownloaded.fileName!!), host))
+
+            /* And */
+            val request = ExternalUrlRequest.ForItem(
+                host = host,
+                podcastTitle = item.podcast.title,
+                file = itemDownloaded.fileName!!
+            )
+            whenever(fileService.toExternalUrl(request))
                 .thenReturn(URI.create("https://localhost:8080/data/Podcast%20Bar/file_to_download.mp4"))
 
             /* When */
@@ -172,8 +180,15 @@ class ItemHandlerTest(
             /* Given */
             val host = URI.create("https://localhost:8080/")
             whenever(itemService.findById(item.id)).thenReturn(item)
-            whenever(fileService.coverExists(any<Item>())).thenReturn(Path("${item.id}.png"))
-            whenever(fileService.toExternalUrl(FileDescriptor(item.podcast.title, Path("${item.id}.png")), host))
+            whenever(fileService.coverExists(any<CoverExistsRequest.ForItem>())).thenReturn(Path("${item.id}.png"))
+
+            /* And */
+            val request = ExternalUrlRequest.ForItem(
+                host = host,
+                podcastTitle = item.podcast.title,
+                file = Path("${item.id}.png")
+            )
+            whenever(fileService.toExternalUrl(request))
                 .thenReturn(URI.create("https://localhost:8080/data/Podcast%20Bar/27184b1a-7642-4ffd-ac7e-14fb36f7f15c.png"))
 
             /* When */
@@ -191,7 +206,7 @@ class ItemHandlerTest(
         fun `by redirecting to external file if cover does not exist locally`() {
             /* Given */
             whenever(itemService.findById(item.id)).thenReturn(item)
-            whenever(fileService.coverExists(item)).thenReturn(null)
+            whenever(fileService.coverExists(item.toCoverExistsRequest())).thenReturn(null)
 
             /* When */
             rest

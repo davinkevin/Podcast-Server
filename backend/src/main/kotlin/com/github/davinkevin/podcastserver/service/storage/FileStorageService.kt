@@ -34,7 +34,7 @@ class FileStorageService(
     private val bucket: S3AsyncClient,
     private val preSignerBuilder: (URI) -> S3Presigner,
     private val properties: StorageProperties,
-) {
+): CoverExists, ToExternalUrl {
 
     private val log = LoggerFactory.getLogger(FileStorageService::class.java)
 
@@ -72,10 +72,12 @@ class FileStorageService(
             .isSuccess
     }
 
-    fun coverExists(p: Podcast) = coverExists(p.title, p.id, p.cover.extension())
-    fun coverExists(i: Item) = coverExists(i.podcast.title, i.id, i.cover.extension())
-    fun coverExists(podcastTitle: String, itemId: UUID, extension: String): Path? {
-        val path = "$podcastTitle/$itemId.$extension"
+    override fun coverExists(r: CoverExistsRequest): Path? {
+        val path = when(r) {
+            is CoverExistsRequest.ForPlaylist -> ".playlist/${r.name}/${r.id}.${r.coverExtension}"
+            is CoverExistsRequest.ForPodcast -> "${r.title}/${r.id}.${r.coverExtension}"
+            is CoverExistsRequest.ForItem -> "${r.podcastTitle}/${r.id}.${r.coverExtension}"
+        }
 
         val result = bucket.headObject { it.bucket(properties.bucket).key(path) }
             .runCatching { join() }
@@ -235,12 +237,18 @@ class FileStorageService(
         log.info("✅ Bucket creation done")
     }
 
-    fun toExternalUrl(file: FileDescriptor, requestedHost: URI): URI {
-        return preSignerBuilder(requestedHost).presignGetObject { sign -> sign
+    override fun toExternalUrl(r: ExternalUrlRequest): URI {
+        val path = when(r) {
+            is ExternalUrlRequest.ForPlaylist -> ".playlist/${r.playlistName}/${r.file.fileName}"
+            is ExternalUrlRequest.ForItem -> "${r.podcastTitle}/${r.file.fileName}"
+            is ExternalUrlRequest.ForPodcast -> "${r.podcastTitle}/${r.file.fileName}"
+        }
+
+        return preSignerBuilder(r.host).presignGetObject { sign -> sign
             .signatureDuration(Duration.ofDays(1))
             .getObjectRequest { request -> request
                 .bucket(properties.bucket)
-                .key("${file.podcastTitle}/${file.fileName}")
+                .key(path)
             }
         }.url().toURI()
     }

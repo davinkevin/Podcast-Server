@@ -3,7 +3,8 @@ package com.github.davinkevin.podcastserver.podcast
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
-import com.github.davinkevin.podcastserver.service.storage.FileDescriptor
+import com.github.davinkevin.podcastserver.service.storage.CoverExistsRequest
+import com.github.davinkevin.podcastserver.service.storage.ExternalUrlRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.slf4j.LoggerFactory
 import org.springframework.web.servlet.function.ServerRequest
@@ -83,8 +84,14 @@ class PodcastHandler(
 
         log.debug("the url of the podcast cover is {}", podcast.cover.url)
 
-        val uri = when(val coverPath = fileService.coverExists(podcast)) {
-            is Path -> fileService.toExternalUrl(FileDescriptor(podcast.title, coverPath), host)
+        val coverExistsRequest = podcast.toCoverExistsRequest()
+        val uri = when(val coverPath = fileService.coverExists(coverExistsRequest)) {
+            is Path -> ExternalUrlRequest.ForPodcast(
+                host = host,
+                podcastTitle = podcast.title,
+                file = coverPath,
+            )
+                .let(fileService::toExternalUrl)
             else -> podcast.cover.url
         }
 
@@ -117,6 +124,12 @@ class PodcastHandler(
         return ServerResponse.ok().body(StatsPodcastTypeWrapperHAL(stats))
     }
 }
+
+internal fun Podcast.toCoverExistsRequest() = CoverExistsRequest.ForPodcast(
+    id = id,
+    title = title,
+    coverExtension = cover.extension()
+)
 
 @Suppress("unused")
 private class FindAllPodcastHAL(val content: Collection<PodcastHAL>)

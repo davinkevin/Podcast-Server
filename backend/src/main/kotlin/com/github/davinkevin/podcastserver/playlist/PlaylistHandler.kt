@@ -1,15 +1,21 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.java.net.extension
+import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
+import com.github.davinkevin.podcastserver.service.storage.CoverExistsRequest
+import com.github.davinkevin.podcastserver.service.storage.ExternalUrlRequest
+import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.body
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
+import java.nio.file.Path
 import java.util.*
 
 class PlaylistHandler(
-        private val playlistService: PlaylistService
+        private val playlistService: PlaylistService,
+        private val file: FileStorageService,
 ) {
 
     fun save(r: ServerRequest): ServerResponse {
@@ -25,7 +31,6 @@ class PlaylistHandler(
 
         return ServerResponse.ok().body(body)
     }
-
 
     fun findAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
         val playlists = playlistService.findAll()
@@ -51,6 +56,26 @@ class PlaylistHandler(
         )
 
         return ServerResponse.ok().body(body)
+    }
+
+    fun cover(r: ServerRequest): ServerResponse {
+        val id = r.pathVariable("id").let(UUID::fromString)
+
+        val playlist = playlistService.findById(id)
+            ?: return ServerResponse.notFound().build()
+
+        val coverExistsRequest = playlist.toCoverExistsRequest()
+        val uri = when(val coverPath = file.coverExists(coverExistsRequest)) {
+            is Path -> ExternalUrlRequest.ForPlaylist(
+                host = r.extractHost(),
+                playlistName = playlist.name,
+                file = coverPath
+            )
+                .let(file::toExternalUrl)
+            else -> playlist.cover.url
+        }
+
+        return ServerResponse.seeOther(uri).build()
     }
 
     fun deleteById(r: ServerRequest): ServerResponse {
@@ -152,3 +177,9 @@ private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
             )
     )
 }
+
+internal fun PlaylistWithItems.toCoverExistsRequest() = CoverExistsRequest.ForPlaylist(
+    id = id,
+    name = name,
+    coverExtension = cover.url.extension()
+)
