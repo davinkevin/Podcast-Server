@@ -1,21 +1,12 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.java.net.extension
-import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
-import com.github.davinkevin.podcastserver.rss.PlaylistChannel
-import com.github.davinkevin.podcastserver.rss.itunesNS
-import org.jdom2.Document
-import org.jdom2.Element
-import org.jdom2.output.Format
-import org.jdom2.output.XMLOutputter
-import org.springframework.http.MediaType
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.body
 import org.springframework.web.util.UriComponentsBuilder
 import java.net.URI
 import java.util.*
-import com.github.davinkevin.podcastserver.rss.Item as RssItem
 
 class PlaylistHandler(
         private val playlistService: PlaylistService
@@ -69,23 +60,6 @@ class PlaylistHandler(
         playlistService.deleteById(id)
 
         return ServerResponse.noContent().build()
-    }
-
-    fun rss(r: ServerRequest): ServerResponse {
-        val host = r.extractHost()
-        val id = r.pathVariable("id")
-            .let(UUID::fromString)
-
-        val playlist = playlistService.findById(id)
-            ?: return ServerResponse.notFound().build()
-
-        val rss = playlist.toRss(host)
-
-        val body = XMLOutputter(Format.getPrettyFormat()).outputString(Document(rss))
-
-        return ServerResponse.ok()
-            .contentType(MediaType.APPLICATION_XML)
-            .body(body)
     }
 
     fun addToPlaylist(r: ServerRequest): ServerResponse {
@@ -178,41 +152,3 @@ private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
             )
     )
 }
-
-private fun PlaylistWithItems.toRss(host: URI): Element {
-    val channel = PlaylistChannel(
-        playlist = PlaylistChannel.Playlist(
-            id = id,
-            name = name
-        ),
-        host = host,
-    )
-        .toElement()
-
-    this.items
-        .map { it.toRssItem(host) }
-        .apply(channel::addContent)
-
-    return Element("rss").apply {
-        addContent(channel)
-        addNamespaceDeclaration(itunesNS)
-    }
-}
-
-private fun PlaylistWithItems.Item.toRssItem(host: URI): Element = RssItem(
-    host = host,
-    podcast = RssItem.Podcast(podcast.id),
-    item = RssItem.Item(
-        id = id,
-        title = title,
-        mimeType = mimeType,
-        fileName = fileName,
-        pubDate = pubDate,
-        description = description,
-        length = length,
-    ),
-    cover = RssItem.Cover(
-        url = cover.url
-    )
-)
-    .toElement()

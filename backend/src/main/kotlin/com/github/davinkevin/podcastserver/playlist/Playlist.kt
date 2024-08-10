@@ -11,7 +11,18 @@ import java.util.*
  */
 data class Playlist(val id: UUID, val name: String)
 
-data class PlaylistWithItems(val id: UUID, val name: String, val items: Collection<Item>) {
+data class PlaylistWithItems(
+    val id: UUID,
+    val name: String,
+    val cover: Cover = Cover(
+        url = URI("https://placehold.co/600x600.png?text=no+cover"),
+        height = 600,
+        width = 600,
+    ),
+    val items: Collection<Item>
+) {
+
+    data class Cover (val url: URI, val height: Int, val width: Int)
 
     data class Item(
         val id: UUID,

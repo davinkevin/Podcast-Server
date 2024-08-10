@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.database.Tables.*
 import org.jooq.DSLContext
+import org.jooq.impl.DSL.select
 import java.net.URI
 import java.util.*
 
@@ -81,7 +82,7 @@ class PlaylistRepository(
             .execute()
 
         if (numberOfRowInserted == 1) {
-            return PlaylistWithItems(id, name, emptyList())
+            return PlaylistWithItems(id = id, name = name, items = emptyList())
         }
 
         val playlist = query

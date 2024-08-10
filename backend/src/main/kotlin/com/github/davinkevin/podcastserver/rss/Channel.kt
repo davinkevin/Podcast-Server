@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.rss
 
+import com.github.davinkevin.podcastserver.extension.java.net.extension
 import org.jdom2.Element
 import org.jdom2.Text
 import org.springframework.web.util.UriComponentsBuilder
@@ -12,21 +13,34 @@ import kotlin.io.path.extension
 
 data class PlaylistChannel(
     val playlist: Playlist,
-    val host: URI,
+    val cover: Cover,
+    val calledURI: URI,
 ) {
     data class Playlist(val id: UUID, val name: String)
+    data class Cover(val url: URI, val height: Int, val width: Int)
 
     fun toElement(): Element {
-        val url = UriComponentsBuilder
-            .fromUri(host)
-            .pathSegment("api", "v1", "playlists", playlist.id.toString(), "rss")
+        val url = UriComponentsBuilder.fromUri(calledURI).build(true).toUriString()
+        val ext = cover.url.extension()
+            .takeIf { it.isNotEmpty() }
+            ?.let { ".$it" }
+
+        val coverUrl = UriComponentsBuilder.fromUri(calledURI)
+            .replacePath(null)
+            .pathSegment("api", "v1", "playlists", playlist.id.toString(), "cover$ext")
             .build(true)
             .toUriString()
 
-        return Element("channel").apply {
-            addContent(Element("title").addContent(playlist.name))
-            addContent(Element("link").addContent(url))
-        }
+        return Element("channel").addContent(listOf(
+            Element("title").addContent(playlist.name),
+            Element("link").addContent(url),
+            Element("image", itunesNS).addContent(coverUrl),
+            Element("image").apply {
+                addContent(Element("url").addContent(coverUrl))
+                addContent(Element("height").addContent(cover.height.toString()))
+                addContent(Element("width").addContent(cover.width.toString()))
+            }
+        ))
     }
 }
 

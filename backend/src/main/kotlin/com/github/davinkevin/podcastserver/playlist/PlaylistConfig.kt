@@ -12,13 +12,16 @@ import org.springframework.web.servlet.function.router
 class PlaylistRoutingConfig {
 
     @Bean
-    fun playlistRouter(playlist: PlaylistHandler) = router {
+    fun playlistRouter(
+        playlist: PlaylistHandler,
+        rss: PlaylistXmlHandler,
+    ) = router {
         "/api/v1/playlists".nest {
             GET("", playlist::findAll)
             POST("", playlist::save)
             GET("{id}", playlist::findById)
             DELETE("{id}", playlist::deleteById)
-            GET("{id}/rss", playlist::rss)
+            GET("{id}/rss", rss::rss)
             "{id}/items/{itemId}".nest {
                 POST("", playlist::addToPlaylist)
                 DELETE("", playlist::removeFromPlaylist)
@@ -31,6 +34,7 @@ class PlaylistRoutingConfig {
 @Import(
     PlaylistRoutingConfig::class,
     PlaylistHandler::class,
+    PlaylistXmlHandler::class,
     PlaylistService::class,
     PlaylistRepository::class
 )
