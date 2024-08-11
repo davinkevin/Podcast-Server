@@ -20,10 +20,11 @@ class ImageService (private val rcb: RestClient.Builder ) {
             .clone()
             .baseUrl(url.toASCIIString()).build()
             .get()
-            .accept(MediaType.APPLICATION_OCTET_STREAM)
+            .accept(MediaType.ALL, MediaType.APPLICATION_OCTET_STREAM)
             .runCatching {
                 retrieve().body<ByteArrayResource>()
             }
+            .onFailure { log.error("Error during download of {}", url, it) }
             .getOrNull()
             ?: return null
 

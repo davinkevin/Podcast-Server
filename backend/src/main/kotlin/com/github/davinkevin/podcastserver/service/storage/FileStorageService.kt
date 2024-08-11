@@ -110,7 +110,7 @@ class FileStorageService(
         .baseUrl(url.toASCIIString())
         .build()
         .get()
-        .accept(MediaType.APPLICATION_OCTET_STREAM)
+        .accept(MediaType.ALL, MediaType.APPLICATION_OCTET_STREAM)
         .retrieve()
         .body<ByteArrayResource>()
 

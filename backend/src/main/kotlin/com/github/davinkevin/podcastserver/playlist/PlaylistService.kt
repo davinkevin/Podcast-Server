@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.playlist
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.service.storage.DownloadAndUploadRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
+import org.slf4j.LoggerFactory
 import java.net.URI
 import java.util.*
 
@@ -11,13 +12,17 @@ class PlaylistService(
     private val imageService: ImageService,
     private val fileService: FileStorageService,
 ) {
+    private val log = LoggerFactory.getLogger(PlaylistService::class.java)
 
     fun findAll(): List<Playlist> = repository.findAll()
     fun findById(id: UUID): PlaylistWithItems? = repository.findById(id)
 
     fun save(request: SaveRequest): PlaylistWithItems {
         val cover = imageService.fetchCoverInformation(request.coverUrl)
-            ?: error("cover ${request.coverUrl} is not available")
+        if (cover == null) {
+            log.error("cover {} is not available", request.coverUrl)
+            error("cover ${request.coverUrl} is not available")
+        }
 
         val saveRequest = PlaylistRepository.SaveRequest(
             name = request.name,
