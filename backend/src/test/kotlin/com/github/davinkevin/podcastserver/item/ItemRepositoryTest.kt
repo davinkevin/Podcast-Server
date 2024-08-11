@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
+import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import org.assertj.core.api.Assertions.*
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
@@ -196,11 +197,12 @@ class ItemRepositoryTest(
             /* Then */
             assertThat(it)
                 .hasSize(1)
-                .containsOnly(DeleteItemRequest(
-                    id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
-                    fileName = Path("geekinc.124.mp3"),
-                    podcastTitle = "Geek Inc HD"
-                ))
+                .containsOnly(
+                    DeleteRequest.ForItem(
+                        id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
+                        fileName = Path("geekinc.124.mp3"),
+                        podcastTitle = "Geek Inc HD"
+                    ))
         }
     }
 
@@ -272,7 +274,7 @@ class ItemRepositoryTest(
                 val response = repository.deleteById(id)
 
                 /* Then */
-                assertThat(response).isEqualTo(DeleteItemRequest(fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), Path("geekinc.124.mp3"), "Geek Inc HD"))
+                assertThat(response).isEqualTo(DeleteRequest.ForItem(fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), Path("geekinc.124.mp3"), "Geek Inc HD"))
             }
 
             @Test

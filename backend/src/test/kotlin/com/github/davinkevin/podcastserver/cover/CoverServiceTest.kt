@@ -1,8 +1,7 @@
 package com.github.davinkevin.podcastserver.cover
 
-import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Item
-import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Podcast
 import com.github.davinkevin.podcastserver.service.storage.CoverExistsRequest
+import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.junit.jupiter.api.AfterEach
 import org.junit.jupiter.api.DisplayName
@@ -35,7 +34,8 @@ class CoverServiceTest (
     @DisplayName("should delete old covers")
     inner class ShouldDeleteOldCovers {
 
-        @AfterEach fun afterEach() = Mockito.reset(cover, file)
+        @AfterEach
+        fun afterEach() = Mockito.reset(cover, file)
 
         @Test
         fun `with no cover to delete`() {
@@ -46,26 +46,26 @@ class CoverServiceTest (
 
             /* Then */
             verify(cover).findCoverOlderThan(date)
-            verify(file, never()).deleteCover(any())
+            verify(file, never()).delete(any<DeleteRequest.ForCover>())
         }
 
         @Test
         fun `with covers existing`() {
             /* Given */
             val covers = listOf(
-                    randomCover("item1", "podcast1"),
-                    randomCover("item2", "podcast2"),
-                    randomCover("item3", "podcast3")
+                randomCover("item1", "podcast1"),
+                randomCover("item2", "podcast2"),
+                randomCover("item3", "podcast3")
             )
             whenever(cover.findCoverOlderThan(date)).thenReturn(covers)
             whenever(file.coverExists(any<CoverExistsRequest.ForItem>())).thenReturn(Path("file.mp3"))
-            whenever(file.deleteCover(any())).thenReturn(true)
+            whenever(file.delete(any<DeleteRequest.ForCover>())).thenReturn(true)
 
             /* When */
             service.deleteCoversInFileSystemOlderThan(date)
 
             /* Then */
-            verify(file, times(3)).deleteCover(any())
+            verify(file, times(3)).delete(any<DeleteRequest.ForCover>())
         }
 
         @Test
@@ -80,7 +80,7 @@ class CoverServiceTest (
             service.deleteCoversInFileSystemOlderThan(date)
 
             /* Then */
-            verify(file, never()).deleteCover(any())
+            verify(file, never()).delete(any<DeleteRequest.ForCover>())
         }
 
     }
@@ -88,4 +88,9 @@ class CoverServiceTest (
 }
 
 private fun randomCover(itemTitle: String, podcastTitle: String) =
-        DeleteCoverRequest(randomUUID(), "png", Item(randomUUID(), itemTitle), Podcast(randomUUID(), podcastTitle))
+    DeleteRequest.ForCover(
+        id = randomUUID(),
+        extension = "png",
+        item = DeleteRequest.ForCover.Item(randomUUID(), itemTitle),
+        podcast = DeleteRequest.ForCover.Podcast(randomUUID(), podcastTitle)
+    )

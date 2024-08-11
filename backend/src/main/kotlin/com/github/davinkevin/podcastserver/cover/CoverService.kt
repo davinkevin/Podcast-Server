@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.cover
 
 import com.github.davinkevin.podcastserver.service.storage.CoverExistsRequest
+import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import java.time.OffsetDateTime
 
@@ -13,12 +14,12 @@ class CoverService(
             .findCoverOlderThan(date)
             .asSequence()
             .filter { file.coverExists(it.toCoverExistsRequest()) != null }
-            .forEach { file.deleteCover(it) }
+            .forEach { file.delete(it) }
     }
 
 }
 
-private fun DeleteCoverRequest.toCoverExistsRequest() = CoverExistsRequest.ForItem(
+private fun DeleteRequest.ForCover.toCoverExistsRequest() = CoverExistsRequest.ForItem(
     id = id,
     podcastTitle = podcast.title,
     coverExtension = extension

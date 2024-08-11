@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.podcast
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.tables.records.ItemRecord
+import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.tag.Tag
 import org.jooq.DSLContext
 import org.jooq.Record13
@@ -173,7 +174,7 @@ class PodcastRepository(private val query: DSLContext) {
             .execute()
     }
 
-    fun deleteById(id: UUID): DeletePodcastRequest? {
+    fun deleteById(id: UUID): DeleteRequest.ForPodcast? {
         query
             .delete(PLAYLIST_ITEMS)
             .where(
@@ -212,7 +213,7 @@ class PodcastRepository(private val query: DSLContext) {
             return null
         }
 
-        return DeletePodcastRequest(podcast[PODCAST.ID], podcast[PODCAST.TITLE])
+        return DeleteRequest.ForPodcast(podcast[PODCAST.ID], podcast[PODCAST.TITLE])
     }
 }
 

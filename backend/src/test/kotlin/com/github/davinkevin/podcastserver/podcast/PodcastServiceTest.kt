@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.podcast
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.cover.CoverRepository
+import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.service.storage.MovePodcastRequest
 import com.github.davinkevin.podcastserver.tag.Tag
@@ -716,15 +717,15 @@ class PodcastServiceTest(
         fun `a podcast which has to be deleted`() {
             /* Given */
             val id = UUID.randomUUID()
-            val information = DeletePodcastRequest(id, "foo")
+            val information = DeleteRequest.ForPodcast(id, "foo")
             whenever(repository.deleteById(id)).thenReturn(information)
-            whenever(fileService.deletePodcast(information)).thenReturn(true)
+            whenever(fileService.delete(information)).thenReturn(true)
 
             /* When */
             service.deleteById(id)
 
             /* Then */
-            verify(fileService).deletePodcast(information)
+            verify(fileService).delete(information)
         }
 
         @Test
@@ -737,7 +738,7 @@ class PodcastServiceTest(
             service.deleteById(id)
 
             /* Then */
-            verify(fileService, never()).deletePodcast(any())
+            verify(fileService, never()).delete(any())
         }
     }
 }

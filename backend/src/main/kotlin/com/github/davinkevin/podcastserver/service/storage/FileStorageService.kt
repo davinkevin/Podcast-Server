@@ -1,11 +1,8 @@
 package com.github.davinkevin.podcastserver.service.storage
 
 import com.github.davinkevin.podcastserver.cover.Cover
-import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest
 import com.github.davinkevin.podcastserver.extension.java.net.extension
-import com.github.davinkevin.podcastserver.item.DeleteItemRequest
 import com.github.davinkevin.podcastserver.item.Item
-import com.github.davinkevin.podcastserver.podcast.DeletePodcastRequest
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
@@ -35,14 +32,26 @@ class FileStorageService(
     private val bucket: S3AsyncClient,
     private val preSignerBuilder: (URI) -> S3Presigner,
     private val properties: StorageProperties,
-): CoverExists, ToExternalUrl {
+): CoverExists, ToExternalUrl, DeleteObject {
 
     private val log = LoggerFactory.getLogger(FileStorageService::class.java)
 
-    fun deletePodcast(podcast: DeletePodcastRequest): Boolean {
-        log.info("Deletion of podcast {}", podcast.title)
+    override fun delete(request: DeleteRequest): Boolean {
+        return when(request) {
+            is DeleteRequest.ForItem -> deleteObject("${request.podcastTitle}/${request.fileName}")
+            is DeleteRequest.ForCover -> deleteObject("${request.podcast.title}/${request.item.id}.${request.extension}")
+            is DeleteRequest.ForPodcast -> deleteAllInside(request.title)
+        }
+    }
 
-        val result = bucket.listObjects { it.bucket(properties.bucket).prefix(podcast.title) }
+    private fun deleteObject(path: String): Boolean {
+        return bucket.deleteObject { it.bucket(properties.bucket).key(path) }
+            .runCatching { join() }
+            .isSuccess
+    }
+
+    private fun deleteAllInside(path: String): Boolean {
+        val result = bucket.listObjects { it.bucket(properties.bucket).prefix(path) }
             .runCatching { join() }
             .getOrNull() ?: return false
 
@@ -51,26 +60,6 @@ class FileStorageService(
             .map { bucket.deleteObject(it.toDeleteRequest()) }
             .map { it.runCatching { join() } }
             .all { it.isSuccess }
-    }
-
-    fun deleteItem(item: DeleteItemRequest): Boolean {
-        val path = "${item.podcastTitle}/${item.fileName}"
-
-        log.info("Deletion of file {}", path)
-
-        return bucket.deleteObject { it.bucket(properties.bucket).key(path) }
-            .runCatching { join() }
-            .isSuccess
-    }
-
-    fun deleteCover(cover: DeleteCoverRequest): Boolean {
-        val path = "${cover.podcast.title}/${cover.item.id}.${cover.extension}"
-
-        log.info("Deletion of file {}", path)
-
-        return bucket.deleteObject { it.bucket(properties.bucket).key(path) }
-            .runCatching { join() }
-            .isSuccess
     }
 
     override fun coverExists(r: CoverExistsRequest): Path? {

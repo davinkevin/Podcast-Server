@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.database.tables.records.CoverRecord
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.fromDb
 import com.github.davinkevin.podcastserver.entity.toDb
+import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import org.jooq.*
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
@@ -45,7 +46,7 @@ class ItemRepository(private val query: DSLContext) {
             .map(::toItem)
     }
 
-    fun findAllToDelete(date: OffsetDateTime): List<DeleteItemRequest> {
+    fun findAllToDelete(date: OffsetDateTime): List<DeleteRequest.ForItem> {
         return query
             .select(ITEM.ID, ITEM.FILE_NAME, PODCAST.TITLE)
             .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
@@ -54,10 +55,10 @@ class ItemRepository(private val query: DSLContext) {
             .and(PODCAST.HAS_TO_BE_DELETED.isTrue)
             .and(ITEM.ID.notIn(query.select(PLAYLIST_ITEMS.ITEMS_ID).from(PLAYLIST_ITEMS)))
             .fetch()
-            .map { DeleteItemRequest(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
+            .map { DeleteRequest.ForItem(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
     }
 
-    fun deleteById(id: UUID): DeleteItemRequest? {
+    fun deleteById(id: UUID): DeleteRequest.ForItem? {
         query
             .delete(PLAYLIST_ITEMS)
             .where(PLAYLIST_ITEMS.ITEMS_ID.eq(id))
@@ -75,7 +76,7 @@ class ItemRepository(private val query: DSLContext) {
         return result
             .filter { it[PODCAST.HAS_TO_BE_DELETED] }
             .filter { it[ITEM.STATUS] == FINISH }
-            .map { DeleteItemRequest(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
+            .map { DeleteRequest.ForItem(it[ITEM.ID], it[ITEM.FILE_NAME], it[PODCAST.TITLE]) }
             .firstOrNull()
     }
 

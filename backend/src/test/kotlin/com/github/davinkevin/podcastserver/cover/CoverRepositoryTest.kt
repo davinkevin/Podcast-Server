@@ -1,10 +1,9 @@
 package com.github.davinkevin.podcastserver.cover
 
-import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Item
-import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Podcast
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
+import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.insertInto
@@ -196,47 +195,47 @@ class CoverRepositoryTest(
             val covers = repository.findCoverOlderThan(now().minusDays(1))
             /* Then */
             assertThat(covers).containsExactly(
-                DeleteCoverRequest(
+                DeleteRequest.ForCover(
                     id=fromString("1ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
                     extension="png",
-                    item=Item(id= fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), title="Appload 1"),
-                    podcast=Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
+                    item=DeleteRequest.ForCover.Item(id= fromString("e3d41c71-37fb-4c23-a207-5fb362fa15bb"), title="Appload 1"),
+                    podcast=DeleteRequest.ForCover.Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
                 ),
-                DeleteCoverRequest(
+                DeleteRequest.ForCover(
                     id=fromString("1f050dc4-6a2e-46c3-8276-43098c011e68"),
                     extension="png",
-                    item=Item(id= fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"), title="Geek INC 123"),
-                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
+                    item=DeleteRequest.ForCover.Item(id= fromString("b721a6b6-896a-48fc-b820-28aeafddbb53"), title="Geek INC 123"),
+                    podcast=DeleteRequest.ForCover.Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
                 ),
-                DeleteCoverRequest(
+                DeleteRequest.ForCover(
                     id=fromString("2ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
                     extension="png",
-                    item=Item(id= fromString("817a4626-6fd2-457e-8d27-69ea5acdc828"), title="Appload 2"),
-                    podcast=Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
+                    item=DeleteRequest.ForCover.Item(id= fromString("817a4626-6fd2-457e-8d27-69ea5acdc828"), title="Appload 2"),
+                    podcast=DeleteRequest.ForCover.Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
                 ),
-                DeleteCoverRequest(
+                DeleteRequest.ForCover(
                     id=fromString("2f050dc4-6a2e-46c3-8276-43098c011e68"),
                     extension="png",
-                    item=Item(id= fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), title="Geek INC 124"),
-                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
+                    item=DeleteRequest.ForCover.Item(id= fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"), title="Geek INC 124"),
+                    podcast=DeleteRequest.ForCover.Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
                 ),
-                DeleteCoverRequest(
+                DeleteRequest.ForCover(
                     id=fromString("3ea0373e-7af6-4e15-b0fd-9ec4b10822ec"),
                     extension="png",
-                    item=Item(id= fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), title="Appload 3"),
-                    podcast=Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
+                    item=DeleteRequest.ForCover.Item(id= fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"), title="Appload 3"),
+                    podcast=DeleteRequest.ForCover.Podcast(id= fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"), title="AppLoad")
                 ),
-                DeleteCoverRequest(
+                DeleteRequest.ForCover(
                     id=fromString("3f050dc4-6a2e-46c3-8276-43098c011e68"),
                     extension="png",
-                    item=Item(id= fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"), title="Geek INC 122"),
-                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
+                    item=DeleteRequest.ForCover.Item(id= fromString("0a774611-c867-44df-b7e0-5e5af31f7b56"), title="Geek INC 122"),
+                    podcast=DeleteRequest.ForCover.Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
                 ),
-                DeleteCoverRequest(
+                DeleteRequest.ForCover(
                     id=fromString("4f050dc4-6a2e-46c3-8276-43098c011e68"),
                     extension="png",
-                    item=Item(id= fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"), title="Geek INC 126"),
-                    podcast=Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
+                    item=DeleteRequest.ForCover.Item(id= fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"), title="Geek INC 126"),
+                    podcast=DeleteRequest.ForCover.Podcast(id= fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"), title="Geek Inc HD")
                 ),
             )
         }

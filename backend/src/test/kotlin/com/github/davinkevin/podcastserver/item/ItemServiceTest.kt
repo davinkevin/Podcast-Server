@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.entity.Status.FINISH
 import com.github.davinkevin.podcastserver.entity.Status.NOT_DOWNLOADED
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
+import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.assertj.core.api.Assertions.assertThat
@@ -77,12 +78,12 @@ class ItemServiceTest(
         /* Given */
         val limit = OffsetDateTime.now().minusDays(30)
         val items = listOf(
-                DeleteItemRequest(UUID.fromString("2e7d6cc7-c3ed-47d1-866f-7f797624124d"), Path("foo"), "bar"),
-                DeleteItemRequest(UUID.fromString("dca41d0b-a59c-43fa-8d2d-2129fb637546"), Path("num1"), "num2"),
-                DeleteItemRequest(UUID.fromString("40430ce3-b421-4c82-b34d-2deb4c46b1cd"), Path("itemT"), "podcastT")
+                DeleteRequest.ForItem(UUID.fromString("2e7d6cc7-c3ed-47d1-866f-7f797624124d"), Path("foo"), "bar"),
+                DeleteRequest.ForItem(UUID.fromString("dca41d0b-a59c-43fa-8d2d-2129fb637546"), Path("num1"), "num2"),
+                DeleteRequest.ForItem(UUID.fromString("40430ce3-b421-4c82-b34d-2deb4c46b1cd"), Path("itemT"), "podcastT")
         )
         whenever(repository.findAllToDelete(limit)).thenReturn(items)
-        whenever(fileService.deleteItem(any())).thenReturn(true)
+        whenever(fileService.delete(any())).thenReturn(true)
         doNothing().whenever(repository).updateAsDeleted(any())
 
         /* When */
@@ -91,7 +92,7 @@ class ItemServiceTest(
         /* Then */
         val ids = items.map { it.id }
         verify(repository).findAllToDelete(limit)
-        verify(fileService, times(3)).deleteItem(argWhere { it in items })
+        verify(fileService, times(3)).delete(argWhere { it in items })
         verify(repository).updateAsDeleted(argWhere { it == ids })
     }
 
@@ -125,7 +126,7 @@ class ItemServiceTest(
             assertThat(resetItem).isSameAs(item)
             verify(repository, never()).hasToBeDeleted(any())
             verify(repository, never()).resetById(any<UUID>())
-            verify(fileService, never()).deleteItem(any())
+            verify(fileService, never()).delete(any())
         }
 
         @Test
@@ -141,7 +142,7 @@ class ItemServiceTest(
             /* Then */
             assertThat(resetItem).isSameAs(item)
             verify(repository, never()).resetById(any<UUID>())
-            verify(fileService, never()).deleteItem(any())
+            verify(fileService, never()).delete(any())
         }
 
         @Test
@@ -157,7 +158,7 @@ class ItemServiceTest(
 
             /* Then */
             assertThat(resetItem).isSameAs(item)
-            verify(fileService, never()).deleteItem(any())
+            verify(fileService, never()).delete(any())
         }
 
         @Test
@@ -174,7 +175,7 @@ class ItemServiceTest(
 
             /* Then */
             assertThat(resetItem).isSameAs(item)
-            verify(fileService, never()).deleteItem(any())
+            verify(fileService, never()).delete(any())
         }
 
         @Test
@@ -191,30 +192,27 @@ class ItemServiceTest(
 
             /* Then */
             assertThat(resetItem).isSameAs(item)
-            verify(fileService, never()).deleteItem(any())
+            verify(fileService, never()).delete(any())
         }
 
         @Test
         fun `and delete files`() {
             /* Given */
             val currentItem = item.copy(status = FINISH, fileName = Path("foo.mp4"))
-            val deleteItemInformation = DeleteItemRequest(currentItem.id, currentItem.fileName!!, currentItem.podcast.title)
+            val deleteItemInformation = DeleteRequest.ForItem(currentItem.id, currentItem.fileName!!, currentItem.podcast.title)
             whenever(repository.resetById(item.id)).thenReturn(item)
             whenever(idm.isInDownloadingQueueById(item.id)).thenReturn(false)
             whenever(repository.hasToBeDeleted(item.id)).thenReturn(true)
             whenever(repository.findById(item.id)).thenReturn(currentItem)
-            whenever(fileService.deleteItem(deleteItemInformation)).thenReturn(true)
+            whenever(fileService.delete(deleteItemInformation)).thenReturn(true)
 
             /* When */
             val resetItem = itemService.reset(item.id)!!
 
             /* Then */
             assertThat(resetItem).isSameAs(item)
-            verify(fileService).deleteItem(deleteItemInformation)
+            verify(fileService).delete(deleteItemInformation)
         }
-
-
-
     }
 
     @Nested
@@ -316,23 +314,23 @@ class ItemServiceTest(
             itemService.deleteById(id)
 
             /* Then */
-            verify(fileService, never()).deleteItem(any())
+            verify(fileService, never()).delete(any())
         }
 
         @Test
         fun `an item which should be deleted from disk`() {
             /* Given */
             val id = UUID.randomUUID()
-            val deleteItem = DeleteItemRequest(id, Path("foo"), "bar")
+            val deleteItem = DeleteRequest.ForItem(id, Path("foo"), "bar")
             whenever(repository.deleteById(id)).thenReturn(deleteItem)
-            whenever(fileService.deleteItem(deleteItem)).thenReturn(true)
+            whenever(fileService.delete(deleteItem)).thenReturn(true)
             doNothing().whenever(idm).removeItemFromQueueAndDownload(id)
 
             /* When */
             itemService.deleteById(id)
 
             /* Then */
-            verify(fileService).deleteItem(deleteItem)
+            verify(fileService).delete(deleteItem)
         }
     }
 

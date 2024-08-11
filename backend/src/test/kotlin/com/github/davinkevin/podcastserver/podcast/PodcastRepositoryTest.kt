@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
+import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.tag.Tag
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
@@ -674,7 +675,7 @@ class PodcastRepositoryTest(
             val deletionRequest = repository.deleteById(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"))
 
             /* Then */
-            assertThat(deletionRequest).isEqualTo(DeletePodcastRequest(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD"))
+            assertThat(deletionRequest).isEqualTo(DeleteRequest.ForPodcast(fromString("ef85dcd3-758c-473f-a8fc-b82104762d9d"), "Geek Inc HD"))
         }
 
         @Test

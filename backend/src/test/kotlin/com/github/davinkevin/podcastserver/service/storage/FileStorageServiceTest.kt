@@ -1,14 +1,10 @@
 package com.github.davinkevin.podcastserver.service.storage
 
 import com.github.davinkevin.podcastserver.cover.Cover
-import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest
-import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.*
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.fileAsByteArray
-import com.github.davinkevin.podcastserver.item.DeleteItemRequest
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.toCoverExistsRequest
-import com.github.davinkevin.podcastserver.podcast.DeletePodcastRequest
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.podcast.toCoverExistsRequest
 import com.github.davinkevin.podcastserver.tag.Tag
@@ -66,7 +62,7 @@ class FileStorageServiceTest(
     @DisplayName("should delete podcast")
     inner class ShouldDeletePodcast {
 
-        val request = DeletePodcastRequest(id = UUID.randomUUID(), title = "podcast-title")
+        val request = DeleteRequest.ForPodcast(id = UUID.randomUUID(), title = "podcast-title")
 
         @Test
         fun `with success`() {
@@ -88,7 +84,7 @@ class FileStorageServiceTest(
             s3Backend.stubFor(delete("/data/podcast-title/second.mp3").willReturn(ok()))
 
             /* When */
-            val result = fileService.deletePodcast(request)
+            val result = fileService.delete(request)
 
             /* Then */
             assertThat(result).isTrue()
@@ -114,7 +110,7 @@ class FileStorageServiceTest(
             s3Backend.stubFor(delete("/data/podcast-title/second.mp3").willReturn(notFound()))
 
             /* When */
-            val result = fileService.deletePodcast(request)
+            val result = fileService.delete(request)
 
             /* Then */
             assertThat(result).isFalse()
@@ -126,7 +122,7 @@ class FileStorageServiceTest(
             s3Backend.stubFor(get("/data?prefix=podcast-title").willReturn(notFound()))
 
             /* When */
-            val result = fileService.deletePodcast(request)
+            val result = fileService.delete(request)
 
             /* Then */
             assertThat(result).isFalse()
@@ -138,7 +134,7 @@ class FileStorageServiceTest(
     @DisplayName("should delete item file")
     inner class ShouldDeleteItemFile {
 
-        val request = DeleteItemRequest(UUID.randomUUID(), Path("foo.txt"), "podcast-title")
+        val request = DeleteRequest.ForItem(UUID.randomUUID(), Path("foo.txt"), "podcast-title")
 
         @Test
         fun `with success`() {
@@ -146,7 +142,7 @@ class FileStorageServiceTest(
             s3Backend.stubFor(delete("/data/podcast-title/foo.txt").willReturn(ok()))
 
             /* When */
-            val isDeleted = fileService.deleteItem(request)
+            val isDeleted = fileService.delete(request)
 
             /* Then */
             assertThat(isDeleted).isTrue()
@@ -158,7 +154,7 @@ class FileStorageServiceTest(
             s3Backend.stubFor(delete("/data/podcast-title/foo.txt").willReturn(notFound()))
 
             /* When */
-            val isDeleted = fileService.deleteItem(request)
+            val isDeleted = fileService.delete(request)
 
             /* Then */
             assertThat(isDeleted).isFalse()
@@ -169,20 +165,22 @@ class FileStorageServiceTest(
     @DisplayName("should delete cover")
     inner class ShouldDeleteCover {
 
-        private val request = DeleteCoverRequest(
+        private val request = DeleteRequest.ForCover(
             UUID.randomUUID(), "png",
-            Item(UUID.fromString("4ab252dc-1cf4-4f60-ba18-1d91d1917ee6"), "foo"),
-            Podcast(UUID.randomUUID(), "podcast-title")
+            DeleteRequest.ForCover.Item(UUID.fromString("4ab252dc-1cf4-4f60-ba18-1d91d1917ee6"), "foo"),
+            DeleteRequest.ForCover.Podcast(UUID.randomUUID(), "podcast-title")
         )
 
         @Test
         fun `with success`() {
             /* Given */
-            s3Backend.stubFor(delete("/data/podcast-title/4ab252dc-1cf4-4f60-ba18-1d91d1917ee6.png")
-                .willReturn(ok()))
+            s3Backend.stubFor(
+                delete("/data/podcast-title/4ab252dc-1cf4-4f60-ba18-1d91d1917ee6.png")
+                    .willReturn(ok())
+            )
 
             /* When */
-            val isDeleted = fileService.deleteCover(request)
+            val isDeleted = fileService.delete(request)
 
             /* Then */
             assertThat(isDeleted).isTrue()
@@ -191,11 +189,13 @@ class FileStorageServiceTest(
         @Test
         fun `with error`() {
             /* Given */
-            s3Backend.stubFor(delete("/data/podcast-title/4ab252dc-1cf4-4f60-ba18-1d91d1917ee6.png")
-                .willReturn(notFound()))
+            s3Backend.stubFor(
+                delete("/data/podcast-title/4ab252dc-1cf4-4f60-ba18-1d91d1917ee6.png")
+                    .willReturn(notFound())
+            )
 
             /* When */
-            val isDeleted = fileService.deleteCover(request)
+            val isDeleted = fileService.delete(request)
 
             /* Then */
             assertThat(isDeleted).isFalse()

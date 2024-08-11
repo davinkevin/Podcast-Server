@@ -98,7 +98,7 @@ class PodcastService(
     fun deleteById(id: UUID) {
         val request = repository.deleteById(id) ?: return
 
-        fileService.deletePodcast(request)
+        fileService.delete(request)
     }
 }
 

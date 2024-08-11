@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
+import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.slf4j.LoggerFactory
 import java.nio.file.Paths
@@ -35,7 +36,7 @@ class ItemService(
         log.info("Deletion of items older than {}", date)
         val items = repository.findAllToDelete(date)
 
-        items.forEach { file.deleteItem(it) }
+        items.forEach { file.delete(it) }
 
         repository.updateAsDeleted(items.map { it.id })
     }
@@ -57,7 +58,7 @@ class ItemService(
             ?: return null
 
         if (item.isDownloaded() && item.fileName != Path("")) {
-            file.deleteItem(DeleteItemRequest(item.id, item.fileName!!, item.podcast.title))
+            file.delete(DeleteRequest.ForItem(item.id, item.fileName!!, item.podcast.title))
         }
 
         return repository.resetById(id)!!
@@ -129,7 +130,7 @@ class ItemService(
         val item = repository.deleteById(itemId)
 
         if (item !== null) {
-            file.deleteItem(item)
+            file.delete(item)
         }
     }
 }

@@ -1,10 +1,9 @@
 package com.github.davinkevin.podcastserver.cover
 
-import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Item
-import com.github.davinkevin.podcastserver.cover.DeleteCoverRequest.Podcast
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
 import com.github.davinkevin.podcastserver.database.Tables.PODCAST
 import com.github.davinkevin.podcastserver.database.tables.Cover.COVER
+import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import org.jooq.DSLContext
 import java.net.URI
 import java.time.OffsetDateTime
@@ -27,7 +26,7 @@ class CoverRepository(private val query: DSLContext) {
         return Cover(id, cover.url, cover.height, cover.width)
     }
 
-    fun findCoverOlderThan(date: OffsetDateTime): List<DeleteCoverRequest> {
+    fun findCoverOlderThan(date: OffsetDateTime): List<DeleteRequest.ForCover> {
         return query
             .select(
                 PODCAST.ID, PODCAST.TITLE,
@@ -43,18 +42,14 @@ class CoverRepository(private val query: DSLContext) {
             .orderBy(COVER.ID.asc())
             .fetch()
             .map { (podcastId, podcastTitle, itemId, itemTitle, coverId, coverUrl) ->
-                DeleteCoverRequest(
+                DeleteRequest.ForCover(
                     id = coverId,
                     extension = Path(coverUrl).extension,
-                    item = Item(itemId, itemTitle),
-                    podcast = Podcast(podcastId, podcastTitle)
+                    item = DeleteRequest.ForCover.Item(itemId, itemTitle),
+                    podcast = DeleteRequest.ForCover.Podcast(podcastId, podcastTitle)
                 )
             }
     }
 }
 
 data class CoverForCreation(val width: Int, val height: Int, val url: URI)
-data class DeleteCoverRequest(val id: UUID, val extension: String, val item: Item, val podcast: Podcast) {
-    data class Item(val id: UUID, val title: String)
-    data class Podcast(val id: UUID, val title: String)
-}
