@@ -11,6 +11,7 @@ import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
+import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -412,10 +413,10 @@ class ItemServiceTest(
 
             whenever(file.filename).thenReturn(fileName)
             whenever(file.inputStream).thenReturn(fileStream)
-            val uploadRequest = FileStorageService.UploadFromStreamRequest(
+            val uploadRequest = UploadRequest.ForItemFromStream(
                 podcastTitle = podcast.title,
                 fileName = normalizedFileName,
-                stream = fileStream
+                content = fileStream
             )
             doNothing().whenever(fileService).upload(uploadRequest)
 

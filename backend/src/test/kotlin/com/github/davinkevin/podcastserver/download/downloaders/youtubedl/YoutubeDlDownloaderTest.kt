@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
+import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
 import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLResponse
 import org.assertj.core.api.Assertions.assertThat
@@ -28,7 +29,6 @@ import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
-import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
@@ -96,8 +96,7 @@ class YoutubeDlDownloaderTest(
             Mockito.reset(template, youtube, idm)
             downloader.itemDownloadManager = idm
 
-            whenever(file.upload(eq(dItem.item.podcast.title), any()))
-                .thenReturn(PutObjectResponse.builder().build())
+            doNothing().whenever(file).upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == dItem.item.podcast.title })
             whenever(file.metadata(eq(dItem.item.podcast.title), any())).thenReturn(FileMetaData("foo/bar", 123L))
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
             whenever(downloadRepository.finishDownload(any(), any(), anyOrNull(), any(), any()))
@@ -122,7 +121,7 @@ class YoutubeDlDownloaderTest(
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
-                verify(file).upload(dItem.item.podcast.title, finalFile)
+                verify(file).upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == dItem.item.podcast.title && content == finalFile })
                 verify(file).metadata(dItem.item.podcast.title, finalFile)
             }
         }

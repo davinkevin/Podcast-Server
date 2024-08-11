@@ -7,6 +7,7 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
+import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import org.slf4j.LoggerFactory
 import java.nio.file.Paths
 import java.time.*
@@ -82,10 +83,10 @@ class ItemService(
             .replace("[^a-zA-Z0-9.-]".toRegex(), "_")
             .let(Paths::get)
 
-        val uploadRequest = FileStorageService.UploadFromStreamRequest(
+        val uploadRequest = UploadRequest.ForItemFromStream(
             podcastTitle = podcast.title,
             fileName = filename,
-            stream = uploadedFile.inputStream,
+            content = uploadedFile.inputStream,
         )
         file.upload(uploadRequest)
 

@@ -3,12 +3,14 @@ package com.github.davinkevin.podcastserver.update
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemForCreation
 import com.github.davinkevin.podcastserver.item.ItemRepository
 import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.image.ImageService
+import com.github.davinkevin.podcastserver.service.storage.DownloadAndUploadRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
@@ -112,10 +114,12 @@ class UpdateService(
             return
         }
 
-        createdItems.forEach { item ->
-            runCatching { fileService.downloadItemCover(item) }
-                .onFailure { log.error("Error during download of cover ${item.cover.url}") }
-        }
+        createdItems
+            .map { it.toCoverUploadRequest() }
+            .forEach { item ->
+                runCatching { fileService.downloadAndUpload(item) }
+                    .onFailure { log.error("Error during download of cover ${item.coverUrl}") }
+            }
 
         podcastRepository.updateLastUpdate(podcast.id)
     }
@@ -144,7 +148,11 @@ private fun ItemFromUpdate.toCreation(podcastId: UUID): ItemForCreation {
 }
 
 private fun ItemFromUpdate.Cover.toCreation() = CoverForCreation(width, height, url)
-
+internal fun Item.toCoverUploadRequest() = DownloadAndUploadRequest.ForItemCover(
+    id = id,
+    coverUrl = cover.url,
+    podcastTitle = podcast.title
+)
 fun ImageService.fetchCoverUpdateInformation(url: URI): ItemFromUpdate.Cover? {
     val coverInformation = fetchCoverInformation(url)
         ?: return null

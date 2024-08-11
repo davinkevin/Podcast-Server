@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
+import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
 import java.nio.file.Path
@@ -76,7 +77,7 @@ abstract class AbstractDownloader(
     }
 
     private fun finishDownloadSync() = runCatching {
-        file.upload(downloadingInformation.item.podcast.title, target)
+        file.upload(UploadRequest.ForItemFromPath(downloadingInformation.item.podcast.title, target))
 
         val (mimeType, size) = file.metadata(downloadingInformation.item.podcast.title, target)
             ?: return@runCatching

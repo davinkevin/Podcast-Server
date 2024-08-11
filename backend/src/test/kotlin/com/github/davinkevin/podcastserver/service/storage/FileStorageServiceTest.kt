@@ -7,7 +7,9 @@ import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.toCoverExistsRequest
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.podcast.toCoverExistsRequest
+import com.github.davinkevin.podcastserver.podcast.toUploadCoverRequest
 import com.github.davinkevin.podcastserver.tag.Tag
+import com.github.davinkevin.podcastserver.update.toCoverUploadRequest
 import com.github.tomakehurst.wiremock.client.WireMock.*
 import com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 import com.github.tomakehurst.wiremock.http.RequestMethod
@@ -20,10 +22,14 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.api.extension.RegisterExtension
 import org.junit.jupiter.api.io.TempDir
+import org.junit.jupiter.params.ParameterizedTest
+import org.junit.jupiter.params.provider.Arguments
+import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
 import org.springframework.context.annotation.Import
+import org.springframework.core.io.ByteArrayResource
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.DigestUtils
@@ -35,9 +41,9 @@ import java.nio.file.Paths
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
+import java.util.stream.Stream
 import kotlin.io.path.Path
 import kotlin.io.path.inputStream
-import kotlin.io.path.writeText
 
 /**
  * Created by kevin on 2019-02-12
@@ -389,10 +395,15 @@ class FileStorageServiceTest(
                 s3Backend.stubFor(put("/data/podcast-title/dd16b2eb-657e-4064-b470-5b99397ce729.png").willReturn(ok()))
 
                 /* When */
-                fileService.downloadPodcastCover(podcast)
+                fileService.downloadAndUpload(podcast.toUploadCoverRequest())
 
                 /* Then */
-                val bodyDigest = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlEqualTo("/data/podcast-title/dd16b2eb-657e-4064-b470-5b99397ce729.png")))
+                val bodyDigest = s3Backend.findAll(
+                    newRequestPattern(
+                        RequestMethod.PUT,
+                        urlEqualTo("/data/podcast-title/dd16b2eb-657e-4064-b470-5b99397ce729.png")
+                    )
+                )
                     .first().body
                     .let(DigestUtils::md5DigestAsHex)
 
@@ -436,12 +447,48 @@ class FileStorageServiceTest(
             fun `and save it in podcast folder with specific name`() {
                 /* Given */
                 val urlInBucket = "/data/podcast-title/f47421c2-f7fd-480a-b266-635a97c301dd.png"
-                externalBackend.stubFor(get("/img/image.png")
-                    .willReturn(ok().withBody(fileAsByteArray("/__files/img/image.png"))))
+                externalBackend.stubFor(
+                    get("/img/image.png")
+                        .willReturn(ok().withBody(fileAsByteArray("/__files/img/image.png")))
+                )
                 s3Backend.stubFor(put(urlInBucket).willReturn(ok()))
 
                 /* When */
-                fileService.downloadItemCover(item)
+                fileService.downloadAndUpload(item.toCoverUploadRequest())
+
+                /* Then */
+                val bodyDigest = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlEqualTo(urlInBucket)))
+                    .first().body
+                    .let(DigestUtils::md5DigestAsHex)
+
+                assertThat(bodyDigest).isEqualTo("1cc21d3dce8bfedbda2d867a3238e8db")
+            }
+
+        }
+
+        @Nested
+        @DisplayName("for item")
+        inner class ForPlaylist {
+
+            @Test
+            fun `and save it in playlist folder with playlist name`() {
+                /* Given */
+                val request = DownloadAndUploadRequest.ForPlaylistCover(
+                    name = "playlist-title",
+                    cover = DownloadAndUploadRequest.ForPlaylistCover.Cover(
+                        id = UUID.fromString("d570742e-8a0b-4710-bdd1-ad98c9c67567"),
+                        url = URI("http://localhost:8089/img/image.png")
+                    )
+                )
+                externalBackend.stubFor(
+                    get("/img/image.png")
+                        .willReturn(ok().withBody(fileAsByteArray("/__files/img/image.png")))
+                )
+                val urlInBucket = "/data/.playlist/playlist-title/d570742e-8a0b-4710-bdd1-ad98c9c67567.png"
+                s3Backend.stubFor(put(urlInBucket).willReturn(ok()))
+
+                /* When */
+                fileService.downloadAndUpload(request)
 
                 /* Then */
                 val bodyDigest = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlEqualTo(urlInBucket)))
@@ -509,68 +556,71 @@ class FileStorageServiceTest(
     }
 
     @Nested
-    @DisplayName("should upload Path")
-    inner class ShouldUploadPath {
+    @DisplayName("should upload byteStream or path")
+    inner class ShouldUploadByteStreamOrPath {
 
-        @Test
-        fun `with success`(@TempDir dir: Path) {
+        @DisplayName("with success")
+        @MethodSource("com.github.davinkevin.podcastserver.service.storage.FileStorageServiceTest#uploadRequest")
+        @ParameterizedTest(name = "when request is {0}")
+        fun `with success`(request: UploadRequest) {
             /* Given */
-            val file = dir.resolve("toUpload.txt").apply { writeText("text is here !") }
-            s3Backend.stubFor(put("/data/podcast-title/toUpload.txt").willReturn(ok()))
+            s3Backend.stubFor(put(urlMatching("/data/foo/bar.*txt")).willReturn(ok()))
 
             /* When */
-            val result = fileService.upload("podcast-title", file)
+            val result = fileService.upload(request)
 
             /* Then */
             assertThat(result).isNotNull()
 
             /* And */
-            val allRequests = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlEqualTo("/data/podcast-title/toUpload.txt")))
+            val allRequests = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlMatching("/data/foo/bar.*txt")))
             assertThat(allRequests).hasSize(1)
 
             /* And */
             val textContent = allRequests.first().body.decodeToString()
-            assertThat(textContent).isEqualTo("text is here !")
+            assertThat(textContent).isEqualTo("Foo")
         }
 
-        @Test
-        fun `with success after second retry`(@TempDir dir: Path) {
+        @DisplayName("with success after second retry")
+        @MethodSource("com.github.davinkevin.podcastserver.service.storage.FileStorageServiceTest#uploadRequest")
+        @ParameterizedTest(name = "when request is {0}")
+        fun `with success after second retry`(request: UploadRequest) {
             /* Given */
-            val file = dir.resolve("toUpload.txt").apply { writeText("text is here !") }
             s3Backend.apply {
-                stubFor(put("/data/podcast-title/toUpload.txt").willReturn(badRequest()))
-                stubFor(put("/data/podcast-title/toUpload.txt").willReturn(ok()))
+                stubFor(put(urlMatching("/data/foo/bar.*txt")).willReturn(badRequest()))
+                stubFor(put(urlMatching("/data/foo/bar.*txt")).willReturn(ok()))
             }
 
             /* When */
-            val result = fileService.upload("podcast-title", file)
+            val result = fileService.upload(request)
 
             /* Then */
             assertThat(result).isNotNull()
 
-            val textContent = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlEqualTo("/data/podcast-title/toUpload.txt")))
+            val textContent = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlMatching("/data/foo/bar.*txt")))
                 .first().body
                 .decodeToString()
 
-            assertThat(textContent).isEqualTo("text is here !")
+            assertThat(textContent).isEqualTo("Foo")
         }
 
-        @Test
-        fun `with failure after all retries`(@TempDir dir: Path) {
+        @DisplayName("with failure after all retries")
+        @MethodSource("com.github.davinkevin.podcastserver.service.storage.FileStorageServiceTest#uploadRequest")
+        @ParameterizedTest(name = "when request is {0}")
+        fun `with failure after all retries`(request: UploadRequest) {
             /* Given */
-            val file = dir.resolve("toUpload.txt").apply { writeText("text is here !") }
             s3Backend.apply {
-                stubFor(put("/data/podcast-title/toUpload.txt").willReturn(badRequest()))
-                stubFor(put("/data/podcast-title/toUpload.txt").willReturn(badRequest()))
-                stubFor(put("/data/podcast-title/toUpload.txt").willReturn(badRequest()))
-                stubFor(put("/data/podcast-title/toUpload.txt").willReturn(badRequest()))
+                stubFor(put(urlMatching("/data/foo/bar.*txt")).willReturn(badRequest()))
+                stubFor(put(urlMatching("/data/foo/bar.*txt")).willReturn(badRequest()))
+                stubFor(put(urlMatching("/data/foo/bar.*txt")).willReturn(badRequest()))
+                stubFor(put(urlMatching("/data/foo/bar.*txt")).willReturn(badRequest()))
             }
 
             /* When */
-            val result = fileService.upload("podcast-title", file)
+            fileService.upload(request)
 
             /* Then */
-            assertThat(result).isNull()
+            // no exception are thrown, system just ignore the upload
         }
     }
 
@@ -586,10 +636,10 @@ class FileStorageServiceTest(
             s3Backend.stubFor(put("/data/podcast-title/toUpload.txt").willReturn(ok()))
 
             /* And */
-            val request = FileStorageService.UploadFromStreamRequest(
+            val request = UploadRequest.ForItemFromStream(
                 podcastTitle = "podcast-title",
                 fileName = file.fileName,
-                stream = file.inputStream()
+                content = file.inputStream()
             )
 
             /* When */
@@ -599,7 +649,6 @@ class FileStorageServiceTest(
             val wiremockRequest = s3Backend.findAll(newRequestPattern(RequestMethod.PUT, urlEqualTo("/data/podcast-title/toUpload.txt")))
             assertThat(wiremockRequest).isNotEmpty
         }
-
     }
 
     @Nested
@@ -804,5 +853,14 @@ class FileStorageServiceTest(
                 //.notifier(ConsoleNotifier(true))
             )
             .build()
+
+        @JvmStatic
+        fun uploadRequest(): Stream<Arguments> =
+            Stream.of(
+                Arguments.of(UploadRequest.ForPlaylistCover(Path("foo/bar.txt"), ByteArrayResource("Foo".toByteArray()))),
+                Arguments.of(UploadRequest.ForPodcastCover(Path("foo/bar.txt"), ByteArrayResource("Foo".toByteArray()))),
+                Arguments.of(UploadRequest.ForItemCover(Path("foo/bar.txt"), ByteArrayResource("Foo".toByteArray()))),
+                Arguments.of(UploadRequest.ForItemFromPath("foo", Files.createTempFile("bar", ".txt").let { Files.write(it, "Foo".toByteArray()) } ))
+            )
     }
 }

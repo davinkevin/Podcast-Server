@@ -11,6 +11,7 @@ import com.github.davinkevin.podcastserver.service.ffmpeg.FfmpegService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
+import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import net.bramp.ffmpeg.builder.FFmpegBuilder
 import net.bramp.ffmpeg.progress.Progress
 import net.bramp.ffmpeg.progress.ProgressListener
@@ -25,7 +26,6 @@ import org.mockito.Spy
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
-import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
@@ -109,8 +109,7 @@ class FfmpegDownloaderTest {
                 whenever(processService.waitFor(any())).thenReturn(Result.success(1))
                 doAnswer { writeEmptyFileTo(it.getArgument<Path>(0).toString()); null
                 }.whenever(ffmpegService).concat(any(), anyVararg())
-                whenever(file.upload(eq(item.podcast.title), any()))
-                    .thenReturn(PutObjectResponse.builder().build())
+                doNothing().whenever(file).upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == item.podcast.title })
                 whenever(file.metadata(eq(item.podcast.title), any()))
                     .thenReturn(FileMetaData("video/mp4", 123L))
                 whenever(downloadRepository.finishDownload(

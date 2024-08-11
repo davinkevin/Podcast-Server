@@ -1,9 +1,5 @@
 package com.github.davinkevin.podcastserver.service.storage
 
-import com.github.davinkevin.podcastserver.cover.Cover
-import com.github.davinkevin.podcastserver.extension.java.net.extension
-import com.github.davinkevin.podcastserver.item.Item
-import com.github.davinkevin.podcastserver.podcast.Podcast
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
@@ -13,9 +9,7 @@ import software.amazon.awssdk.core.async.AsyncRequestBody
 import software.amazon.awssdk.services.s3.S3AsyncClient
 import software.amazon.awssdk.services.s3.model.*
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
-import java.io.InputStream
 import java.net.URI
-import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Duration
 import java.util.*
@@ -32,7 +26,7 @@ class FileStorageService(
     private val bucket: S3AsyncClient,
     private val preSignerBuilder: (URI) -> S3Presigner,
     private val properties: StorageProperties,
-): CoverExists, ToExternalUrl, DeleteObject {
+): CoverExists, ToExternalUrl, DeleteObject, Upload {
 
     private val log = LoggerFactory.getLogger(FileStorageService::class.java)
 
@@ -80,6 +74,38 @@ class FileStorageService(
             .let(::Path)
     }
 
+    override fun downloadAndUpload(request: DownloadAndUploadRequest) {
+        val content = download(request.url)
+            ?: return
+
+        when(request) {
+            is DownloadAndUploadRequest.ForPlaylistCover -> upload(request.toUploadRequest(content))
+            is DownloadAndUploadRequest.ForPodcastCover ->  upload(request.toUploadRequest(content))
+            is DownloadAndUploadRequest.ForItemCover ->     upload(request.toUploadRequest(content))
+        }
+    }
+
+    override fun upload(request: UploadRequest) {
+        val bucketRequest = PutObjectRequest.builder()
+            .bucket(properties.bucket)
+            .acl(ObjectCannedACL.PUBLIC_READ)
+            .key(request.path.toString())
+            .build()
+
+        val operation = when(request) {
+            is UploadRequest.ForPlaylistCover  -> bucket.putObject(bucketRequest, AsyncRequestBody.fromBytes(request.content.byteArray))
+            is UploadRequest.ForPodcastCover   -> bucket.putObject(bucketRequest, AsyncRequestBody.fromBytes(request.content.byteArray))
+            is UploadRequest.ForItemCover      -> bucket.putObject(bucketRequest, AsyncRequestBody.fromBytes(request.content.byteArray))
+            is UploadRequest.ForItemFromPath   -> bucket.putObject(bucketRequest, request.content)
+            is UploadRequest.ForItemFromStream -> bucket.putObject(bucketRequest, AsyncRequestBody.fromInputStream { it
+                .inputStream(request.content)
+                .executor(Executors.newVirtualThreadPerTaskExecutor())
+            })
+        }
+
+        retry { operation.join() }
+    }
+
     private fun download(url: URI): ByteArrayResource? = rcb.clone()
         .baseUrl(url.toASCIIString())
         .build()
@@ -87,43 +113,6 @@ class FileStorageService(
         .accept(MediaType.APPLICATION_OCTET_STREAM)
         .retrieve()
         .body<ByteArrayResource>()
-
-    private fun upload(key: String, resource: ByteArrayResource): PutObjectResponse? {
-        val request = PutObjectRequest.builder()
-            .bucket(properties.bucket)
-            .acl(ObjectCannedACL.PUBLIC_READ)
-            .key(key)
-            .build()
-
-        return bucket.putObject(request, AsyncRequestBody.fromBytes(resource.byteArray))
-            .runCatching { join() }
-            .getOrNull()
-    }
-
-    fun downloadPodcastCover(podcast: Podcast) {
-        val response = download(podcast.cover.url)
-            ?: return
-
-        upload("""${podcast.title}/${podcast.id}.${podcast.cover.extension()}""", response)
-    }
-
-    fun downloadItemCover(item: Item) {
-        val response = download(item.cover.url)
-            ?: return
-
-        upload("""${item.podcast.title}/${item.id}.${item.cover.extension()}""", response)
-    }
-
-    fun downloadPlaylistCover(request: DownloadPlaylistCoverRequest) {
-        val (name, cover) = request
-        val response = download(cover.url)
-            ?: return
-
-        upload(""".playlist/${name}/${cover.id}.${cover.url.extension().ifBlank { "jpg" }}""", response)
-    }
-    data class DownloadPlaylistCoverRequest(val name: String, val cover: Cover) {
-        data class Cover(val id: UUID, val url: URI)
-    }
 
     fun movePodcast(request: MovePodcastRequest) {
         val listRequest = ListObjectsRequest.builder()
@@ -148,41 +137,6 @@ class FileStorageService(
                 .getOrNull() ?: return@forEach
         }
     }
-
-    fun upload(podcastTitle: String, file: Path): PutObjectResponse? {
-        val request = PutObjectRequest.builder()
-            .bucket(properties.bucket)
-            .acl(ObjectCannedACL.PUBLIC_READ)
-            .key("$podcastTitle/${file.fileName}")
-            .build()
-
-        val response = retry { bucket.putObject(request, file).join() }
-            .onFailure { log.error("Error during upload of file ${file.fileName} to ${request.key()}", it) }
-            .getOrNull()
-
-        Files.deleteIfExists(file)
-
-        return response
-    }
-
-    fun upload(request: UploadFromStreamRequest) {
-        val (podcastTitle, fileName, stream) = request
-
-        val putRequest = PutObjectRequest.builder()
-            .bucket(properties.bucket)
-            .acl(ObjectCannedACL.PUBLIC_READ)
-            .key("$podcastTitle/${fileName.fileName}")
-            .build()
-
-        val body = AsyncRequestBody.fromInputStream { it
-            .inputStream(stream)
-            .executor(Executors.newVirtualThreadPerTaskExecutor())
-        }
-
-        retry { bucket.putObject(putRequest, body).join() }
-    }
-
-    data class UploadFromStreamRequest(val podcastTitle: String, val fileName: Path, val stream: InputStream)
 
     fun <T> retry(block: () -> T): Result<T> {
         val retries = 3
@@ -255,8 +209,9 @@ class FileStorageService(
     }
 }
 
-private fun Cover.extension(): String = Path(url.path).extension.ifBlank { "jpg" }
-private fun Item.Cover.extension() = Path(url.path).extension.ifBlank { "jpg" }
+private fun DownloadAndUploadRequest.ForItemCover.extension() = Path(coverUrl.path).extension.ifBlank { "jpg" }
+private fun DownloadAndUploadRequest.ForPlaylistCover.extension() = Path(cover.url.path).extension.ifBlank { "jpg" }
+private fun DownloadAndUploadRequest.ForPodcastCover.extension() = Path(coverUrl.path).extension.ifBlank { "jpg" }
 
 data class MovePodcastRequest(val id: UUID, val from: String, val to: String)
 data class FileMetaData(val contentType: String, val size: Long)

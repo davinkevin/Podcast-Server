@@ -10,6 +10,7 @@ import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
+import com.github.davinkevin.podcastserver.service.storage.DownloadAndUploadRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Updater
@@ -195,7 +196,7 @@ class UpdateServiceTest(
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast) }
             }
-            doNothing().whenever(fileService).downloadItemCover(any())
+            doNothing().whenever(fileService).downloadAndUpload(any<DownloadAndUploadRequest.ForItemCover>())
             doNothing().whenever(podcastRepository).updateLastUpdate(eq(podcast.id))
 
             /* When */
@@ -219,7 +220,7 @@ class UpdateServiceTest(
                 }
                 verify(updaters).of(uri)
                 verify(itemRepository).create(any<List<ItemForCreation>>())
-                verify(fileService, times(2)).downloadItemCover(any())
+                verify(fileService, times(2)).downloadAndUpload(any<DownloadAndUploadRequest.ForItemCover>())
                 verifyNoMoreInteractions(
                     podcastRepository,
                     fakeUpdater,
@@ -248,7 +249,7 @@ class UpdateServiceTest(
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast) }
             }
-            doNothing().whenever(fileService).downloadItemCover(any())
+            doNothing().whenever(fileService).downloadAndUpload(any<DownloadAndUploadRequest.ForItemCover>())
             doNothing().whenever(podcastRepository).updateLastUpdate(eq(podcast.id))
 
             /* When */
@@ -272,7 +273,7 @@ class UpdateServiceTest(
                 }
                 verify(updaters).of(uri)
                 verify(itemRepository).create(any<List<ItemForCreation>>())
-                verify(fileService, times(2)).downloadItemCover(any())
+                verify(fileService, times(2)).downloadAndUpload(any<DownloadAndUploadRequest.ForItemCover>())
                 verifyNoMoreInteractions(
                     podcastRepository,
                     fakeUpdater,
@@ -453,7 +454,7 @@ class UpdateServiceTest(
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast1) }
             }
-            doNothing().whenever(fileService).downloadItemCover(any())
+            doNothing().whenever(fileService).downloadAndUpload(any<DownloadAndUploadRequest.ForItemCover>())
             doNothing().whenever(podcastRepository).updateLastUpdate(podcast1.id)
 
             /* When */
@@ -477,7 +478,7 @@ class UpdateServiceTest(
                 }
                 verify(updaters).of(uri)
                 verify(itemRepository).create(any<List<ItemForCreation>>())
-                verify(fileService, times(2)).downloadItemCover(any())
+                verify(fileService, times(2)).downloadAndUpload(any<DownloadAndUploadRequest.ForItemCover>())
                 verifyNoMoreInteractions(
                     podcastRepository,
                     fakeUpdater,
@@ -506,7 +507,7 @@ class UpdateServiceTest(
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast1) }
             }
-            doNothing().whenever(fileService).downloadItemCover(any())
+            doNothing().whenever(fileService).downloadAndUpload(any<DownloadAndUploadRequest.ForItemCover>())
             doNothing().whenever(podcastRepository).updateLastUpdate(podcast1.id)
             doNothing().whenever(idm).launchDownload()
 
@@ -531,7 +532,7 @@ class UpdateServiceTest(
                 }
                 verify(updaters).of(uri)
                 verify(itemRepository).create(any<List<ItemForCreation>>())
-                verify(fileService, times(2)).downloadItemCover(any())
+                verify(fileService, times(2)).downloadAndUpload(any<DownloadAndUploadRequest.ForItemCover>())
                 verify(idm).launchDownload()
                 verifyNoMoreInteractions(
                     podcastRepository,
@@ -561,7 +562,7 @@ class UpdateServiceTest(
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(podcast1) }
             }
-            doNothing().whenever(fileService).downloadItemCover(any())
+            doNothing().whenever(fileService).downloadAndUpload(any<DownloadAndUploadRequest.ForItemCover>())
             doNothing().whenever(podcastRepository).updateLastUpdate(podcast1.id)
 
             /* When */
@@ -585,7 +586,7 @@ class UpdateServiceTest(
                 }
                 verify(updaters).of(uri)
                 verify(itemRepository).create(any<List<ItemForCreation>>())
-                verify(fileService, times(2)).downloadItemCover(any())
+                verify(fileService, times(2)).downloadAndUpload(any<DownloadAndUploadRequest.ForItemCover>())
                 verifyNoMoreInteractions(
                     podcastRepository,
                     fakeUpdater,
@@ -615,7 +616,7 @@ class UpdateServiceTest(
                 args.getArgument<List<ItemForCreation>>(0)
                     .map { it.toItem(p) }
             }
-            doNothing().whenever(fileService).downloadItemCover(any())
+            doNothing().whenever(fileService).downloadAndUpload(any<DownloadAndUploadRequest.ForItemCover>())
             doNothing().whenever(podcastRepository).updateLastUpdate(p.id)
 
             /* When */
@@ -639,7 +640,7 @@ class UpdateServiceTest(
                 }
                 verify(updaters).of(uri)
                 verify(itemRepository).create(any<List<ItemForCreation>>())
-                verify(fileService, times(2)).downloadItemCover(any())
+                verify(fileService, times(2)).downloadAndUpload(any<DownloadAndUploadRequest.ForItemCover>())
                 verifyNoMoreInteractions(
                     podcastRepository,
                     fakeUpdater,

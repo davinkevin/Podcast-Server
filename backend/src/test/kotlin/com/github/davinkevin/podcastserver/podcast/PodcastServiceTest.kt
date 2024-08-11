@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.cover.CoverRepository
 import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
+import com.github.davinkevin.podcastserver.service.storage.DownloadAndUploadRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.service.storage.MovePodcastRequest
 import com.github.davinkevin.podcastserver.tag.Tag
@@ -288,12 +289,12 @@ class PodcastServiceTest(
 
             @BeforeEach
             fun beforeEach() {
-                doNothing().whenever(fileService).downloadPodcastCover(podcast)
+                doNothing().whenever(fileService).downloadAndUpload(podcast.toUploadCoverRequest())
             }
 
             @AfterEach
             fun afterEach() {
-                verify(fileService).downloadPodcastCover(podcast)
+                verify(fileService).downloadAndUpload(podcast.toUploadCoverRequest())
                 Mockito.reset(fileService)
             }
 
@@ -304,8 +305,17 @@ class PodcastServiceTest(
                 val pBeforeUpdate = podcastForCreation.copy(tags = tags)
                 val savedCover = pBeforeUpdate.cover.toCover()
                 whenever(coverRepository.save(pBeforeUpdate.cover)).thenReturn(savedCover)
-                whenever(repository.save(eq(pBeforeUpdate.title), eq(pBeforeUpdate.url!!.toASCIIString()), eq(pBeforeUpdate.hasToBeDeleted), eq(pBeforeUpdate.type), argThat { isEmpty() }, eq(savedCover)))
-                        .thenReturn(podcast)
+                whenever(
+                    repository.save(
+                        eq(pBeforeUpdate.title),
+                        eq(pBeforeUpdate.url!!.toASCIIString()),
+                        eq(pBeforeUpdate.hasToBeDeleted),
+                        eq(pBeforeUpdate.type),
+                        argThat { isEmpty() },
+                        eq(savedCover)
+                    )
+                )
+                    .thenReturn(podcast)
 
                 /* When */
                 val savedPodcast = service.save(pBeforeUpdate)
@@ -319,22 +329,24 @@ class PodcastServiceTest(
             fun `with already existing tags and a cover`() {
                 /* Given */
                 val tags = listOf(
-                        TagForCreation(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma"),
-                        TagForCreation(UUID.fromString("f9d92928-1c4c-47a5-965d-efbb2d422f0c"), "Sport")
+                    TagForCreation(UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c"), "Cinéma"),
+                    TagForCreation(UUID.fromString("f9d92928-1c4c-47a5-965d-efbb2d422f0c"), "Sport")
                 )
                 val p = podcastForCreation.copy(tags = tags)
                 val savedCover = p.cover.toCover()
 
                 whenever(coverRepository.save(p.cover)).thenReturn(savedCover)
-                whenever(repository.save(
+                whenever(
+                    repository.save(
                         eq(p.title),
                         eq(p.url!!.toASCIIString()),
                         eq(p.hasToBeDeleted),
                         eq(p.type),
                         argThat { map { it.id }.containsAll(tags.map { it.id }) && size == 2 },
                         eq(savedCover)
-                ))
-                        .thenReturn(podcast)
+                    )
+                )
+                    .thenReturn(podcast)
 
                 /* When */
                 val savedPodcast = service.save(p)
@@ -349,23 +361,25 @@ class PodcastServiceTest(
                 val newTagId = UUID.randomUUID()
                 val oldTagId = UUID.fromString("f9d92927-1c4c-47a5-965d-efbb2d422f0c")
                 val tags = listOf(
-                        TagForCreation(oldTagId, "Cinéma"),
-                        TagForCreation(null, "Sport")
+                    TagForCreation(oldTagId, "Cinéma"),
+                    TagForCreation(null, "Sport")
                 )
                 val p = podcastForCreation.copy(tags = tags)
                 val savedCover = p.cover.toCover()
 
                 whenever(coverRepository.save(p.cover)).thenReturn(savedCover)
                 whenever(tagRepository.save("Sport")).thenReturn(Tag(newTagId, "Sport"))
-                whenever(repository.save(
+                whenever(
+                    repository.save(
                         eq(p.title),
                         eq(p.url!!.toASCIIString()),
                         eq(p.hasToBeDeleted),
                         eq(p.type),
                         argThat { map { it.id }.containsAll(listOf(newTagId, oldTagId)) && size == 2 },
                         eq(savedCover)
-                ))
-                        .thenReturn(podcast)
+                    )
+                )
+                    .thenReturn(podcast)
 
                 /* When */
                 val savedPodcast = service.save(p)
@@ -386,12 +400,12 @@ class PodcastServiceTest(
         private val id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729")
 
         private val podcastForUpdate = PodcastForUpdate(
-                id = id,
-                title = "Podcast title",
-                url = URI("https://foo.bar.com/app/file.rss"),
-                hasToBeDeleted = true,
-                tags = setOf(),
-                cover = CoverForCreation(url = URI("https://external.domain.tld/cover.png"), height = 200, width = 200)
+            id = id,
+            title = "Podcast title",
+            url = URI("https://foo.bar.com/app/file.rss"),
+            hasToBeDeleted = true,
+            tags = setOf(),
+            cover = CoverForCreation(url = URI("https://external.domain.tld/cover.png"), height = 200, width = 200)
         )
 
         @BeforeEach
@@ -405,16 +419,16 @@ class PodcastServiceTest(
             val p = podcast
             whenever(repository.findById(p.id)).thenReturn(podcast)
             whenever(repository.update(
-                    id = eq(p.id),
-                    title = eq(p.title),
-                    url = eq(p.url),
-                    hasToBeDeleted = eq(p.hasToBeDeleted),
-                    tags = argThat { isEmpty() },
-                    cover = argThat {
-                        id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
-                                url == URI("https://external.domain.tld/cover.png") &&
-                                height == 200 && width == 200
-                    }
+                id = eq(p.id),
+                title = eq(p.title),
+                url = eq(p.url),
+                hasToBeDeleted = eq(p.hasToBeDeleted),
+                tags = argThat { isEmpty() },
+                cover = argThat {
+                    id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
+                      url == URI("https://external.domain.tld/cover.png") &&
+                      height == 200 && width == 200
+                }
             )).thenReturn(p)
 
             /* When */
@@ -425,7 +439,7 @@ class PodcastServiceTest(
 
             verify(tagRepository, never()).save(any())
             verify(coverRepository, never()).save(any())
-            verify(fileService, never()).downloadPodcastCover(any())
+            verify(fileService, never()).downloadAndUpload(any<DownloadAndUploadRequest.ForPodcastCover>())
             verify(fileService, never()).movePodcast(any())
         }
 
@@ -448,16 +462,16 @@ class PodcastServiceTest(
                 whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb)
                 whenever(repository.findById(p.id)).thenReturn(podcast)
                 whenever(repository.update(
-                        id = eq(p.id),
-                        title = eq(p.title),
-                        url = eq(p.url),
-                        hasToBeDeleted = eq(p.hasToBeDeleted),
-                        tags = argThat { contains(newTagsInDb) && size == 1 },
-                        cover = argThat {
-                            id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
-                                    url == URI("https://external.domain.tld/cover.png") &&
-                                    height == 200 && width == 200
-                        }
+                    id = eq(p.id),
+                    title = eq(p.title),
+                    url = eq(p.url),
+                    hasToBeDeleted = eq(p.hasToBeDeleted),
+                    tags = argThat { contains(newTagsInDb) && size == 1 },
+                    cover = argThat {
+                        id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
+                          url == URI("https://external.domain.tld/cover.png") &&
+                          height == 200 && width == 200
+                    }
                 )).thenReturn(p)
 
                 /* When */
@@ -476,14 +490,16 @@ class PodcastServiceTest(
 
                 whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb)
                 whenever(repository.findById(p.id)).thenReturn(podcast)
-                whenever(repository.update(
+                whenever(
+                    repository.update(
                         id = eq(p.id),
                         title = eq(p.title),
                         url = eq(p.url),
                         hasToBeDeleted = eq(p.hasToBeDeleted),
                         tags = argThat { containsAll(listOf(newTagsInDb, oldTagInDb)) && size == 2 },
                         cover = any()
-                )).thenReturn(p)
+                    )
+                ).thenReturn(p)
 
                 /* When */
                 val podcastAfterUpdate = service.update(pToUpdate)
@@ -501,14 +517,16 @@ class PodcastServiceTest(
 
                 whenever(tagRepository.save(newTagForCreation.name)).thenReturn(newTagsInDb)
                 whenever(repository.findById(p.id)).thenReturn(podcast)
-                whenever(repository.update(
+                whenever(
+                    repository.update(
                         id = eq(p.id),
                         title = eq(p.title),
                         url = eq(p.url),
                         hasToBeDeleted = eq(p.hasToBeDeleted),
                         tags = argThat { containsAll(listOf(oldTagInDb)) && size == 1 },
                         cover = any()
-                )).thenReturn(p)
+                    )
+                ).thenReturn(p)
 
                 /* When */
                 val podcastAfterUpdate = service.update(pToUpdate)
@@ -523,29 +541,31 @@ class PodcastServiceTest(
                 /* Given */
                 val tagsName = listOf("Foo", "Bar", "One", "Another", "Tags")
                 val listOfNewTags = tagsName
-                        .map { "$it.new" }
-                        .map { TagForCreation(id = null, name = it) }
+                    .map { "$it.new" }
+                    .map { TagForCreation(id = null, name = it) }
                 val listOfOldTags = tagsName
-                        .map { "$it.old" }
-                        .map { TagForCreation(id = UUID.randomUUID(), name = it) }
+                    .map { "$it.old" }
+                    .map { TagForCreation(id = UUID.randomUUID(), name = it) }
 
                 val allTagsInDb = (listOfNewTags + listOfOldTags)
-                        .map { Tag(it.id ?: UUID.randomUUID(), it.name) }
+                    .map { Tag(it.id ?: UUID.randomUUID(), it.name) }
 
                 val pToUpdate = podcastForUpdate.copy(tags = listOfNewTags + listOfOldTags)
                 val p = podcast.copy(tags = allTagsInDb)
 
                 whenever(tagRepository.save(argThat { this in listOfNewTags.map { it.name } }))
-                        .then { allTagsInDb.first { t -> t.name == it.getArgument<String>(0) } }
+                    .then { allTagsInDb.first { t -> t.name == it.getArgument<String>(0) } }
                 whenever(repository.findById(p.id)).thenReturn(podcast)
-                whenever(repository.update(
+                whenever(
+                    repository.update(
                         id = eq(p.id),
                         title = eq(p.title),
                         url = eq(p.url),
                         hasToBeDeleted = eq(p.hasToBeDeleted),
                         tags = argThat { containsAll(allTagsInDb) && size == allTagsInDb.size },
                         cover = any()
-                )).thenReturn(p)
+                    )
+                ).thenReturn(p)
 
                 /* When */
                 val podcastAfterUpdate = service.update(pToUpdate)
@@ -558,7 +578,7 @@ class PodcastServiceTest(
             @AfterEach
             fun afterEach() {
                 verify(coverRepository, never()).save(any())
-                verify(fileService, never()).downloadPodcastCover(any())
+                verify(fileService, never()).downloadAndUpload(any<DownloadAndUploadRequest.ForPodcastCover>())
                 verify(fileService, never()).movePodcast(any())
             }
 
@@ -572,22 +592,22 @@ class PodcastServiceTest(
             fun `and do nothing if new cover url is relative`() {
                 /* Given */
                 val pToUpdate = podcastForUpdate.copy(
-                        cover = CoverForCreation(200, 200, URI("/api/v1/cover.png"))
+                    cover = CoverForCreation(200, 200, URI("/api/v1/cover.png"))
                 )
                 val p = podcast
 
                 whenever(repository.findById(p.id)).thenReturn(podcast)
                 whenever(repository.update(
-                        id = eq(p.id),
-                        title = eq(p.title),
-                        url = eq(p.url),
-                        hasToBeDeleted = eq(p.hasToBeDeleted),
-                        tags = any(),
-                        cover = argThat {
-                            id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
-                                    url == URI("https://external.domain.tld/cover.png") &&
-                                    height == 200 && width == 200
-                        }
+                    id = eq(p.id),
+                    title = eq(p.title),
+                    url = eq(p.url),
+                    hasToBeDeleted = eq(p.hasToBeDeleted),
+                    tags = any(),
+                    cover = argThat {
+                        id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
+                          url == URI("https://external.domain.tld/cover.png") &&
+                          height == 200 && width == 200
+                    }
                 )).thenReturn(p)
 
                 /* When */
@@ -603,21 +623,21 @@ class PodcastServiceTest(
                 /* Given */
                 val p = podcast
                 val pToUpdate = podcastForUpdate.copy(
-                        cover = CoverForCreation(200, 200, p.cover.url)
+                    cover = CoverForCreation(200, 200, p.cover.url)
                 )
 
                 whenever(repository.findById(p.id)).thenReturn(podcast)
                 whenever(repository.update(
-                        id = eq(p.id),
-                        title = eq(p.title),
-                        url = eq(p.url),
-                        hasToBeDeleted = eq(p.hasToBeDeleted),
-                        tags = any(),
-                        cover = argThat {
-                            id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
-                                    url == URI("https://external.domain.tld/cover.png") &&
-                                    height == 200 && width == 200
-                        }
+                    id = eq(p.id),
+                    title = eq(p.title),
+                    url = eq(p.url),
+                    hasToBeDeleted = eq(p.hasToBeDeleted),
+                    tags = any(),
+                    cover = argThat {
+                        id == UUID.fromString("1e275238-4cbe-4abb-bbca-95a0e4ebbeea") &&
+                          url == URI("https://external.domain.tld/cover.png") &&
+                          height == 200 && width == 200
+                    }
                 )).thenReturn(p)
 
                 /* When */
@@ -638,15 +658,18 @@ class PodcastServiceTest(
 
                 whenever(repository.findById(p.id)).thenReturn(podcast)
                 whenever(coverRepository.save(newCover)).thenReturn(coverInDb)
-                doNothing().whenever(fileService).downloadPodcastCover(argThat { title == p.title && cover.url == newCover.url })
-                whenever(repository.update(
+                doNothing().whenever(fileService)
+                    .downloadAndUpload(argThat<DownloadAndUploadRequest.ForPodcastCover> { title == p.title && coverUrl == newCover.url })
+                whenever(
+                    repository.update(
                         id = eq(p.id),
                         title = eq(p.title),
                         url = eq(p.url),
                         hasToBeDeleted = eq(p.hasToBeDeleted),
                         tags = any(),
                         cover = eq(coverInDb)
-                )).thenReturn(p)
+                    )
+                ).thenReturn(p)
 
                 /* When */
                 val podcastAfterUpdate = service.update(pToUpdate)
@@ -654,9 +677,8 @@ class PodcastServiceTest(
                 /* Then */
                 assertThat(podcastAfterUpdate).isEqualTo(p)
                 verify(coverRepository).save(any())
-                verify(fileService).downloadPodcastCover(any())
+                verify(fileService).downloadAndUpload(any<DownloadAndUploadRequest.ForPodcastCover>())
             }
-
 
 
             @AfterEach
@@ -677,18 +699,20 @@ class PodcastServiceTest(
                 val pToUpdate = podcastForUpdate.copy(title = "newName")
                 val pAfterUpdate = p.copy(title = "newName")
                 whenever(repository.findById(p.id)).thenReturn(p)
-                whenever(repository.update(
+                whenever(
+                    repository.update(
                         id = eq(p.id),
                         title = eq(pToUpdate.title),
                         url = eq(p.url),
                         hasToBeDeleted = eq(p.hasToBeDeleted),
                         tags = any(),
                         cover = any()
-                )).thenReturn(pAfterUpdate)
+                    )
+                ).thenReturn(pAfterUpdate)
                 val moveOperation = MovePodcastRequest(
-                        id = p.id,
-                        from = p.title,
-                        to = pToUpdate.title
+                    id = p.id,
+                    from = p.title,
+                    to = pToUpdate.title
                 )
                 doNothing().whenever(fileService).movePodcast(moveOperation)
 
@@ -699,7 +723,7 @@ class PodcastServiceTest(
                 assertThat(podcastAfterUpdate).isEqualTo(pAfterUpdate)
                 verify(tagRepository, never()).save(any())
                 verify(coverRepository, never()).save(any())
-                verify(fileService, never()).downloadPodcastCover(any())
+                verify(fileService, never()).downloadAndUpload(any<DownloadAndUploadRequest.ForPodcastCover>())
                 verify(fileService).movePodcast(moveOperation)
             }
 

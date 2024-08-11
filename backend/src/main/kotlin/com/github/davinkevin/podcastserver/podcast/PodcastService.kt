@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.podcast
 
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverRepository
+import com.github.davinkevin.podcastserver.service.storage.DownloadAndUploadRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.service.storage.MovePodcastRequest
 import com.github.davinkevin.podcastserver.tag.Tag
@@ -20,15 +21,19 @@ class PodcastService(
 
     fun findStatByPodcastIdAndPubDate(id: UUID, numberOfMonths: Int): List<NumberOfItemByDateWrapper> =
         repository.findStatByPodcastIdAndPubDate(id, numberOfMonths)
+
     fun findStatByPodcastIdAndDownloadDate(id: UUID, numberOfMonths: Int): List<NumberOfItemByDateWrapper> =
         repository.findStatByPodcastIdAndDownloadDate(id, numberOfMonths)
+
     fun findStatByPodcastIdAndCreationDate(id: UUID, numberOfMonths: Int): List<NumberOfItemByDateWrapper> =
         repository.findStatByPodcastIdAndCreationDate(id, numberOfMonths)
 
     fun findStatByTypeAndCreationDate(numberOfMonths: Int): List<StatsPodcastType> =
         repository.findStatByTypeAndCreationDate(numberOfMonths)
+
     fun findStatByTypeAndPubDate(numberOfMonths: Int): List<StatsPodcastType> =
         repository.findStatByTypeAndPubDate(numberOfMonths)
+
     fun findStatByTypeAndDownloadDate(numberOfMonths: Int): List<StatsPodcastType> =
         repository.findStatByTypeAndDownloadDate(numberOfMonths)
 
@@ -48,7 +53,7 @@ class PodcastService(
             cover = cover
         )
 
-        fileService.downloadPodcastCover(podcast)
+        fileService.downloadAndUpload(podcast.toUploadCoverRequest())
 
         return podcast
     }
@@ -66,12 +71,14 @@ class PodcastService(
 
         val isLocalCover = newCover.url.toASCIIString().startsWith("/")
         val coversAreIdentical = oldCover.url != newCover.url
-        val cover = if (!isLocalCover && coversAreIdentical)
-            coverRepository.save(newCover)!!.also {
-                fileService
-                    .downloadPodcastCover(p.copy(cover = Cover(it.id, it.url, it.height, it.width)))
-            }
-        else Cover(oldCover.id, oldCover.url, oldCover.height, oldCover.width)
+        val cover = if (!isLocalCover && coversAreIdentical) {
+            coverRepository.save(newCover)
+                .also {
+                    fileService.downloadAndUpload(
+                        DownloadAndUploadRequest.ForPodcastCover(id = p.id, title = p.title, coverUrl = it.url)
+                    )
+                }
+        } else Cover(oldCover.id, oldCover.url, oldCover.height, oldCover.width)
 
         val podcast = repository.update(
             id = updatePodcast.id,
@@ -102,3 +109,8 @@ class PodcastService(
     }
 }
 
+internal fun Podcast.toUploadCoverRequest() = DownloadAndUploadRequest.ForPodcastCover(
+    id = id,
+    title = title,
+    coverUrl = cover.url
+)

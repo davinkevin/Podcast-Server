@@ -9,6 +9,7 @@ import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
+import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
@@ -20,7 +21,6 @@ import org.mockito.Mock
 import org.mockito.Mockito
 import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
-import software.amazon.awssdk.services.s3.model.PutObjectResponse
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.net.URI
@@ -189,8 +189,8 @@ class RTMPDownloaderTest {
             @Test
             fun `and save file to disk`() {
                 /* Given */
-                whenever(file.upload(eq(item.podcast.title), any()))
-                    .thenReturn(PutObjectResponse.builder().build())
+                doNothing().whenever(file)
+                    .upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == item.podcast.title })
                 whenever(file.metadata(eq(item.podcast.title), any()))
                     .thenReturn(FileMetaData("video/mp4", 123L))
                 whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
@@ -226,8 +226,8 @@ class RTMPDownloaderTest {
                 @Test
                 fun stop() {
                     /* GIVEN */
-                    whenever(file.upload(eq(item.podcast.title), any()))
-                        .thenReturn(PutObjectResponse.builder().build())
+                    doNothing().whenever(file)
+                        .upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == item.podcast.title })
                     whenever(file.metadata(eq(item.podcast.title), any()))
                         .thenReturn(FileMetaData("video/mp4", 123L))
                     whenever(downloadRepository.finishDownload(

@@ -1,8 +1,8 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.service.image.ImageService
+import com.github.davinkevin.podcastserver.service.storage.DownloadAndUploadRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
-import com.github.davinkevin.podcastserver.service.storage.FileStorageService.DownloadPlaylistCoverRequest
 import java.net.URI
 import java.util.*
 
@@ -30,8 +30,8 @@ class PlaylistService(
 
         val saveResponse = repository.save(saveRequest)
 
-        saveResponse.toDownloadPlaylistCoverRequest()
-            .let(fileService::downloadPlaylistCover)
+        saveResponse.toUploadRequest()
+            .let(fileService::downloadAndUpload)
 
         return saveResponse
     }
@@ -44,9 +44,9 @@ class PlaylistService(
         repository.removeFromPlaylist(playlistId, itemId)
 }
 
-internal fun PlaylistWithItems.toDownloadPlaylistCoverRequest() = DownloadPlaylistCoverRequest(
+internal fun PlaylistWithItems.toUploadRequest() = DownloadAndUploadRequest.ForPlaylistCover(
     name = name,
-    cover = DownloadPlaylistCoverRequest.Cover(
+    cover = DownloadAndUploadRequest.ForPlaylistCover.Cover(
         id = cover.id,
         url = cover.url,
     )

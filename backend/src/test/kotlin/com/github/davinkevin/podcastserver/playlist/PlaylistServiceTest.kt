@@ -9,7 +9,9 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.kotlin.*
+import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Import
@@ -152,7 +154,7 @@ class PlaylistServiceTest(
 
             /* Then */
             assertThat(p).isEqualTo(playlist)
-            verify(fileService).downloadPlaylistCover(playlist.toDownloadPlaylistCoverRequest())
+            verify(fileService).downloadAndUpload(playlist.toUploadRequest())
         }
 
         @Test

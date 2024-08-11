@@ -105,7 +105,7 @@ class DownloaderTest {
             val information = DownloadingInformation(item, listOf(), Path("file.mp4"), null)
             downloader.with(information, itemDownloadManager)
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(1)
-            whenever(file.upload(any(), any())).thenThrow(RuntimeException("not expected error"))
+            whenever(file.upload(any())).thenThrow(RuntimeException("not expected error"))
             whenever(file.metadata(any(), any())).thenThrow(RuntimeException("not expected error"))
 
             /* When */
