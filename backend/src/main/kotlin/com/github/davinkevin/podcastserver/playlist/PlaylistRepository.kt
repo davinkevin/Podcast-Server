@@ -3,15 +3,10 @@ package com.github.davinkevin.podcastserver.playlist
 import com.github.davinkevin.podcastserver.database.Keys
 import com.github.davinkevin.podcastserver.database.Tables.*
 import org.jooq.DSLContext
-import org.jooq.Record14
-import org.jooq.Result
 import org.jooq.impl.DSL.multiset
 import org.jooq.impl.DSL.select
 import java.net.URI
-import java.nio.file.Path
-import java.time.OffsetDateTime
 import java.util.*
-import java.util.function.Function
 
 class PlaylistRepository(
     private val query: DSLContext
@@ -86,7 +81,7 @@ class PlaylistRepository(
 
     fun save(request: SaveRequest): PlaylistWithItems {
         val (name, cover) = request
-        val playlistId = UUID.randomUUID()
+        var playlistId = UUID.randomUUID()
         val coverId = UUID.randomUUID()
 
         query.transaction { trx ->
@@ -98,7 +93,7 @@ class PlaylistRepository(
                 .set(COVER.WIDTH, cover.width)
                 .execute()
 
-            trx.dsl()
+            playlistId = trx.dsl()
                 .insertInto(PLAYLIST)
                 .set(PLAYLIST.ID, playlistId)
                 .set(PLAYLIST.NAME, name)
@@ -106,17 +101,11 @@ class PlaylistRepository(
                 .onConflictOnConstraint(Keys.PLAYLIST_NAME_KEY)
                 .doUpdate()
                 .set(PLAYLIST.COVER_ID, coverId)
-                .execute()
+                .returningResult(PLAYLIST.ID)
+                .fetchOne { (v) -> v }
         }
 
-        val (id) = query
-            .select(PLAYLIST.ID)
-            .from(PLAYLIST)
-            .where(PLAYLIST.NAME.eq(name))
-            .fetch()
-            .first()
-
-        return findById(id)!!
+        return findById(playlistId)!!
     }
     data class SaveRequest(val name: String, val cover: Cover) {
         data class Cover(val url: URI, val height: Int, val width: Int)
