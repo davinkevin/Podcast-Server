@@ -143,16 +143,15 @@ class PlaylistRepository(
         return findById(playlistId)!!
     }
 
-    fun deleteById(id: UUID) {
-        query
+    fun deleteById(id: UUID): Unit = query.transaction { ctx ->
+        ctx.dsl()
             .deleteFrom(PLAYLIST_ITEMS)
             .where(PLAYLIST_ITEMS.PLAYLISTS_ID.eq(id))
             .execute()
 
-        query
+        ctx.dsl()
             .deleteFrom(PLAYLIST)
             .where(PLAYLIST.ID.eq(id))
             .execute()
     }
-
 }
