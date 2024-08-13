@@ -3,8 +3,15 @@ package com.github.davinkevin.podcastserver.playlist
 import com.github.davinkevin.podcastserver.database.Keys
 import com.github.davinkevin.podcastserver.database.Tables.*
 import org.jooq.DSLContext
+import org.jooq.Record14
+import org.jooq.Result
+import org.jooq.impl.DSL.multiset
+import org.jooq.impl.DSL.select
 import java.net.URI
+import java.nio.file.Path
+import java.time.OffsetDateTime
 import java.util.*
+import java.util.function.Function
 
 class PlaylistRepository(
     private val query: DSLContext
@@ -21,65 +28,61 @@ class PlaylistRepository(
                 name = it[PLAYLIST.NAME]
             ) }
 
-    fun findById(id: UUID): PlaylistWithItems? {
-        val playlist = query
-            .select(
-                PLAYLIST.ID, PLAYLIST.NAME,
-                PLAYLIST.cover().ID, PLAYLIST.cover().HEIGHT, PLAYLIST.cover().WIDTH, PLAYLIST.cover().URL,
-            )
-            .from(PLAYLIST)
-            .where(PLAYLIST.ID.eq(id))
-            .fetchOne()
-            ?: return null
-
-        val items = query
-                .select(
+    fun findById(id: UUID): PlaylistWithItems? = query
+        .select(
+            PLAYLIST.ID, PLAYLIST.NAME,
+            multiset(
+                select(
                     ITEM.ID, ITEM.TITLE, ITEM.URL,
                     ITEM.FILE_NAME, ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.PUB_DATE,
 
                     PODCAST.ID, PODCAST.TITLE,
                     COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT,
                 )
-                .from(
-                    PLAYLIST_ITEMS
-                        .innerJoin(ITEM).on(PLAYLIST_ITEMS.ITEMS_ID.eq(ITEM.ID))
-                        .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
-                        .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
-                )
-                .where(PLAYLIST_ITEMS.PLAYLISTS_ID.eq(id))
-            .fetch()
-            .map { PlaylistWithItems.Item(
-                id = it[ITEM.ID],
-                title = it[ITEM.TITLE],
-                fileName = it[ITEM.FILE_NAME],
-                description = it[ITEM.DESCRIPTION],
-                mimeType = it[ITEM.MIME_TYPE],
-                length = it[ITEM.LENGTH],
-                pubDate = it[ITEM.PUB_DATE],
-                podcast = PlaylistWithItems.Item.Podcast(
-                    id = it[PODCAST.ID],
-                    title = it[PODCAST.TITLE]
-                ),
-                cover = PlaylistWithItems.Item.Cover(
-                    id = it[COVER.ID],
-                    width = it[COVER.WIDTH],
-                    height = it[COVER.HEIGHT],
-                    url = URI(it[COVER.URL])
-                )
-            ) }
-
-        return PlaylistWithItems(
-            id = playlist[PLAYLIST.ID],
-            name = playlist[PLAYLIST.NAME],
-            items = items,
-            cover = PlaylistWithItems.Cover(
-                id = playlist[COVER.ID],
-                height = playlist[COVER.HEIGHT],
-                width = playlist[COVER.WIDTH],
-                url = URI(playlist[COVER.URL]),
-            ),
+                    .from(
+                        PLAYLIST_ITEMS
+                            .innerJoin(ITEM).on(PLAYLIST_ITEMS.ITEMS_ID.eq(ITEM.ID))
+                            .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
+                            .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
+                    )
+                    .where(PLAYLIST_ITEMS.PLAYLISTS_ID.eq(PLAYLIST.ID))
+            ).`as`("items"),
+            PLAYLIST.cover().ID, PLAYLIST.cover().HEIGHT, PLAYLIST.cover().WIDTH, PLAYLIST.cover().URL,
         )
-    }
+        .from(PLAYLIST)
+        .where(PLAYLIST.ID.eq(id))
+        .fetchOne()
+        ?.let { r -> PlaylistWithItems(
+            id = r[PLAYLIST.ID],
+            name = r[PLAYLIST.NAME],
+            items = r.value3().map {
+                PlaylistWithItems.Item(
+                    id = it[ITEM.ID],
+                    title = it[ITEM.TITLE],
+                    fileName = it[ITEM.FILE_NAME],
+                    description = it[ITEM.DESCRIPTION],
+                    mimeType = it[ITEM.MIME_TYPE],
+                    length = it[ITEM.LENGTH],
+                    pubDate = it[ITEM.PUB_DATE],
+                    podcast = PlaylistWithItems.Item.Podcast(
+                        id = it[PODCAST.ID],
+                        title = it[PODCAST.TITLE]
+                    ),
+                    cover = PlaylistWithItems.Item.Cover(
+                        id = it[COVER.ID],
+                        width = it[COVER.WIDTH],
+                        height = it[COVER.HEIGHT],
+                        url = URI(it[COVER.URL])
+                    )
+                )
+            },
+            cover = PlaylistWithItems.Cover(
+                id = r[COVER.ID],
+                height = r[COVER.HEIGHT],
+                width = r[COVER.WIDTH],
+                url = URI(r[COVER.URL]),
+            ),
+        ) }
 
     fun save(request: SaveRequest): PlaylistWithItems {
         val (name, cover) = request
@@ -107,11 +110,11 @@ class PlaylistRepository(
         }
 
         val (id) = query
-                .select(PLAYLIST.ID)
-                .from(PLAYLIST)
-                .where(PLAYLIST.NAME.eq(name))
-                .fetch()
-                .first()
+            .select(PLAYLIST.ID)
+            .from(PLAYLIST)
+            .where(PLAYLIST.NAME.eq(name))
+            .fetch()
+            .first()
 
         return findById(id)!!
     }

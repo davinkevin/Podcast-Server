@@ -112,6 +112,18 @@ class PlaylistRepositoryTest(
     inner class ShouldFindById {
 
         @Test
+        fun `and returns null because the playlist doesn't exist`() {
+            /* Given */
+            val id = fromString("d2c0d935-10c7-47a7-aa70-83cbdf1f93ca")
+
+            /* When */
+            val playlist = repository.findById(id)
+
+            /* Then */
+            assertThat(playlist).isNull()
+        }
+
+        @Test
         fun `with no item`() {
             /* Given */
             val id = fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea")
