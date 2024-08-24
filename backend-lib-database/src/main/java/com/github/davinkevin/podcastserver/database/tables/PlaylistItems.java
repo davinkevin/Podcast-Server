@@ -142,19 +142,7 @@ public class PlaylistItems extends TableImpl<PlaylistItemsRecord> {
 
     @Override
     public List<ForeignKey<PlaylistItemsRecord, ?>> getReferences() {
-        return Arrays.asList(Keys.PLAYLIST_ITEMS__PLAYLIST_ITEMS_PLAYLISTS_ID_FKEY, Keys.PLAYLIST_ITEMS__PLAYLIST_ITEMS_ITEMS_ID_FKEY);
-    }
-
-    private transient PlaylistPath _playlist;
-
-    /**
-     * Get the implicit join path to the <code>public.playlist</code> table.
-     */
-    public PlaylistPath playlist() {
-        if (_playlist == null)
-            _playlist = new PlaylistPath(this, Keys.PLAYLIST_ITEMS__PLAYLIST_ITEMS_PLAYLISTS_ID_FKEY, null);
-
-        return _playlist;
+        return Arrays.asList(Keys.PLAYLIST_ITEMS__PLAYLIST_ITEMS_ITEMS_ID_FKEY, Keys.PLAYLIST_ITEMS__PLAYLIST_ITEMS_PLAYLISTS_ID_FKEY);
     }
 
     private transient ItemPath _item;
@@ -167,6 +155,18 @@ public class PlaylistItems extends TableImpl<PlaylistItemsRecord> {
             _item = new ItemPath(this, Keys.PLAYLIST_ITEMS__PLAYLIST_ITEMS_ITEMS_ID_FKEY, null);
 
         return _item;
+    }
+
+    private transient PlaylistPath _playlist;
+
+    /**
+     * Get the implicit join path to the <code>public.playlist</code> table.
+     */
+    public PlaylistPath playlist() {
+        if (_playlist == null)
+            _playlist = new PlaylistPath(this, Keys.PLAYLIST_ITEMS__PLAYLIST_ITEMS_PLAYLISTS_ID_FKEY, null);
+
+        return _playlist;
     }
 
     @Override
