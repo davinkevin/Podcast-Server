@@ -8,9 +8,9 @@ import com.github.davinkevin.podcastserver.database.enums.ItemStatus.*
 import com.github.davinkevin.podcastserver.database.tables.Item
 import com.github.davinkevin.podcastserver.entity.fromDb
 import com.github.davinkevin.podcastserver.entity.toDb
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem.Cover
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem.Podcast
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem.Cover
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem.Podcast
 import org.jooq.DSLContext
 import org.jooq.Record9
 import org.jooq.impl.DSL.*

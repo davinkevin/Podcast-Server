@@ -1,4 +1,4 @@
-package com.github.davinkevin.podcastserver.manager.downloader
+package com.github.davinkevin.podcastserver.download.downloaders
 
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 

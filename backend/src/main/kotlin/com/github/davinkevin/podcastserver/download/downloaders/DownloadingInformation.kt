@@ -1,4 +1,4 @@
-package com.github.davinkevin.podcastserver.manager.downloader
+package com.github.davinkevin.podcastserver.download.downloaders
 
 import com.github.davinkevin.podcastserver.entity.Status
 import java.net.URI
@@ -48,14 +48,14 @@ data class DownloadingInformation(val item: DownloadingItem, val urls: List<URI>
 }
 
 data class DownloadingItem(
-        val id: UUID,
-        val title: String,
-        val status: Status,
-        val url: URI,
-        val numberOfFail: Int,
-        val progression: Int,
-        val podcast: Podcast,
-        val cover: Cover
+    val id: UUID,
+    val title: String,
+    val status: Status,
+    val url: URI,
+    val numberOfFail: Int,
+    val progression: Int,
+    val podcast: Podcast,
+    val cover: Cover
 ) {
     data class Podcast(val id: UUID, val title: String)
     data class Cover(val id: UUID, val url: URI)

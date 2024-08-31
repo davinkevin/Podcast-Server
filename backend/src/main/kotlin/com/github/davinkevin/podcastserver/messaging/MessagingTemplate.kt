@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.messaging
 
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import org.springframework.context.ApplicationEventPublisher
 
 /**

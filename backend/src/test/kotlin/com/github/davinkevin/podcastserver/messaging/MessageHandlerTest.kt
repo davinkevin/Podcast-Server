@@ -3,7 +3,7 @@ package com.github.davinkevin.podcastserver.messaging
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility
 import org.junit.jupiter.api.Disabled

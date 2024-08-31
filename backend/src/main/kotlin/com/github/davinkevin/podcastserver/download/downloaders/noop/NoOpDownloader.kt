@@ -1,9 +1,9 @@
 package com.github.davinkevin.podcastserver.download.downloaders.noop
 
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
-import com.github.davinkevin.podcastserver.manager.downloader.Downloader
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.download.downloaders.Downloader
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 
 
 /**

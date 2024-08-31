@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.messaging
 
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.google.common.annotations.VisibleForTesting
 import org.springframework.context.event.EventListener
 import org.springframework.web.servlet.function.ServerRequest

@@ -1,9 +1,9 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
 import com.github.davinkevin.podcastserver.download.DownloadRepository
-import com.github.davinkevin.podcastserver.manager.downloader.AbstractDownloader
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.download.downloaders.AbstractDownloader
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback

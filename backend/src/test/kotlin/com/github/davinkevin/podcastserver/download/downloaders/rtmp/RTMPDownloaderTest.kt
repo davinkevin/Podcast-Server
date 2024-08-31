@@ -1,8 +1,10 @@
-package com.github.davinkevin.podcastserver.manager.downloader
+package com.github.davinkevin.podcastserver.download.downloaders.rtmp
 
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
@@ -125,7 +127,7 @@ class RTMPDownloaderTest {
                 /* Then */
                 assertThat(downloader.downloadingInformation.item.status).isEqualTo(Status.FAILED)
             }
-            //
+
             @Test
             fun after_launch_process() {
                 /* Given */

@@ -1,11 +1,9 @@
-package com.github.davinkevin.podcastserver.manager.selector
+package com.github.davinkevin.podcastserver.download.downloaders
 
+import com.github.davinkevin.podcastserver.download.downloaders.ffmpeg.FfmpegDownloader
+import com.github.davinkevin.podcastserver.download.downloaders.rtmp.RTMPDownloader
 import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.YoutubeDlDownloader
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
-import com.github.davinkevin.podcastserver.download.downloaders.ffmpeg.FfmpegDownloader
-import com.github.davinkevin.podcastserver.manager.downloader.RTMPDownloader
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -51,7 +49,8 @@ class DownloaderSelectorTest(
     @Test
     fun `should reject empty url`() {
         /* When */
-        assertThat(selector.of(DownloadingInformation(dItem, listOf(), Path("file.mp4"), null))).isEqualTo(DownloaderSelector.NO_OP_DOWNLOADER)
+        assertThat(selector.of(DownloadingInformation(dItem, listOf(), Path("file.mp4"), null))).isEqualTo(
+            DownloaderSelector.NO_OP_DOWNLOADER)
     }
 
     @MethodSource("urlToDownloader")

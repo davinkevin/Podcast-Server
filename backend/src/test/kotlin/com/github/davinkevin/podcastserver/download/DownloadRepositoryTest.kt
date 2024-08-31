@@ -6,7 +6,7 @@ import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.toDb
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
 import org.jooq.DSLContext
@@ -879,7 +879,8 @@ class DownloadRepositoryTest(
 
             /* Then */
             assertThat(items).hasSize(1)
-            assertThat(items.first()).isEqualTo(DownloadingItem(
+            assertThat(items.first()).isEqualTo(
+                DownloadingItem(
                 id = itemId2,
                 title = "item_2",
                 status = Status.NOT_DOWNLOADED,
@@ -896,7 +897,8 @@ class DownloadRepositoryTest(
                     id = itemCoverId2,
                     url = URI.create("https://foo.bac.com/item/cover.jpg")
                 )
-            ))
+            )
+            )
         }
 
         @Test
@@ -918,7 +920,8 @@ class DownloadRepositoryTest(
             assertThat(items).hasSize(2)
             val (first, second) = items
             assertAll {
-                assertThat(first).isEqualTo(DownloadingItem(
+                assertThat(first).isEqualTo(
+                    DownloadingItem(
                     id = itemId2,
                     title = "item_2",
                     status = Status.NOT_DOWNLOADED,
@@ -935,8 +938,10 @@ class DownloadRepositoryTest(
                         id = itemCoverId2,
                         url = URI.create("https://foo.bac.com/item/cover.jpg")
                     )
-                ))
-                assertThat(second).isEqualTo(DownloadingItem(
+                )
+                )
+                assertThat(second).isEqualTo(
+                    DownloadingItem(
                     id = itemId3,
                     title = "item_3",
                     status = Status.NOT_DOWNLOADED,
@@ -953,7 +958,8 @@ class DownloadRepositoryTest(
                         id = itemCoverId3,
                         url = URI.create("https://foo.bac.com/item/cover.jpg")
                     )
-                ))
+                )
+                )
             }
         }
     }
@@ -1065,7 +1071,8 @@ class DownloadRepositoryTest(
 
             /* Then */
             assertThat(items).hasSize(1)
-            assertThat(items.first()).isEqualTo(DownloadingItem(
+            assertThat(items.first()).isEqualTo(
+                DownloadingItem(
                 id = itemId2,
                 title = "item_2",
                 status = Status.NOT_DOWNLOADED,
@@ -1082,7 +1089,8 @@ class DownloadRepositoryTest(
                     id = itemCoverId2,
                     url = URI.create("https://foo.bac.com/item/cover.jpg")
                 )
-            ))
+            )
+            )
         }
 
         @Test
@@ -1104,7 +1112,8 @@ class DownloadRepositoryTest(
             assertThat(items).hasSize(2)
             val (first, second) = items
             assertAll {
-                assertThat(first).isEqualTo(DownloadingItem(
+                assertThat(first).isEqualTo(
+                    DownloadingItem(
                     id = itemId2,
                     title = "item_2",
                     status = Status.NOT_DOWNLOADED,
@@ -1121,8 +1130,10 @@ class DownloadRepositoryTest(
                         id = itemCoverId2,
                         url = URI.create("https://foo.bac.com/item/cover.jpg")
                     )
-                ))
-                assertThat(second).isEqualTo(DownloadingItem(
+                )
+                )
+                assertThat(second).isEqualTo(
+                    DownloadingItem(
                     id = itemId3,
                     title = "item_3",
                     status = Status.NOT_DOWNLOADED,
@@ -1139,7 +1150,8 @@ class DownloadRepositoryTest(
                         id = itemCoverId3,
                         url = URI.create("https://foo.bac.com/item/cover.jpg")
                     )
-                ))
+                )
+                )
             }
         }
 

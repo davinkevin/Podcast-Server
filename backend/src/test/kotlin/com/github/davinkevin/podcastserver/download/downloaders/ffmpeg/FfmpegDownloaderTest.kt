@@ -3,10 +3,9 @@ package com.github.davinkevin.podcastserver.download.downloaders.ffmpeg
 
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
-import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
-import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.ffmpeg.FfmpegService
@@ -52,7 +51,7 @@ class FfmpegDownloaderTest {
     private val item: DownloadingItem = DownloadingItem (
             id = UUID.randomUUID(),
             title = "Title",
-            status = Status.NOT_DOWNLOADED,
+            status = NOT_DOWNLOADED,
             url = URI("http://a.fake.url/with/file.mp4?param=1"),
             numberOfFail = 0,
             progression = 0,

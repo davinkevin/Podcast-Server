@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.download
 
-import com.github.davinkevin.podcastserver.manager.selector.DownloaderSelector
+import com.github.davinkevin.podcastserver.download.downloaders.DownloaderSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.assertj.core.api.Assertions.assertThat
