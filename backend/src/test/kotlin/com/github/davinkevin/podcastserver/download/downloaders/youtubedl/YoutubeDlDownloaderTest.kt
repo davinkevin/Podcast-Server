@@ -108,7 +108,10 @@ class YoutubeDlDownloaderTest(
             /* Given */
             val url = URI.create("https://foo.bar.com/one.mp3")
             var finalFile: Path = Files.createTempFile("not-used-for-now", ".mp3")
-            downloader.downloadingInformation = dItem.copy(urls = listOf(url))
+            downloader.with(
+                information = dItem.copy(urls = listOf(url)),
+                itemDownloadManager = idm
+            )
             whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
             whenever(youtube.download(eq(url.toASCIIString()), any(), any())).then {
                 val fileToCreate = it.getArgument<Path>(1)
@@ -139,7 +142,10 @@ class YoutubeDlDownloaderTest(
                 @Test
                 fun `with youtube-dl`() {
                     /* Given */
-                    downloader.downloadingInformation = dItem.copy(urls = listOf(url))
+                    downloader.with(
+                        information = dItem.copy(urls = listOf(url)),
+                        itemDownloadManager = idm
+                    )
 
                     whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
                     doThrow(RuntimeException("fake error"))
@@ -159,7 +165,10 @@ class YoutubeDlDownloaderTest(
 
                 @BeforeEach
                 fun beforeEach() {
-                    downloader.downloadingInformation = dItem.copy(urls = listOf(url))
+                    downloader.with(
+                        information = dItem.copy(urls = listOf(url)),
+                        itemDownloadManager = idm
+                    )
 
                     whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
                 }
@@ -188,7 +197,10 @@ class YoutubeDlDownloaderTest(
             fun beforeEach() {
                 Mockito.reset(template, youtube)
                 val url = URI.create("https://foo.bar.com/one.mp3")
-                downloader.downloadingInformation = dItem.copy(urls = listOf(url))
+                downloader.with(
+                    information = dItem.copy(urls = listOf(url)),
+                    itemDownloadManager = idm
+                )
                 whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
                 whenever(youtube.download(eq(url.toASCIIString()), any(), any())).then {
                     Files.createFile(it.getArgument(1))

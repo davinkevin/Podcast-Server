@@ -105,7 +105,7 @@ class FfmpegDownloader(
         downloadingInformation = downloadingInformation.progression(progress)
         log.debug("Progression : {}", downloadingInformation.item.progression)
 
-        broadcast(downloadingInformation.item)
+        helper.broadcast(downloadingInformation)
     }
 
     override fun stopDownload() {

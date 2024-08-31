@@ -82,7 +82,6 @@ class DownloaderTest {
         }
 
         @Test
-        @Suppress("UnassignedFluxMonoInstance")
         fun `should save sync with podcast`() {
             /* Given */
             val information = DownloadingInformation(item, listOf(), Path("file.mp4"), null)
@@ -90,7 +89,7 @@ class DownloaderTest {
             whenever(downloadRepository.updateDownloadItem(any())).thenReturn(1)
 
             /* When */
-            downloader.saveStateOfItem(information.item)
+            downloader.saveStateOfItem(information)
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {

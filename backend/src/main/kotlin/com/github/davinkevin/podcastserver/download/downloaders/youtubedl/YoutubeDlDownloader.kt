@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
 import com.github.davinkevin.podcastserver.download.DownloadRepository
+import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.download.downloaders.AbstractDownloader
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
@@ -18,7 +19,7 @@ import kotlin.streams.asSequence
 /**
  * Created by kevin on 2019-07-21
  */
-class YoutubeDlDownloader(
+open class YoutubeDlDownloader(
     downloadRepository: DownloadRepository,
     template: MessagingTemplate,
     clock: Clock,
@@ -39,7 +40,7 @@ class YoutubeDlDownloader(
             val broadcast = downloadingInformation.item.progression < progression
             if (broadcast) {
                 downloadingInformation = downloadingInformation.progression(progression)
-                broadcast(downloadingInformation.item)
+                broadcast(downloadingInformation)
             }
         }
 

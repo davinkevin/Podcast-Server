@@ -106,7 +106,7 @@ class RTMPDownloaderTest {
         inner class ShouldFailed {
 
             @Test
-            fun immediately_when_process_start() {
+            fun `immediately when process start`() {
                 /* Given */
                 val pb = mock<ProcessBuilder>()
                 whenever(pb.directory(File("/tmp"))).then { pb }

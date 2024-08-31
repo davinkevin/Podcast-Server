@@ -95,7 +95,7 @@ class RTMPDownloader(
 
     override fun startDownload() {
         stopDownloading.set(false)
-        super.startDownload()
+        helper.startDownload(this::download, this::failDownload)
     }
 
     override fun stopDownload() {
@@ -120,7 +120,7 @@ class RTMPDownloader(
 
     private fun broadcastProgression(item: DownloadingItem, progression: Int) {
         if (item.progression != progression)
-            broadcast(downloadingInformation.item)
+            broadcast(downloadingInformation)
     }
 
     private fun isProgressionLine(line: String): Pair<Boolean, Int> {
