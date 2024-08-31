@@ -95,7 +95,7 @@ class RTMPDownloader(
 
     override fun startDownload() {
         stopDownloading.set(false)
-        helper.startDownload(this::download, this::failDownload)
+        helper.startDownload(this, this::failDownload)
     }
 
     override fun stopDownload() {

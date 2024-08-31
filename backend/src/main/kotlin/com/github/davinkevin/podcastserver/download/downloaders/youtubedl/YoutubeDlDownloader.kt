@@ -1,74 +1,67 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
-import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
-import com.github.davinkevin.podcastserver.download.downloaders.AbstractDownloader
+import com.github.davinkevin.podcastserver.download.downloaders.Downloader
+import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelper
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
-import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
-import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
-import java.time.Clock
-import java.util.*
 import kotlin.io.path.absolutePathString
 import kotlin.math.roundToInt
 import kotlin.streams.asSequence
 
-/**
- * Created by kevin on 2019-07-21
- */
-open class YoutubeDlDownloader(
-    downloadRepository: DownloadRepository,
-    template: MessagingTemplate,
-    clock: Clock,
-    file: FileStorageService,
-    private val youtubeDl: YoutubeDlService
-) : AbstractDownloader(downloadRepository, template, clock, file) {
+class YoutubeDlDownloader(
+    private val state: DownloaderHelper,
+    private val youtubeDL: YoutubeDlService,
+): Downloader {
 
     private val log = LoggerFactory.getLogger(YoutubeDlDownloader::class.java)
 
-    override fun download(): DownloadingItem {
-        val url = downloadingInformation.url.toASCIIString()
-        downloadingInformation = downloadingInformation.fileName(youtubeDl.extractName(url))
+    //* To be removed when Downloader won't be anymore a DownloaderFactory *//
+    override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager): Downloader =
+        throw IllegalAccessException()
 
-        target = computeTargetFile(downloadingInformation)
+    override fun compatibility(downloadingInformation: DownloadingInformation): Int = throw IllegalAccessException()
+
+    override val downloadingInformation: DownloadingInformation
+        get() = state.info
+    //* end of section to remove *//
+
+    override fun download(): DownloadingItem {
+        val url = state.info.url.toASCIIString()
+        state.info = state.info.fileName(youtubeDL.extractName(url))
+
+        state.target = state.computeTargetFile(state.info)
 
         val callback = DownloadProgressCallback { p, _ ->
             val progression = p.roundToInt()
-            val broadcast = downloadingInformation.item.progression < progression
+            val broadcast = state.info.item.progression < progression
             if (broadcast) {
-                downloadingInformation = downloadingInformation.progression(progression)
-                broadcast(downloadingInformation)
+                state.info = state.info.progression(progression)
+                state.broadcast(state.info)
             }
         }
 
-        Result.run { youtubeDl.download(url, target, callback) }
+        youtubeDL.download(url, state.target, callback)
 
         finishDownload()
 
-        return downloadingInformation.item
+        return state.info.item
     }
 
     override fun finishDownload() {
-        target = Files.walk(target.parent).asSequence()
-                .firstOrNull { it.absolutePathString().startsWith(target.absolutePathString()) }
+        state.target = Files.walk(state.target.parent).asSequence()
+                .firstOrNull { it.absolutePathString().startsWith(state.target.absolutePathString()) }
                 ?: throw RuntimeException("No file found after download with youtube-dl...")
 
-        log.debug("File downloaded by youtube-dl is $target")
+        log.debug("File downloaded by youtube-dl is {}", state.target)
 
-        super.finishDownload()
+        state.finishDownload()
     }
 
-    override fun compatibility(downloadingInformation: DownloadingInformation): Int {
-        val url = downloadingInformation.urls.first().toASCIIString().lowercase(Locale.getDefault())
-
-        return when {
-            downloadingInformation.urls.size > 1 -> Int.MAX_VALUE
-            isFromVideoPlatform(url) -> 5
-            url.startsWith("http") -> Int.MAX_VALUE - 1
-            else -> Int.MAX_VALUE
-        }
-    }
+    override fun startDownload() = state.startDownload(this)
+    override fun stopDownload() = state.stopDownload()
+    override fun failDownload() = state.failDownload()
 }

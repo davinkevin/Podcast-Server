@@ -1,17 +1,15 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
-import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
-import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelper
+import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelperFactory
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
-import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
-import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
 import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLResponse
-import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
@@ -19,8 +17,6 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
@@ -48,7 +44,7 @@ private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC
 @ExtendWith(SpringExtension::class)
 class YoutubeDlDownloaderTest(
     @Autowired private val downloader: YoutubeDlDownloader,
-    @Autowired private val idm: ItemDownloadManager,
+    @Autowired private val helper: DownloaderHelper,
 ) {
 
     private val item: DownloadingItem = DownloadingItem (
@@ -68,16 +64,18 @@ class YoutubeDlDownloaderTest(
             )
     )
 
-    @MockBean private lateinit var downloadRepository: DownloadRepository
-    @MockBean private lateinit var template: MessagingTemplate
-    @MockBean private lateinit var file: FileStorageService
     @MockBean private lateinit var youtube: YoutubeDlService
 
     @TestConfiguration
     @Import(YoutubeDlDownloader::class)
     class LocalTestConfiguration {
-        @Bean fun clock(): Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
         @Bean fun idm(): ItemDownloadManager = mock()
+        @Bean fun helper(): DownloaderHelper = DownloaderHelperFactory(
+            downloadRepository = mock(),
+            clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC")),
+            file = mock(),
+            template = mock(),
+        ).build(mock(), mock())
     }
 
     @Nested
@@ -93,13 +91,12 @@ class YoutubeDlDownloaderTest(
 
         @BeforeEach
         fun beforeEach() {
-            Mockito.reset(template, youtube, idm)
-            downloader.itemDownloadManager = idm
+            Mockito.reset(helper.template, youtube, helper.manager)
 
-            doNothing().whenever(file).upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == dItem.item.podcast.title })
-            whenever(file.metadata(eq(dItem.item.podcast.title), any())).thenReturn(FileMetaData("foo/bar", 123L))
-            whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
-            whenever(downloadRepository.finishDownload(any(), any(), anyOrNull(), any(), any()))
+            doNothing().whenever(helper.file).upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == dItem.item.podcast.title })
+            whenever(helper.file.metadata(eq(dItem.item.podcast.title), any())).thenReturn(FileMetaData("foo/bar", 123L))
+            whenever(helper.downloadRepository.updateDownloadItem(any())).thenReturn(0)
+            whenever(helper.downloadRepository.finishDownload(any(), any(), anyOrNull(), any(), any()))
                     .thenReturn(0)
         }
 
@@ -108,10 +105,8 @@ class YoutubeDlDownloaderTest(
             /* Given */
             val url = URI.create("https://foo.bar.com/one.mp3")
             var finalFile: Path = Files.createTempFile("not-used-for-now", ".mp3")
-            downloader.with(
-                information = dItem.copy(urls = listOf(url)),
-                itemDownloadManager = idm
-            )
+            helper.info = dItem.copy(urls = listOf(url))
+
             whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
             whenever(youtube.download(eq(url.toASCIIString()), any(), any())).then {
                 val fileToCreate = it.getArgument<Path>(1)
@@ -124,8 +119,8 @@ class YoutubeDlDownloaderTest(
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
-                verify(file).upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == dItem.item.podcast.title && content == finalFile })
-                verify(file).metadata(dItem.item.podcast.title, finalFile)
+                verify(helper.file).upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == dItem.item.podcast.title && content == finalFile })
+                verify(helper.file).metadata(dItem.item.podcast.title, finalFile)
             }
         }
 
@@ -142,10 +137,7 @@ class YoutubeDlDownloaderTest(
                 @Test
                 fun `with youtube-dl`() {
                     /* Given */
-                    downloader.with(
-                        information = dItem.copy(urls = listOf(url)),
-                        itemDownloadManager = idm
-                    )
+                    helper.info = dItem.copy(urls = listOf(url))
 
                     whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
                     doThrow(RuntimeException("fake error"))
@@ -165,11 +157,7 @@ class YoutubeDlDownloaderTest(
 
                 @BeforeEach
                 fun beforeEach() {
-                    downloader.with(
-                        information = dItem.copy(urls = listOf(url)),
-                        itemDownloadManager = idm
-                    )
-
+                    helper.info = dItem.copy(urls = listOf(url))
                     whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
                 }
 
@@ -195,12 +183,10 @@ class YoutubeDlDownloaderTest(
 
             @BeforeEach
             fun beforeEach() {
-                Mockito.reset(template, youtube)
+                Mockito.reset(helper.template, youtube)
                 val url = URI.create("https://foo.bar.com/one.mp3")
-                downloader.with(
-                    information = dItem.copy(urls = listOf(url)),
-                    itemDownloadManager = idm
-                )
+                helper.info = dItem.copy(urls = listOf(url))
+
                 whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
                 whenever(youtube.download(eq(url.toASCIIString()), any(), any())).then {
                     Files.createFile(it.getArgument(1))
@@ -218,100 +204,73 @@ class YoutubeDlDownloaderTest(
                 callback.onProgressUpdate(1f, 2)
 
                 /* Then */
-                verify(template, times(2)).sendItem(any())
+                verify(helper.template, times(2)).sendItem(any())
             }
 
             @Test
             fun `and should not broadcast`() {
                 /* Given */
                 val callback = captor.firstValue
-                downloader.downloadingInformation = downloader.downloadingInformation.progression(1)
+                helper.info = helper.info.progression(1)
 
                 /* When */
                 callback.onProgressUpdate(1f, 2)
 
                 /* Then */
                 await().atMost(5, TimeUnit.SECONDS).untilAsserted {
-                    verify(template).sendItem(any())
+                    verify(helper.template).sendItem(any())
                 }
             }
         }
     }
 
     @Nested
-    @DisplayName("compatibility")
-    inner class Compatibility {
+    @DisplayName("should call state methods")
+    inner class ShouldCallStateMethods {
 
         @Test
-        fun `should be at lower level of compatibility if multiple urls`() {
+        fun `for run`() {
             /* Given */
-            val dItem = DownloadingInformation(
-                    item = item,
-                    urls = listOf("https://foo.bar.com/one.mp3", "https://foo.bar.com/two.mp3").map(URI::create),
-                    filename = Path("one.mp3"),
-                    userAgent = null
-            )
+            val state: DownloaderHelper = mock()
+            val aDownloader = YoutubeDlDownloader(state, mock())
             /* When */
-            val compatibility = downloader.compatibility(dItem)
+            aDownloader.run()
             /* Then */
-            assertThat(compatibility).isEqualTo(Int.MAX_VALUE)
-        }
-
-        @ParameterizedTest(name = "url {0}")
-        @ValueSource(strings = [
-            "https://youtube.com/file.mp3",
-            "https://www.6play.fr/file.mp3",
-            "https://www.tf1.fr/file.mp3",
-            "https://www.france.tv/file.mp3",
-            "https://replay.gulli.fr/file.mp3",
-            "https://dailymotion.com/file.mp3"
-        ])
-        fun `should be compatible if is video platform from`(url: String) {
-            /* Given */
-            val dItem = DownloadingInformation(
-                    item = item,
-                    urls = listOf(URI.create(url)),
-                    filename = Path("one.mp3"),
-                    userAgent = null
-            )
-
-            /* When */
-            val compatibility = downloader.compatibility(dItem)
-
-            /* Then */
-            assertThat(compatibility).isEqualTo(5)
+            verify(state).startDownload(any(), any())
         }
 
         @Test
-        fun `should be at lower level minus one for http`() {
+        fun `for startDownload`() {
             /* Given */
-            val dItem = DownloadingInformation(
-                    item = item,
-                    urls = listOf(URI.create("https://foo.bar.com/one.mp3")),
-                    filename = Path("one.mp3"),
-                    userAgent = null
-            )
+            val state: DownloaderHelper = mock()
+            val aDownloader = YoutubeDlDownloader(state, mock())
             /* When */
-            val compatibility = downloader.compatibility(dItem)
+            aDownloader.startDownload()
             /* Then */
-            assertThat(compatibility).isEqualTo(Int.MAX_VALUE-1)
+            verify(state).startDownload(any(), any())
         }
 
         @Test
-        fun `should not support other format of urls`() {
+        fun `for stopDownload`() {
             /* Given */
-            val dItem = DownloadingInformation(
-                    item = item,
-                    urls = listOf(URI.create("rtmp://foo.bar.com/one.mp3")),
-                    filename = Path("one.mp3"),
-                    userAgent = null
-            )
+            val state: DownloaderHelper = mock()
+            val aDownloader = YoutubeDlDownloader(state, mock())
             /* When */
-            val compatibility = downloader.compatibility(dItem)
+            aDownloader.stopDownload()
             /* Then */
-            assertThat(compatibility).isEqualTo(Int.MAX_VALUE)
+            verify(state).stopDownload()
+        }
+
+        @Test
+        fun `for failDownload`() {
+            /* Given */
+            val state: DownloaderHelper = mock()
+            val aDownloader = YoutubeDlDownloader(state, mock())
+            /* When */
+            aDownloader.failDownload()
+            /* Then */
+            verify(state).failDownload()
         }
 
     }
-
 }

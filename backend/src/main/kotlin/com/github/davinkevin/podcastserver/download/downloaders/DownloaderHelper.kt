@@ -7,6 +7,8 @@ import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import org.slf4j.LoggerFactory
+import org.springframework.context.annotation.Configuration
+import org.springframework.context.annotation.Import
 import java.nio.file.Files
 import java.nio.file.Path
 import java.time.Clock
@@ -29,18 +31,19 @@ class DownloaderHelper(
     val clock: Clock,
     val file: FileStorageService,
     val manager: ItemDownloadManager,
-    var item: DownloadingInformation,
+    var info: DownloadingInformation,
 ) {
 
     var target: Path = Files.createTempFile("default-init-file", ".ext")
     private val log = LoggerFactory.getLogger(DownloaderHelper::class.java)
 
-    fun startDownload(download: () -> Unit, failDownload: () -> Unit = this::failDownload) {
-        item = item.status(Status.STARTED)
-        saveState(item)
-        broadcast(item)
+    fun startDownload(downloader: Downloader, failDownload: () -> Unit = this::failDownload) {
+        log.info("Starting download of ${info.item.url}")
+        info = info.status(Status.STARTED)
+        saveState(info)
+        broadcast(info)
 
-        val execution = runCatching { download() }
+        val execution = runCatching { downloader.download() }
         if (execution.isFailure) {
             log.error("Error during download", execution.exceptionOrNull())
             failDownload()
@@ -48,42 +51,42 @@ class DownloaderHelper(
     }
 
     fun stopDownload() {
-        item = item.status(Status.STOPPED)
-        saveState(item)
-        manager.removeACurrentDownload(item.item.id)
+        info = info.status(Status.STOPPED)
+        saveState(info)
+        manager.removeACurrentDownload(info.item.id)
 
         Files.deleteIfExists(target)
 
-        broadcast(item)
+        broadcast(info)
     }
 
     fun failDownload() {
-        item = item
+        info = info
             .status(Status.FAILED)
             .addATry()
 
-        saveState(item)
+        saveState(info)
 
-        manager.removeACurrentDownload(item.item.id)
+        manager.removeACurrentDownload(info.item.id)
 
         Files.deleteIfExists(target)
 
-        broadcast(item)
+        broadcast(info)
     }
 
     fun finishDownload() {
-        manager.removeACurrentDownload(item.item.id)
+        manager.removeACurrentDownload(info.item.id)
         Thread.ofVirtual().start(::finishDownloadSync)
     }
 
     private fun finishDownloadSync() = runCatching {
-        file.upload(UploadRequest.ForItemFromPath(item.item.podcast.title, target))
+        file.upload(UploadRequest.ForItemFromPath(info.item.podcast.title, target))
 
-        val (mimeType, size) = file.metadata(item.item.podcast.title, target)
+        val (mimeType, size) = file.metadata(info.item.podcast.title, target)
             ?: return@runCatching
 
         downloadRepository.finishDownload(
-            id = item.item.id,
+            id = info.item.id,
             length = size,
             mimeType = mimeType,
             fileName = target.fileName,
@@ -91,12 +94,12 @@ class DownloaderHelper(
         )
     }
         .onSuccess {
-            item = item.status(Status.FINISH)
-            broadcast(item)
-            log.info("End of download for ${item.item.url}")
+            info = info.status(Status.FINISH)
+            broadcast(info)
+            log.info("End of download for ${info.item.url}")
         }
         .onFailure {
-            log.error("Error during download of ${item.item.url}", it)
+            log.error("Error during download of ${info.item.url}", it)
             failDownload()
         }
 
@@ -105,7 +108,7 @@ class DownloaderHelper(
             .replace("\n".toRegex(), "")
             .replace("[^a-zA-Z0-9.-]".toRegex(), "_")
             .let(::Path)
-        val name = simplifiedFilename.nameWithoutExtension + "-${item.item.id}"
+        val name = simplifiedFilename.nameWithoutExtension + "-${this.info.item.id}"
         val extension = simplifiedFilename.extension
 
         return Files.createTempDirectory(info.item.podcast.title)
@@ -117,3 +120,7 @@ class DownloaderHelper(
     }
     fun broadcast(item: DownloadingInformation) = template.sendItem(item.item)
 }
+
+@Configuration
+@Import(DownloaderHelperFactory::class)
+class DownloaderConfiguration

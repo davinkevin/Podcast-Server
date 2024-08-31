@@ -9,17 +9,23 @@ import org.springframework.stereotype.Service
  * Created by kevin on 17/03/15.
  */
 @Service
-class DownloaderSelector(val context: ApplicationContext, val downloaders: Set<Downloader>) {
+class DownloaderSelector(
+    val context: ApplicationContext,
+    val downloaderFactories: Set<DownloaderFactory>
+) {
 
     @Suppress("UNCHECKED_CAST")
-    fun of(information: DownloadingInformation): Downloader {
+    fun of(information: DownloadingInformation): DownloaderFactory {
         if (information.urls.isEmpty()) {
             return NO_OP_DOWNLOADER
         }
 
-        val d = downloaders.minByOrNull { it.compatibility(information) }!!
-        val clazz = (if (d is TargetClassAware) d.targetClass else d.javaClass) as Class<Downloader>
-        return context.getBean(clazz)
+        val d = downloaderFactories.minByOrNull { it.compatibility(information) }!!
+        if (d is Downloader) {
+            val clazz = (if (d is TargetClassAware) d.targetClass else d.javaClass) as Class<Downloader>
+            return context.getBean(clazz)
+        }
+        return d
     }
 
     companion object {

@@ -10,22 +10,21 @@ import java.nio.file.Path
 import java.time.Clock
 
 abstract class AbstractDownloader(
-    private val downloadRepository: DownloadRepository,
-    private val template: MessagingTemplate,
+    downloadRepository: DownloadRepository,
+    template: MessagingTemplate,
     clock: Clock,
     file: FileStorageService,
 ) : Downloader {
 
     private val log = LoggerFactory.getLogger(AbstractDownloader::class.java)
-    private val helperFactory: DownloaderHelperFactory = DownloaderHelperFactory(downloadRepository, template, clock, file)
 
+    private val helperFactory = DownloaderHelperFactory(downloadRepository, template, clock, file)
     internal lateinit var helper: DownloaderHelper
-    internal open lateinit var itemDownloadManager: ItemDownloadManager
 
     override var downloadingInformation: DownloadingInformation
-        get() = helper.item
+        get() = helper.info
         set(value) {
-            helper.item = value
+            helper.info = value
         }
 
     var target: Path
@@ -36,8 +35,6 @@ abstract class AbstractDownloader(
 
     override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager): Downloader {
         this.helper = helperFactory.build(information, itemDownloadManager)
-        this.downloadingInformation = information
-        this.itemDownloadManager = itemDownloadManager
         return this
     }
 
@@ -47,7 +44,7 @@ abstract class AbstractDownloader(
     }
 
     override fun startDownload() {
-        helper.startDownload(this::download)
+        helper.startDownload(this)
     }
 
     override fun stopDownload() {

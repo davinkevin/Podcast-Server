@@ -2,7 +2,7 @@ package com.github.davinkevin.podcastserver.download.downloaders
 
 import com.github.davinkevin.podcastserver.download.downloaders.ffmpeg.FfmpegDownloader
 import com.github.davinkevin.podcastserver.download.downloaders.rtmp.RTMPDownloader
-import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.YoutubeDlDownloader
+import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.YoutubeDlDownloaderFactory
 import com.github.davinkevin.podcastserver.entity.Status
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
@@ -33,13 +33,13 @@ class DownloaderSelectorTest(
 
     @MockBean private lateinit var ffmpegDownloader: FfmpegDownloader
     @MockBean private lateinit var rtmpDownloader: RTMPDownloader
-    @MockBean private lateinit var youtubeDLownloader: YoutubeDlDownloader
+    @MockBean private lateinit var youtubeDLDownloader: YoutubeDlDownloaderFactory
 
     lateinit var selector: DownloaderSelector
 
     @BeforeEach
     fun beforeEach() {
-        val downloaders = setOf(ffmpegDownloader, rtmpDownloader, youtubeDLownloader)
+        val downloaders = setOf(ffmpegDownloader, rtmpDownloader, youtubeDLDownloader)
 
         downloaders.forEach { whenever(it.compatibility(any())).thenCallRealMethod()}
 
@@ -67,10 +67,10 @@ class DownloaderSelectorTest(
         @JvmStatic
         fun urlToDownloader(): Stream<DownloaderArgument> =
                 Stream.of(
-                        DownloaderArgument(URI.create("http://foo.bar.com/a/path/with/file.mp3"), YoutubeDlDownloader::class),
+                        DownloaderArgument(URI.create("http://foo.bar.com/a/path/with/file.mp3"), YoutubeDlDownloaderFactory::class),
                         DownloaderArgument(URI.create("http://foo.bar.com/a/path/with/file.m3u8"), FfmpegDownloader::class),
                         DownloaderArgument(URI.create("rtmp://ma.video.free.fr/video.mp4/audio/tnt/tnt1217/tnt1217.mp3"), RTMPDownloader::class),
-                        DownloaderArgument(URI.create("https://www.youtube.com/watch?v=RKh4T3m-Qlk&feature=youtube_gdata"), YoutubeDlDownloader::class)
+                        DownloaderArgument(URI.create("https://www.youtube.com/watch?v=RKh4T3m-Qlk&feature=youtube_gdata"), YoutubeDlDownloaderFactory::class)
                 )
     }
 }
