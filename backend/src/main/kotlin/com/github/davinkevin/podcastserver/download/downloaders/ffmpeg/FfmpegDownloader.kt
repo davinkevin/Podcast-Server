@@ -1,8 +1,10 @@
-package com.github.davinkevin.podcastserver.manager.downloader
-
+package com.github.davinkevin.podcastserver.download.downloaders.ffmpeg
 
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.manager.downloader.AbstractDownloader
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.ffmpeg.FfmpegService
@@ -10,7 +12,7 @@ import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import net.bramp.ffmpeg.builder.FFmpegBuilder
 import net.bramp.ffmpeg.progress.ProgressListener
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
+import org.springframework.beans.factory.config.ConfigurableBeanFactory
 import org.springframework.context.annotation.Scope
 import org.springframework.stereotype.Component
 import java.nio.file.Files
@@ -18,7 +20,7 @@ import java.nio.file.Path
 import java.time.Clock
 import java.util.*
 
-@Scope(SCOPE_PROTOTYPE)
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 @Component
 class FfmpegDownloader(
     downloadRepository: DownloadRepository,

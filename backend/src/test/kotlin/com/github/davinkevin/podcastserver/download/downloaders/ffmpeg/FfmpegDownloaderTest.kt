@@ -1,10 +1,12 @@
-package com.github.davinkevin.podcastserver.manager.downloader
+package com.github.davinkevin.podcastserver.download.downloaders.ffmpeg
 
 
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.*
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.ffmpeg.FfmpegService
@@ -201,10 +203,6 @@ class FfmpegDownloaderTest {
                     i.getArgument<ProgressListener>(2).progress(Progress().apply { out_time_ns = outTimeMs })
             private fun writeEmptyFileTo(location: String): Path =
                     Files.write(Paths.get(location), "".toByteArray(), StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING)
-            private fun numberOfChildrenFiles(location: Path) = Files
-                    .newDirectoryStream(location)
-                    .map { it }
-                    .size
         }
 
         @Nested

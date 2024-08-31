@@ -4,7 +4,7 @@ import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.Youtub
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
 import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
-import com.github.davinkevin.podcastserver.manager.downloader.FfmpegDownloader
+import com.github.davinkevin.podcastserver.download.downloaders.ffmpeg.FfmpegDownloader
 import com.github.davinkevin.podcastserver.manager.downloader.RTMPDownloader
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
