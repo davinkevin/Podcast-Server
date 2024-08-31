@@ -1,6 +1,5 @@
-package com.github.davinkevin.podcastserver.manager.worker
+package com.github.davinkevin.podcastserver.update.updaters
 
-import com.github.davinkevin.podcastserver.update.updaters.Type
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 

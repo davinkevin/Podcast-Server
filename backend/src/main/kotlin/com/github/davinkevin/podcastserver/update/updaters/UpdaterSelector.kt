@@ -1,7 +1,5 @@
-package com.github.davinkevin.podcastserver.manager.selector
+package com.github.davinkevin.podcastserver.update.updaters
 
-import com.github.davinkevin.podcastserver.update.updaters.Type
-import com.github.davinkevin.podcastserver.update.updaters.Updater
 import java.net.URI
 
 /**

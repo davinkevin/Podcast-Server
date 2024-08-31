@@ -1,6 +1,6 @@
 package com.github.davinkevin.podcastserver.podcast.type
 
-import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
+import com.github.davinkevin.podcastserver.update.updaters.UpdaterSelector
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import

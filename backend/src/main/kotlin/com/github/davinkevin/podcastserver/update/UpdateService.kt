@@ -6,7 +6,7 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemForCreation
 import com.github.davinkevin.podcastserver.item.ItemRepository
-import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
+import com.github.davinkevin.podcastserver.update.updaters.UpdaterSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.image.ImageService

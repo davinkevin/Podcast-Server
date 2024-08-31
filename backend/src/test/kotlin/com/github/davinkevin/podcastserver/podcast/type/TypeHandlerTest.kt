@@ -1,7 +1,7 @@
 package com.github.davinkevin.podcastserver.podcast.type
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
-import com.github.davinkevin.podcastserver.manager.selector.UpdaterSelector
+import com.github.davinkevin.podcastserver.update.updaters.UpdaterSelector
 import com.github.davinkevin.podcastserver.update.updaters.Type
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
