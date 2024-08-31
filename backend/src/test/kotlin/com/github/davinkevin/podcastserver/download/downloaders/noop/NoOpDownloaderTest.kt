@@ -1,7 +1,9 @@
-package com.github.davinkevin.podcastserver.manager.downloader
+package com.github.davinkevin.podcastserver.download.downloaders.noop
 
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.times

@@ -1,13 +1,15 @@
-package com.github.davinkevin.podcastserver.manager.downloader
+package com.github.davinkevin.podcastserver.download.downloaders.noop
 
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
+import com.github.davinkevin.podcastserver.manager.downloader.Downloader
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingInformation
+import com.github.davinkevin.podcastserver.manager.downloader.DownloadingItem
 
 
 /**
  * Created by kevin on 10/03/2016 for Podcast Server
  */
 class NoOpDownloader : Downloader {
-
 
     override lateinit var downloadingInformation: DownloadingInformation
     private lateinit var itemDownloadManager: ItemDownloadManager
