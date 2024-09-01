@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.download.downloaders
 
 import com.github.davinkevin.podcastserver.download.downloaders.noop.NoOpDownloader
+import com.github.davinkevin.podcastserver.download.downloaders.noop.NoOpDownloaderFactory
 import org.springframework.aop.TargetClassAware
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
@@ -17,7 +18,7 @@ class DownloaderSelector(
     @Suppress("UNCHECKED_CAST")
     fun of(information: DownloadingInformation): DownloaderFactory {
         if (information.urls.isEmpty()) {
-            return NO_OP_DOWNLOADER
+            return NoOpDownloaderFactory
         }
 
         val d = downloaderFactories.minByOrNull { it.compatibility(information) }!!
@@ -29,6 +30,6 @@ class DownloaderSelector(
     }
 
     companion object {
-        val NO_OP_DOWNLOADER = NoOpDownloader()
+        val NoOpDownloaderFactory = NoOpDownloaderFactory()
     }
 }

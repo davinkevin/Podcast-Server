@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.verify
 import org.mockito.kotlin.any
@@ -39,9 +40,7 @@ class NoOpDownloaderTest {
     fun `should return default value`() {
         /* Given */
         val info = DownloadingInformation(item,  listOf(), Path("noop.mp4"), null)
-        val downloader = NoOpDownloader().apply {
-            with(info, mock())
-        }
+        val downloader = NoOpDownloaderFactory().with(info, mock())
 
         /* When */
         downloader.stopDownload()
@@ -50,6 +49,22 @@ class NoOpDownloaderTest {
         /* Then */
         assertThat(downloader.download()).isEqualTo(info.item)
         assertThat(downloader.compatibility(info)).isEqualTo(-1)
+
+        /* And */
+        assertThatThrownBy { downloader.with(mock(), mock()) }
+            .isInstanceOf(IllegalAccessException::class.java)
+        assertThat(downloader.downloadingInformation).isNotNull
+            .isSameAs(info)
+    }
+
+    @Test
+    fun `should return default value with factory`() {
+        /* Given */
+        val info = DownloadingInformation(item,  listOf(), Path("noop.mp4"), null)
+        /* When */
+        val factory = NoOpDownloaderFactory()
+        /* Then */
+        assertThat(factory.compatibility(info)).isEqualTo(-1)
     }
 
     @Test
@@ -57,9 +72,7 @@ class NoOpDownloaderTest {
         /* GIVEN */
         val idm = mock<ItemDownloadManager>()
         val info = DownloadingInformation(item,  listOf(), Path(""), "")
-        val noOpDownloader = NoOpDownloader().apply {
-                with(info, idm)
-        }
+        val noOpDownloader = NoOpDownloaderFactory().with(info, idm)
 
         /* WHEN  */
         noOpDownloader.run()

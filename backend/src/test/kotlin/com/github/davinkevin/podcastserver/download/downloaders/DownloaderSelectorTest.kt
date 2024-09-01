@@ -50,7 +50,7 @@ class DownloaderSelectorTest(
     fun `should reject empty url`() {
         /* When */
         assertThat(selector.of(DownloadingInformation(dItem, listOf(), Path("file.mp4"), null))).isEqualTo(
-            DownloaderSelector.NO_OP_DOWNLOADER)
+            DownloaderSelector.NoOpDownloaderFactory)
     }
 
     @MethodSource("urlToDownloader")
