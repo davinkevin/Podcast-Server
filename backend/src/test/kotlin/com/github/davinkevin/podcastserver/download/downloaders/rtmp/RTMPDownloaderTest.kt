@@ -1,33 +1,34 @@
 package com.github.davinkevin.podcastserver.download.downloaders.rtmp
 
-import com.github.davinkevin.podcastserver.download.DownloadRepository
-import com.github.davinkevin.podcastserver.download.ItemDownloadManager
-import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelper
+import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelperFactory
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
-import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
-import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.mockito.Mock
 import org.mockito.Mockito
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Import
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.net.URI
 import java.nio.file.Files
-import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.Clock
 import java.time.OffsetDateTime
@@ -44,8 +45,14 @@ private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC
 /**
  * Created by kevin on 27/03/2016 for Podcast Server
  */
-@ExtendWith(MockitoExtension::class)
-class RTMPDownloaderTest {
+@ExtendWith(SpringExtension::class)
+class RTMPDownloaderTest(
+    @Autowired private val downloader: RTMPDownloader,
+    @Autowired private val helper: DownloaderHelper,
+) {
+
+    @MockBean lateinit var externalTools: ExternalTools
+    @MockBean lateinit var processService: ProcessService
 
     private val item: DownloadingItem = DownloadingItem (
             id = UUID.randomUUID(),
@@ -64,18 +71,28 @@ class RTMPDownloaderTest {
             )
     )
 
+    @TestConfiguration
+    @Import(RTMPDownloader::class)
+    class LocalTestConfiguration {
+        @Bean fun helper(): DownloaderHelper = DownloaderHelperFactory(
+            downloadRepository = mock(),
+            clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC")),
+            file = mock(),
+            template = mock(),
+        ).build(mock(), mock())
+    }
+
+    @Test
+    fun `should not be a factory anymore`() {
+        /* Given */
+        /* When */
+        assertThatThrownBy { downloader.with(mock(), mock()) }
+        /* Then */
+            .isInstanceOf(IllegalAccessException::class.java)
+    }
 
     @Nested
     inner class DownloadTest {
-
-        @Mock lateinit var downloadRepository: DownloadRepository
-        @Mock lateinit var itemDownloadManager: ItemDownloadManager
-        @Mock lateinit var template: MessagingTemplate
-        @Mock lateinit var file: FileStorageService
-        @Mock lateinit var externalTools: ExternalTools
-        @Mock lateinit var processService: ProcessService
-        val clock: Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
-        lateinit var downloader: RTMPDownloader
 
         lateinit var executionLogs: ByteArrayInputStream
 
@@ -93,12 +110,7 @@ class RTMPDownloaderTest {
                     .inputStream()
 
             whenever(externalTools.rtmpdump).thenReturn("/usr/local/bin/rtmpdump")
-            downloader = RTMPDownloader(downloadRepository, template, clock, file, processService, externalTools)
-
-            downloader.with(
-                    DownloadingInformation(item,  listOf(), Path("file.mp4"), null),
-                    itemDownloadManager
-            )
+            helper.info = DownloadingInformation(item, listOf(), Path("file.mp4"), null)
         }
 
         @Nested
@@ -119,7 +131,7 @@ class RTMPDownloaderTest {
                     any<String>(),
                 )).then { pb }
                 whenever(processService.start(any())).then { throw RuntimeException("Error occur during shell execution")}
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
+                whenever(helper.downloadRepository.updateDownloadItem(any())).thenReturn(0)
 
                 /* When */
                 downloader.run()
@@ -144,7 +156,7 @@ class RTMPDownloaderTest {
                 )).then { pb }
                 whenever(processService.start(any())).then { p }
                 whenever(processService.pidOf(p)).then { throw RuntimeException("Error during pid fetching") }
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
+                whenever(helper.downloadRepository.updateDownloadItem(any())).thenReturn(0)
 
                 /* When */
                 downloader.run()
@@ -191,12 +203,12 @@ class RTMPDownloaderTest {
             @Test
             fun `and save file to disk`() {
                 /* Given */
-                doNothing().whenever(file)
+                doNothing().whenever(helper.file)
                     .upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == item.podcast.title })
-                whenever(file.metadata(eq(item.podcast.title), any()))
+                whenever(helper.file.metadata(eq(item.podcast.title), any()))
                     .thenReturn(FileMetaData("video/mp4", 123L))
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
-                whenever(downloadRepository.finishDownload(
+                whenever(helper.downloadRepository.updateDownloadItem(any())).thenReturn(0)
+                whenever(helper.downloadRepository.finishDownload(
                         id = item.id,
                         length = 123L,
                         mimeType = "video/mp4",
@@ -222,17 +234,17 @@ class RTMPDownloaderTest {
                 @BeforeEach
                 fun beforeEach() {
                     whenever(p.waitFor()).then { isWaiting = true; SECONDS.sleep(4); 0 }
-                    whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
+                    whenever(helper.downloadRepository.updateDownloadItem(any())).thenReturn(0)
                 }
 
                 @Test
                 fun stop() {
                     /* GIVEN */
-                    doNothing().whenever(file)
+                    doNothing().whenever(helper.file)
                         .upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == item.podcast.title })
-                    whenever(file.metadata(eq(item.podcast.title), any()))
+                    whenever(helper.file.metadata(eq(item.podcast.title), any()))
                         .thenReturn(FileMetaData("video/mp4", 123L))
-                    whenever(downloadRepository.finishDownload(
+                    whenever(helper.downloadRepository.finishDownload(
                             id = item.id,
                             length = 123L,
                             mimeType = "video/mp4",
@@ -266,7 +278,7 @@ class RTMPDownloaderTest {
                         .trimIndent()
                         .toByteArray()
                         .inputStream()
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
+                whenever(helper.downloadRepository.updateDownloadItem(any())).thenReturn(0)
                 whenever(p.inputStream).then { executionLogs }
 
                 /* When */
@@ -280,28 +292,6 @@ class RTMPDownloaderTest {
 
     @Nested
     inner class CompatibilityTest {
-
-        @Mock lateinit var downloadRepository: DownloadRepository
-        @Mock lateinit var itemDownloadManager: ItemDownloadManager
-        @Mock lateinit var podcastServerParameters: PodcastServerParameters
-        @Mock lateinit var template: MessagingTemplate
-        @Mock lateinit var file: FileStorageService
-        @Mock lateinit var externalTools: ExternalTools
-        @Mock lateinit var processService: ProcessService
-        val clock: Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
-        lateinit var downloader: RTMPDownloader
-
-        @BeforeEach
-        fun beforeEach() {
-            downloader = RTMPDownloader(
-                downloadRepository,
-                template,
-                clock,
-                file,
-                processService,
-                externalTools
-            )
-        }
 
         @Test
         fun `should be compatible with only one url starting with rtmp`() {
@@ -334,9 +324,4 @@ class RTMPDownloaderTest {
         }
 
     }
-
-    private fun numberOfChildrenFiles(location: Path) = Files
-            .newDirectoryStream(location)
-            .map { it }
-            .size
 }

@@ -1,37 +1,37 @@
 package com.github.davinkevin.podcastserver.download.downloaders.rtmp
 
-import com.github.davinkevin.podcastserver.download.DownloadRepository
-import com.github.davinkevin.podcastserver.download.downloaders.AbstractDownloader
+import com.github.davinkevin.podcastserver.download.ItemDownloadManager
+import com.github.davinkevin.podcastserver.download.downloaders.Downloader
+import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelper
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
-import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
-import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.config.ConfigurableBeanFactory.SCOPE_PROTOTYPE
-import org.springframework.context.annotation.Scope
-import org.springframework.stereotype.Component
 import java.io.File
-import java.time.Clock
 import java.util.*
 import java.util.concurrent.atomic.AtomicBoolean
 import java.util.regex.Pattern
 
-@Component
-@Scope(SCOPE_PROTOTYPE)
 class RTMPDownloader(
-    downloadRepository: DownloadRepository,
-    template: MessagingTemplate,
-    clock: Clock,
-    file: FileStorageService,
-    val processService: ProcessService,
-    val externalTools: ExternalTools
-) : AbstractDownloader(downloadRepository, template, clock, file) {
+    private val state: DownloaderHelper,
+    private val processService: ProcessService,
+    private val externalTools: ExternalTools,
+) : Downloader {
 
     private val log = LoggerFactory.getLogger(RTMPDownloader::class.java)
 
-    internal var pid = 0L
+    //* To be removed when Downloader won't be anymore a DownloaderFactory *//
+    override val downloadingInformation: DownloadingInformation
+        get() = state.info
+    override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager): Downloader =
+        throw IllegalAccessException()
+    override fun compatibility(downloadingInformation: DownloadingInformation) =
+        if (downloadingInformation.urls.size == 1 && downloadingInformation.urls.first().toASCIIString().startsWith("rtmp://")) 1
+        else Integer.MAX_VALUE
+    //* end of section to remove *//
+
+    private var pid = 0L
     private var p: Process? = null
     private val stopDownloading = AtomicBoolean(false)
 
@@ -39,8 +39,8 @@ class RTMPDownloader(
         log.debug("Download")
 
         try {
-            target = computeTargetFile(downloadingInformation)
-            log.debug("out file : {}", target.toAbsolutePath().toString())
+            state.target = state.computeTargetFile(downloadingInformation)
+            log.debug("out file : {}", state.target.toAbsolutePath().toString())
 
             val processToExecute = processService
                 .newProcessBuilder(
@@ -48,7 +48,7 @@ class RTMPDownloader(
                     "-r",
                     downloadingInformation.url.toASCIIString(),
                     "-o",
-                    target.toAbsolutePath().toString()
+                    state.target.toAbsolutePath().toString()
                 )
                 .directory(File("/tmp"))
                 .redirectErrorStream(true)
@@ -73,18 +73,12 @@ class RTMPDownloader(
         process.inputStream
             .bufferedReader()
             .lines()
+            .peek { log.info("log is: $it") }
             .forEach {
-                log.info("log is: $it")
                 val (isProgression, progression) = isProgressionLine(it)
-                if (isProgression) {
-                    broadcastProgression(downloadingInformation.item, progression)
-                    return@forEach
-                }
-
-                if (isDownloadComplete(it)) {
-                    endReached = true
-                    finishDownload()
-                    return@forEach
+                when {
+                    isProgression -> broadcastProgression(downloadingInformation.item, progression)
+                    isDownloadComplete(it) -> { endReached = true; finishDownload() }
                 }
             }
 
@@ -95,13 +89,13 @@ class RTMPDownloader(
 
     override fun startDownload() {
         stopDownloading.set(false)
-        helper.startDownload(this, this::failDownload)
+        state.startDownload(this, this::failDownload)
     }
 
     override fun stopDownload() {
         stopDownloading.set(true)
         destroyProcess()
-        super.stopDownload()
+        state.stopDownload()
     }
 
     private fun destroyProcess() {
@@ -111,16 +105,14 @@ class RTMPDownloader(
     override fun failDownload() {
         stopDownloading.set(true)
         destroyProcess()
-        super.failDownload()
+        state.failDownload()
     }
 
-    override fun compatibility(downloadingInformation: DownloadingInformation) =
-        if (downloadingInformation.urls.size == 1 && downloadingInformation.urls.first().toASCIIString().startsWith("rtmp://")) 1
-        else Integer.MAX_VALUE
+    override fun finishDownload() = state.finishDownload()
 
     private fun broadcastProgression(item: DownloadingItem, progression: Int) {
         if (item.progression != progression)
-            broadcast(downloadingInformation)
+            state.broadcast(downloadingInformation)
     }
 
     private fun isProgressionLine(line: String): Pair<Boolean, Int> {
