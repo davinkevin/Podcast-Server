@@ -1,6 +1,58 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2024.9.0
+
+### Features
+
+- **playlist:** Add default cover for playlist in `rss` ([78b1b90](78b1b902292a5583394bc28c8d56a528d9788c66) - [#219](https://gitlab.com/davinkevin/Podcast-Server/-/issues/219))
+- **playlist:** Add cover redirection management ([9b7a7d1](9b7a7d145492320938f0018ffed2ace4fbbb1836) - [#219](https://gitlab.com/davinkevin/Podcast-Server/-/issues/219))
+- **playlist:** Add default cover to playlist until repository ([46a325e](46a325e9f3bf328dea07340045f7a64825a62cc6) - [#219](https://gitlab.com/davinkevin/Podcast-Server/-/issues/219))
+- **playlist:** Add cover insert into database ([3b7a141](3b7a1412753d9799e4271e8cc6b8683a854d08a0) - [#219](https://gitlab.com/davinkevin/Podcast-Server/-/issues/219))
+- **playlist:** Add cover insert into database ([b78c565](b78c5656af387ba7f1ea70d3348998c6bff55541) - [#219](https://gitlab.com/davinkevin/Podcast-Server/-/issues/219))
+- **playlist:** Rename WATCH_LIST to PLAYLIST ([0febea4](0febea4ac700560d6eeab0751ab5820a832f35dd) - [#219](https://gitlab.com/davinkevin/Podcast-Server/-/issues/219))
+
+### Bug Fixes
+
+- **backend:** Improve upload performance for item ([8539219](8539219e5bc6c88285b868327ce1f3be90a9fc95) - [#236](https://gitlab.com/davinkevin/Podcast-Server/-/issues/236))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.26.30 ([bebd146](bebd14696af845adb619c002caa03d829ea24ebf))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.26.31 ([e26c7da](e26c7daa02504bb0e3108bca9f98bc7c2a437d83))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.0 ([1b1533a](1b1533a558a0d859dad287ab7e855298fc6019bf))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.1 ([a5c5ed0](a5c5ed0f47e59e88297315c914eb965d63ee7fc5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.2 ([a0587ae](a0587aec82968f9704b0ff4977dc3a0d4d3aabc0))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.3 ([ff86812](ff868126ca3e27cbc15e533048fffba3edaa3e2a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.4 ([b802906](b8029067d78ec51e4dd8ed8fd2d0ebeca69c0232))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.5 ([7a9dfe0](7a9dfe0fd4853b69c69117123fe10e4b3c75425f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.6 ([b20bab0](b20bab00d7c831c7a487156308ae39da98fd088f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.7 ([bda51db](bda51db6f459e374b88af553fe7bc1e63885d3de))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.8 ([1dbdcb9](1dbdcb97657a4c573e91b8385d4ae5ef41a9e728))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.9 ([315cffc](315cffc0dfdc885f3eb14c18ae91ea860d075094))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.10 ([dc0d9ec](dc0d9ecc6a9652cf41e77641efd6772ff7f9c165))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.11 ([6df8df6](6df8df685ecceaf1219b9f8b1363fbcfde242691))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.12 ([bf4c474](bf4c4741fe455d1243b610efe9a06249045986f5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.13 ([2828f3e](2828f3e7a81ca5cf736daef9c666fc62c116c8b3))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.14 ([3016b09](3016b0964918a220d49a53d20426fef907eaa6ce))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.15 ([476280e](476280e77401ae38ba84e7980a0cb0ea2ca6869f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.16 ([c1dbc26](c1dbc2614f250635f3b6fa444fbf39c47abbfc15))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.17 ([3547ded](3547dedc036c473629bdccdf21e8475f7593ca7a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.18 ([bff03e0](bff03e0fe437e08e99d25775f327461286d14351))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.27.19 ([c6b8d7d](c6b8d7d16a4423980ab3a2a8af6268a01a3b3181))
+- **frontend:** Disable compression-static to avoid double gzip ([13c1620](13c16201fd43ce704652fe40404072337ca69ffd) - [#237](https://gitlab.com/davinkevin/Podcast-Server/-/issues/237))
+- **playlist:** Add extra mediatype for download ([e971710](e971710f7f83b97b15171ee4a54718c894f3b196) - [#219](https://gitlab.com/davinkevin/Podcast-Server/-/issues/219))
+
+### Refactor
+
+- **backend:** Refactor delete method to leverage sealed class for simplification ([2bbdb5d](2bbdb5dc188031760be6960ddb9637fb5d79827a) - [#219](https://gitlab.com/davinkevin/Podcast-Server/-/issues/219))
+- **backend:** Collocate logic about playlist cover download/upload ([936a9c0](936a9c0d01c62641ed69d3667cf2aaeb457b6477) - [#219](https://gitlab.com/davinkevin/Podcast-Server/-/issues/219))
+- **backend:** Move ffmpeg downloader to dedicated package ([698edbb](698edbb1335a1ff28d13fe6ee7090b7468fcb67b))
+- **backend:** Move noop downloader to dedicated package ([ddbb138](ddbb1385a322d622e9b87ddca3a1c5be6599c4ab))
+- **backend:** Move remaining downloaders to dedicated package ([9f34d7e](9f34d7e9f18a2d591a862b5f06e0ef4df7d446f5))
+- **backend:** Move updaters class to its own package ([e28e698](e28e69800c00861a365ce55131a117d7e82facc5))
+- **playlist:** Rename WATCH_LIST to PLAYLIST ([006acc6](006acc64515dbc9b4718bd6e595c34ee060c4b51) - [#219](https://gitlab.com/davinkevin/Podcast-Server/-/issues/219))
+- **playlist:** Merge playlist and item SQL queries ([5c755c0](5c755c0faab41879c6e9a555750f31bbaac28ca9))
+- **playlist:** DeleteById performs in one transaction ([0eabbbb](0eabbbb35211a69b9b4e7bf39e68b75877b7311a))
+- **playlist:** Save performs one less roundtrip to the db ([291cc4e](291cc4ebf9057015d3b9577f4a0df44bac887125))
+
 ## 2024.8.0
 
 ### Features
