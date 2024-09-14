@@ -23,6 +23,8 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
+import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
@@ -37,6 +39,7 @@ import java.util.concurrent.TimeUnit
 private val fixedDate = Clock.fixed(OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC).toInstant(), ZoneId.of("UTC"))
 
 @ExtendWith(SpringExtension::class)
+@AutoConfigureObservability
 class UpdateServiceTest(
     @Autowired private val service: UpdateService
 ) {

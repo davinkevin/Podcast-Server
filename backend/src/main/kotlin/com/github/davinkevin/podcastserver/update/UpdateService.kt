@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemForCreation
 import com.github.davinkevin.podcastserver.item.ItemRepository
-import com.github.davinkevin.podcastserver.update.updaters.UpdaterSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.image.ImageService
@@ -14,6 +13,9 @@ import com.github.davinkevin.podcastserver.service.storage.DownloadAndUploadRequ
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.UpdaterSelector
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Timer
 import org.slf4j.LoggerFactory
 import org.springframework.core.task.SimpleAsyncTaskExecutor
 import java.net.URI
@@ -21,6 +23,8 @@ import java.time.OffsetDateTime.now
 import java.util.*
 import java.util.concurrent.Callable
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.atomic.AtomicInteger
+import java.util.function.Supplier
 import kotlin.time.measureTimedValue
 
 class UpdateService(
@@ -31,12 +35,19 @@ class UpdateService(
     private val fileService: FileStorageService,
     private val idm: ItemDownloadManager,
     private val updateExecutor: SimpleAsyncTaskExecutor,
+    registry: MeterRegistry,
 ) {
 
     private val log = LoggerFactory.getLogger(UpdateService::class.java)!!
+    private val updateTimer = Timer.builder("update.all.duration")
+        .description("Time to update all podcasts")
+        .register(registry)
+
+    private val numberOfItemGauge = registry.gauge("update.all.numberOfItems", AtomicInteger(0))!!
+    private val numberOfPodcastGauge = registry.gauge("update.all.numberOfPodcast", AtomicInteger(0))!!
 
     fun updateAll(force: Boolean, download: Boolean) {
-        updateExecutor.execute { updateAllSync(force, download) }
+        updateExecutor.execute { updateTimer.record(Supplier{updateAllSync(force, download)}) }
     }
 
     private fun updateAllSync(force: Boolean, download: Boolean) {
@@ -58,6 +69,10 @@ class UpdateService(
                 .map { Callable { updaters.of(it.url).update(it) } }
                 .map { updateExecutor.submitCompletable(it).exceptionally { null } }
                 .mapNotNull { it.get(5, TimeUnit.MINUTES) }
+                .also {
+                    numberOfItemGauge.set(it.size)
+                    numberOfPodcastGauge.set(it.flatMap { v -> v.items }.size)
+                }
 
             results
                 .forEach { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
