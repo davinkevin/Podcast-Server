@@ -1,51 +1,50 @@
 package com.github.davinkevin.podcastserver.download.downloaders.ffmpeg
 
-import com.github.davinkevin.podcastserver.download.DownloadRepository
-import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.download.downloaders.AbstractDownloader
+import com.github.davinkevin.podcastserver.download.ItemDownloadManager
+import com.github.davinkevin.podcastserver.download.downloaders.Downloader
+import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelper
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
-import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.ffmpeg.FfmpegService
-import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import net.bramp.ffmpeg.builder.FFmpegBuilder
 import net.bramp.ffmpeg.progress.ProgressListener
 import org.slf4j.LoggerFactory
-import org.springframework.beans.factory.config.ConfigurableBeanFactory
-import org.springframework.context.annotation.Scope
-import org.springframework.stereotype.Component
 import java.nio.file.Files
 import java.nio.file.Path
-import java.time.Clock
-import java.util.*
 
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-@Component
 class FfmpegDownloader(
-    downloadRepository: DownloadRepository,
-    template: MessagingTemplate,
-    clock: Clock,
-    file: FileStorageService,
-    val ffmpegService: FfmpegService,
-    val processService: ProcessService
-) : AbstractDownloader(downloadRepository, template, clock, file) {
+    private val state: DownloaderHelper,
+    private val ffmpegService: FfmpegService,
+    private val processService: ProcessService,
+) : Downloader {
 
     private val log = LoggerFactory.getLogger(FfmpegDownloader::class.java)
+
+    //* To be removed when Downloader won't be anymore a DownloaderFactory *//
+    override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager): Downloader =
+        throw IllegalAccessException()
+
+    override fun compatibility(downloadingInformation: DownloadingInformation): Int = throw IllegalAccessException()
+
+    override val downloadingInformation: DownloadingInformation
+        get() = state.info
+    //* end of section to remove *//
 
     lateinit var process: Process
     private var globalDuration = 0.0
     private var alreadyDoneDuration = 0.0
 
     override fun download(): DownloadingItem {
-        log.debug("Download {}", downloadingInformation.item.title)
+        log.debug("Download {}", state.info.item.title)
 
-        target = computeTargetFile(downloadingInformation)
+        state.target = state.computeTargetFile(state.info)
 
-        globalDuration = downloadingInformation.urls
-                .sumOf { ffmpegService.getDurationOf(it.toASCIIString(), downloadingInformation.userAgent) }
+        globalDuration = state.info.urls
+            .sumOf { ffmpegService.getDurationOf(it.toASCIIString(), state.info.userAgent) }
 
-        val multiDownloads = downloadingInformation.urls.map { download(it.toASCIIString()) }
+        val multiDownloads = state.info.urls.map { download(it.toASCIIString()) }
 
         if (multiDownloads.any { it.isFailure }) {
             val cause = multiDownloads.first { it.isFailure }.exceptionOrNull()
@@ -53,13 +52,12 @@ class FfmpegDownloader(
         }
 
         runCatching {
-            ffmpegService.concat(target, *multiDownloads.map { it.getOrNull()!! }.toTypedArray())
+            ffmpegService.concat(state.target, *multiDownloads.map { it.getOrNull()!! }.toTypedArray())
         }
 
         multiDownloads
-                .filter { it.isSuccess }
-                .map { it.getOrNull()!! }
-                .forEach { Result.runCatching { Files.deleteIfExists(it) } }
+            .mapNotNull { it.getOrNull() }
+            .forEach { runCatching { Files.deleteIfExists(it) } }
 
         if (downloadingInformation.item.status == Status.STARTED) {
             finishDownload()
@@ -69,19 +67,19 @@ class FfmpegDownloader(
     }
 
     private fun download(url: String): Result<Path> {
-        val duration = ffmpegService.getDurationOf(url, downloadingInformation.userAgent)
+        val duration = ffmpegService.getDurationOf(url, state.info.userAgent)
 
-        val subTarget = Files.createTempFile("podcast-server", downloadingInformation.item.id.toString())
-        val userAgent = downloadingInformation.userAgent ?: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36"
+        val subTarget = Files.createTempFile("podcast-server", state.info.item.id.toString())
+        val userAgent = state.info.userAgent ?: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_5) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.85 Safari/537.36"
         val command = FFmpegBuilder()
-                .addUserAgent(userAgent)
-                .addInput(url)
-                .addOutput(subTarget.toAbsolutePath().toString())
-                .setFormat("mp4")
-                .setAudioBitStreamFilter(FfmpegService.AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC)
-                .setVideoCodec(FfmpegService.CODEC_COPY)
-                .setAudioCodec(FfmpegService.CODEC_COPY)
-                .done()
+            .addUserAgent(userAgent)
+            .addInput(url)
+            .addOutput(subTarget.toAbsolutePath().toString())
+            .setFormat("mp4")
+            .setAudioBitStreamFilter(FfmpegService.AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC)
+            .setVideoCodec(FfmpegService.CODEC_COPY)
+            .setAudioCodec(FfmpegService.CODEC_COPY)
+            .done()
 
         return Result.runCatching {
             process = ffmpegService.download(url, command, handleProgression(alreadyDoneDuration, globalDuration))
@@ -89,38 +87,38 @@ class FfmpegDownloader(
             alreadyDoneDuration += duration
             subTarget
         }
-                .onFailure { Files.deleteIfExists(subTarget) }
+            .onFailure { Files.deleteIfExists(subTarget) }
 
     }
 
     private fun handleProgression(alreadyDoneDuration: Double, globalDuration: Double) =
-            ProgressListener{
-                broadcastProgression(((it.out_time_ns.toFloat() + alreadyDoneDuration.toFloat()) / globalDuration.toFloat() * 100).toInt())
-            }
+        ProgressListener{
+            broadcastProgression(((it.out_time_ns.toFloat() + alreadyDoneDuration.toFloat()) / globalDuration.toFloat() * 100).toInt())
+        }
 
     private fun broadcastProgression(progress: Int) {
 
-        if (downloadingInformation.item.progression == progress) return
+        if (state.info.item.progression == progress) return
 
-        downloadingInformation = downloadingInformation.progression(progress)
-        log.debug("Progression : {}", downloadingInformation.item.progression)
+        state.info = state.info.progression(progress)
+        log.debug("Progression : {}", state.info.item.progression)
 
-        helper.broadcast(downloadingInformation)
+        state.broadcast(state.info)
     }
 
     override fun stopDownload() {
         try {
             process.destroy()
-            super.stopDownload()
+            state.stopDownload()
         } catch (e: Exception) {
             log.error("Error during stop of process :", e)
-            failDownload()
+            state.failDownload()
         }
     }
 
-    override fun compatibility(downloadingInformation: DownloadingInformation) =
-            if (downloadingInformation.urls.map { it.toASCIIString().lowercase(Locale.getDefault()) }.all { "m3u8" in it || "mp4" in it }) 10
-            else Integer.MAX_VALUE
+    override fun startDownload() = state.startDownload(this)
+    override fun failDownload() = state.failDownload()
+    override fun finishDownload() = state.finishDownload()
 }
 
 private fun FFmpegBuilder.addUserAgent(userAgent: String) = addExtraArgs("-headers", "User-Agent: $userAgent")

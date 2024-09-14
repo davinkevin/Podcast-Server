@@ -39,14 +39,14 @@ class RTMPDownloader(
         log.debug("Download")
 
         try {
-            state.target = state.computeTargetFile(downloadingInformation)
+            state.target = state.computeTargetFile(state.info)
             log.debug("out file : {}", state.target.toAbsolutePath().toString())
 
             val processToExecute = processService
                 .newProcessBuilder(
                     externalTools.rtmpdump,
                     "-r",
-                    downloadingInformation.url.toASCIIString(),
+                    state.info.url.toASCIIString(),
                     "-o",
                     state.target.toAbsolutePath().toString()
                 )
@@ -64,7 +64,7 @@ class RTMPDownloader(
             throw RuntimeException(e)
         }
 
-        return downloadingInformation.item
+        return state.info.item
     }
 
     fun listenLogs(process: Process) {
@@ -77,7 +77,7 @@ class RTMPDownloader(
             .forEach {
                 val (isProgression, progression) = isProgressionLine(it)
                 when {
-                    isProgression -> broadcastProgression(downloadingInformation.item, progression)
+                    isProgression -> broadcastProgression(state.info.item, progression)
                     isDownloadComplete(it) -> { endReached = true; finishDownload() }
                 }
             }
@@ -112,7 +112,7 @@ class RTMPDownloader(
 
     private fun broadcastProgression(item: DownloadingItem, progression: Int) {
         if (item.progression != progression)
-            state.broadcast(downloadingInformation)
+            state.broadcast(state.info)
     }
 
     private fun isProgressionLine(line: String): Pair<Boolean, Int> {

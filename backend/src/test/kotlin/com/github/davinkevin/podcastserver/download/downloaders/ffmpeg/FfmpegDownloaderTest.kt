@@ -1,32 +1,34 @@
 package com.github.davinkevin.podcastserver.download.downloaders.ffmpeg
 
 
-import com.github.davinkevin.podcastserver.download.DownloadRepository
-import com.github.davinkevin.podcastserver.download.ItemDownloadManager
-import com.github.davinkevin.podcastserver.entity.Status.*
+import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelper
+import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelperFactory
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
-import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
+import com.github.davinkevin.podcastserver.entity.Status.*
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.ffmpeg.FfmpegService
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
-import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import net.bramp.ffmpeg.builder.FFmpegBuilder
 import net.bramp.ffmpeg.progress.Progress
 import net.bramp.ffmpeg.progress.ProgressListener
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.awaitility.Awaitility.await
-import org.junit.jupiter.api.*
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Disabled
+import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
-import org.junit.jupiter.params.ParameterizedTest
-import org.junit.jupiter.params.provider.ValueSource
-import org.mockito.Mock
-import org.mockito.Spy
 import org.mockito.invocation.InvocationOnMock
-import org.mockito.junit.jupiter.MockitoExtension
 import org.mockito.kotlin.*
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Import
+import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
@@ -42,11 +44,14 @@ import kotlin.io.path.Path
 
 private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
-/**
- * Created by kevin on 20/02/2016 for Podcast Server
- */
-@ExtendWith(MockitoExtension::class)
-class FfmpegDownloaderTest {
+@ExtendWith(SpringExtension::class)
+class FfmpegDownloaderTest(
+    @Autowired private val downloader: FfmpegDownloader,
+    @Autowired private val helper: DownloaderHelper,
+) {
+
+    @MockBean lateinit var ffmpegService: FfmpegService
+    @MockBean lateinit var processService: ProcessService
 
     private val item: DownloadingItem = DownloadingItem (
             id = UUID.randomUUID(),
@@ -65,29 +70,42 @@ class FfmpegDownloaderTest {
             )
     )
 
+    @TestConfiguration
+    @Import(FfmpegDownloader::class)
+    class LocalTestConfiguration {
+        @Bean
+        fun helper(): DownloaderHelper = DownloaderHelperFactory(
+            downloadRepository = mock(),
+            clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC")),
+            file = mock(),
+            template = mock(),
+        ).build(mock(), mock())
+    }
+
+    @Test
+    fun `should not be a factory anymore`() {
+        /* Given */
+        /* When */
+        assertThatThrownBy { downloader.with(mock(), mock()) }
+            /* Then */
+            .isInstanceOf(IllegalAccessException::class.java)
+    }
+
+    @Test
+    fun `should not report compatibility`() {
+        /* Given */
+        /* When */
+        assertThatThrownBy { downloader.compatibility(DownloadingInformation(item, emptyList(), Path("file.mp4"), null)) }
+            /* Then */
+            .isInstanceOf(IllegalAccessException::class.java)
+    }
+
     @Nested
     inner class DownloaderTest {
 
-        @Mock lateinit var downloadRepository: DownloadRepository
-        @Mock lateinit var podcastServerParameters: PodcastServerParameters
-        @Mock lateinit var template: MessagingTemplate
-        @Mock lateinit var file: FileStorageService
-
-        @Mock lateinit var itemDownloadManager: ItemDownloadManager
-
-        @Mock lateinit var ffmpegService: FfmpegService
-        @Mock lateinit var processService: ProcessService
-        @Spy val clock: Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
-
-        lateinit var downloader: FfmpegDownloader
-
-
         @BeforeEach
         fun beforeEach() {
-            downloader = FfmpegDownloader(downloadRepository, template, clock, file, ffmpegService, processService)
-
-            downloader
-                    .with(DownloadingInformation(item, listOf(item.url, URI.create("http://foo.bar.com/end.mp4")), Path("file.mp4"), "Fake UserAgent"), itemDownloadManager)
+            helper.info = DownloadingInformation(item, listOf(item.url, URI.create("http://foo.bar.com/end.mp4")), Path("file.mp4"), "Fake UserAgent")
         }
 
         @Nested
@@ -95,7 +113,7 @@ class FfmpegDownloaderTest {
 
             @BeforeEach
             fun beforeEach() {
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
+//                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
             }
 
             @Test
@@ -110,10 +128,10 @@ class FfmpegDownloaderTest {
                 whenever(processService.waitFor(any())).thenReturn(Result.success(1))
                 doAnswer { writeEmptyFileTo(it.getArgument<Path>(0).toString()); null
                 }.whenever(ffmpegService).concat(any(), anyVararg())
-                doNothing().whenever(file).upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == item.podcast.title })
-                whenever(file.metadata(eq(item.podcast.title), any()))
+                doNothing().whenever(helper.file).upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == item.podcast.title })
+                whenever(helper.file.metadata(eq(item.podcast.title), any()))
                     .thenReturn(FileMetaData("video/mp4", 123L))
-                whenever(downloadRepository.finishDownload(
+                whenever(helper.downloadRepository.finishDownload(
                         id = item.id,
                         length = 123L,
                         mimeType = "video/mp4",
@@ -207,13 +225,12 @@ class FfmpegDownloaderTest {
         @Nested
         inner class DuringDownloadOperation {
 
-
             @Test
             fun should_stop_a_download() {
                 /* Given */
-                downloader.downloadingInformation = downloader.downloadingInformation.status(STARTED)
+                helper.info = helper.info.status(STARTED)
                 downloader.process = mock()
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
+//                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
 
                 /* When */
                 downloader.stopDownload()
@@ -228,11 +245,11 @@ class FfmpegDownloaderTest {
             @Test
             fun should_failed_to_stop_a_download() {
                 /* Given */
-                downloader.downloadingInformation = downloader.downloadingInformation.status(STARTED)
+                helper.info = helper.info.status(STARTED)
                 downloader.process = mock()
                 doAnswer { throw RuntimeException("Error when executing process") }
                         .whenever(downloader.process).destroy()
-                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
+//                whenever(downloadRepository.updateDownloadItem(any())).thenReturn(0)
                 /* When */
                 downloader.stopDownload()
 
@@ -243,89 +260,5 @@ class FfmpegDownloaderTest {
             }
 
         }
-    }
-
-    @Nested
-    inner class CompatibilityTest {
-
-        @Mock lateinit var downloadRepository: DownloadRepository
-        @Mock lateinit var podcastServerParameters: PodcastServerParameters
-        @Mock lateinit var template: MessagingTemplate
-        @Mock lateinit var file: FileStorageService
-
-        @Mock lateinit var itemDownloadManager: ItemDownloadManager
-
-        @Mock lateinit var ffmpegService: FfmpegService
-        @Mock lateinit var processService: ProcessService
-        @Spy val clock: Clock = Clock.fixed(fixedDate.toInstant(), ZoneId.of("UTC"))
-
-        lateinit var downloader: FfmpegDownloader
-
-        @BeforeEach
-        fun beforeEach() {
-            downloader = FfmpegDownloader(
-                downloadRepository,
-                template,
-                clock,
-                file,
-                ffmpegService,
-                processService
-            )
-        }
-
-        @Test
-        fun `should be compatible with multiple urls ending with M3U8 and MP4`() {
-            /* Given */
-            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.M3U8", "http://foo.bar.com/end.mp4").map(URI::create), Path("end.mp4"), null)
-            /* When */
-            val compatibility = downloader.compatibility(di)
-            /* Then */
-            assertThat(compatibility).isEqualTo(10)
-        }
-
-        @Test
-        fun `should be compatible with only urls ending with M3U8`() {
-            /* Given */
-            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.m3u8", "http://foo.bar.com/end.M3U8").map(URI::create), Path("end.mp4"), null)
-            /* When */
-            val compatibility = downloader.compatibility(di)
-            /* Then */
-            assertThat(compatibility).isEqualTo(10)
-        }
-
-        @Test
-        fun `should be compatible with only urls ending with mp4`() {
-            /* Given */
-            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.MP4", "http://foo.bar.com/end.mp4").map(URI::create), Path("end.mp4"), null)
-            /* When */
-            val compatibility = downloader.compatibility(di)
-            /* Then */
-            assertThat(compatibility).isEqualTo(10)
-        }
-
-        @DisplayName("should be compatible with only one url with extension")
-        @ParameterizedTest(name = "{arguments}")
-        @ValueSource(strings = ["m3u8", "mp4"])
-        fun `should be compatible with only one url with extension`(ext: String) {
-            /* Given */
-            val di = DownloadingInformation(item, listOf(URI.create("http://foo.bar.com/end.$ext")), Path("end.mp4"), null)
-            /* When */
-            val compatibility = downloader.compatibility(di)
-            /* Then */
-            assertThat(compatibility).isEqualTo(10)
-        }
-
-        @DisplayName("should not be compatible with")
-        @ParameterizedTest(name = "{arguments}")
-        @ValueSource(strings = ["http://foo.bar.com/end.webm", "http://foo.bar.com/end.manifest"])
-        fun `should not be compatible with`(url: String) {
-            /* Given */
-            val di = DownloadingInformation(item, listOf(URI.create(url)), Path("end.mp4"), null)
-            /* When */
-            val compatibility = downloader.compatibility(di)
-            /* Then */
-            assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
-        }
-
     }
 }
