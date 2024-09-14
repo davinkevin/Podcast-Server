@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters.upload
 
+import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 
@@ -10,6 +11,8 @@ import org.springframework.context.annotation.Configuration
 class UploadUpdaterConfig {
 
     @Bean
-    fun uploadUpdater(): UploadUpdater = UploadUpdater()
+    fun uploadUpdater(
+        registry: MeterRegistry
+    ): UploadUpdater = UploadUpdater(registry)
 
 }

@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Type
 import com.github.davinkevin.podcastserver.update.updaters.Updater
+import io.micrometer.core.instrument.MeterRegistry
 import org.jsoup.Jsoup
 import org.springframework.util.DigestUtils
 import org.springframework.web.client.RestClient
@@ -21,7 +22,8 @@ import java.time.ZonedDateTime
 class GulliUpdater(
     private val restClient: RestClient,
     private val image: ImageService,
-    private val mapper: ObjectMapper
+    private val mapper: ObjectMapper,
+    override val registry: MeterRegistry,
 ): Updater {
 
     override fun findItems(podcast: PodcastToUpdate): List<ItemFromUpdate> {

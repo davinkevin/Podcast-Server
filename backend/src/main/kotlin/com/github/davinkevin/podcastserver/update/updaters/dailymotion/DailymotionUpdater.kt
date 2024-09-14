@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Type
 import com.github.davinkevin.podcastserver.update.updaters.Updater
 import com.github.davinkevin.podcastserver.utils.MatcherExtractor
+import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.util.DigestUtils
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
@@ -18,7 +19,8 @@ import java.time.ZonedDateTime
 
 class DailymotionUpdater(
     private val rc: RestClient,
-    private val image: ImageService
+    private val image: ImageService,
+    override val registry: MeterRegistry,
 ): Updater {
 
     override fun signatureOf(url: URI): String? {

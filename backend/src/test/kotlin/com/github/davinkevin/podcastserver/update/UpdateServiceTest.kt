@@ -13,10 +13,14 @@ import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.storage.DownloadAndUploadRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
+import com.github.davinkevin.podcastserver.update.updaters.Type
 import com.github.davinkevin.podcastserver.update.updaters.Updater
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
+import org.junit.jupiter.api.DisplayNameGenerator.Simple
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -43,7 +47,9 @@ private val fixedDate = Clock.fixed(OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, Zo
 class UpdateServiceTest(
     @Autowired private val service: UpdateService
 ) {
-    abstract class FakeUpdater : Updater
+    abstract class FakeUpdater : Updater {
+        override fun type() = Type("foo", "bar")
+    }
     @MockBean lateinit var podcastRepository: PodcastRepository
     @MockBean lateinit var itemRepository: ItemRepository
     @MockBean lateinit var updaters: UpdaterSelector
@@ -149,6 +155,8 @@ class UpdateServiceTest(
                 on { signatureOf(any()) } doReturn "another-signature"
                 on { findItems(any()) } doReturn emptyList()
                 on { update(any()) }.thenCallRealMethod()
+                on { type() }.thenCallRealMethod()
+                on { registry }.thenReturn(SimpleMeterRegistry())
             }
             val uri = URI(podcast.url!!)
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
@@ -167,6 +175,8 @@ class UpdateServiceTest(
                     verify().update(any())
                     verify().signatureOf(any())
                     verify().findItems(any())
+                    verify().type()
+                    verify().registry
                 }
                 verify(podcastRepository).findById(podcast.id)
                 verify(podcastRepository).updateSignature(podcast.id, "")
@@ -192,6 +202,8 @@ class UpdateServiceTest(
                 on { signatureOf(any()) } doReturn "another-signature"
                 on { findItems(any()) } doReturn items
                 on { update(any()) }.thenCallRealMethod()
+                on { type() }.thenCallRealMethod()
+                on { registry }.thenReturn(SimpleMeterRegistry())
             }
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
             doNothing().whenever(podcastRepository).updateSignature(eq(podcast.id), any())
@@ -215,6 +227,8 @@ class UpdateServiceTest(
                     verify().update(any())
                     verify().signatureOf(any())
                     verify().findItems(any())
+                    verify().type()
+                    verify().registry
                 }
                 podcastRepository.inOrder {
                     verify().findById(podcast.id)
@@ -245,6 +259,8 @@ class UpdateServiceTest(
                 on { signatureOf(any()) } doReturn "another-signature"
                 on { findItems(any()) } doReturn items
                 on { update(any()) }.thenCallRealMethod()
+                on { type() }.thenCallRealMethod()
+                on { registry }.thenReturn(SimpleMeterRegistry())
             }
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
             doNothing().whenever(podcastRepository).updateSignature(eq(podcast.id), any())
@@ -268,6 +284,8 @@ class UpdateServiceTest(
                     verify().update(any())
                     verify().signatureOf(any())
                     verify().findItems(any())
+                    verify().type()
+                    verify().registry
                 }
                 podcastRepository.inOrder {
                     verify().findById(podcast.id)
@@ -298,6 +316,8 @@ class UpdateServiceTest(
                 on { signatureOf(any()) } doReturn "another-signature"
                 on { findItems(any()) } doReturn items
                 on { update(any()) }.thenCallRealMethod()
+                on { type() }.thenCallRealMethod()
+                on { registry } doReturn SimpleMeterRegistry()
             }
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
             doNothing().whenever(podcastRepository).updateSignature(eq(podcast.id), any())
@@ -316,6 +336,8 @@ class UpdateServiceTest(
                     verify().update(any())
                     verify().signatureOf(any())
                     verify().findItems(any())
+                    verify().type()
+                    verify().registry
                 }
                 podcastRepository.inOrder {
                     verify().findById(podcast.id)
@@ -346,6 +368,8 @@ class UpdateServiceTest(
                 on { signatureOf(any()) }.then { error("error during signature check") }
                 on { findItems(any()) } doReturn items
                 on { update(any()) }.thenCallRealMethod()
+                on { type() }.thenCallRealMethod()
+                on { registry } doReturn SimpleMeterRegistry()
             }
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
 
@@ -449,6 +473,8 @@ class UpdateServiceTest(
                 on { signatureOf(any()) } doReturn "another-signature"
                 on { findItems(any()) } doReturn items
                 on { update(any()) }.thenCallRealMethod()
+                on { type() }.thenCallRealMethod()
+                on { registry }.thenReturn(SimpleMeterRegistry())
             }
             val uri = URI(podcast1.url!!)
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
@@ -473,6 +499,8 @@ class UpdateServiceTest(
                     verify().update(any())
                     verify().signatureOf(any())
                     verify().findItems(any())
+                    verify().type()
+                    verify().registry
                 }
                 podcastRepository.inOrder {
                     verify().findAll()
@@ -502,6 +530,8 @@ class UpdateServiceTest(
                 on { signatureOf(any()) } doReturn "another-signature"
                 on { findItems(any()) } doReturn items
                 on { update(any()) }.thenCallRealMethod()
+                on { type() }.thenCallRealMethod()
+                on { registry }.thenReturn(SimpleMeterRegistry())
             }
             val uri = URI(podcast1.url!!)
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
@@ -527,6 +557,8 @@ class UpdateServiceTest(
                     verify().update(any())
                     verify().signatureOf(any())
                     verify().findItems(any())
+                    verify().type()
+                    verify().registry
                 }
                 podcastRepository.inOrder {
                     verify().findAll()
@@ -557,6 +589,8 @@ class UpdateServiceTest(
                 on { signatureOf(any()) } doReturn "another-signature"
                 on { findItems(any()) } doReturn items
                 on { update(any()) }.thenCallRealMethod()
+                on { type() }.thenCallRealMethod()
+                on { registry }.thenReturn(SimpleMeterRegistry())
             }
             val uri = URI(podcast1.url!!)
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
@@ -581,6 +615,8 @@ class UpdateServiceTest(
                     verify().update(any())
                     verify().signatureOf(any())
                     verify().findItems(any())
+                    verify().type()
+                    verify().registry
                 }
                 podcastRepository.inOrder {
                     verify().findAll()
@@ -611,6 +647,8 @@ class UpdateServiceTest(
                 on { signatureOf(any()) } doReturn "another-signature"
                 on { findItems(any()) } doReturn items
                 on { update(any()) }.thenCallRealMethod()
+                on { type() }.thenCallRealMethod()
+                on { registry }.thenReturn(SimpleMeterRegistry())
             }
             val uri = URI(p.url!!)
             whenever(updaters.of(uri)).thenReturn(fakeUpdater)
@@ -635,6 +673,8 @@ class UpdateServiceTest(
                     verify().update(any())
                     verify().signatureOf(any())
                     verify().findItems(any())
+                    verify().type()
+                    verify().registry
                 }
                 podcastRepository.inOrder {
                     verify().findAll()

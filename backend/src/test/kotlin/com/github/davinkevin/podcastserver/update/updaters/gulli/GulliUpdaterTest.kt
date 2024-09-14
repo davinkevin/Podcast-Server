@@ -20,6 +20,7 @@ import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
@@ -34,6 +35,7 @@ import java.util.*
  * Created by kevin on 14/03/2020
  */
 @ExtendWith(SpringExtension::class)
+@AutoConfigureObservability
 class GulliUpdaterTest(
     @Autowired private val updater: GulliUpdater
 ) {

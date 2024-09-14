@@ -1,5 +1,8 @@
 package com.github.davinkevin.podcastserver.update.updaters
 
+import io.micrometer.core.instrument.Counter
+import io.micrometer.core.instrument.MeterRegistry
+import io.micrometer.core.instrument.Tags
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.time.ZonedDateTime
@@ -9,6 +12,8 @@ import kotlin.time.measureTimedValue
 val log = LoggerFactory.getLogger(Updater::class.java)!!
 
 interface Updater {
+
+    val registry: MeterRegistry
 
     fun update(podcast: PodcastToUpdate): UpdatePodcastInformation? {
         log.info("podcast {} starts update", podcast.url)
@@ -28,6 +33,15 @@ interface Updater {
             val items = runCatching { findItems(podcast).toSet() }
                 .onFailure { log.error("podcast {} ends with error", podcast.url, it) }
                 .getOrNull() ?: return@measureTimedValue null
+
+            Counter.builder("update.numberOfItem")
+                .tags(
+                    "url", podcast.url.toASCIIString(),
+                    "id", podcast.id.toString(),
+                    "type", type().key
+                )
+                .register(registry)
+                .increment(items.size.toDouble())
 
             if (items.isEmpty())
                 log.warn("podcast {} has no item found, potentially updater {} not working anymore", podcast.url, this::class)

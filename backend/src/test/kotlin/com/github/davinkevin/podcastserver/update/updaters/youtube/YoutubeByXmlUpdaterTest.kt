@@ -17,6 +17,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
@@ -31,6 +32,7 @@ import java.util.*
  * Created by kevin on 16/09/2018
  */
 @ExtendWith(SpringExtension::class)
+@AutoConfigureObservability
 class YoutubeByXmlUpdaterTest(
     @Autowired private val updater: YoutubeByXmlUpdater
 ) {

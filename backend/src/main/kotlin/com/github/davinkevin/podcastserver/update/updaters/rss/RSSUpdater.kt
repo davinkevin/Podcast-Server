@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Type
 import com.github.davinkevin.podcastserver.update.updaters.Updater
+import io.micrometer.core.instrument.MeterRegistry
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.jdom2.input.SAXBuilder
@@ -24,7 +25,8 @@ private val ITUNES_NS = Namespace.getNamespace("itunes", "http://www.itunes.com/
 
 class RSSUpdater(
     private val imageService: ImageService,
-    private val rcb: RestClient.Builder
+    private val rcb: RestClient.Builder,
+    override val registry: MeterRegistry,
 ) : Updater {
 
     private val log = LoggerFactory.getLogger(RSSUpdater::class.java)

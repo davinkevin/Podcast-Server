@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.update.updaters.youtube
 
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
 import com.github.davinkevin.podcastserver.update.updaters.Updater
+import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.boot.context.properties.ConfigurationProperties
 import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
@@ -21,6 +22,7 @@ class YoutubeUpdaterConfig {
     fun youtubeUpdater(
         api: YoutubeApi,
         rcb: RestClient.Builder,
+        registry: MeterRegistry,
     ): Updater {
         val key = api.youtube
 
@@ -34,13 +36,14 @@ class YoutubeUpdaterConfig {
             .build()
 
         if (key.isEmpty()) {
-            return YoutubeByXmlUpdater(youtubeClient)
+            return YoutubeByXmlUpdater(youtubeClient, registry)
         }
 
         return YoutubeByApiUpdater(
             key = key,
             youtube = youtubeClient,
-            googleApi = builder.clone().baseUrl("https://www.googleapis.com").build()
+            googleApi = builder.clone().baseUrl("https://www.googleapis.com").build(),
+            registry = registry,
         )
     }
 }

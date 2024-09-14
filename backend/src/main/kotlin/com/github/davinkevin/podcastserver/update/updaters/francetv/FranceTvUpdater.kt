@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Type
 import com.github.davinkevin.podcastserver.update.updaters.Updater
+import io.micrometer.core.instrument.MeterRegistry
 import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
 import org.springframework.util.DigestUtils
@@ -24,7 +25,8 @@ class FranceTvUpdater(
     private val franceTvClient: RestClient,
     private val image: ImageService,
     private val mapper: ObjectMapper,
-    private val clock: Clock
+    private val clock: Clock,
+    override val registry: MeterRegistry,
 ): Updater {
 
     private val log = LoggerFactory.getLogger(FranceTvUpdater::class.java)

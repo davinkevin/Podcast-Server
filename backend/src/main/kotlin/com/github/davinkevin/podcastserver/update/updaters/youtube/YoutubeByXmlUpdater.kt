@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.find.finders.meta
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Updater
+import io.micrometer.core.instrument.MeterRegistry
 import org.jdom2.Element
 import org.jdom2.Namespace
 import org.jdom2.input.SAXBuilder
@@ -19,7 +20,8 @@ import java.time.format.DateTimeFormatter
 private val MEDIA_NAMESPACE = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")
 
 class YoutubeByXmlUpdater(
-    private val youtube: RestClient
+    private val youtube: RestClient,
+    override val registry: MeterRegistry,
 ): Updater {
 
     override fun findItems(podcast: PodcastToUpdate): List<ItemFromUpdate> {

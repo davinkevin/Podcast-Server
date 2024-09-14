@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Updater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByApiUpdater.Companion.URL_PAGE_BASE
+import io.micrometer.core.instrument.MeterRegistry
 import org.jsoup.Jsoup
 import org.slf4j.LoggerFactory
 import org.springframework.util.DigestUtils
@@ -25,6 +26,7 @@ class YoutubeByApiUpdater(
     private val key: String,
     private val youtube: RestClient,
     private val googleApi: RestClient,
+    override val registry: MeterRegistry,
 ): Updater {
 
     private val log = LoggerFactory.getLogger(YoutubeByApiUpdater::class.java)
