@@ -20,13 +20,8 @@ class NoOpDownloader(
     val manager: ItemDownloadManager,
 ) : Downloader {
 
-    //* To be removed when Downloader won't be anymore a DownloaderFactory *//
-    override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager): Downloader =
-        throw IllegalAccessException()
-    override fun compatibility(downloadingInformation: DownloadingInformation) = -1
     override val downloadingInformation: DownloadingInformation
         get() = state
-    //* end of section to remove *//
 
     override fun download(): DownloadingItem = state.item
     override fun startDownload() = failDownload()

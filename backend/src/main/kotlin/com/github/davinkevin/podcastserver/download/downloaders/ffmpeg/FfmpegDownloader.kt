@@ -22,15 +22,8 @@ class FfmpegDownloader(
 
     private val log = LoggerFactory.getLogger(FfmpegDownloader::class.java)
 
-    //* To be removed when Downloader won't be anymore a DownloaderFactory *//
-    override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager): Downloader =
-        throw IllegalAccessException()
-
-    override fun compatibility(downloadingInformation: DownloadingInformation): Int = throw IllegalAccessException()
-
     override val downloadingInformation: DownloadingInformation
         get() = state.info
-    //* end of section to remove *//
 
     lateinit var process: Process
     private var globalDuration = 0.0

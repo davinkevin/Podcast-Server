@@ -5,4 +5,4 @@ import org.springframework.context.annotation.Import
 
 @Configuration
 @Import(FfmpegDownloaderFactory::class)
-class FfmepgDownloaderConfig
+class FfmpegDownloaderConfig

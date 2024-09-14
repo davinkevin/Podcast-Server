@@ -1,10 +1,7 @@
 package com.github.davinkevin.podcastserver.download
 
+import com.github.davinkevin.podcastserver.download.downloaders.*
 import com.github.davinkevin.podcastserver.entity.Status
-import com.github.davinkevin.podcastserver.download.downloaders.Downloader
-import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
-import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
-import com.github.davinkevin.podcastserver.download.downloaders.DownloaderSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.assertj.core.api.Assertions.assertThat
@@ -680,7 +677,7 @@ private fun DownloadingItem.toInformation(): DownloadingInformation {
     return DownloadingInformation(this, listOf(url), fileName, null)
 }
 
-internal class SimpleDownloader: Downloader {
+internal class SimpleDownloader: Downloader, DownloaderFactory {
 
     override lateinit var downloadingInformation: DownloadingInformation
     internal lateinit var itemDownloadManager: ItemDownloadManager

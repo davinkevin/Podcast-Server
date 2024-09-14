@@ -82,24 +82,6 @@ class FfmpegDownloaderTest(
         ).build(mock(), mock())
     }
 
-    @Test
-    fun `should not be a factory anymore`() {
-        /* Given */
-        /* When */
-        assertThatThrownBy { downloader.with(mock(), mock()) }
-            /* Then */
-            .isInstanceOf(IllegalAccessException::class.java)
-    }
-
-    @Test
-    fun `should not report compatibility`() {
-        /* Given */
-        /* When */
-        assertThatThrownBy { downloader.compatibility(DownloadingInformation(item, emptyList(), Path("file.mp4"), null)) }
-            /* Then */
-            .isInstanceOf(IllegalAccessException::class.java)
-    }
-
     @Nested
     inner class DownloaderTest {
 

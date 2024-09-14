@@ -48,11 +48,9 @@ class NoOpDownloaderTest {
 
         /* Then */
         assertThat(downloader.download()).isEqualTo(info.item)
-        assertThat(downloader.compatibility(info)).isEqualTo(-1)
+        assertThat(NoOpDownloaderFactory().compatibility(info)).isEqualTo(-1)
 
         /* And */
-        assertThatThrownBy { downloader.with(mock(), mock()) }
-            .isInstanceOf(IllegalAccessException::class.java)
         assertThat(downloader.downloadingInformation).isNotNull
             .isSameAs(info)
     }

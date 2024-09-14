@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.download.downloaders.ffmpeg
 
 import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelperFactory
-import com.github.davinkevin.podcastserver.download.downloaders.rtmp.RTMPDownloaderFactory
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.ffmpeg.FfmpegService
 import org.assertj.core.api.Assertions.assertThat
@@ -14,7 +13,7 @@ import org.springframework.context.annotation.Bean
 class FfmepgDownloaderConfigTest {
 
     private val contextRunner = ApplicationContextRunner()
-        .withConfiguration(AutoConfigurations.of(LocalTestConfiguration::class.java, FfmepgDownloaderConfig::class.java))
+        .withConfiguration(AutoConfigurations.of(LocalTestConfiguration::class.java, FfmpegDownloaderConfig::class.java))
 
     @Test
     fun `should provide a rtmp downloader factory`() {

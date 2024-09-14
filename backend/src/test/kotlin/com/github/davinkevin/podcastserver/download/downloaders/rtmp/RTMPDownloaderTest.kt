@@ -82,15 +82,6 @@ class RTMPDownloaderTest(
         ).build(mock(), mock())
     }
 
-    @Test
-    fun `should not be a factory anymore`() {
-        /* Given */
-        /* When */
-        assertThatThrownBy { downloader.with(mock(), mock()) }
-        /* Then */
-            .isInstanceOf(IllegalAccessException::class.java)
-    }
-
     @Nested
     inner class DownloadTest {
 
@@ -290,38 +281,4 @@ class RTMPDownloaderTest(
         }
     }
 
-    @Nested
-    inner class CompatibilityTest {
-
-        @Test
-        fun `should be compatible with only one url starting with rtmp`() {
-            /* Given */
-            val di = DownloadingInformation(item, listOf("rtmp://foo.bar.com/end.M3U8").map(URI::create), Path("file.mp4"), null)
-            /* When */
-            val compatibility = downloader.compatibility(di)
-            /* Then */
-            assertThat(compatibility).isEqualTo(1)
-        }
-
-        @Test
-        fun `should not be compatible with multiple url`() {
-            /* Given */
-            val di = DownloadingInformation(item, listOf("rmtp://foo.bar.com/end.m3u8", "rmtp://foo.bar.com/end.M3U8").map(URI::create), Path("file.mp4"), null)
-            /* When */
-            val compatibility = downloader.compatibility(di)
-            /* Then */
-            assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
-        }
-
-        @Test
-        fun `should not be compatible with url not starting by rtmp`() {
-            /* Given */
-            val di = DownloadingInformation(item, listOf("http://foo.bar.com/end.MP4").map(URI::create), Path("file.mp4"), null)
-            /* When */
-            val compatibility = downloader.compatibility(di)
-            /* Then */
-            assertThat(compatibility).isEqualTo(Integer.MAX_VALUE)
-        }
-
-    }
 }

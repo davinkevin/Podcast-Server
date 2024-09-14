@@ -21,15 +21,8 @@ class RTMPDownloader(
 
     private val log = LoggerFactory.getLogger(RTMPDownloader::class.java)
 
-    //* To be removed when Downloader won't be anymore a DownloaderFactory *//
     override val downloadingInformation: DownloadingInformation
         get() = state.info
-    override fun with(information: DownloadingInformation, itemDownloadManager: ItemDownloadManager): Downloader =
-        throw IllegalAccessException()
-    override fun compatibility(downloadingInformation: DownloadingInformation) =
-        if (downloadingInformation.urls.size == 1 && downloadingInformation.urls.first().toASCIIString().startsWith("rtmp://")) 1
-        else Integer.MAX_VALUE
-    //* end of section to remove *//
 
     private var pid = 0L
     private var p: Process? = null

@@ -3,7 +3,7 @@ package com.github.davinkevin.podcastserver.download.downloaders
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 
 
-interface Downloader: Runnable, DownloaderFactory {
+interface Downloader: Runnable {
 
     val downloadingInformation: DownloadingInformation
 
