@@ -14,6 +14,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.context.annotation.Import
 import org.springframework.dao.DataIntegrityViolationException
@@ -21,7 +22,6 @@ import java.net.URI
 import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
 import java.time.ZoneOffset
-import java.time.temporal.ChronoUnit
 import java.time.temporal.ChronoUnit.SECONDS
 import java.util.*
 import java.util.UUID.fromString
@@ -33,6 +33,7 @@ import kotlin.io.path.Path
  */
 @JooqTest
 @Import(ItemRepository::class)
+@AutoConfigureObservability
 class ItemRepositoryTest(
     @Autowired val query: DSLContext,
     @Autowired val repository: ItemRepository

@@ -9,6 +9,7 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.fromDb
 import com.github.davinkevin.podcastserver.entity.toDb
 import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
+import io.micrometer.core.instrument.MeterRegistry
 import org.jooq.*
 import org.jooq.impl.DSL
 import org.jooq.impl.DSL.*
@@ -21,7 +22,12 @@ import java.util.*
 /**
  * Created by kevin on 2019-02-03
  */
-class ItemRepository(private val query: DSLContext) {
+class ItemRepository(
+    private val query: DSLContext,
+    registry: MeterRegistry
+) {
+
+    private val itemsCreation = registry.counter("items.creation")
 
     private val log = LoggerFactory.getLogger(ItemRepository::class.java)
 
@@ -285,6 +291,7 @@ class ItemRepository(private val query: DSLContext) {
 
         val ids: List<UUID> = query.batch(queries)
             .execute()
+            .also { itemsCreation.increment(it.sum().toDouble()) }
             .withIndex()
             .filter { (_, isCreated) -> isCreated >= 1 }
             .map { (idx, _) -> itemsWithIds[idx].id }
