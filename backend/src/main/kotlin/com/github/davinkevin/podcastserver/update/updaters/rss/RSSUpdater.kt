@@ -18,6 +18,9 @@ import org.springframework.web.client.body
 import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+import java.util.concurrent.CompletableFuture
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 private val MEDIA = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")
 private val FEED_BURNER = Namespace.getNamespace("feedburner", "http://rssnamespace.org/feedburner/ext/1.0")
@@ -44,11 +47,13 @@ class RSSUpdater(
         val itunesCover = channel.getChild("image", ITUNES_NS)?.getAttributeValue("href")
         val alternativeCoverURL = (rssCover ?: itunesCover)?.let(::URI)
 
+        val withVT = Executors.newVirtualThreadPerTaskExecutor()
         return channel
             .getChildren("item")
             .toList()
             .filter(::hasEnclosure)
-            .map { findItem(it, alternativeCoverURL) }
+            .map { CompletableFuture.supplyAsync( { findItem(it, alternativeCoverURL) }, withVT).exceptionally { null } }
+            .mapNotNull { it.get(30, TimeUnit.SECONDS) }
     }
 
     private fun findItem(elem: Element, alternativeCoverURL: URI?): ItemFromUpdate {
