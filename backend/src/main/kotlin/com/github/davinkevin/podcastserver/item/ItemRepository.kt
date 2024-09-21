@@ -289,7 +289,8 @@ class ItemRepository(
                 .set(ITEM.DESCRIPTION, item.description)
         }
 
-        val ids: List<UUID> = query.batch(queries)
+        val ids: List<UUID> = query
+            .batch(queries)
             .execute()
             .also { itemsCreation.increment(it.sum().toDouble()) }
             .withIndex()
