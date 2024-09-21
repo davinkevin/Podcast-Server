@@ -12,15 +12,12 @@ import org.jdom2.Namespace
 import org.jdom2.input.SAXBuilder
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
-import org.springframework.core.task.SimpleAsyncTaskExecutor
 import org.springframework.util.DigestUtils
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import java.net.URI
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import java.util.concurrent.Callable
-import java.util.concurrent.TimeUnit
 
 private val MEDIA = Namespace.getNamespace("media", "http://search.yahoo.com/mrss/")
 private val FEED_BURNER = Namespace.getNamespace("feedburner", "http://rssnamespace.org/feedburner/ext/1.0")
@@ -33,9 +30,6 @@ class RSSUpdater(
 ) : Updater {
 
     private val log = LoggerFactory.getLogger(RSSUpdater::class.java)
-    private val executor = SimpleAsyncTaskExecutor(Thread.ofVirtual().factory()).apply {
-        concurrencyLimit = 100
-    }
 
     override fun findItems(podcast: PodcastToUpdate): List<ItemFromUpdate> {
         val resource = fetchRss(podcast.url)
@@ -54,12 +48,7 @@ class RSSUpdater(
             .getChildren("item")
             .toList()
             .filter(::hasEnclosure)
-            .map {
-                executor
-                    .submitCompletable( Callable { findItem(it, alternativeCoverURL) })
-                    .exceptionally { null }
-            }
-            .map { it.get(30, TimeUnit.SECONDS) }
+            .map { findItem(it, alternativeCoverURL) }
     }
 
     private fun findItem(elem: Element, alternativeCoverURL: URI?): ItemFromUpdate {
