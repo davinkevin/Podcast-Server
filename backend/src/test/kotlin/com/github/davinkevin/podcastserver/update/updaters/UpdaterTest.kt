@@ -4,7 +4,6 @@ import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
-import org.mockito.Mockito.mock
 import java.net.URI
 import java.time.*
 import java.util.*
@@ -88,7 +87,7 @@ class UpdaterTest {
         val updater = SimpleUpdater(
             itemProducer = { error("findItem ends in error…") },
             signatureProducer = { "qefokijqeiojqoiejeqf=" },
-            registry = mock(),
+            registry = SimpleMeterRegistry(),
         )
 
         /* When */

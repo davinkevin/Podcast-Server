@@ -6,7 +6,6 @@ import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemForCreation
 import com.github.davinkevin.podcastserver.item.ItemRepository
-import com.github.davinkevin.podcastserver.update.updaters.UpdaterSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
@@ -15,12 +14,11 @@ import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.Type
 import com.github.davinkevin.podcastserver.update.updaters.Updater
-import io.micrometer.core.instrument.MeterRegistry
+import com.github.davinkevin.podcastserver.update.updaters.UpdaterSelector
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.DisplayNameGenerator.Simple
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -28,7 +26,6 @@ import org.mockito.Mockito
 import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
-import org.springframework.boot.test.autoconfigure.jooq.JooqTest
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.context.annotation.Bean
@@ -167,6 +164,8 @@ class UpdateServiceTest(
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                verify(fakeUpdater, times(2)).type()
+                verify(fakeUpdater, times(2)).registry
                 liveUpdate.inOrder {
                     verify().isUpdating(true)
                     verify().isUpdating(false)
@@ -219,6 +218,8 @@ class UpdateServiceTest(
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                verify(fakeUpdater, times(2)).type()
+                verify(fakeUpdater, times(2)).registry
                 liveUpdate.inOrder {
                     verify().isUpdating(true)
                     verify().isUpdating(false)
@@ -276,6 +277,9 @@ class UpdateServiceTest(
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                verify(fakeUpdater, times(2)).type()
+                verify(fakeUpdater, times(2)).registry
+
                 liveUpdate.inOrder {
                     verify().isUpdating(true)
                     verify().isUpdating(false)
@@ -328,6 +332,9 @@ class UpdateServiceTest(
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                verify(fakeUpdater, times(2)).type()
+                verify(fakeUpdater, times(2)).registry
+
                 liveUpdate.inOrder {
                     verify().isUpdating(true)
                     verify().isUpdating(false)
@@ -378,6 +385,9 @@ class UpdateServiceTest(
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                verify(fakeUpdater, times(1)).type()
+                verify(fakeUpdater, times(1)).registry
+
                 liveUpdate.inOrder {
                     verify().isUpdating(true)
                     verify().isUpdating(false)
@@ -491,6 +501,9 @@ class UpdateServiceTest(
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                verify(fakeUpdater, times(2)).type()
+                verify(fakeUpdater, times(2)).registry
+
                 liveUpdate.inOrder {
                     verify().isUpdating(true)
                     verify().isUpdating(false)
@@ -549,6 +562,9 @@ class UpdateServiceTest(
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                verify(fakeUpdater, times(2)).type()
+                verify(fakeUpdater, times(2)).registry
+
                 liveUpdate.inOrder {
                     verify().isUpdating(true)
                     verify().isUpdating(false)
@@ -607,6 +623,8 @@ class UpdateServiceTest(
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                verify(fakeUpdater, times(2)).type()
+                verify(fakeUpdater, times(2)).registry
                 liveUpdate.inOrder {
                     verify().isUpdating(true)
                     verify().isUpdating(false)
@@ -665,6 +683,9 @@ class UpdateServiceTest(
 
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                verify(fakeUpdater, times(2)).type()
+                verify(fakeUpdater, times(2)).registry
+
                 liveUpdate.inOrder {
                     verify().isUpdating(true)
                     verify().isUpdating(false)

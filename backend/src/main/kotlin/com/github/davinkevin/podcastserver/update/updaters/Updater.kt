@@ -2,11 +2,12 @@ package com.github.davinkevin.podcastserver.update.updaters
 
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
-import io.micrometer.core.instrument.Tags
+import io.micrometer.core.instrument.Timer
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.time.ZonedDateTime
 import java.util.*
+import java.util.concurrent.TimeUnit
 import kotlin.time.measureTimedValue
 
 val log = LoggerFactory.getLogger(Updater::class.java)!!
@@ -16,6 +17,7 @@ interface Updater {
     val registry: MeterRegistry
 
     fun update(podcast: PodcastToUpdate): UpdatePodcastInformation? {
+
         log.info("podcast {} starts update", podcast.url)
         val (value, duration) = measureTimedValue {
             val signature = runCatching { signatureOf(podcast.url) }
@@ -51,6 +53,17 @@ interface Updater {
             return@measureTimedValue UpdatePodcastInformation(podcast, items, signature)
         }
 
+        Timer
+            .builder("update.process")
+            .description("Timer containing the complete update process done by *ONE* updater")
+            .tags(
+                "url", podcast.url.toASCIIString(),
+                "id", podcast.id.toString(),
+                "type", type().key
+            )
+            .register(registry)
+            .record(duration.inWholeMicroseconds, TimeUnit.MICROSECONDS)
+
         log.info("podcast {} ends update after {} seconds", podcast.url, duration.inWholeSeconds)
 
         return value
@@ -63,18 +76,17 @@ interface Updater {
     fun compatibility(url: String): Int
 }
 
-
 data class UpdatePodcastInformation(val podcast: PodcastToUpdate, val items: Set<ItemFromUpdate>, val newSignature: String)
 data class PodcastToUpdate(val id: UUID, val url: URI, val signature: String)
 data class ItemFromUpdate(
-        val title: String?,
-        val pubDate: ZonedDateTime?,
-        val length: Long? = null,
-        val mimeType: String,
-        val url: URI,
-        val guid: String? = null,
-        val description: String?,
-        val cover: Cover?,
+    val title: String?,
+    val pubDate: ZonedDateTime?,
+    val length: Long? = null,
+    val mimeType: String,
+    val url: URI,
+    val guid: String? = null,
+    val description: String?,
+    val cover: Cover?,
 ) {
 
     fun guidOrUrl(): String = guid ?: url.toASCIIString()
