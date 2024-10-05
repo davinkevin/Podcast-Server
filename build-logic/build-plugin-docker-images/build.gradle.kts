@@ -4,7 +4,7 @@ plugins {
 }
 
 group = "com.gitlab.davinkevin.podcastserver.dockerimages"
-version = "2024.8.0"
+version = "2024.10.0"
 
 repositories {
     mavenCentral()
