@@ -3,7 +3,7 @@
 host = "::"
 port = 8080
 root = "/podcast-server"
-log-level = "info"
+log-level = "error"
 
 page-fallback = "/podcast-server/index.html"
 cache-control-headers = true
