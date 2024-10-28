@@ -1,0 +1,68 @@
+include:
+  - local: .gitlab/ci/utils.yaml
+
+.container-scanning-with-trivy:
+  variables:
+    TRIVY_TIMEOUT: 10m
+    TRIVY_USERNAME: ${DOCKER_IO_USER}
+    TRIVY_PASSWORD: ${DOCKER_IO_PASSWORD}
+  image:
+    name: aquasec/trivy
+    entrypoint: [""]
+  artifacts:
+    reports:
+      container_scanning: gl-container-scanning-report.json
+  cache:
+    - key: trivy-database
+      policy: pull
+      paths:
+        - .trivy
+
+⬇ container analysis db:
+  stage: ⬇ download
+  extends: [ .only-on-code-change ]
+  variables:
+    TRIVY_NO_PROGRESS: "true"
+  image:
+    name: aquasec/trivy
+    entrypoint: [""]
+  script:
+    - trivy --cache-dir .trivy/ image --download-db-only
+    - trivy --cache-dir .trivy/ image --download-java-db-only
+  cache:
+    - key: trivy-database
+      paths:
+        - .trivy
+  retry: 2
+
+🔎 backend:
+  stage: 🔎 Security Analysis
+  extends: [.container-scanning-with-trivy, .only-on-backend-changes]
+  needs: [⬇ container analysis db, 🐳 backend]
+  script:
+    - trivy --cache-dir .trivy/ image --skip-db-update --skip-java-db-update --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/backend:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --cache-dir .trivy/ image --skip-db-update --skip-java-db-update --exit-code 0 --no-progress podcastserver/backend:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+
+🔎 init-db:
+  stage: 🔎 Security Analysis
+  extends: [.container-scanning-with-trivy, .only-on-backend-changes]
+  needs: [⬇ container analysis db, 🐳 init-db]
+  script:
+    - trivy --cache-dir .trivy/ image --skip-db-update --skip-java-db-update --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --cache-dir .trivy/ image --skip-db-update --skip-java-db-update --exit-code 0 --no-progress podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+
+🔎 storage:
+  stage: 🔎 Security Analysis
+  extends: [.container-scanning-with-trivy, .only-on-storage-changes]
+  needs: [⬇ container analysis db, 🐳 storage]
+  script:
+    - trivy --cache-dir .trivy/ image --skip-db-update --skip-java-db-update --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/storage:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --cache-dir .trivy/ image --skip-db-update --skip-java-db-update --exit-code 0 --no-progress podcastserver/storage:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+
+🔎 ui:
+  stage: 🔎 Security Analysis
+  extends: [.container-scanning-with-trivy, .only-on-frontend-changes]
+  needs: [⬇ container analysis db, 🐳 ui]
+  script:
+    - trivy --cache-dir .trivy/ image --skip-db-update --skip-java-db-update --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/ui:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
+    - trivy --cache-dir .trivy/ image --skip-db-update --skip-java-db-update --exit-code 0 --no-progress podcastserver/ui:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}

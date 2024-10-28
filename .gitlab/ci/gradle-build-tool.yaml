@@ -1,0 +1,23 @@
+include:
+  - local: .gitlab/ci/utils.yaml
+
+.with-build-tool: &with-build-tool
+  key:
+    files:
+      - gradle/wrapper/gradle-wrapper.properties
+    prefix: "build-tool"
+  paths:
+    - .gradle_home
+
+.using-build-tool:
+  <<: *with-build-tool
+  policy: pull
+
+⬇ build-tool:
+  stage: ⬇ download
+  extends: [ .only-on-code-change ]
+  image: gradle:jdk21
+  script:
+    - ./gradlew --version
+  cache:
+    - !reference [ .with-build-tool ]

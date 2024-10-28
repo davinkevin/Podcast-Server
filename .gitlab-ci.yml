@@ -1,3 +1,7 @@
+include:
+  - local: .gitlab/ci/container-analysis.yaml
+  - local: .gitlab/ci/gradle-build-tool.yaml
+
 workflow:
   rules:
     - if: $CI_COMMIT_TAG
@@ -5,100 +9,9 @@ workflow:
 
 variables:
   GRADLE_OPTS: "-Dorg.gradle.daemon=false -Dorg.gradle.parallel=true -Dorg.gradle.caching=true -Duser.name=davin.kevin+gitlab-ci-runner-podcast-server"
-  GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle
+  GRADLE_USER_HOME: $CI_PROJECT_DIR/.gradle_home
   YARN_CACHE_FOLDER: $CI_PROJECT_DIR/.yarn
   DEVELOCITY_SERVER: https://develocity.davinkevin.fr
-
-
-.cicd_utils: &cicd_utils |
-  function delete_docker_hub_image() {
-    COMPONENT=$1
-    JWT_TOKEN=$(curl -s -H 'Content-Type: application/json' -d '{"username": "'${DOCKER_IO_USER}'", "password": "'${DOCKER_IO_PASSWORD}'"}' https://hub.docker.com/v2/users/login/ | sed -e 's@.*token":"\([^"]*\)".*@\1@g')
-    curl -L -X DELETE -H "Authorization: JWT $JWT_TOKEN" https://hub.docker.com/v2/repositories/podcastserver/$COMPONENT/tags/$CI_COMMIT_REF_SLUG/
-  }
-
-  function kaniko_auth_docker_hub() {
-    TOKEN=$(echo -n $DOCKER_IO_USER:$DOCKER_IO_PASSWORD | base64)
-    echo "{\"auths\":{\"https://index.docker.io/v1/\":{\"auth\":\"$TOKEN\"}}}" > /kaniko/.docker/config.json
-  }
-
-.container-scanning-with-trivy:
-  variables:
-    TRIVY_TIMEOUT: 10m
-    TRIVY_USERNAME: ${DOCKER_IO_USER}
-    TRIVY_PASSWORD: ${DOCKER_IO_PASSWORD}
-  image:
-    name: aquasec/trivy
-    entrypoint: [""]
-  artifacts:
-    reports:
-      container_scanning: gl-container-scanning-report.json
-  cache:
-    key: trivy-database
-    policy: pull
-    paths:
-      - .trivy
-
-.delete-docker-image:
-  image: curlimages/curl
-  dependencies: []
-  variables:
-    GIT_STRATEGY: none
-  before_script:
-    - *cicd_utils
-  script:
-    - delete_docker_hub_image $COMPONENT
-
-.backend_files:
-  - &changes_backend_files
-    changes:
-    - backend/**/*
-    - backend-lib-youtubedl/**/*
-    - backend-lib-database/**/*
-
-.storage_files:
-  - &changes_storage_files
-    changes:
-    - storage/**/*
-
-.frontend_files:
-  - &changes_frontend_files
-    changes:
-    - frontend-angular/**/*
-    - frontend-angularjs/**/*
-    - ui/**/*
-
-.documentation_files:
-  - &changes_documentation_files
-    changes:
-      - documentation/**/*
-
-.not-on-default-branch:
-  - &rule-not-on-default-branch
-    if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
-    when: never
-
-.only-on-backend-changes:
-  rules:
-    - *changes_backend_files
-
-.only-on-storage-changes:
-  rules:
-    - *changes_storage_files
-
-.only-on-frontend-changes:
-  rules:
-    - *changes_frontend_files
-
-.only-on-documentation-changes:
-  rules:
-    - *changes_documentation_files
-
-.only-on-code-change:
-  rules:
-    - *changes_frontend_files
-    - *changes_storage_files
-    - *changes_backend_files
 
 stages:
   - ⬇ download
@@ -107,72 +20,67 @@ stages:
   - 🐳 packaging
   - 🔎 Security Analysis
 
-⬇ container analysis db:
-  stage: ⬇ download
-  extends: [ .only-on-code-change ]
-  image:
-    name: aquasec/trivy
-    entrypoint: [""]
-  script:
-    - trivy --cache-dir .trivy/ image --download-db-only --no-progress
-  cache:
-    key: trivy-database
-    paths:
-      - .trivy
-  retry: 2
-
 ⬇ backend:
   stage: ⬇ download
   extends: [ .only-on-backend-changes ]
+  needs: [⬇ build-tool]
   image: gradle:jdk21
   script:
     - ./gradlew $GRADLE_OPTS :backend:downloadDependencies :backend-lib-youtubedl:downloadDependencies :backend-lib-database:downloadDependencies
   cache:
-    key:
-      files:
-        - backend/build.gradle.kts
-      prefix: "backend"
-    paths:
-      - .gradle/
-      - backend/build
+    - !reference [ .using-build-tool ]
+    - key:
+        files:
+          - backend/build.gradle.kts
+        prefix: "backend"
+      paths:
+        - .gradle
+        - .gradle_home/caches
+        - backend/build
 
 ⬇ ui-v1:
   stage: ⬇ download
   extends: [ .only-on-frontend-changes ]
+  needs: [⬇ build-tool]
   image: gradle:jdk21
   before_script:
     - apt update && apt install bzip2
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angularjs:downloadDependencies
   cache:
-    key:
-      files:
-        - frontend-angularjs/npm-shrinkwrap.json
-        - frontend-angularjs/www/config.js
-      prefix: "ui-v1"
-    paths:
-      - .gradle
-      - frontend-angularjs/.gradle
-      - frontend-angularjs/node_modules/
-      - frontend-angularjs/www/jspm_packages/
-      - frontend-angularjs/target/
+    - !reference [ .using-build-tool ]
+    - key:
+        files:
+          - frontend-angularjs/npm-shrinkwrap.json
+          - frontend-angularjs/www/config.js
+        prefix: "ui-v1"
+      paths:
+        - .gradle
+        - .gradle_home/caches
+        - frontend-angularjs/.gradle
+        - frontend-angularjs/node_modules/
+        - frontend-angularjs/www/jspm_packages/
+        - frontend-angularjs/target/
 
 ⬇ ui-v2:
   stage: ⬇ download
   extends: [ .only-on-frontend-changes ]
+  needs: [⬇ build-tool]
   image: gradle:jdk21
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angular:downloadDependencies
   cache:
-    key:
-      files:
-        - frontend-angular/yarn.lock
-      prefix: "ui-v2"
-    paths:
-      - .gradle
-      - .yarn
-      - frontend-angular/.gradle
-      - frontend-angular/node_modules/
+    - !reference [ .using-build-tool ]
+    - key:
+        files:
+          - frontend-angular/yarn.lock
+        prefix: "ui-v2"
+      paths:
+        - .gradle
+        - .gradle_home/caches
+        - .yarn
+        - frontend-angular/.gradle
+        - frontend-angular/node_modules/
 
 🧪 backend:
   stage: 🧪 test
@@ -194,14 +102,16 @@ stages:
       junit: backend/build/test-results/test/TEST-*.xml
   coverage: '/^application line coverage:\s(\d+\.\d+%)/'
   cache:
-    key:
-      files:
-        - backend/build.gradle.kts
-      prefix: "backend"
-    policy: pull
-    paths:
-      - .gradle/
-      - backend/build
+    - !reference [ .using-build-tool ]
+    - key:
+        files:
+          - backend/build.gradle.kts
+        prefix: "backend"
+      policy: pull
+      paths:
+        - .gradle
+        - .gradle_home/caches
+        - backend/build
   retry: 2
 
 🧪 database:
@@ -220,13 +130,15 @@ stages:
     - git diff || true
     - git diff-index --quiet HEAD -- || exit 8
   cache:
-    key:
-      files:
-        - backend/build.gradle.kts
-      prefix: "backend"
-    policy: pull
-    paths:
-      - .gradle/
+    - !reference [ .using-build-tool ]
+    - key:
+        files:
+          - backend/build.gradle.kts
+        prefix: "backend"
+      policy: pull
+      paths:
+        - .gradle
+        - .gradle_home/caches
 
 🧪 ui-v2:
   stage: 🧪 test
@@ -236,16 +148,18 @@ stages:
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angular:yarn_test
   cache:
-    key:
-      files:
-        - frontend-angular/yarn.lock
-      prefix: "ui-v2"
-    policy: pull
-    paths:
-      - .gradle
-      - .yarn
-      - frontend-angular/.gradle
-      - frontend-angular/node_modules/
+    - !reference [ .using-build-tool ]
+    - key:
+        files:
+          - frontend-angular/yarn.lock
+        prefix: "ui-v2"
+      policy: pull
+      paths:
+        - .gradle
+        - .gradle_home/caches
+        - .yarn
+        - frontend-angular/.gradle
+        - frontend-angular/node_modules/
 
 👷 backend-base-image:
   stage: 👷‍ build
@@ -255,7 +169,7 @@ stages:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   before_script:
-    - *cicd_utils
+    - !reference [ .cicd_utils ]
     - kaniko_auth_docker_hub
   script:
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend/src/main/base-image/Dockerfile --destination podcastserver/backend-base-image:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
@@ -271,18 +185,20 @@ stages:
     paths:
       - frontend-angularjs/target/dist/
   cache:
-    key:
-      files:
-        - frontend-angularjs/npm-shrinkwrap.json
-        - frontend-angularjs/www/config.js
-      prefix: "ui-v1"
-    policy: pull
-    paths:
-      - .gradle
-      - frontend-angularjs/.gradle
-      - frontend-angularjs/node_modules/
-      - frontend-angularjs/www/jspm_packages/
-      - frontend-angularjs/target/
+    - !reference [ .using-build-tool ]
+    - key:
+        files:
+          - frontend-angularjs/npm-shrinkwrap.json
+          - frontend-angularjs/www/config.js
+        prefix: "ui-v1"
+      policy: pull
+      paths:
+        - .gradle
+        - .gradle_home/caches
+        - frontend-angularjs/.gradle
+        - frontend-angularjs/node_modules/
+        - frontend-angularjs/www/jspm_packages/
+        - frontend-angularjs/target/
 
 👷 ui-v2:
   stage: 👷‍ build
@@ -295,16 +211,18 @@ stages:
     paths:
       - frontend-angular/dist/
   cache:
-    key:
-      files:
-        - frontend-angular/yarn.lock
-      prefix: "ui-v2"
-    policy: pull
-    paths:
-      - .gradle
-      - .yarn
-      - frontend-angular/.gradle
-      - frontend-angular/node_modules/
+    - !reference [ .using-build-tool ]
+    - key:
+        files:
+          - frontend-angular/yarn.lock
+        prefix: "ui-v2"
+      policy: pull
+      paths:
+        - .gradle
+        - .gradle_home/caches
+        - .yarn
+        - frontend-angular/.gradle
+        - frontend-angular/node_modules/
 
 👷 documentation:
   stage: 👷‍ build
@@ -331,14 +249,16 @@ stages:
   script:
     - ./gradlew $GRADLE_OPTS :backend:jib
   cache:
-    key:
-      files:
-        - backend/build.gradle.kts
-      prefix: "backend"
-    policy: pull
-    paths:
-      - .gradle/
-      - backend/build
+    - !reference [ .using-build-tool ]
+    - key:
+        files:
+          - backend/build.gradle.kts
+        prefix: "backend"
+      policy: pull
+      paths:
+        - .gradle
+        - .gradle_home/caches
+        - backend/build
   environment:
     name: backend/$CI_COMMIT_REF_SLUG
     url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/backend/tags
@@ -353,12 +273,8 @@ stages:
     - delete_docker_hub_image backend
     - delete_docker_hub_image backend-base-image
   rules:
-    - if: '$CI_MERGE_REQUEST_ID || $CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
-      when: never
-    - changes:
-        - backend/**/*
-      when: manual
-      allow_failure: true
+    - !reference [ .not-on-default-branch ]
+    - !reference [ .manual_run_if_changes_on_backend_files ]
   environment:
     name: backend/$CI_COMMIT_REF_SLUG
     action: stop
@@ -371,7 +287,7 @@ stages:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   before_script:
-    - *cicd_utils
+    - !reference [ .cicd_utils ]
     - kaniko_auth_docker_hub
   script:
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend-lib-database/src/main/docker/Dockerfile --destination podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
@@ -388,10 +304,8 @@ stages:
     GIT_STRATEGY: none
     COMPONENT: init-db
   rules:
-    - *rule-not-on-default-branch
-    - <<: *changes_backend_files
-      when: manual
-      allow_failure: true
+    - !reference [ .not-on-default-branch ]
+    - !reference [ .manual_run_if_changes_on_backend_files ]
   environment:
     name: init-db/$CI_COMMIT_REF_SLUG
     action: stop
@@ -404,7 +318,7 @@ stages:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   before_script:
-    - *cicd_utils
+    - !reference [ .cicd_utils ]
     - kaniko_auth_docker_hub
   script:
     - export VERSION="${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}"
@@ -423,10 +337,8 @@ stages:
     GIT_STRATEGY: none
     COMPONENT: storage
   rules:
-    - *rule-not-on-default-branch
-    - <<: *changes_storage_files
-      when: manual
-      allow_failure: true
+    - !reference [ .not-on-default-branch ]
+    - !reference [ .manual_run_if_changes_on_storage_files ]
   environment:
     name: storage/$CI_COMMIT_REF_SLUG
     action: stop
@@ -439,7 +351,7 @@ stages:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
   before_script:
-    - *cicd_utils
+    - !reference [ .cicd_utils ]
     - kaniko_auth_docker_hub
   script:
     - sh ./ui/compile.sh
@@ -458,42 +370,8 @@ stages:
   variables:
     COMPONENT: ui
   rules:
-    - *rule-not-on-default-branch
-    - <<: *changes_frontend_files
-      when: manual
-      allow_failure: true
+    - !reference [ .not-on-default-branch ]
+    - !reference [ .manual_run_if_changes_on_frontend_files ]
   environment:
     name: ui/$CI_COMMIT_REF_SLUG
     action: stop
-
-🔎 backend:
-  stage: 🔎 Security Analysis
-  extends: [.container-scanning-with-trivy, .only-on-backend-changes]
-  needs: [⬇ container analysis db, 🐳 backend]
-  script:
-    - trivy --cache-dir .trivy/ image --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/backend:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
-    - trivy --cache-dir .trivy/ image --exit-code 0 --no-progress podcastserver/backend:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
-
-🔎 init-db:
-  stage: 🔎 Security Analysis
-  extends: [.container-scanning-with-trivy, .only-on-backend-changes]
-  needs: [⬇ container analysis db, 🐳 init-db]
-  script:
-    - trivy --cache-dir .trivy/ image --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
-    - trivy --cache-dir .trivy/ image --exit-code 0 --no-progress podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
-
-🔎 storage:
-  stage: 🔎 Security Analysis
-  extends: [.container-scanning-with-trivy, .only-on-storage-changes]
-  needs: [⬇ container analysis db, 🐳 storage]
-  script:
-    - trivy --cache-dir .trivy/ image --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/storage:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
-    - trivy --cache-dir .trivy/ image --exit-code 0 --no-progress podcastserver/storage:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
-
-🔎 ui:
-  stage: 🔎 Security Analysis
-  extends: [.container-scanning-with-trivy, .only-on-frontend-changes]
-  needs: [⬇ container analysis db, 🐳 ui]
-  script:
-    - trivy --cache-dir .trivy/ image --format template --template "@/contrib/gitlab.tpl" -o gl-container-scanning-report.json --exit-code 0 --no-progress podcastserver/ui:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
-    - trivy --cache-dir .trivy/ image --exit-code 0 --no-progress podcastserver/ui:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
