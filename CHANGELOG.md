@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## 2024.10.0
+## 2024.11.0
 
 ### Features
 
@@ -52,6 +52,27 @@ All notable changes to this project will be documented in this file.
 - **deps:** Update dependency software.amazon.awssdk:bom to v2.28.5 ([6cab6a0](6cab6a0155f2da0e444642f7f4785b45e937e5a7))
 - **deps:** Update dependency software.amazon.awssdk:bom to v2.28.6 ([f4754c5](f4754c516d349958a39b6fdc0e62692e1a3d20de))
 - **deps:** Update dependency software.amazon.awssdk:bom to v2.28.7 ([ba126b0](ba126b011d3ec124e9ac76a83684a95b4ad2c6da))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.10 ([de1f2fe](de1f2fe28f3337626bfcac70a5d8d4dab01c2e60))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.16 ([317bd0d](317bd0ddb2cf80eff0000f208e623483ae0fde55))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.17 ([5a1c27c](5a1c27cd8c019c822a7ed80c088fc57cde50573a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.18 ([41f8759](41f87595964ccff80d5f5320fef06120a5e5860f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.19 ([fc63e7d](fc63e7dcf2ea257ee9183b69e21c74b332375269))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.20 ([8d92edf](8d92edf18e70f1dc621460f64418f31b592534df))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.21 ([f529435](f52943563044e79f5a01f0d0dcef33e78c7a6678))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.22 ([7dcad29](7dcad29a80d23e46494d2167ba32db36d7866737))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.23 ([66714e0](66714e02bce290f3699ae28c79a0d4ff4c485ea0))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.24 ([33f244c](33f244c6c2258736adde28a3f0ce1278279755f8))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.25 ([edc48dc](edc48dc2af7e01b111b392fb43c7f831dfc3ba1c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.26 ([2ecb449](2ecb449b4ba42df1129662b2066e01ab556616f5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.27 ([5a58f48](5a58f48982afdc8efa63dcd2e7888c5d7fbd8573))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.28 ([fedd35e](fedd35e7f59b36947bc70bfa0b033ce28f32ef55))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.28.29 ([9dc6398](9dc6398348c73650c3c19791b67668f6f1b0e271))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.0 ([4e012f7](4e012f74c2aeaa75aa6f2c5a3b3797bf2f196e15))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.4 ([e37c012](e37c01222b8b9aaf340ea431ce111d62db0afa04))
+- **deps:** Update dependency net.javacrumbs.json-unit:json-unit-assertj to v3.5.0 ([778e182](778e182080cab05aceed859bc5b388e0ebbb5936))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.5 ([0de0585](0de058519ef6951acc54ae7ec70f4dc565422d83))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.6 ([2d44f01](2d44f0129c6675df6334b8106532093ec4f727c9))
+- **front:** Set back compression after update of SWS to v2.33.0 ([3ecbeae](3ecbeae957f98f4d24f3fca3eaa9adeff0d9ef32))
 - **frontend:** Disable compression-static to avoid double gzip ([13c1620](13c16201fd43ce704652fe40404072337ca69ffd) - [#237](https://gitlab.com/davinkevin/Podcast-Server/-/issues/237))
 - **playlist:** Add extra mediatype for download ([e971710](e971710f7f83b97b15171ee4a54718c894f3b196) - [#219](https://gitlab.com/davinkevin/Podcast-Server/-/issues/219))
 
