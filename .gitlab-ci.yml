@@ -88,7 +88,7 @@ stages:
   image: gradle:jdk21
   needs: [⬇ backend]
   services:
-    - postgres:17.0-alpine
+    - postgres:17.1-alpine
   variables:
     POSTGRES_USER: pg-user
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
@@ -120,7 +120,7 @@ stages:
   image: gradle:jdk21
   needs: [⬇ backend]
   services:
-    - postgres:17.0-alpine
+    - postgres:17.1-alpine
   variables:
     POSTGRES_USER: pg-user
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
@@ -241,7 +241,7 @@ stages:
   image: gradle:jdk21
   needs: [⬇ backend, 👷 backend-base-image]
   services:
-    - postgres:17.0-alpine
+    - postgres:17.1-alpine
   variables:
     POSTGRES_USER: pg-user
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
