@@ -15,7 +15,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
@@ -33,10 +33,10 @@ class PodcastServiceTest(
     @Autowired val service: PodcastService
 ) {
 
-    @MockBean private lateinit var coverRepository: CoverRepository
-    @MockBean private lateinit var tagRepository: TagRepository
-    @MockBean private lateinit var repository: PodcastRepository
-    @MockBean private lateinit var fileService: FileStorageService
+    @MockitoBean private lateinit var coverRepository: CoverRepository
+    @MockitoBean private lateinit var tagRepository: TagRepository
+    @MockitoBean private lateinit var repository: PodcastRepository
+    @MockitoBean private lateinit var fileService: FileStorageService
 
     val podcast = Podcast(
             id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),

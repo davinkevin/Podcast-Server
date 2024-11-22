@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
@@ -42,7 +42,7 @@ class RSSUpdaterTest(
         @Bean fun webClientCustomization() = WebClientCustomizer { wcb -> wcb.baseUrl("http://localhost:5555/") }
     }
 
-    @MockBean lateinit var image: ImageService
+    @MockitoBean lateinit var image: ImageService
 
     private val podcast = PodcastToUpdate(UUID.randomUUID(), URI("http://localhost:5555/rss.xml"), "noSign")
 

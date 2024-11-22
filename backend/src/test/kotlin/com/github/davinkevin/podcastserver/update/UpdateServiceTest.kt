@@ -27,7 +27,7 @@ import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.core.task.SimpleAsyncTaskExecutor
@@ -47,12 +47,12 @@ class UpdateServiceTest(
     abstract class FakeUpdater : Updater {
         override fun type() = Type("foo", "bar")
     }
-    @MockBean lateinit var podcastRepository: PodcastRepository
-    @MockBean lateinit var itemRepository: ItemRepository
-    @MockBean lateinit var updaters: UpdaterSelector
-    @MockBean lateinit var liveUpdate: MessagingTemplate
-    @MockBean lateinit var fileService: FileStorageService
-    @MockBean lateinit var idm: ItemDownloadManager
+    @MockitoBean lateinit var podcastRepository: PodcastRepository
+    @MockitoBean lateinit var itemRepository: ItemRepository
+    @MockitoBean lateinit var updaters: UpdaterSelector
+    @MockitoBean lateinit var liveUpdate: MessagingTemplate
+    @MockitoBean lateinit var fileService: FileStorageService
+    @MockitoBean lateinit var idm: ItemDownloadManager
 
     @TestConfiguration
     @Import(UpdateService::class)

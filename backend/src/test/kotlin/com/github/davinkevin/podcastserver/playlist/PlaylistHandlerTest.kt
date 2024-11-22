@@ -12,7 +12,7 @@ import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -28,8 +28,8 @@ class PlaylistHandlerTest (
     @Autowired val rest: WebTestClient
 ) {
 
-    @MockBean private lateinit var service: PlaylistService
-    @MockBean private lateinit var file: FileStorageService
+    @MockitoBean private lateinit var service: PlaylistService
+    @MockitoBean private lateinit var file: FileStorageService
 
     @Nested
     @DisplayName("should save")

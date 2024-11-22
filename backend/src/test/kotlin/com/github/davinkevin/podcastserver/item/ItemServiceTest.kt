@@ -22,7 +22,7 @@ import org.mockito.Mockito
 import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -40,10 +40,10 @@ class ItemServiceTest(
         @Autowired val clock: Clock
 ) {
 
-    @MockBean private lateinit var repository: ItemRepository
-    @MockBean private lateinit var fileService: FileStorageService
-    @MockBean private lateinit var idm: ItemDownloadManager
-    @MockBean private lateinit var podcastRepository: PodcastRepository
+    @MockitoBean private lateinit var repository: ItemRepository
+    @MockitoBean private lateinit var fileService: FileStorageService
+    @MockitoBean private lateinit var idm: ItemDownloadManager
+    @MockitoBean private lateinit var podcastRepository: PodcastRepository
 
     val item = Item(
             id = UUID.fromString("27184b1a-7642-4ffd-ac7e-14fb36f7f15c"),

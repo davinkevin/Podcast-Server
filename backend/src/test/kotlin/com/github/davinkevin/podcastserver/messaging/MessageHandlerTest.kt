@@ -14,7 +14,7 @@ import org.mockito.Mockito.*
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.http.codec.ServerSentEvent
@@ -38,8 +38,7 @@ class MessageHandlerTest(
     @Autowired val mapper: ObjectMapper
 ) {
 
-    @MockBean
-    private lateinit var messageTemplate: MessagingTemplate
+    @MockitoBean private lateinit var messageTemplate: MessagingTemplate
 
     @Nested
     @Disabled("Impossible to test infinite stream with fake Spring Servlet: https://github.com/spring-projects/spring-framework/issues/32687")

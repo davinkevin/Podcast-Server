@@ -13,7 +13,7 @@ import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
@@ -28,9 +28,9 @@ class PlaylistServiceTest(
     @Autowired val service: PlaylistService
 ) {
 
-    @MockBean private lateinit var repository: PlaylistRepository
-    @MockBean private lateinit var image: ImageService
-    @MockBean private lateinit var fileService: FileStorageService
+    @MockitoBean private lateinit var repository: PlaylistRepository
+    @MockitoBean private lateinit var image: ImageService
+    @MockitoBean private lateinit var fileService: FileStorageService
 
     @Nested
     @DisplayName("should find all")

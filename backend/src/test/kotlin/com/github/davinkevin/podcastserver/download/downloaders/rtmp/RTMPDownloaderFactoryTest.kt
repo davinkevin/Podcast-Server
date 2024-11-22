@@ -16,7 +16,7 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
@@ -28,9 +28,9 @@ import kotlin.io.path.Path
 class RTMPDownloaderFactoryTest(
     @Autowired private val factory: RTMPDownloaderFactory
 ) {
-    @MockBean lateinit var downloaderHelperFactory: DownloaderHelperFactory
-    @MockBean lateinit var processService: ProcessService
-    @MockBean lateinit var externalTools: ExternalTools
+    @MockitoBean lateinit var downloaderHelperFactory: DownloaderHelperFactory
+    @MockitoBean lateinit var processService: ProcessService
+    @MockitoBean lateinit var externalTools: ExternalTools
 
     @Test
     fun `should produce a downloader`() {

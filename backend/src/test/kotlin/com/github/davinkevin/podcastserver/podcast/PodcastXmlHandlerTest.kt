@@ -18,7 +18,7 @@ import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.net.URI
@@ -32,9 +32,9 @@ class PodcastXmlHandlerTest(
     @Autowired val rest: WebTestClient
 ) {
 
-    @MockBean private lateinit var fileService: FileStorageService
-    @MockBean private lateinit var itemService: ItemService
-    @MockBean private lateinit var podcastService: PodcastService
+    @MockitoBean private lateinit var fileService: FileStorageService
+    @MockitoBean private lateinit var itemService: ItemService
+    @MockitoBean private lateinit var podcastService: PodcastService
 
     val podcast = Podcast(
         id = UUID.fromString("dd16b2eb-657e-4064-b470-5b99397ce729"),

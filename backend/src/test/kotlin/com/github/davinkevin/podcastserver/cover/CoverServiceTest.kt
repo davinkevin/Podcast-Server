@@ -11,7 +11,7 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.time.OffsetDateTime
@@ -27,8 +27,8 @@ class CoverServiceTest (
 ) {
     private val date = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
-    @MockBean private lateinit var cover: CoverRepository
-    @MockBean private lateinit var file: FileStorageService
+    @MockitoBean private lateinit var cover: CoverRepository
+    @MockitoBean private lateinit var file: FileStorageService
 
     @Nested
     @DisplayName("should delete old covers")

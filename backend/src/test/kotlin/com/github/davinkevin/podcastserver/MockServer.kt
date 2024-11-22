@@ -50,5 +50,6 @@ internal fun HttpRequest.copy(uri: URI): HttpRequest {
         override fun getHeaders(): HttpHeaders = this@copy.headers
         override fun getMethod(): HttpMethod = this@copy.method
         override fun getURI(): URI = uri
+        override fun getAttributes() = this@copy.attributes
     }
 }

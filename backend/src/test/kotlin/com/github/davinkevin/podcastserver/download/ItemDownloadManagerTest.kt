@@ -13,7 +13,7 @@ import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
@@ -34,10 +34,10 @@ class ItemDownloadManagerTest(
     @Autowired val idm: ItemDownloadManager
 ) {
 
-    @MockBean private lateinit var messaging: MessagingTemplate
-    @MockBean private lateinit var repository: DownloadRepository
-    @MockBean private lateinit var parameters: PodcastServerParameters
-    @MockBean private lateinit var downloaders: DownloaderSelector
+    @MockitoBean private lateinit var messaging: MessagingTemplate
+    @MockitoBean private lateinit var repository: DownloadRepository
+    @MockitoBean private lateinit var parameters: PodcastServerParameters
+    @MockitoBean private lateinit var downloaders: DownloaderSelector
 
     private val date = OffsetDateTime.of(2012, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 

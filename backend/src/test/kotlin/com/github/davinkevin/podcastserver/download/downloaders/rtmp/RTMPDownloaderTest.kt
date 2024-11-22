@@ -21,7 +21,7 @@ import org.mockito.Mockito
 import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -51,8 +51,8 @@ class RTMPDownloaderTest(
     @Autowired private val helper: DownloaderHelper,
 ) {
 
-    @MockBean lateinit var externalTools: ExternalTools
-    @MockBean lateinit var processService: ProcessService
+    @MockitoBean lateinit var externalTools: ExternalTools
+    @MockitoBean lateinit var processService: ProcessService
 
     private val item: DownloadingItem = DownloadingItem (
             id = UUID.randomUUID(),

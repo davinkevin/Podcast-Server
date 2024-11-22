@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
@@ -17,8 +17,8 @@ class FindServiceTest(
         @Autowired private val service: FindService
 ) {
 
-    @MockBean(name = "firstFinder") private lateinit var firstFinder: Finder
-    @MockBean(name = "secondFinder") private lateinit var secondFinder: Finder
+    @MockitoBean(name = "firstFinder") private lateinit var firstFinder: Finder
+    @MockitoBean(name = "secondFinder") private lateinit var secondFinder: Finder
 
     @Test
     fun `should find most compatible finder and delegate to it the find operation`() {

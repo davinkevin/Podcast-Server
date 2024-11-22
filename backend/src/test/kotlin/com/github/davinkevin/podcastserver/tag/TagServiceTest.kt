@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.util.*
@@ -21,7 +21,7 @@ class TagServiceTest (
     @Autowired val service: TagService
 ) {
 
-    @MockBean private lateinit var repo: TagRepository
+    @MockitoBean private lateinit var repo: TagRepository
 
     @Nested
     @DisplayName("should find by id")

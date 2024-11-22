@@ -14,7 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.net.URI
@@ -27,7 +27,7 @@ class DownloadHandlerTest(
         @Autowired val rest: WebTestClient
 ) {
 
-    @MockBean private lateinit var idm: ItemDownloadManager
+    @MockitoBean private lateinit var idm: ItemDownloadManager
 
     private val item1 = DownloadingItem(
             id = UUID.fromString("6c05149f-a3e1-4302-ab1f-83324c75ad70"),

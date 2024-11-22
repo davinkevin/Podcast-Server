@@ -17,7 +17,7 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.nio.file.Paths
@@ -31,7 +31,7 @@ class YoutubeDlServiceTest(
         @Autowired private val youtube: YoutubeDlService
 ) {
 
-    @MockBean private lateinit var youtubeDl: YoutubeDL
+    @MockitoBean private lateinit var youtubeDl: YoutubeDL
 
     @BeforeEach
     fun beforeEach() = Mockito.reset(youtubeDl)

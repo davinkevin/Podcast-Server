@@ -10,7 +10,7 @@ import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
@@ -28,7 +28,7 @@ class CoverHandlerTest(
     @Autowired val rest: WebTestClient
 ) {
 
-    @MockBean private lateinit var cover: CoverService
+    @MockitoBean private lateinit var cover: CoverService
 
     @Nested
     @DisplayName("should delete cover")

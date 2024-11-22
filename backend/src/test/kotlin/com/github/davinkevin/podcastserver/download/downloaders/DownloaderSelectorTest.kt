@@ -18,7 +18,7 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.mockito.quality.Strictness
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
@@ -33,9 +33,9 @@ class DownloaderSelectorTest(
     @Autowired val applicationContext: ApplicationContext
 ) {
 
-    @MockBean private lateinit var ffmpegDownloader: FfmpegDownloaderFactory
-    @MockBean private lateinit var rtmpDownloader: RTMPDownloaderFactory
-    @MockBean private lateinit var youtubeDLDownloader: YoutubeDlDownloaderFactory
+    @MockitoBean private lateinit var ffmpegDownloader: FfmpegDownloaderFactory
+    @MockitoBean private lateinit var rtmpDownloader: RTMPDownloaderFactory
+    @MockitoBean private lateinit var youtubeDLDownloader: YoutubeDlDownloaderFactory
 
     lateinit var selector: DownloaderSelector
 

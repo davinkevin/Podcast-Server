@@ -24,7 +24,7 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -39,7 +39,7 @@ class FranceTvFinderTest(
     @Autowired val finder: FranceTvFinder
 ) {
 
-    @MockBean lateinit var image: ImageService
+    @MockitoBean lateinit var image: ImageService
 
     @Nested
     @ExtendWith(MockServer::class)

@@ -19,7 +19,7 @@ import org.mockito.Mockito.mock
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
@@ -32,9 +32,9 @@ class FfmpegDownloaderFactoryTest(
     @Autowired private val factory: FfmpegDownloaderFactory
 ) {
 
-    @MockBean lateinit var downloaderHelperFactory: DownloaderHelperFactory
-    @MockBean lateinit var ffmpegService: FfmpegService
-    @MockBean lateinit var processService: ProcessService
+    @MockitoBean lateinit var downloaderHelperFactory: DownloaderHelperFactory
+    @MockitoBean lateinit var ffmpegService: FfmpegService
+    @MockitoBean lateinit var processService: ProcessService
 
     private val item: DownloadingItem = DownloadingItem (
         id = UUID.randomUUID(),

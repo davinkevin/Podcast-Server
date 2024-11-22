@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.net.URI
@@ -18,8 +18,7 @@ class FindHandlerTest(
     @Autowired val rest: WebTestClient
 ) {
 
-    @MockBean
-    private lateinit var finder: FindService
+    @MockitoBean private lateinit var finder: FindService
 
     @Nested
     @DisplayName("should find")

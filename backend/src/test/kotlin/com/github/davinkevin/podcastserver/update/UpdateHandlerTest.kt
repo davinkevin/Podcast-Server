@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.util.*
@@ -24,7 +24,7 @@ import java.util.*
 class UpdateHandlerTest(
         @Autowired val rest: WebTestClient
 ) {
-    @MockBean private lateinit var update: UpdateService
+    @MockitoBean private lateinit var update: UpdateService
 
     @Nested
     @DisplayName("should update all")

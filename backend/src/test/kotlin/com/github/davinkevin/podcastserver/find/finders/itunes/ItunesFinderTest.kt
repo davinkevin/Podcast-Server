@@ -18,7 +18,7 @@ import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfigura
 import org.springframework.boot.autoconfigure.web.reactive.function.client.WebClientAutoConfiguration
 import org.springframework.boot.test.autoconfigure.json.AutoConfigureJson
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.boot.test.mock.mockito.MockBean
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
@@ -33,7 +33,7 @@ class ItunesFinderTest(
     @Autowired val finder: ItunesFinder
 ) {
 
-    @MockBean lateinit var rssFinder: RSSFinder
+    @MockitoBean lateinit var rssFinder: RSSFinder
 
     @Test
     fun `should be compatible with podcasts dot apple dot com url`() {
