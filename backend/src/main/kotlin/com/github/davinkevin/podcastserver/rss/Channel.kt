@@ -56,7 +56,7 @@ data class PodcastChannel(
         val url = UriComponentsBuilder.fromUri(calledURI).build(true).toUriString()
         val baseUrl = calledURI.scheme + "://" + calledURI.authority
 
-        val coverUrl = UriComponentsBuilder.fromHttpUrl(baseUrl)
+        val coverUrl = UriComponentsBuilder.fromUriString(baseUrl)
             .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "cover." + Path(cover.url.path).extension)
             .build(true)
             .toUriString()
