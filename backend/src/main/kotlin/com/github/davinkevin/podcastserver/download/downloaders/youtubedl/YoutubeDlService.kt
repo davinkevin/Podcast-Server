@@ -48,10 +48,10 @@ class YoutubeDlService(private val youtube: YoutubeDL) {
         val r = YoutubeDLRequest(url, downloadLocation).apply {
             setOption("retries", 10)
             setOption("output", name)
-            setOption("merge-output-format", "mp4")
+            setOption("merge-output-format", "mp4/webm")
 
             if(isFromVideoPlatform(url)) {
-                setOption("format", "bestvideo[ext=webm]+bestaudio[ext=webm]/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=webm]/best[ext=mp4]/mp4+m4a/best/bv*+ba")
+                setOption("format", "bv+ba")
             }
         }
 

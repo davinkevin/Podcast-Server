@@ -128,8 +128,8 @@ class YoutubeDlServiceTest(
                         it.directory == "/tmp" &&
                         it.option["retries"] == "10" &&
                         it.option["output"] == "foo.mp3" &&
-                        it.option["merge-output-format"] == "mp4" &&
-                        it.option["format"] == "bestvideo[ext=webm]+bestaudio[ext=webm]/bestvideo[ext=mp4]+bestaudio[ext=m4a]/best[ext=webm]/best[ext=mp4]/mp4+m4a/best/bv*+ba"
+                        it.option["merge-output-format"] == "mp4/webm" &&
+                        it.option["format"] == "bv+ba"
             }
             whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
 
