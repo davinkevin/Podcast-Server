@@ -9,6 +9,8 @@ spec:
             value: "/api"
         - path:
             value: "/actuator"
+        - path:
+            value: "/kodi"
       backendRefs:
         - name: backend
           port: 8080
