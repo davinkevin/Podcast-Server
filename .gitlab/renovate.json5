@@ -1,32 +1,49 @@
 {
-  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "config:recommended"
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
+  extends: [
+    'config:recommended',
   ],
-  "rebaseWhen": "never",
-  "assignees": [
-    "@davinkevin"
+  rebaseWhen: 'never',
+  assignees: [
+    '@davinkevin',
   ],
   ignorePaths: [
-    "frontend-angular/**",
-    "frontend-angularjs/**"
+    'frontend-angular/**',
+    'frontend-angularjs/**',
   ],
-  "packageRules": [{
-    matchPackageNames: ["software.amazon.awssdk:bom"],
-    "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-    automerge: true,
-  }, {
-    "packagePatterns": ["^minio"],
-    "versioning": "regex:^RELEASE\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})T\\d{2}-\\d{2}-\\d{2}Z$",
-    automerge: true
-  }, {
-    matchPackagePatterns: [".*flyway.*"],
-    groupName: "all-flyway",
-    groupSlug: "all-flyway"
-  }, {
-    matchPackagePatterns: ["^org.jetbrains.kotlin.*"],
-    groupName: "all-kotlin",
-    groupSlug: "all-kotlin"
-  }]
+  packageRules: [
+    {
+      matchPackageNames: [
+        'software.amazon.awssdk:bom',
+      ],
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+        'pin',
+        'digest',
+      ],
+      automerge: true,
+    },
+    {
+      versioning: 'regex:^RELEASE\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})T\\d{2}-\\d{2}-\\d{2}Z$',
+      automerge: true,
+      matchPackageNames: [
+        '/^minio/',
+      ],
+    },
+    {
+      groupName: 'all-flyway',
+      groupSlug: 'all-flyway',
+      matchPackageNames: [
+        '/.*flyway.*/',
+      ],
+    },
+    {
+      groupName: 'all-kotlin',
+      groupSlug: 'all-kotlin',
+      matchPackageNames: [
+        '/^org.jetbrains.kotlin.*/',
+      ],
+    },
+  ],
 }
-
