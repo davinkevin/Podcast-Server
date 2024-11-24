@@ -41,6 +41,7 @@ class PlaylistRepository(
                             .innerJoin(COVER).on(ITEM.COVER_ID.eq(COVER.ID))
                     )
                     .where(PLAYLIST_ITEMS.PLAYLISTS_ID.eq(PLAYLIST.ID))
+                    .orderBy(ITEM.PUB_DATE.desc())
             ).`as`("items"),
             PLAYLIST.cover().ID, PLAYLIST.cover().HEIGHT, PLAYLIST.cover().WIDTH, PLAYLIST.cover().URL,
         )
