@@ -54,7 +54,11 @@ class YoutubeDlServiceTest(
         fun `with success`(name: String, transformed: String) {
             /* Given */
             val response = response(name)
-            val requestForFileName = argForWhich<YoutubeDLRequest> { this.url == url && option["get-filename"] == "" }
+            val requestForFileName = argForWhich<YoutubeDLRequest> {
+                this.url == url &&
+                  option["get-filename"] == "" &&
+                  option["merge-output-format"] == "mp4"
+            }
             whenever(youtubeDl.execute(requestForFileName)).thenReturn(response)
 
             /* When */
@@ -128,7 +132,7 @@ class YoutubeDlServiceTest(
                         it.directory == "/tmp" &&
                         it.option["retries"] == "10" &&
                         it.option["output"] == "foo.mp3" &&
-                        it.option["merge-output-format"] == "mp4/webm" &&
+                        it.option["merge-output-format"] == "mp4" &&
                         it.option["format"] == "bv+ba"
             }
             whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)

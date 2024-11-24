@@ -24,6 +24,7 @@ class YoutubeDlService(private val youtube: YoutubeDL) {
 
         val request = YoutubeDLRequest(url).apply {
             setOption("get-filename")
+            setOption("merge-output-format", "mp4")
         }
 
         return try {
@@ -48,12 +49,14 @@ class YoutubeDlService(private val youtube: YoutubeDL) {
         val r = YoutubeDLRequest(url, downloadLocation).apply {
             setOption("retries", 10)
             setOption("output", name)
-            setOption("merge-output-format", "mp4/webm")
+            setOption("merge-output-format", "mp4")
 
             if(isFromVideoPlatform(url)) {
                 setOption("format", "bv+ba")
             }
         }
+
+        log.debug("yt-dlp {}", r.buildOptions())
 
         return youtube.execute(r) { progress, etaInSeconds ->
             log.debug("p: {}, s:{}", progress, etaInSeconds)
