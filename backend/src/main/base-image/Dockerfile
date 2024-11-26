@@ -25,7 +25,7 @@ ENV PODCASTSERVER_EXTERNALTOOLS_YOUTUBEDL "/usr/local/bin/yt-dlp"
 
 RUN echo "install runtime dependencies" && \
   apt-get update && apt-get install python3 python3-pip rtmpdump procps -y --no-install-recommends && \
-  python3 -m pip install -U yt-dlp[default] && \
+  python3 -m pip install --break-system-packages -U yt-dlp[default] && \
   rm -rf /var/lib/apt/lists/* && apt-get autoremove && \
   echo "print version of built in tools" && \
   ffmpeg -version | head -n 1 && \
