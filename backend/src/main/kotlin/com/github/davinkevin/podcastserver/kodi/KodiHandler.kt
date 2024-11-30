@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.kodi
 
 import com.github.davinkevin.podcastserver.extension.serverRequest.extractHost
-import org.slf4j.LoggerFactory
 import org.springframework.http.MediaType
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
@@ -19,6 +18,9 @@ class KodiHandler(
     val header = """
         <!DOCTYPE html>
         <html>
+            <head>
+                <meta charset="utf-8"/>
+            </head>
             <body>
                 <table>
                     <thead>
@@ -38,13 +40,8 @@ class KodiHandler(
     fun podcasts(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
         val response = kodi
             .podcasts()
-            .joinToString(separator = "\n") {
-                """
-                    <tr>
-                        <td><a href="${it.title.encode()}/?podcastId=${it.id}">${it.title}/</a></td><td align="right">  - </td><td align="right">  - </td>
-                    </tr>
-                """.trimIndent()
-            }
+            .map(::PodcastHTML)
+            .joinToString(separator = "\n") { it.toTableRow() }
 
         return ServerResponse.ok()
             .contentType(MediaType.TEXT_HTML)
@@ -59,16 +56,8 @@ class KodiHandler(
 
         val response = kodi
             .items(podcastId = podcastId)
-            .joinToString(separator = "\n") {
-                """
-                    <tr>
-                        <td><a href="${it.title.encode()}.${it.extension()}?podcastId=${podcastId}&itemId=${it.id}">${it.title}.${it.extension()}</a></td>
-                        <td align="right">${it.formattedDate()}</td>
-                        <td align="right">${it.length}B</td>
-                    </tr>
-                """
-                    .replaceIndent("        ")
-            }
+            .map { ItemHTML(it, podcastId) }
+            .joinToString(separator = "\n") { it.toTableRow().replaceIndent("        ") }
 
         return ServerResponse.ok()
             .contentType(MediaType.TEXT_HTML)
@@ -87,15 +76,51 @@ class KodiHandler(
             ?.let(UUID::fromString)
             ?: error("podcastId query param not provided")
 
-        val itemTitle = r.pathVariable("itemTitle")
+        val itemTitle = URLEncoder.encode(r.pathVariable("itemTitle"), "UTF-8")
 
         return ServerResponse.seeOther(
-            URI.create("${host}api/v1/podcasts/${podcastId}/items/${itemId}/${itemTitle.encode()}")
+            URI.create("${host}api/v1/podcasts/${podcastId}/items/${itemId}/${itemTitle}")
         ).build()
     }
+}
+
+class PodcastHTML(private val podacst: Podcast) {
+
+    val title = URLEncoder.encode(podacst.title, "UTF-8")
+        .replace("+", "%20")
+
+    fun toTableRow() =
+        """
+            <tr>
+                <td><a href="${title}/?podcastId=${podacst.id}">${podacst.title}/</a></td>
+                <td align="right"> - </td>
+                <td align="right"> - </td>
+            </tr>
+        """.trimIndent()
 
 }
 
-private fun String.encode() = URLEncoder.encode(this, "UTF-8").replace("+", "%20")
-private fun Item.extension() = this.fileName?.extension ?: mimeType.substringAfter("/")
-private fun Item.formattedDate() = this.pubDate.format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+class ItemHTML(private val item: Item, private val podcastId: UUID) {
+
+    private val title = item.title.replace(KEEP_STANDARD_CHARACTERS, "")
+
+    private fun href(): String {
+        val encodedTitle = URLEncoder.encode(title, "UTF-8").replace("+", "%20")
+        return "${encodedTitle}.${extension()}?podcastId=${podcastId}&itemId=${item.id}"
+    }
+    private fun extension() = item.fileName?.extension ?: item.mimeType.substringAfter("/")
+
+    fun toTableRow(): String =
+        """
+            <tr>
+                <td><a href="${href()}">${title}.${extension()}</a></td>
+                <td align="right">${item.pubDate.format(KODI_DATE_FORMAT)}</td>
+                <td align="right">${item.length}B</td>
+            </tr>
+        """
+
+    companion object {
+        private val KEEP_STANDARD_CHARACTERS = "[^\\p{L}\\p{N}\\p{P}\\p{Z}]".toRegex()
+        private val KODI_DATE_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")
+    }
+}
