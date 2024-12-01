@@ -1,6 +1,38 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2024.12.0
+
+### Features
+
+- **kodi:** Support kodi http source ([5e85df7](5e85df7dd2f864dd05bbbb1f820ad89b3004097b) - [#244](https://gitlab.com/davinkevin/Podcast-Server/-/issues/244))
+- **playlist:** Order items by pubdate desc ([80cec58](80cec58c999c5a21faf917667d2246314326f7cf))
+
+### Bug Fixes
+
+- **backend:** Download youtube video with higher quality by default ([3aaf949](3aaf9492f27f8a20c8f50d033975926a23dedd1a))
+- **backend:** Force python lib installation ([91affff](91affff54284ef55d7e63bb23faa1a1fd69e4637))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.7 ([c92eb7d](c92eb7d2ce9fce4c432f7e12ca950204e7845be5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.8 ([49d3ee6](49d3ee6e263ed4b2e35178a9c0b78566eaaa0894))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.9 ([572ed7e](572ed7e6ed63452d39530690958f7a3a920b773a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.10 ([6aa55f6](6aa55f66f104791bcc48744c8dcad2037eccb63b))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.11 ([a351783](a351783a881ec49d31d3b935f512ce7fcb0b62be))
+- **deps:** Update dependency net.javacrumbs.json-unit:json-unit-assertj to v4 ([25bdab0](25bdab0775a80fba7928e3d16fd557b02f42c8c3))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.14 ([229f467](229f467c942a84b75b6ec9760218570f3e2921ce))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.19 ([5e2f539](5e2f5397d31bd47e685bc9e6aef61b8f2a2fdf83))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.20 ([0cd1e1c](0cd1e1c6f4c27b4c09eb7fcb01d953d55be457de))
+- **deps:** Update dependency org.jsoup:jsoup to v1.18.2 ([eed9993](eed9993ba4cd4c3c905f2c9ef2e470683991ab60))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.21 ([972dc95](972dc9585256013eb51c9ac2ff2f677342b7dded))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.22 ([2e8335b](2e8335b1e5faa1f0ff2f5a9f35645a2cf3babb62))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.23 ([db19f2a](db19f2a47b0bee21c632fb06f4c27c15273648a8))
+- **deps:** Update dependency net.javacrumbs.json-unit:json-unit-assertj to v4.1.0 ([a8dbc46](a8dbc461f8c84df2f0ba528cf557e5de92ceeccd))
+- **kodi:** Support podcast with emojis ([e133fd0](e133fd06a590e4e9db7c78b11751505d95869aec))
+- **youtube:** Align download and name to the same container type ([13fe3b0](13fe3b07e267692fb400f873710accc18cf7d5f8))
+
+### Refactor
+
+- **backend:** Adjust test following deprecations ([23546a6](23546a6eb473ec705fa98ff908e1526de2d00254))
+
 ## 2024.11.0
 
 ### Features

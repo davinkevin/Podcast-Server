@@ -1,6 +1,6 @@
 {
   "name": "podcast-server",
-  "version": "2024.11.0",
+  "version": "2024.12.0",
   "description": "Podcast Server",
   "devDependencies": {
     "babel": "^5.8.23",
