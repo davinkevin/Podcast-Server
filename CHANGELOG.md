@@ -1,7 +1,7 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
-## 2024.12.0
+## 2025.1.0
 
 ### Features
 
@@ -26,6 +26,28 @@ All notable changes to this project will be documented in this file.
 - **deps:** Update dependency software.amazon.awssdk:bom to v2.29.22 ([2e8335b](2e8335b1e5faa1f0ff2f5a9f35645a2cf3babb62))
 - **deps:** Update dependency software.amazon.awssdk:bom to v2.29.23 ([db19f2a](db19f2a47b0bee21c632fb06f4c27c15273648a8))
 - **deps:** Update dependency net.javacrumbs.json-unit:json-unit-assertj to v4.1.0 ([a8dbc46](a8dbc461f8c84df2f0ba528cf557e5de92ceeccd))
+- **deps:** Update dependency org.jsoup:jsoup to v1.18.3 ([7d98f66](7d98f66e66ffea8cfdf77e8c386582a65eaa9145))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.24 ([a128ecb](a128ecb9ddbad4a1532a3025e7fcbc840fc55511))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.25 ([adc28b1](adc28b1befe4909c4458f4f315528320deb0c799))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.26 ([2555444](25554440cac594378cbcae50f088a76bf5dd6071))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.27 ([e06a28e](e06a28e81f68e77eb3cc5d6bf1a3bd719669ab3f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.28 ([f662828](f66282874c61ed591834dedbfcc0795d0cba9124))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.29 ([ce274c4](ce274c4cb629477b2a62a27e3ba4087c6c27626a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.30 ([0b67733](0b67733a4914f03977ef64b513c6ae7c61f80522))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.31 ([2536e3c](2536e3c0f2a4e368b7204177261c4bdbe5bf31b3))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.32 ([1ff5387](1ff53878f0231b81c1be7175c5436eed9be3a464))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.33 ([c198bbe](c198bbe8f4421ad3188d6ad5cc005ccb10c302d1))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.34 ([d38c3c2](d38c3c298549614eea593feb71e898ad927d78c6))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.35 ([2c17385](2c17385b6e7b7e743834ec3a54c1d10017e9d012))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.36 ([82129b3](82129b397541e238f57db865210908fb924e381f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.37 ([f06b422](f06b4228bc487dfe44b5526e6e5790c95ff18094))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.38 ([9a84cbc](9a84cbc83f4176f18119029e10f6f0b8bcdb3c0c))
+- **deps:** Update all-flyway to v11.1.0 ([52db984](52db984411e81cc80b1b976a896b4fb528b810e6))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.39 ([1dbcfd0](1dbcfd0b0dfc8ffc38930240a1899380da908a56))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.40 ([54d58dd](54d58dd8c00ca2182343b5e65394d3eb48bbbd8e))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.41 ([3a964da](3a964da9c2a017cc87985b76f6986c98025c9a50))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.42 ([807ca6c](807ca6cb334d33d04fd7483cd043b4fc6e046e6c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.43 ([c7dc4e7](c7dc4e76e1d39e745ac94e58c8fe784146ae363f))
 - **kodi:** Support podcast with emojis ([e133fd0](e133fd06a590e4e9db7c78b11751505d95869aec))
 - **youtube:** Align download and name to the same container type ([13fe3b0](13fe3b07e267692fb400f873710accc18cf7d5f8))
 
