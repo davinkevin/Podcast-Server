@@ -6,6 +6,7 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.mock
 import org.springframework.boot.autoconfigure.AutoConfigurations
+import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.context.annotation.Bean
 
@@ -16,7 +17,11 @@ import org.springframework.context.annotation.Bean
 class YoutubeDlConfigTest {
 
     private val contextRunner = ApplicationContextRunner()
-            .withConfiguration(AutoConfigurations.of(LocalTestConfiguration::class.java, YoutubeDlConfig::class.java))
+            .withConfiguration(AutoConfigurations.of(
+                JacksonAutoConfiguration::class.java,
+                LocalTestConfiguration::class.java,
+                YoutubeDlConfig::class.java)
+            )
 
     @Test
     fun `should provide a youtube dl service`() {

@@ -17,14 +17,11 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.mockito.Mockito
 import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.nio.file.Paths
 
-/**
- * Created by kevin on 08/05/2020
- */
 @ExtendWith(SpringExtension::class)
 @Import(YoutubeDlService::class)
 class YoutubeDlServiceTest(
@@ -63,6 +60,7 @@ class YoutubeDlServiceTest(
 
             /* When */
             val fileName = youtube.extractName(url)
+
             /* Then */
             assertThat(fileName).isEqualTo(transformed)
         }
@@ -84,6 +82,23 @@ class YoutubeDlServiceTest(
             assertThatThrownBy { youtube.extractName(url) }
                     /* Then */
                     .hasMessage("Error during creation of filename of $url")
+        }
+
+        @Test
+        fun `should use extra parameters provided by configuration`() {
+            /* Given */
+            val ytdlp = YoutubeDlService(youtubeDl, mapOf("foo" to "bar"))
+            val response = response("lowercase.mp3")
+            val requestForFileName = argForWhich<YoutubeDLRequest> {
+                this.url == url && option["foo"] == "bar"
+            }
+            whenever(youtubeDl.execute(requestForFileName)).thenReturn(response)
+
+            /* When */
+            val fileName = ytdlp.extractName(url)
+
+            /* Then */
+            assertThat(fileName).isEqualTo("lowercase.mp3")
         }
 
         fun response(name: String) = YoutubeDLResponse(null, null, null, 0, 0, name, null)
@@ -162,6 +177,31 @@ class YoutubeDlServiceTest(
             assertThat(isCalled).isTrue
         }
 
+        @Test
+        fun `should use extra parameters provided by configuration`() {
+            /* Given */
+            val ytdlp = YoutubeDlService(youtubeDl, mapOf("foo" to "bar"))
+            val requestForDownload = argWhere<YoutubeDLRequest> {
+                it.url == "https://youtube.com/file.mp3"  &&
+                  it.directory == "/tmp" &&
+                  it.option["retries"] == "10" &&
+                  it.option["output"] == "foo.mp3" &&
+                  it.option["merge-output-format"] == "mp4" &&
+                  it.option["format"] == "bv+ba"
+                  it.option["foo"] == "bar"
+            }
+            whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
+
+            /* When */
+            val download = ytdlp.download(
+                url = "https://youtube.com/file.mp3",
+                destination = destination,
+                callback = progressCallback
+            )
+
+            /* Then */
+            assertThat(download).isSameAs(response)
+        }
 
     }
 

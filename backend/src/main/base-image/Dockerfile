@@ -21,7 +21,7 @@ ENV PATH="/opt/ffmpeg:/opt/youtube-dl/:/opt/yt-dl/:${PATH}"
 ENV PODCASTSERVER_EXTERNALTOOLS_FFMPEG    "/opt/ffmpeg/ffmpeg"
 ENV PODCASTSERVER_EXTERNALTOOLS_FFPROBE   "/opt/ffmpeg/ffprobe"
 ENV PODCASTSERVER_EXTERNALTOOLS_RTMPDUMP  "/usr/bin/rtmpdump"
-ENV PODCASTSERVER_EXTERNALTOOLS_YOUTUBEDL "/usr/local/bin/yt-dlp"
+ENV PODCASTSERVER_EXTERNALTOOLS_YTDLP_PATH "/usr/local/bin/yt-dlp"
 
 RUN echo "install runtime dependencies" && \
   apt-get update && apt-get install python3 python3-pip rtmpdump procps -y --no-install-recommends && \

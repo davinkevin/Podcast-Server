@@ -1,5 +1,7 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDL
@@ -12,12 +14,14 @@ import org.springframework.context.annotation.Import
  * Created by kevin on 08/05/2020
  */
 @Configuration
-@EnableConfigurationProperties(ExternalTools::class, PodcastServerParameters::class)
+@EnableConfigurationProperties(ExternalTools::class, PodcastServerParameters::class, YTDlpParameters::class)
 @Import(YoutubeDlDownloaderFactory::class)
 class YoutubeDlConfig {
     @Bean
-    fun youtubeDlService(externalTools: ExternalTools): YoutubeDlService {
-        val youtube = YoutubeDL(externalTools.youtubedl)
-        return YoutubeDlService(youtube)
+    fun youtubeDlService(parameters: YTDlpParameters, om: ObjectMapper): YoutubeDlService {
+        val youtube = YoutubeDL(parameters.path)
+        val extraParameters = om.readValue<Map<String, String>>(parameters.extraParameters)
+
+        return YoutubeDlService(youtube, extraParameters)
     }
 }

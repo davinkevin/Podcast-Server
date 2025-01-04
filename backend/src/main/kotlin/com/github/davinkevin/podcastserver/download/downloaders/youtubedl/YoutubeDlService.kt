@@ -12,7 +12,10 @@ import kotlin.io.path.Path
 /**
  * Created by kevin on 08/05/2020
  */
-class YoutubeDlService(private val youtube: YoutubeDL) {
+class YoutubeDlService(
+    private val youtube: YoutubeDL,
+    private val extraParameters: Map<String, String>
+) {
 
     private val log = LoggerFactory.getLogger(YoutubeDlService::class.java)
 
@@ -25,6 +28,9 @@ class YoutubeDlService(private val youtube: YoutubeDL) {
         val request = YoutubeDLRequest(url).apply {
             setOption("get-filename")
             setOption("merge-output-format", "mp4")
+
+            setOption("format", "bv+ba")
+            extraParameters.forEach { setOption(it.key, it.value) }
         }
 
         return try {
@@ -37,6 +43,7 @@ class YoutubeDlService(private val youtube: YoutubeDL) {
 
             name
         } catch (e: Exception) {
+            log.warn("yt-dlp {}", request.buildOptions())
             throw RuntimeException("Error during creation of filename of $url", e)
         }
     }
@@ -53,6 +60,7 @@ class YoutubeDlService(private val youtube: YoutubeDL) {
 
             if(isFromVideoPlatform(url)) {
                 setOption("format", "bv+ba")
+                extraParameters.forEach { setOption(it.key, it.value) }
             }
         }
 
