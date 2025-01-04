@@ -7,9 +7,9 @@ metadata:
     module: backend
 spec:
   ports:
-    - name: http-backend-port
+    - name: http-port
       port: 8080
-      targetPort: 8080
+      targetPort: http-port
       protocol: TCP
   selector:
     app: podcast-server
