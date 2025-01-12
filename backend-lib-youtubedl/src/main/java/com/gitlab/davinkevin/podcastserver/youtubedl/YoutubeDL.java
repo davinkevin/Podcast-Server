@@ -31,7 +31,7 @@ public class YoutubeDL {
      */
     private final String executablePath;
     private static final Pattern SPLIT_PATTERN = Pattern
-            .compile("[^\\s\"']+|\"([^\"]*)\"|'([^']*)'");
+            .compile("[^\\s\"]+|\"([^\"]*)\"|'([^']*)'");
 
     public YoutubeDL(String executablePath) {
         this.executablePath = executablePath;
@@ -66,12 +66,11 @@ public class YoutubeDL {
         while (regexMatcher.find()) {
             if (regexMatcher.group(1) != null) {
                 matchList.add(regexMatcher.group(1));
-            } else if (regexMatcher.group(2) != null) {
-                matchList.add(regexMatcher.group(2));
             } else {
                 matchList.add(regexMatcher.group());
             }
         }
+
         return matchList.toArray(new String[]{});
     }
 
@@ -83,8 +82,6 @@ public class YoutubeDL {
      * @throws YoutubeDLException
      */
     public YoutubeDLResponse execute(YoutubeDLRequest request, DownloadProgressCallback callback) throws YoutubeDLException {
-
-        String command = buildCommand(request.buildOptions());
         String directory = request.getDirectory();
         Map<String, String> options = request.getOption();
 
@@ -95,8 +92,8 @@ public class YoutubeDL {
         StringBuffer errBuffer = new StringBuffer(); //stderr
         long startTime = System.nanoTime();
 
+        String command = buildCommand(request.buildOptions());
         String[] split = this.splitCommand(command);
-
         ProcessBuilder processBuilder = new ProcessBuilder(split);
 
         // Define directory if one is passed

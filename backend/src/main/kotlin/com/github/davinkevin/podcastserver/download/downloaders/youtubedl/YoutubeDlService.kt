@@ -17,6 +17,7 @@ class YoutubeDlService(
     private val extraParameters: Map<String, String>
 ) {
 
+    private val DEFAULT_FORMAT = "bv+ba"
     private val log = LoggerFactory.getLogger(YoutubeDlService::class.java)
 
     fun extractName(url: String): String {
@@ -29,9 +30,10 @@ class YoutubeDlService(
             setOption("get-filename")
             setOption("merge-output-format", "mp4")
 
-            setOption("format", "bv+ba")
+            setOption("format", DEFAULT_FORMAT)
             extraParameters.forEach { setOption(it.key, it.value) }
         }
+            .also { log.debug("yt-dlp {}", it.buildOptions()) }
 
         return try {
             val name = youtube.execute(request)
@@ -59,12 +61,11 @@ class YoutubeDlService(
             setOption("merge-output-format", "mp4")
 
             if(isFromVideoPlatform(url)) {
-                setOption("format", "bv+ba")
+                setOption("format", DEFAULT_FORMAT)
                 extraParameters.forEach { setOption(it.key, it.value) }
             }
         }
-
-        log.debug("yt-dlp {}", r.buildOptions())
+            .also { log.debug("yt-dlp {}", it.buildOptions()) }
 
         return youtube.execute(r) { progress, etaInSeconds ->
             log.debug("p: {}, s:{}", progress, etaInSeconds)
