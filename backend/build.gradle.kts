@@ -13,8 +13,8 @@ plugins {
 	id("com.google.cloud.tools.jib") version "3.4.4"
 	id("org.jetbrains.kotlinx.kover") version "0.9.1"
 
-	kotlin("jvm") version "2.1.0"
-	kotlin("plugin.spring") version "2.1.0"
+	kotlin("jvm") version "2.1.10"
+	kotlin("plugin.spring") version "2.1.10"
 
 	id("build-plugin-database")
 	id("build-plugin-docker-images")
