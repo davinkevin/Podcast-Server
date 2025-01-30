@@ -8,7 +8,7 @@ import org.gradle.internal.deprecation.DeprecatableConfiguration
 
 buildscript {
     dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:11.2.0")
+        classpath("org.flywaydb:flyway-database-postgresql:11.3.0")
     }
 }
 
@@ -18,7 +18,7 @@ plugins {
 
     id("java")
 
-    id("org.flywaydb.flyway") version "11.2.0"
+    id("org.flywaydb.flyway") version "11.3.0"
     id("nu.studer.jooq") version "9.0"
     id("build-plugin-database")
 }
