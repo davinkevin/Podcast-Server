@@ -99,6 +99,7 @@ class FileStorageService(
             is UploadRequest.ForItemFromPath   -> bucket.putObject(bucketRequest, request.content)
             is UploadRequest.ForItemFromStream -> bucket.putObject(bucketRequest, AsyncRequestBody.fromInputStream { it
                 .inputStream(request.content)
+                .contentLength(request.length)
                 .executor(Executors.newVirtualThreadPerTaskExecutor())
             })
         }
@@ -153,6 +154,7 @@ class FileStorageService(
         }
 
         return errors.first()
+            .also { log.error("error during operation, operation canceled", it.exceptionOrNull()) }
     }
 
     fun metadata(title: String, file: Path): FileMetaData? {

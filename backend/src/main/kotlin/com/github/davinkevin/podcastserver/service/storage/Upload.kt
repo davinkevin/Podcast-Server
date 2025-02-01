@@ -22,7 +22,7 @@ sealed interface UploadRequest {
     data class ForItemFromPath  (val podcastTitle: String, val content: Path): UploadRequest {
         override val path: Path = Path("$podcastTitle/${content.fileName}")
     }
-    data class ForItemFromStream(val podcastTitle: String, val fileName: Path, val content: InputStream): UploadRequest {
+    data class ForItemFromStream(val podcastTitle: String, val fileName: Path, val content: InputStream, val length: Long): UploadRequest {
         override val path: Path = Path("$podcastTitle/${fileName.fileName}")
     }
 }

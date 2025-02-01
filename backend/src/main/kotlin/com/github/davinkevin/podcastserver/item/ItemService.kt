@@ -87,6 +87,7 @@ class ItemService(
             podcastTitle = podcast.title,
             fileName = filename,
             content = uploadedFile.inputStream,
+            length = uploadedFile.size
         )
         file.upload(uploadRequest)
 

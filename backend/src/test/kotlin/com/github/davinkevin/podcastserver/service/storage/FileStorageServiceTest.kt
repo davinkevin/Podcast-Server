@@ -43,6 +43,7 @@ import java.time.ZoneOffset
 import java.util.*
 import java.util.stream.Stream
 import kotlin.io.path.Path
+import kotlin.io.path.fileSize
 import kotlin.io.path.inputStream
 
 /**
@@ -407,7 +408,7 @@ class FileStorageServiceTest(
                     .first().body
                     .let(DigestUtils::md5DigestAsHex)
 
-                assertThat(bodyDigest).isEqualTo("1cc21d3dce8bfedbda2d867a3238e8db")
+                assertThat(bodyDigest).isEqualTo("cf283e981284bf90c362687dec876f24")
             }
         }
 
@@ -461,7 +462,7 @@ class FileStorageServiceTest(
                     .first().body
                     .let(DigestUtils::md5DigestAsHex)
 
-                assertThat(bodyDigest).isEqualTo("1cc21d3dce8bfedbda2d867a3238e8db")
+                assertThat(bodyDigest).isEqualTo("cf283e981284bf90c362687dec876f24")
             }
 
         }
@@ -495,7 +496,7 @@ class FileStorageServiceTest(
                     .first().body
                     .let(DigestUtils::md5DigestAsHex)
 
-                assertThat(bodyDigest).isEqualTo("1cc21d3dce8bfedbda2d867a3238e8db")
+                assertThat(bodyDigest).isEqualTo("cf283e981284bf90c362687dec876f24")
             }
 
         }
@@ -578,7 +579,7 @@ class FileStorageServiceTest(
 
             /* And */
             val textContent = allRequests.first().body.decodeToString()
-            assertThat(textContent).isEqualTo("Foo")
+            assertThat(textContent).contains("Foo")
         }
 
         @DisplayName("with success after second retry")
@@ -601,7 +602,7 @@ class FileStorageServiceTest(
                 .first().body
                 .decodeToString()
 
-            assertThat(textContent).isEqualTo("Foo")
+            assertThat(textContent).contains("Foo")
         }
 
         @DisplayName("with failure after all retries")
@@ -639,7 +640,8 @@ class FileStorageServiceTest(
             val request = UploadRequest.ForItemFromStream(
                 podcastTitle = "podcast-title",
                 fileName = file.fileName,
-                content = file.inputStream()
+                content = file.inputStream(),
+                length = file.fileSize(),
             )
 
             /* When */

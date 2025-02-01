@@ -413,10 +413,12 @@ class ItemServiceTest(
 
             whenever(file.filename).thenReturn(fileName)
             whenever(file.inputStream).thenReturn(fileStream)
+            whenever(file.size).thenReturn(123L)
             val uploadRequest = UploadRequest.ForItemFromStream(
                 podcastTitle = podcast.title,
                 fileName = normalizedFileName,
-                content = fileStream
+                content = fileStream,
+                length = 123L
             )
             doNothing().whenever(fileService).upload(uploadRequest)
 
