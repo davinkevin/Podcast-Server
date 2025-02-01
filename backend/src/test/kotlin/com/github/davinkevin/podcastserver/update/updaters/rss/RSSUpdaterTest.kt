@@ -305,13 +305,42 @@ class RSSUpdaterTest(
                 </rss>
             """.trimIndent()
             backend.stubFor(get("/rss.xml")
-                    .willReturn(okTextXml(xml)))
+                .willReturn(okTextXml(xml)))
 
             /* When */
             val items = updater.findItems(podcast)
 
             /* Then */
             assertThat(items).hasSize(1)
+        }
+
+        @Test
+        fun `should support item with invalid length`(backend: WireMockServer) {
+            /* Given */
+            val xml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <rss version="2.0">
+                    <channel>
+                        <title>AppLoad</title>
+                        <link>https://www.app-load.com/</link>
+                        <item>
+                            <title>AppLoad 215 - N'invitez pas Cédric</title>
+                            <link>https://feedproxy.google.com/~r/Appload/~3/zHhCKm4_NZs/</link>
+                            <pubDate>Thu, 11 Jun 2015 14:30:25 +0200</pubDate>
+                            <guid isPermaLink="false">63B5D695-F6CC-4704-B927-99B1862D82BF</guid>
+                            <enclosure url='https://localhost:5555/item.mp3' length='12345678 '/>
+                        </item>
+                    </channel>
+                </rss>
+            """.trimIndent()
+            backend.stubFor(get("/rss.xml").willReturn(okTextXml(xml)))
+
+            /* When */
+            val items = updater.findItems(podcast)
+
+            /* Then */
+            assertThat(items).hasSize(1)
+            assertThat(items[0].length).isEqualTo(0)
         }
     }
 
