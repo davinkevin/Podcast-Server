@@ -1,6 +1,34 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2025.2.0
+
+### Features
+
+- **distribution:** Use named port instead of value in k8s service ([8d4f022](8d4f022b28d99d055d96dc9427508fcfcad51edd))
+- **yt-dlp:** Add support for extra parameters provided by users ([0108af6](0108af6e8982c8cd523a4fea5a0dfe641efceb73))
+
+### Bug Fixes
+
+- **aws:** Adjust to the new AWS SDK ([01ba945](01ba945ce8a9297332329c9a948e35742fbf737b))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.44 ([e288b63](e288b6362b7ac4470180ad5ba89caee2c7c4cfe0))
+- **deps:** Update all-flyway to v11.1.1 ([ccf25f4](ccf25f44e2db6725fbc3c067cbb68c6d6760ac5b))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.45 ([e299de8](e299de845190906de3ca6d9017eec8268b236852))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.47 ([ac45828](ac45828a7588c87e779f1545210b957e8fea6c24))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.48 ([f11e17f](f11e17faf5112bc754146b1eb24222e7aaba359a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.49 ([99e5ab0](99e5ab09f853abf03c9a8e079318377c54961182))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.50 ([c0bd646](c0bd646c79e5ee21f03f709edd955972536b13a7))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.51 ([14128a1](14128a15f4d0ae87aa67e1c05575186c926abcf6))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.29.52 ([c625d68](c625d68b4123d91d051f3fa9202742d11aea56d3))
+- **deps:** Update all-flyway to v11.2.0 ([14a0a33](14a0a33d59b9cb85f8f8efc38d56ad586bc2b4c2))
+- **deps:** Update all-flyway to v11.3.0 ([0f2e8c0](0f2e8c05f9ef75399e962f3bf358a7d379e46490))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.0 ([c5bcfe9](c5bcfe903fa74074b59c9f048314cb8b41829b40))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.12 ([807b635](807b6355bc24902e1779753184c314d7d17a383d))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.13 ([7189473](7189473e3cb56a796992cbeb70e8eb91a2ea2f22))
+- **deps:** Update all-flyway to v11.3.1 ([c7462a4](c7462a494db7ba1c657a68c9474cdd3cee9a81ac))
+- **update:** Manage feeds with invalid number for length ([a747b06](a747b06dff003a5d6ccb4988f52c5eb14570e733))
+- **yt-dlp:** Add possibility to provide advance format for youtube video ([7f8de9c](7f8de9c15138141536f085493cff1e7185d53182))
+
 ## 2025.1.0
 
 ### Features
