@@ -9,7 +9,7 @@ plugins {
 	id("org.springframework.boot") version "3.4.5"
 	id("io.spring.dependency-management") version "1.1.7"
 
-	id("com.gorylenko.gradle-git-properties") version "2.4.2"
+	id("com.gorylenko.gradle-git-properties") version "2.5.0"
 	id("com.google.cloud.tools.jib") version "3.4.5"
 	id("org.jetbrains.kotlinx.kover") version "0.9.1"
 
