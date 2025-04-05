@@ -1,6 +1,61 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2025.4.0
+
+### Bug Fixes
+
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.14 ([5e2aee3](5e2aee33619780c3ab64787d18d9804717d87c3c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.15 ([458fe76](458fe7660f1ad797a9c55db11c43a1075c7ce37d))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.16 ([0640142](06401425afb2436b380839ac6aadd524c8eade7c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.17 ([d27439e](d27439ea1ebd35752548817950b0cddb38e5e8f5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.18 ([77d6d6e](77d6d6ef2eaefdd4bb8c623eb71f3fd448983122))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.19 ([ade2ecb](ade2ecb484bc47708286fb97fd396932112370da))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.20 ([4fdf8f0](4fdf8f00f7f143730c63adea529cb0ab4abdbc2a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.21 ([2643ce9](2643ce9caaee7314adcdba3a4cd6f8c56fc66351))
+- **deps:** Update all-flyway to v11.3.2 ([cf36e2a](cf36e2a394ad7806118db3004d5f224137c220e0))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.22 ([d5a25f2](d5a25f28fbf1a9c46368a49bbc952997cd3e5bb5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.23 ([ec1b9b9](ec1b9b9c5b60e02b47665500b86082aab88f5dcb))
+- **deps:** Update all-flyway to v11.3.3 ([2d632be](2d632be49f31639038ecaa0dabddde57a7bf75df))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.24 ([e182e7b](e182e7b3a0e0cde1ff6c4462932383da27b5ebcf))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.25 ([88c2e1a](88c2e1a48072a16c2e6617039e262b8b59a4fad1))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.26 ([d9fa3b0](d9fa3b0268f28a74ca966246ddede4f783dc7542))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.27 ([b5c6621](b5c66218f4e099922a7255b4fc4d22bc9475d028))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.28 ([15ee445](15ee445b013aff67eacdaa9357da8e7f22473b33))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.29 ([49f3728](49f37287fece171e3ee8a5c413a85585e40f2fc5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.30 ([079ae32](079ae3223dfdcd012260621edda648922e3190e4))
+- **deps:** Update all-flyway to v11.3.4 ([b333518](b33351804ec4f02ea27f21e0b564632fefc87693))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.31 ([48a84cb](48a84cb24bac521d3b6348c0c3c1078f898937aa))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.32 ([c40fc05](c40fc05b358c953c9356022355272cd57a43c4ca))
+- **deps:** Update dependency org.jsoup:jsoup to v1.19.1 ([bd05dbc](bd05dbc3a27561eb3dfc2cc1cda323218257e1e9))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.33 ([ad8824e](ad8824e2919a5360eddd19a68ee25661976b60ce))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.34 ([b8d0235](b8d0235dd72e4182b1022584740f4c8fb348ddb2))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.35 ([f328a17](f328a1749909f44f746b8bc12abb6571cbaed851))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.36 ([e667f04](e667f04a79017189e26206bd4213d5f979bfa78e))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.37 ([79dd5dd](79dd5dd84a14fa6832e2c7912f0652063d85c225))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.30.38 ([c240722](c240722e8786992b035a8cca46e09a5583b80546))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.0 ([6b03289](6b0328903a3280ca702c3ac9ed2f97de32428c8e))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.1 ([9582a63](9582a63cada52997147f22f7e5ae550a5841ba34))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.2 ([752b00b](752b00bde9e1629928c28be4ddb27e46ca704af5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.3 ([9d80713](9d80713905b2d1c4455f5922695b36958fe11217))
+- **deps:** Update all-flyway to v11.4.0 ([4fbb003](4fbb003aa48681e86c340ab55fbcc30f54bcc0a2))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.4 ([e6da629](e6da629182b44e150b67b0139265b04cab7a2f12))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.5 ([a0328eb](a0328ebf81521ba22212b4e5c08497acc8481132))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.6 ([33dac56](33dac56096b912a23a029de1afa1398c7a6aac01))
+- **deps:** Update all-flyway to v11.4.1 ([58105b0](58105b011e322e8ea133c52cd4bc533cded254d5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.7 ([ae3063f](ae3063f21cdc532fbf458a8d397092e5051fa289))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.8 ([011aaac](011aaac17261a00844a2b15b922456f23b7bf733))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.9 ([d64a448](d64a448fb46e6b7ba422a8a7a66092a51496e07c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.10 ([c30bc94](c30bc94cd7d1ffe23e293ecf966664a5a78a1d67))
+- **deps:** Update all-flyway to v11.5.0 ([590970e](590970e39e985e45c373bb46797fce42a8dc9fcc))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.11 ([814b7cb](814b7cb97b65f2eb1f8208deb6b81981ecce7ce1))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.12 ([5fabe19](5fabe1992f478d7a09154d99a4ab538a1b98d2ea))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.13 ([dbd83b3](dbd83b365ae8d99ad2bc278b536bb66d94c1b977))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.14 ([9bec81c](9bec81c313bb43a7876dfc0dd0812028089d5d3b))
+- **deps:** Update all-flyway to v11.6.0 ([887d199](887d199d34681aa1389460d896492426f7cbb7bb))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.15 ([8510c86](8510c86b9df9eb9cfde5920503248d6519d40b8e))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.16 ([c1c20ba](c1c20ba1ead8eb4e634f423d10f565a22f238a24))
+
 ## 2025.2.0
 
 ### Features
