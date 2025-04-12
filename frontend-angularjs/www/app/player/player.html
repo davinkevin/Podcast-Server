@@ -17,6 +17,7 @@
                 </vg-volume>
                 <vg-fullscreen-button ng-show="pc.config.sources[0].type.indexOf('audio') === -1"></vg-fullscreen-button>
                 <vg-link ng-show="pc.config.sources[0].src" url="pc.config.sources[0].src"></vg-link>
+                <vg-link-vlc ng-show="pc.config.sources[0].src" url="pc.config.sources[0].src"></vg-link-vlc>
                 <vg-copy ng-show="pc.config.sources[0].src" url="pc.config.sources[0].src"></vg-copy>
             </vg-controls>
 

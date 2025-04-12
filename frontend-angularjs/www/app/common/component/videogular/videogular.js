@@ -15,10 +15,22 @@ import VgCopy from './vg-copy/vg-copy';
 import VgLink from './vg-link/vg-link';
 import 'videogular-themes-default/videogular.css!';
 import './videogular.css!';
+import VgLinkVLC from "./vg-link-vlc/vg-link-vlc";
 
 @Module({
     name : 'ps.common.component.videogular',
-    modules : [ 'ngSanitize', VideogularModule, VideogularPoster, VideogularControls, VideogularOverlayPlay, VideogularBuffering, VgCopy, VgLink, DeviceDetectionService ]
+    modules : [
+        'ngSanitize',
+        VideogularModule,
+        VideogularPoster,
+        VideogularControls,
+        VideogularOverlayPlay,
+        VideogularBuffering,
+        VgCopy,
+        VgLink,
+        VgLinkVLC,
+        DeviceDetectionService,
+    ]
 })
 @Service('VideogularService')
 export default class VideogularService {
