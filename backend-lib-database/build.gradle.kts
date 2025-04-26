@@ -48,9 +48,9 @@ jooq {
                 logging = INFO
                 jdbc.apply {
 					driver = "org.postgresql.Driver"
-					url = db.jdbc()
-					user = db.user
-					password = db.password
+					url = db.jdbc().get()
+					user = db.user.get()
+					password = db.password.get()
                 }
 
                 generator.apply {
@@ -88,12 +88,11 @@ jooq {
 }
 
 flyway {
-	url = db.jdbc()
-	user = db.user
-	password = db.password
+	url = db.jdbc().get()
+	user = db.user.get()
+	password = db.password.get()
 	locations = arrayOf("filesystem:$projectDir/src/main/migrations/")
     cleanDisabled = false
-
 }
 
 tasks.named<JooqGenerate>("generateJooq") {

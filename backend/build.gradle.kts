@@ -114,9 +114,9 @@ tasks.test {
 
 	systemProperty("user.timezone", "UTC")
 	project.extensions.getByType<DatabaseConfiguration>().apply {
-		systemProperty("spring.datasource.url", jdbc())
-		systemProperty("spring.datasource.username", user)
-		systemProperty("spring.datasource.password", password)
+		systemProperty("spring.datasource.url", jdbc().get())
+		systemProperty("spring.datasource.username", user.get())
+		systemProperty("spring.datasource.password", password.get())
 		dependsOn(migrateDbTask)
 	}
 	jvmArgs = listOf("--add-opens", "java.base/java.time=ALL-UNNAMED")
