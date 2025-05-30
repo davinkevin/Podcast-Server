@@ -11,10 +11,12 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 /**
  * <p>Provide an interface for youtube-dl executable</p>
@@ -93,7 +95,8 @@ public class YoutubeDL {
         long startTime = System.nanoTime();
 
         String command = buildCommand(request.buildOptions());
-        String[] split = this.splitCommand(command);
+        String[] split = Stream.concat(Arrays.stream(this.splitCommand(command)), Arrays.stream(StreamProcessExtractor.progressParameter))
+                .toArray(String[]::new);
         ProcessBuilder processBuilder = new ProcessBuilder(split);
 
         // Define directory if one is passed
@@ -109,6 +112,7 @@ public class YoutubeDL {
         InputStream outStream = process.getInputStream();
         InputStream errStream = process.getErrorStream();
 
+        System.out.println("before stream extractor creation");
         StreamProcessExtractor stdOutProcessor = new StreamProcessExtractor(outBuffer, outStream, callback);
         StreamGobbler stdErrProcessor = new StreamGobbler(errBuffer, errStream);
 

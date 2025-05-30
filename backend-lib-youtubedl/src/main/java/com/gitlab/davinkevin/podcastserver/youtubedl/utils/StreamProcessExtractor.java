@@ -11,11 +11,13 @@ public class StreamProcessExtractor extends Thread {
     private static final String GROUP_PERCENT = "percent";
     private static final String GROUP_MINUTES = "minutes";
     private static final String GROUP_SECONDS = "seconds";
-    private InputStream stream;
-    private StringBuffer buffer;
+    private final InputStream stream;
+    private final StringBuffer buffer;
     private final DownloadProgressCallback callback;
 
-    private Pattern p = Pattern.compile("\\[download\\]\\s+(?<percent>\\d+\\.\\d)% .* ETA (?<minutes>\\d+):(?<seconds>\\d+)");
+    private final Pattern p = Pattern.compile("\\[download]\\s+(?<percent>\\d+\\.\\d+)%.*");
+
+    public static final String[] progressParameter = {"--progress-template", "download:[download] %(progress._percent)s%", "--newline"};
 
     public StreamProcessExtractor(StringBuffer buffer, InputStream stream, DownloadProgressCallback callback) {
         this.stream = stream;
@@ -30,7 +32,7 @@ public class StreamProcessExtractor extends Thread {
             int nextChar;
             while ((nextChar = stream.read()) != -1) {
                 buffer.append((char) nextChar);
-                if (nextChar == '\r' && callback != null) {
+                if ((nextChar == '\r' || nextChar == '\n') && callback != null) {
                     processOutputLine(currentLine.toString());
                     currentLine.setLength(0);
                     continue;
@@ -45,12 +47,8 @@ public class StreamProcessExtractor extends Thread {
         Matcher m = p.matcher(line);
         if (m.matches()) {
             float progress = Float.parseFloat(m.group(GROUP_PERCENT));
-            long eta = convertToSeconds(m.group(GROUP_MINUTES), m.group(GROUP_SECONDS));
-            callback.onProgressUpdate(progress, eta);
+            callback.onProgressUpdate(progress);
         }
     }
 
-    private int convertToSeconds(String minutes, String seconds) {
-        return Integer.parseInt(minutes) * 60 + Integer.parseInt(seconds);
-    }
 }

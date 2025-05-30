@@ -33,7 +33,7 @@ class YoutubeDlService(
             setOption("format", DEFAULT_FORMAT)
             extraParameters.forEach { setOption(it.key, it.value) }
         }
-            .also { log.debug("yt-dlp {}", it.buildOptions()) }
+            .also { log.debug("extract name command: yt-dlp {}", it.buildOptions()) }
 
         return try {
             val name = youtube.execute(request)
@@ -65,11 +65,11 @@ class YoutubeDlService(
                 extraParameters.forEach { setOption(it.key, it.value) }
             }
         }
-            .also { log.debug("yt-dlp {}", it.buildOptions()) }
+            .also { log.debug("download command: yt-dlp {}", it.buildOptions()) }
 
-        return youtube.execute(r) { progress, etaInSeconds ->
-            log.debug("p: {}, s:{}", progress, etaInSeconds)
-            callback.onProgressUpdate(progress, etaInSeconds)
+        return youtube.execute(r) { progress ->
+            log.debug("progress: {}", progress)
+            callback.onProgressUpdate(progress)
         }
     }
 }

@@ -21,9 +21,9 @@ import org.mockito.Mockito
 import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
 import java.nio.file.Files
@@ -201,7 +201,7 @@ class YoutubeDlDownloaderTest(
                 /* Given */
                 val callback = captor.firstValue
                 /* When */
-                callback.onProgressUpdate(1f, 2)
+                callback.onProgressUpdate(1f)
 
                 /* Then */
                 verify(helper.template, times(2)).sendItem(any())
@@ -214,7 +214,7 @@ class YoutubeDlDownloaderTest(
                 helper.info = helper.info.progression(1)
 
                 /* When */
-                callback.onProgressUpdate(1f, 2)
+                callback.onProgressUpdate(1f)
 
                 /* Then */
                 await().atMost(5, TimeUnit.SECONDS).untilAsserted {

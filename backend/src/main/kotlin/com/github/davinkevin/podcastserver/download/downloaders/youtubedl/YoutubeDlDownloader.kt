@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
-import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.download.downloaders.Downloader
 import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelper
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
@@ -28,7 +27,7 @@ class YoutubeDlDownloader(
 
         state.target = state.computeTargetFile(state.info)
 
-        val callback = DownloadProgressCallback { p, _ ->
+        val callback = DownloadProgressCallback { p ->
             val progression = p.roundToInt()
             val broadcast = state.info.item.progression < progression
             if (broadcast) {

@@ -1,5 +1,5 @@
 package com.gitlab.davinkevin.podcastserver.youtubedl;
 
 public interface DownloadProgressCallback {
-    void onProgressUpdate(float progress, long etaInSeconds);
+    void onProgressUpdate(float progress);
 }

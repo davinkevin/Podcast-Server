@@ -111,7 +111,7 @@ class YoutubeDlServiceTest(
         private val url = "https://foo.bar.com/file.mp3"
         private val destination = Paths.get("/tmp/", "foo.mp3")
         private val response = YoutubeDLResponse(null, null, null, 1, 1, null, null)
-        private val progressCallback = DownloadProgressCallback { _, _ -> }
+        private val progressCallback = DownloadProgressCallback { _ -> }
 
         @Test
         fun `should download http file`() {
@@ -164,14 +164,14 @@ class YoutubeDlServiceTest(
             /* Given */
             val captor = argumentCaptor<DownloadProgressCallback>()
             var isCalled = false
-            val changeValue = DownloadProgressCallback { _, _ -> isCalled = true}
+            val changeValue = DownloadProgressCallback { _ -> isCalled = true}
 
             whenever(youtubeDl.execute(any(), any())).thenReturn(response)
             youtube.download(url, destination, changeValue)
             verify(youtubeDl).execute(any(), captor.capture())
 
             /* When */
-            captor.firstValue.onProgressUpdate(1f, 2)
+            captor.firstValue.onProgressUpdate(1f)
 
             /* Then */
             assertThat(isCalled).isTrue
