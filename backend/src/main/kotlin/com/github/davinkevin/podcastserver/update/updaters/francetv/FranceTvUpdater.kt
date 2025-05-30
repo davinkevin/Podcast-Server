@@ -1,7 +1,5 @@
 package com.github.davinkevin.podcastserver.update.updaters.francetv
 
-import com.fasterxml.jackson.databind.JsonNode
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformation
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
@@ -10,21 +8,21 @@ import com.github.davinkevin.podcastserver.update.updaters.Type
 import com.github.davinkevin.podcastserver.update.updaters.Updater
 import io.micrometer.core.instrument.MeterRegistry
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.slf4j.LoggerFactory
 import org.springframework.util.DigestUtils
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
 import java.net.URI
 import java.time.Clock
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
-import kotlin.time.Duration
-import kotlin.time.DurationUnit
 
 class FranceTvUpdater(
     private val franceTvClient: RestClient,
     private val image: ImageService,
-    private val mapper: ObjectMapper,
     private val clock: Clock,
     override val registry: MeterRegistry,
 ): Updater {
@@ -49,7 +47,7 @@ class FranceTvUpdater(
         val html = Jsoup.parse(page, url)
 
         val urls = html
-            .select(".c-wall__item > [data-video-id]")
+            .select("main[role=main] .group")
             .toList()
             .filter { !it.html().contains("indisponible") }
             .map { it.select("a[href]").attr("href") }
@@ -68,36 +66,32 @@ class FranceTvUpdater(
             ?: return null
 
         val html = Jsoup.parse(page, "https://www.france.tv/")
-
-        val jsonldTag = html.select("script[type=application/ld+json]").firstOrNull()
-            ?: error("""No <script type="application/ld+json"></script> found""")
-
-        val jsonLd = mapper.readTree(jsonldTag.html())
-        val videoObject = jsonLd.firstOrNull { it.get("@type").asText() == "VideoObject" }
-            ?: error("""No element of type VideoObject""")
-
-        val pubDate = when(val uploadDate = videoObject["uploadDate"]?.asText()) {
-            null -> ZonedDateTime.now(clock)
-            else -> ZonedDateTime.parse(uploadDate, DateTimeFormatter.ISO_DATE_TIME)
-        }
-
-        val cover = videoObject.get("thumbnailUrl")
-            .asSequence()
-            .map(JsonNode::asText)
-            .map(URI::create)
-            .map(image::fetchCoverUpdateInformation)
-            .firstOrNull()
+        val cover = html.select("meta[property=og:image]").attr("content")
+            .let(URI::create)
+            .let(image::fetchCoverUpdateInformation)
 
         return ItemFromUpdate(
-            title = videoObject.get("name").asText().replaceFirst("Secrets d'Histoire ", ""),
-            description = videoObject.get("description").asText(),
-            length = Duration.parse(videoObject.get("duration").asText()).toLong(DurationUnit.SECONDS),
-            pubDate = pubDate,
+            title = html.select("meta[property=og:title]").attr("content"),
+            description = html.select("meta[property=og:description]").attr("content"),
+            pubDate = extractPubDate(html),
             url = URI("https://www.france.tv$pathUrl"),
             cover = cover,
             mimeType = "video/mp4"
         )
     }
+
+    private fun extractPubDate(html: Document): ZonedDateTime? = runCatching {
+        val pubDateBlock = html.select("#about-section [role=heading]").text()
+        val blocks = pubDateBlock
+            .substringBefore(" - ")
+            .split(" ")
+        val dateAsText = blocks[2]
+        val timeAsText = blocks[4].replace("h", ":")
+        val date = LocalDateTime.parse("$dateAsText $timeAsText", DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm"))
+
+        ZonedDateTime.of(date, ZoneId.of("Europe/Paris"))
+    }
+        .getOrElse { ZonedDateTime.now(clock) }
 
     override fun signatureOf(url: URI): String {
         val replay = replayUrl(url)
@@ -110,18 +104,17 @@ class FranceTvUpdater(
             ?: return ""
 
         val html = Jsoup.parse(page, url.toASCIIString())
-        val ids = html.select(".c-wall__item > [data-video-id]")
+        val ids = html.select("main[role=main] .group")
             .toList()
             .filter { !it.html().contains("indisponible") }
+            .map { it.select("a[href]").attr("href") }
+            .sorted()
 
         if (ids.isEmpty()) return ""
 
-        return ids
-            .asSequence()
-            .map { it.select("a[href]").attr("href") }
-            .sorted()
-            .reduce { t, u -> """$t-$u""" }
-            .let { DigestUtils.md5DigestAsHex(it.toByteArray()) }
+        return ids.reduce { t, u -> """$t-$u""" }
+            .toByteArray()
+            .let (DigestUtils::md5DigestAsHex)
     }
 
     override fun type() = Type("FranceTv", "France•tv")

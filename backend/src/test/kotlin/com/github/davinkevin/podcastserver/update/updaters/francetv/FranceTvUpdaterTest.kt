@@ -11,7 +11,6 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock.get
 import com.github.tomakehurst.wiremock.client.WireMock.ok
 import org.assertj.core.api.Assertions.assertThat
-import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -23,9 +22,9 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
 import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.util.DigestUtils
 import java.net.URI
@@ -66,16 +65,15 @@ class FranceTvUpdaterTest(
     @ExtendWith(MockServer::class)
     inner class ShouldFindItems {
 
-        private fun WireMockServer.forV6(path: String, coverPath: String = "") {
+        private fun WireMockServer.forV7(path: String, coverPath: String = "") {
             stubFor(get(path)
-                .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/videos/${path.substringAfterLast("/")}"))))
+                .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/videos/${path.substringAfterLast("/")}"))))
 
             if (coverPath.isEmpty()) {
                 whenever(imageService.fetchCoverInformation(any<URI>())).thenReturn(null)
                 return
             }
-
-            val uri = URI("https://www.france.tv$coverPath")
+            val uri = URI("https://medias.france.tv$coverPath")
             whenever(imageService.fetchCoverInformation(uri)).thenReturn(CoverInformation(
                 width = 256, height = 300, url = uri
             ))
@@ -101,7 +99,7 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/no-item.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/toutes-les-videos/no-item.html"))))
             }
 
             /* When */
@@ -116,7 +114,7 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/all-unavailable.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/toutes-les-videos/all-unavailable.html"))))
             }
 
             /* When */
@@ -131,11 +129,11 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/one-item.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/toutes-les-videos/one-item.html"))))
 
-                forV6(
-                    path = "/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html",
-                    coverPath = "/image/carre/1024/1024/q/4/c/1ae0e33f-phpg7tc4q.jpg"
+                forV7(
+                    path = "/france-3/secrets-d-histoire/saison-19/7153193-la-folle-epopee-de-charlotte-d-angleterre.html",
+                    coverPath = "/_cW692thJEUi4VUnXHzmu8BoRO0/880x0/filters:quality(85):format(jpeg)/7/q/1/phpaa51q7.jpg"
                 )
             }
 
@@ -146,14 +144,13 @@ class FranceTvUpdaterTest(
             assertAll {
                 assertThat(items).hasSize(1)
                 val item = items.first()
-                assertThat(item.title).isEqualTo("Marie-Madeleine : si près de Jésus...")
-                assertThat(item.pubDate).isEqualTo(ZonedDateTime.of(2024, 3, 20, 21, 13, 0, 0, ZoneOffset.ofHours(1)))
-                assertThat(item.length).isEqualTo(6881)
-                assertThat(item.url).isEqualTo(URI("https://www.france.tv/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html"))
-                assertThat(item.description).isEqualTo("Si la Bible regorge de personnages mystérieux et fascinants, Marie-Madeleine occupe une place à part parmi eux. Sa proximité avec Jésus éveille les passions et les polémiques les plus folles. Que représente Marie-Madeleine aux yeux et dans le cœur de Jésus ? Doit-on croire à un amour impossible, ou à des sentiments plus ardents ? Car il s'agit bien d'un \"mystère Marie-Madeleine\", qui tient tout d'abord aux différentes sources qui nous sont parvenues et qui ne s'accordent pas toujours sur la véritable identité, ni sur le rôle qu'a joué cette femme. Pour mieux la comprendre, Stéphane Bern foule la terre de Jérusalem, là où tout a commencé et ainsi tenter de déchiffrer les différents Évangiles.")
+                assertThat(item.title).isEqualTo("La folle Ã©popÃ©e de Charlotte d'Angleterre en replay - Secrets d'Histoire")
+                assertThat(item.pubDate).isEqualTo(ZonedDateTime.of(2025, 5, 21, 21, 7, 0, 0, ZoneId.of("Europe/Paris")))
+                assertThat(item.url).isEqualTo(URI("https://www.france.tv/france-3/secrets-d-histoire/saison-19/7153193-la-folle-epopee-de-charlotte-d-angleterre.html"))
+                assertThat(item.description).isEqualTo("StÃ©phane Bern raconte l'Ã©popÃ©e de Charlotte d'Angleterre, grand-mÃ¨re de la reine Victoria et aÃ¯eule de l'actuel roi Charles III. Cette souveraine est Ã  l'ori...")
                 assertThat(item.cover!!.height).isEqualTo(300)
-                assertThat(item.cover!!.width).isEqualTo(256)
-                assertThat(item.cover!!.url).isEqualTo(URI("https://www.france.tv/image/carre/1024/1024/q/4/c/1ae0e33f-phpg7tc4q.jpg"))
+                assertThat(item.cover.width).isEqualTo(256)
+                assertThat(item.cover.url).isEqualTo(URI("https://medias.france.tv/_cW692thJEUi4VUnXHzmu8BoRO0/880x0/filters:quality(85):format(jpeg)/7/q/1/phpaa51q7.jpg"))
             }
         }
 
@@ -162,9 +159,9 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/one-item.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/toutes-les-videos/one-item.html"))))
 
-                forV6("/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html")
+                forV7(path = "/france-3/secrets-d-histoire/saison-19/7153193-la-folle-epopee-de-charlotte-d-angleterre.html")
             }
 
             /* When */
@@ -182,18 +179,18 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/all.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/toutes-les-videos/all.html"))))
 
-                forV6("/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html")
-                forV6("/france-3/secrets-d-histoire/3007545-l-incroyable-epopee-de-richard-coeur-de-lion.html")
-                forV6("/france-3/secrets-d-histoire/saison-18/5731266-philippe-v-les-demons-du-roi-d-espagne.html")
-                forV6("/france-3/secrets-d-histoire/2772025-louis-xv-et-la-bete-du-gevaudan.html")
-                forV6("/france-3/secrets-d-histoire/saison-18/5672001-au-danemark-le-roi-la-reine-et-le-seduisant-docteur.html")
-                forV6("/france-3/secrets-d-histoire/2759591-philippe-le-bel-et-l-etrange-affaire-des-templiers.html")
-                forV6("/france-3/secrets-d-histoire/saison-18/5587902-arthur-et-les-chevaliers-de-la-table-ronde.html")
-                forV6("/france-3/secrets-d-histoire/5475558-vatel-careme-escoffier-a-la-table-des-rois.html")
-                forV6("/france-3/secrets-d-histoire/secrets-d-histoire-saison-17/5403759-napoleon-iii-le-dernier-empereur-des-francais.html")
-                forV6("/sport/les-jeux-olympiques/4211497-paris-2024-stephane-bern-livre-les-secrets-d-une-marche-historique.html")
+                forV7("/france-3/secrets-d-histoire/saison-19/7153193-la-folle-epopee-de-charlotte-d-angleterre.html")
+                forV7("/france-3/secrets-d-histoire/saison-19/7043581-la-marquise-de-brinvilliers-et-l-affaire-des-poisons.html")
+                forV7("/france-3/secrets-d-histoire/saison-19/6912070-les-amants-tragiques-de-mayerling.html")
+                forV7("/france-3/secrets-d-histoire/saison-19/6851503-louis-xi-un-regne-de-terreur.html")
+                forV7("/france-3/secrets-d-histoire/saison-18/6812617-pauline-borghese-la-diva-de-l-empire.html")
+                forV7("/france-3/secrets-d-histoire/saison-18/6673895-robin-des-bois-le-prince-des-voleurs.html")
+                forV7("/france-3/secrets-d-histoire/saison-18/6653774-spartacus-et-la-revolte-des-gladiateurs.html")
+                forV7("/france-3/secrets-d-histoire/2801349-les-secrets-des-templiers.html")
+                forV7("/france-3/secrets-d-histoire/660047-agatha-christie-l-etrange-reine-du-crime-bande-annonce.html")
+                forV7("/france-3/secrets-d-histoire/222009-alienor-d-aquitaine-une-rebelle-au-moyen-age-bande-annonce.html")
             }
 
             /* When */
@@ -208,9 +205,9 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/one-item.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/toutes-les-videos/one-item.html"))))
 
-                stubFor(get("/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html")
+                stubFor(get("/france-3/secrets-d-histoire/saison-19/7153193-la-folle-epopee-de-charlotte-d-angleterre.html")
                     .willReturn(ok()))
             }
 
@@ -222,50 +219,16 @@ class FranceTvUpdaterTest(
         }
 
         @Test
-        fun `and return no element because no ld+json`(backend: WireMockServer) {
-            /* Given */
-            backend.apply {
-                stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/one-item.html"))))
-
-                stubFor(get("/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/videos/case/5766417.without-application-ld-json.html"))))
-            }
-
-            /* When */
-            assertThatThrownBy { updater.findItems(podcast) }
-                /* Then */
-                .hasMessage("No <script type=\"application/ld+json\"></script> found")
-        }
-
-        @Test
-        fun `and return no element because no VideoObject `(backend: WireMockServer) {
-            /* Given */
-            backend.apply {
-                stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/one-item.html"))))
-
-                stubFor(get("/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/videos/case/5766417.without-videoobject.html"))))
-            }
-
-            /* When */
-            assertThatThrownBy { updater.findItems(podcast) }
-                /* Then */
-                .hasMessage("No element of type VideoObject")
-        }
-
-        @Test
         fun `and return an element without date because uploadDate is not defined `(backend: WireMockServer) {
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/one-item.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/toutes-les-videos/one-item.html"))))
 
-                stubFor(get("/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/videos/case/5766417.without-pubdate.html"))))
+                stubFor(get("/france-3/secrets-d-histoire/saison-19/7153193-la-folle-epopee-de-charlotte-d-angleterre.html")
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/videos/case/7153193-without-date.html"))))
 
-                val uri = URI("https://www.france.tv/image/carre/1024/1024/q/4/c/1ae0e33f-phpg7tc4q.jpg")
+                val uri = URI("https://medias.france.tv/_cW692thJEUi4VUnXHzmu8BoRO0/880x0/filters:quality(85):format(jpeg)/7/q/1/phpaa51q7.jpg")
                 whenever(imageService.fetchCoverInformation(uri))
                     .thenReturn(CoverInformation(width = 256, height = 300, url = uri))
             }
@@ -277,14 +240,13 @@ class FranceTvUpdaterTest(
             assertAll {
                 assertThat(items).hasSize(1)
                 val item = items.first()
-                assertThat(item.title).isEqualTo("Marie-Madeleine : si près de Jésus...")
+                assertThat(item.title).isEqualTo("La folle Ã©popÃ©e de Charlotte d'Angleterre en replay - Secrets d'Histoire")
                 assertThat(item.pubDate).isEqualTo(ZonedDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC))
-                assertThat(item.length).isEqualTo(6881)
-                assertThat(item.url).isEqualTo(URI("https://www.france.tv/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html"))
-                assertThat(item.description).isEqualTo("Si la Bible regorge de personnages mystérieux et fascinants, Marie-Madeleine occupe une place à part parmi eux. Sa proximité avec Jésus éveille les passions et les polémiques les plus folles. Que représente Marie-Madeleine aux yeux et dans le cœur de Jésus ? Doit-on croire à un amour impossible, ou à des sentiments plus ardents ? Car il s'agit bien d'un \"mystère Marie-Madeleine\", qui tient tout d'abord aux différentes sources qui nous sont parvenues et qui ne s'accordent pas toujours sur la véritable identité, ni sur le rôle qu'a joué cette femme. Pour mieux la comprendre, Stéphane Bern foule la terre de Jérusalem, là où tout a commencé et ainsi tenter de déchiffrer les différents Évangiles.")
+                assertThat(item.url).isEqualTo(URI("https://www.france.tv/france-3/secrets-d-histoire/saison-19/7153193-la-folle-epopee-de-charlotte-d-angleterre.html"))
+                assertThat(item.description).isEqualTo("StÃ©phane Bern raconte l'Ã©popÃ©e de Charlotte d'Angleterre, grand-mÃ¨re de la reine Victoria et aÃ¯eule de l'actuel roi Charles III. Cette souveraine est Ã  l'ori...")
                 assertThat(item.cover!!.height).isEqualTo(300)
-                assertThat(item.cover!!.width).isEqualTo(256)
-                assertThat(item.cover!!.url).isEqualTo(URI("https://www.france.tv/image/carre/1024/1024/q/4/c/1ae0e33f-phpg7tc4q.jpg"))
+                assertThat(item.cover.width).isEqualTo(256)
+                assertThat(item.cover.url).isEqualTo(URI("https://medias.france.tv/_cW692thJEUi4VUnXHzmu8BoRO0/880x0/filters:quality(85):format(jpeg)/7/q/1/phpaa51q7.jpg"))
             }
         }
     }
@@ -314,7 +276,7 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/no-item.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/toutes-les-videos/no-item.html"))))
             }
 
             /* When */
@@ -329,7 +291,7 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/all-unavailable.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/toutes-les-videos/all-unavailable.html"))))
             }
 
             /* When */
@@ -344,16 +306,16 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/all.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/toutes-les-videos/all.html"))))
             }
 
             /* When */
             val signature = updater.signatureOf(podcast.url)
 
             /* Then */
-            assertThat(signature).isEqualTo("e40066f26d1ddb195fd89578b158abf3")
-            val hash = DigestUtils.md5DigestAsHex("/france-3/secrets-d-histoire/2759591-philippe-le-bel-et-l-etrange-affaire-des-templiers.html-/france-3/secrets-d-histoire/2772025-louis-xv-et-la-bete-du-gevaudan.html-/france-3/secrets-d-histoire/3007545-l-incroyable-epopee-de-richard-coeur-de-lion.html-/france-3/secrets-d-histoire/5475558-vatel-careme-escoffier-a-la-table-des-rois.html-/france-3/secrets-d-histoire/saison-18/5587902-arthur-et-les-chevaliers-de-la-table-ronde.html-/france-3/secrets-d-histoire/saison-18/5672001-au-danemark-le-roi-la-reine-et-le-seduisant-docteur.html-/france-3/secrets-d-histoire/saison-18/5731266-philippe-v-les-demons-du-roi-d-espagne.html-/france-3/secrets-d-histoire/saison-18/5766417-marie-madeleine-si-pres-de-jesus.html-/france-3/secrets-d-histoire/secrets-d-histoire-saison-17/5403759-napoleon-iii-le-dernier-empereur-des-francais.html-/sport/les-jeux-olympiques/4211497-paris-2024-stephane-bern-livre-les-secrets-d-une-marche-historique.html".toByteArray())
-            assertThat(hash).isEqualTo("e40066f26d1ddb195fd89578b158abf3")
+            assertThat(signature).isEqualTo("932e4c66269adf90931dfb870d3f6599")
+            val hash = DigestUtils.md5DigestAsHex("/france-3/secrets-d-histoire/222009-alienor-d-aquitaine-une-rebelle-au-moyen-age-bande-annonce.html-/france-3/secrets-d-histoire/2801349-les-secrets-des-templiers.html-/france-3/secrets-d-histoire/660047-agatha-christie-l-etrange-reine-du-crime-bande-annonce.html-/france-3/secrets-d-histoire/saison-18/6653774-spartacus-et-la-revolte-des-gladiateurs.html-/france-3/secrets-d-histoire/saison-18/6673895-robin-des-bois-le-prince-des-voleurs.html-/france-3/secrets-d-histoire/saison-18/6812617-pauline-borghese-la-diva-de-l-empire.html-/france-3/secrets-d-histoire/saison-19/6851503-louis-xi-un-regne-de-terreur.html-/france-3/secrets-d-histoire/saison-19/6912070-les-amants-tragiques-de-mayerling.html-/france-3/secrets-d-histoire/saison-19/7043581-la-marquise-de-brinvilliers-et-l-affaire-des-poisons.html-/france-3/secrets-d-histoire/saison-19/7153193-la-folle-epopee-de-charlotte-d-angleterre.html".toByteArray())
+            assertThat(hash).isEqualTo("932e4c66269adf90931dfb870d3f6599")
         }
 
         @Test
@@ -361,7 +323,7 @@ class FranceTvUpdaterTest(
             /* Given */
             backend.apply {
                 stubFor(get("/france-3/secrets-d-histoire/toutes-les-videos/")
-                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/toutes-les-videos/all.html"))))
+                    .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/toutes-les-videos/all.html"))))
             }
 
             /* When */
@@ -369,8 +331,8 @@ class FranceTvUpdaterTest(
             val second = updater.signatureOf(podcast.url)
 
             /* Then */
-            assertThat(first).isEqualTo("e40066f26d1ddb195fd89578b158abf3")
-            assertThat(second).isEqualTo("e40066f26d1ddb195fd89578b158abf3")
+            assertThat(first).isEqualTo("932e4c66269adf90931dfb870d3f6599")
+            assertThat(second).isEqualTo("932e4c66269adf90931dfb870d3f6599")
         }
     }
 

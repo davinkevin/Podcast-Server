@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.update.updaters.francetv
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
 import io.micrometer.core.instrument.MeterRegistry
@@ -21,13 +20,12 @@ class FranceTvUpdaterConfig {
     fun franceTvUpdater(
         rcb: RestClient.Builder,
         image: ImageService,
-        mapper: ObjectMapper,
         clock: Clock,
         registry: MeterRegistry,
     ): FranceTvUpdater {
         val franceTvClient = rcb.clone().baseUrl("https://www.france.tv/").build()
 
-        return FranceTvUpdater(franceTvClient, image, mapper, clock, registry)
+        return FranceTvUpdater(franceTvClient, image, clock, registry)
     }
 
 }

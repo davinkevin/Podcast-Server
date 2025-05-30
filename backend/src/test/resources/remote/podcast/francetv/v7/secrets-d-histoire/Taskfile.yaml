@@ -10,8 +10,10 @@ tasks:
     silent: true
     cmds:
       - cmd: |-
+          mkdir -p toutes-les-videos videos
+          # evaluate a better solution for html format
           function formatHtml() {
-            cat $1 | tidy -i -m -w 400 -ashtml -utf8 - | sponge $1 
+            cat $1 | tidy -i -m -w 600 - | sponge $1 
           }
           
           curl -qs $PAGE -o secrets-d-histoire.html
@@ -20,9 +22,9 @@ tasks:
           curl -qsL --create-dirs --output-dir toutes-les-videos -o all.html ${PAGE}toutes-les-videos/
           formatHtml toutes-les-videos/all.html
           
-          # cp toutes-les-videos/all.html toutes-les-videos/all-unavailable.html
-          # cp toutes-les-videos/all.html toutes-les-videos/no-item.html
-          # cp toutes-les-videos/all.html toutes-les-videos/one-item.html
+          cp toutes-les-videos/all.html toutes-les-videos/all-unavailable.html
+          cp toutes-les-videos/all.html toutes-les-videos/no-item.html
+          cp toutes-les-videos/all.html toutes-les-videos/one-item.html
           
           cat toutes-les-videos/all.html | rg "href=\".*/[0-9]+.*.html\"" | sd '.*href="([^"]*)".*' 'curl -qsLO --create-dirs --output-dir videos https://www.france.tv/$1' | bash
           for f in $(fd . videos/)

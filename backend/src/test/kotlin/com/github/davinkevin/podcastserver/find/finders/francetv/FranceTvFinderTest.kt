@@ -24,9 +24,9 @@ import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
 import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
 import org.springframework.boot.test.autoconfigure.web.client.AutoConfigureWebClient
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
 import java.net.URI
 
@@ -58,7 +58,7 @@ class FranceTvFinderTest(
             ))
 
             backend.stubFor(get("/france-3/secrets-d-histoire/")
-                .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/secrets-d-histoire.html"))))
+                .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/secrets-d-histoire.html"))))
 
             /* When */
             val podcast = finder.findPodcastInformation(url)!!
@@ -73,7 +73,7 @@ class FranceTvFinderTest(
                     height = 123,
                     width = 456
                 ))
-                assertThat(podcast.description).isEqualTo("""Secrets d'Histoire est une émission de télévision présentée par Stéphane Bern. Chaque numéro retrace la vie d'un grand personnage de l'histoire et met en lumière des lieux hautement emblématiques du patrimoine. Magazine Secrets d'Histoire Accessible à tous, le magazine Secrets d’Histoire vous entraîne au cœur des épisodes mystérieux de l’histoire à travers des reportages, des enquêtes, des quizz… et bien plus encore ! En savoir plus""")
+                assertThat(podcast.description).isEqualTo("""Présentée par Stéphane Bern. Chaque numéro retrace la vie d'un grand personnage de l'histoire et met en lumière des lieux hautement emblématiques du patrimoine.""")
             }
         }
 
@@ -84,7 +84,7 @@ class FranceTvFinderTest(
 
             whenever(image.fetchCoverInformation(any())).thenReturn(null)
             backend.stubFor(get("/france-3/secrets-d-histoire/")
-                .willReturn(ok(fileAsString("/remote/podcast/francetv/v6/secrets-d-histoire/secrets-d-histoire.html"))))
+                .willReturn(ok(fileAsString("/remote/podcast/francetv/v7/secrets-d-histoire/secrets-d-histoire.html"))))
 
             /* When */
             val podcast = finder.findPodcastInformation(url)!!
@@ -94,7 +94,7 @@ class FranceTvFinderTest(
                 assertThat(podcast.title).isEqualTo("Secrets d'Histoire")
                 assertThat(podcast.type).isEqualTo("FranceTv")
                 assertThat(podcast.cover).isNull()
-                assertThat(podcast.description).isEqualTo("""Secrets d'Histoire est une émission de télévision présentée par Stéphane Bern. Chaque numéro retrace la vie d'un grand personnage de l'histoire et met en lumière des lieux hautement emblématiques du patrimoine. Magazine Secrets d'Histoire Accessible à tous, le magazine Secrets d’Histoire vous entraîne au cœur des épisodes mystérieux de l’histoire à travers des reportages, des enquêtes, des quizz… et bien plus encore ! En savoir plus""")
+                assertThat(podcast.description).isEqualTo("""Présentée par Stéphane Bern. Chaque numéro retrace la vie d'un grand personnage de l'histoire et met en lumière des lieux hautement emblématiques du patrimoine.""")
             }
         }
 
