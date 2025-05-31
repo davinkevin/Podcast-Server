@@ -13,6 +13,8 @@ import replace from 'gulp-replace';
 import gzip from 'gulp-gzip';
 import paths from '../paths';
 import mkdirp from 'mkdirp';
+import cachebust from 'gulp-cache-bust';
+
 import '../utils';
 
 let prodFiles = ['css', 'js'].map(ext => `${paths.release.root}/${paths.app.name}.min.${ext}`);
@@ -55,6 +57,7 @@ gulp.task('build:css', () =>
 gulp.task('build:index', () =>
     gulp.src(`${paths.srcDir}/index.html`)
         .pipe(inject(gulp.src(prodFiles, {read: false}), { ignorePath: paths.releaseDirName }))
+        .pipe(cachebust({type: 'timestamp'}))
         .pipe(gulp.dest(paths.release.root))
 );
 
