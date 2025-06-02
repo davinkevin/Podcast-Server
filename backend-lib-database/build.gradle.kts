@@ -8,7 +8,7 @@ import org.gradle.internal.deprecation.DeprecatableConfiguration
 
 buildscript {
     dependencies {
-        classpath("org.flywaydb:flyway-database-postgresql:11.8.2")
+        classpath("org.flywaydb:flyway-database-postgresql:11.9.0")
     }
 }
 
