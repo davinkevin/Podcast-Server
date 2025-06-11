@@ -68,7 +68,7 @@ dependencies {
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 
-	implementation(platform("software.amazon.awssdk:bom:2.31.61"))
+	implementation(platform("software.amazon.awssdk:bom:2.31.62"))
 	implementation("software.amazon.awssdk:s3")
 	implementation("software.amazon.awssdk:netty-nio-client")
 
