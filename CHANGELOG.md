@@ -1,6 +1,44 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2025.6.0
+
+### Bug Fixes
+
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.36 ([cabc52b](cabc52b9b5e03f410d9cc6f108aa0e7c4af555e6))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.37 ([e91f571](e91f571502d2de14abead21d1cacafcecca0f78a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.38 ([9163a03](9163a03ca3ce56c493f6f7ae8cf8c35595c04eae))
+- **deps:** Update all-flyway to v11.8.1 ([699faeb](699faebe06484e4646aa48ef00a0c156a95f4d5d))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.39 ([9527c69](9527c69f957042612a5c59d86349d622fd918f56))
+- **deps:** Update dependency net.javacrumbs.json-unit:json-unit-assertj to v4.1.1 ([bcf066f](bcf066f510d69640c203e42a4d896d9f736a7fdb))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.40 ([0780df0](0780df0f0303d3b8c8f1faafbe46d058793badaf))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.41 ([bfe18d3](bfe18d3d26c16905114154abccbfbc01ae675732))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.42 ([4bd4234](4bd4234199d7192d18346c4859a4325322b6f457))
+- **deps:** Update all-flyway to v11.8.2 ([72b4788](72b478848157cdf475bbfa0afd94744be77eb289))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.43 ([4cc3dde](4cc3dde2f33430b8608c70a6472b9086641eed6e))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.44 ([1ed9c10](1ed9c108446ac20dc6e52f57009deb05dee6eb92))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.45 ([ae81c2a](ae81c2ab68e4bb33b1f3de665e108637fcb9773b))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.46 ([576f357](576f357bc72cc702b08080160603e6a4c83ce71d))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.49 ([c501890](c501890d9ce2742771feb6e8e5f98409b378c0e7))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.50 ([d747bb5](d747bb57db484ef39edfe5c1e62169d97d462b74))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.51 ([5ea5e90](5ea5e9047f35e422f24e154d5da3560489eafe42))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.52 ([02a9064](02a9064fe98aa2b7f50f2c90710bba73cb49a712))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.53 ([c6b4978](c6b4978846b8bc35234b33d5997d21a2cdbe786e))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.54 ([df95f0b](df95f0b97f1418bd18b0998b55ed5c4b2cf8be40))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.55 ([cf5153e](cf5153e743a4aa87e2da5101fc6076681f39d96a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.56 ([b04d19b](b04d19b4c10934eb29674bc32c72d9d16d8d00ac))
+- **deps:** Update all-flyway to v11.9.0 ([9fb16dd](9fb16dd5e1f3e7df8a5825096053a8f9274f2fac))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.57 ([6b7063c](6b7063cf6efd023b78389715d85dc5af08fa58b6))
+- **deps:** Update all-flyway to v11.9.1 ([2cbecfb](2cbecfb69b951c2d9db6fc32c452a8cf6b9a2f0a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.58 ([17daafe](17daafef510ef9589dc17a58a6bfffd849d3c03a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.59 ([4bfd59c](4bfd59c89820cbeeee21c6d6650b4600c98d5f45))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.60 ([c1d35f2](c1d35f22b17232ac6cc3026cac4dea1c2dfa71ba))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.61 ([1d18edc](1d18edc783d74fc3a0dbfac84596a7be9210b17a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.62 ([9919004](9919004c51f25d262de7d8b108ebf8e7d84d8a86))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.63 ([9b886c2](9b886c2b0c6cba2c6d71558a72b4f7b48ad08f14))
+- **download:** Report progress correctly with yt-dlp ([a579804](a579804e1bc93e9f0e20e51d27bd36377984b74c))
+- **francetv:** Modify updater after UI change made on the website ([3fa7914](3fa7914e4b0de414fab5add8d0fce72a3bcccfbf))
+
 ## 2025.5.0
 
 ### Features
