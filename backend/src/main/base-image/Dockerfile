@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.16.0
+# syntax=docker/dockerfile:1.17.0
 
 FROM debian:12 AS downloader
 
