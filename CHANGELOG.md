@@ -1,6 +1,31 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2025.7.0
+
+### Bug Fixes
+
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.64 ([908abf0](908abf066293519cb3e06edc63f0cc4382caf609))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.65 ([954edc1](954edc193ecd2cbf19610676b1f5896a7fce0284))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.66 ([c13bd9d](c13bd9de223e494c6cc767c29664d7ca902c99ff))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.67 ([c5765c6](c5765c6b092d54d640f1dda0a959db4868c2d398))
+- **deps:** Update dependency org.flywaydb:flyway-database-postgresql to v11.9.2 ([fee98b3](fee98b318a593c1c27263fe02c3e21372ad1a305))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.68 ([440e059](440e05978fc82cd4e90fd624412f9c46e9972e44))
+- **deps:** Update dependency org.jsoup:jsoup to v1.21.1 ([efeba5b](efeba5b2961970a73795ce07c1b949792b70e184))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.69 ([4ce9b3e](4ce9b3ed0e851b7e604c975827301c1387154b03))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.70 ([7233ea9](7233ea9fac804ce162989da548b1ffccf28b9281))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.71 ([399007f](399007ff75378c29aea7d0bba6abef2be1bea0e5))
+- **deps:** Update all-flyway to v11.10.0 ([54fb17d](54fb17db3675bcdbac20ae086fd63348e4d30d85))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.72 ([8d5cc96](8d5cc96913d9c19c2ce462edfed025e5cbfdf602))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.73 ([bb5d3de](bb5d3dede0aed772a476c3b61d6bedfb952afddc))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.74 ([6c9eebf](6c9eebf2ba30f60754fa91f5c0392a865c4fb413))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.75 ([e30c023](e30c0230ebaf293c5966bef9565c949cae53274f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.76 ([94b047c](94b047c7fb8f3a764bdab87980f0d0072e834734))
+- **deps:** Update all-flyway to v11.10.1 ([6eacc88](6eacc8859b71c4815290edfb3637bc3a635d43d8))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.77 ([1517096](15170967dbbdc409a75412ef387299522a26b106))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.31.78 ([abef758](abef758ddb07ffee6db1ae6dae4ed4caf71bc58b))
+- **deps:** Update all-flyway to v11.10.2 ([5c8286e](5c8286ef9cd7c42f2de81eacc38e26bc90e2e50f))
+
 ## 2025.6.0
 
 ### Bug Fixes
