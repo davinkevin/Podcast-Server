@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.17.1
 
-FROM debian:12 AS downloader
+FROM debian:13 AS downloader
 
 WORKDIR /opt
 
