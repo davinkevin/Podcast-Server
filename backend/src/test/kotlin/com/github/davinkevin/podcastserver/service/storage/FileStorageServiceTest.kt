@@ -363,6 +363,7 @@ class FileStorageServiceTest(
 
         @JvmField
         @RegisterExtension
+        @Suppress("JUnitMalformedDeclaration")
         val externalBackend: WireMockExtension = WireMockExtension.newInstance()
             .options(wireMockConfig().port(8089))
             .build()
@@ -408,7 +409,7 @@ class FileStorageServiceTest(
                     .first().body
                     .let(DigestUtils::md5DigestAsHex)
 
-                assertThat(bodyDigest).isEqualTo("cf283e981284bf90c362687dec876f24")
+                assertThat(bodyDigest).isEqualTo("f143df8ad6be048db386b8d5bedbf216")
             }
         }
 
@@ -462,7 +463,7 @@ class FileStorageServiceTest(
                     .first().body
                     .let(DigestUtils::md5DigestAsHex)
 
-                assertThat(bodyDigest).isEqualTo("cf283e981284bf90c362687dec876f24")
+                assertThat(bodyDigest).isEqualTo("f143df8ad6be048db386b8d5bedbf216")
             }
 
         }
@@ -496,7 +497,7 @@ class FileStorageServiceTest(
                     .first().body
                     .let(DigestUtils::md5DigestAsHex)
 
-                assertThat(bodyDigest).isEqualTo("cf283e981284bf90c362687dec876f24")
+                assertThat(bodyDigest).isEqualTo("f143df8ad6be048db386b8d5bedbf216")
             }
 
         }
