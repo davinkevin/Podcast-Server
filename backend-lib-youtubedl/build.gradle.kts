@@ -8,7 +8,7 @@ plugins {
 }
 
 group = "com.gitlab.davinkevin.podcastserver.youtubedl"
-version = "2025.10.0"
+version = "2025.11.0"
 
 repositories {
     mavenCentral()
