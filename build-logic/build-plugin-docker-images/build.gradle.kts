@@ -1,6 +1,6 @@
 plugins {
     `java-gradle-plugin`
-    kotlin("jvm") version "2.2.21"
+    kotlin("jvm") version "2.3.0"
 }
 
 group = "com.gitlab.davinkevin.podcastserver.dockerimages"
