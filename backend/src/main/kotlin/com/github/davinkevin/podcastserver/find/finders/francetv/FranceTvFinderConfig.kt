@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.find.finders.francetv
 
+import com.github.davinkevin.podcastserver.extension.restclient.withStringUTF8MessageConverter
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
 import org.springframework.context.annotation.Bean
@@ -18,6 +19,7 @@ class FranceTvFinderConfig {
     fun franceTvFinder(rcb: RestClient.Builder, imageService: ImageService): FranceTvFinder {
         val client = rcb.clone()
                 .baseUrl("https://www.france.tv/")
+                .withStringUTF8MessageConverter()
                 .build()
 
         return FranceTvFinder(client, imageService)

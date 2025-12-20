@@ -23,7 +23,7 @@ class MetricsConfig {
     }
 
     @Bean
-    fun jooqMetrics(meterRegistry: ObjectProvider<MeterRegistry?>) = object : BeanPostProcessor {
+    fun jooqMetrics(meterRegistry: ObjectProvider<MeterRegistry>) = object : BeanPostProcessor {
         override fun postProcessAfterInitialization(bean: Any, beanName: String): Any = when (bean) {
             !is DSLContext -> bean
             else -> MetricsDSLContext.withMetrics(bean, meterRegistry.getObject(), Tags.of("query", "jooq"))

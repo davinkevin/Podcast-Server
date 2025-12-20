@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.update.updaters.rss
 
 import com.github.davinkevin.podcastserver.MockServer
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.image.ImageService
@@ -11,35 +12,37 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
+import org.junit.jupiter.api.RepeatedTest
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
+import org.springframework.boot.restclient.RestClientCustomizer
+import org.springframework.boot.restclient.autoconfigure.RestClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.test.context.bean.override.mockito.MockitoBean
-import org.springframework.boot.web.reactive.function.client.WebClientCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.time.Duration
 import java.time.ZoneOffset
 import java.time.ZonedDateTime.now
 import java.util.*
 
-@ExtendWith(SpringExtension::class)
-@AutoConfigureObservability
+@NestedSpringTest
+@AutoConfigureMetrics
 class RSSUpdaterTest(
-        @Autowired val updater: RSSUpdater
+    @Autowired val updater: RSSUpdater
 ){
 
     @TestConfiguration
     @Import(RSSUpdaterConfig::class, RestClientAutoConfiguration::class)
     class LocalTestConfiguration {
-        @Bean fun webClientCustomization() = WebClientCustomizer { wcb -> wcb.baseUrl("http://localhost:5555/") }
+        @Bean fun restClientCustomization() = RestClientCustomizer { wcb -> wcb.baseUrl("http://localhost:5555/") }
     }
 
     @MockitoBean lateinit var image: ImageService
@@ -104,6 +107,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.without-any-cover.xml"))))
 
             /* When */
+
             val items = updater.findItems(podcast)
                 .filter { it.cover == null }
 
@@ -120,6 +124,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
+
             val items = updater.findItems(podcast)
                 .filter { it.cover == null }
 
@@ -166,6 +171,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
+
             val items = updater.findItems(podcast)
                 .filter { it.pubDate?.offset == ZoneOffset.ofHours(6) }
 
@@ -180,6 +186,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
+
             val items = updater.findItems(podcast)
                 .filter { it.pubDate?.offset == ZoneOffset.ofHours(8) }
 
@@ -194,6 +201,7 @@ class RSSUpdaterTest(
                     .willReturn(okTextXml(fileAsString("/remote/podcast/rss/rss.appload.xml"))))
 
             /* When */
+
             val items = updater.findItems(podcast)
                 .filter { it.pubDate?.offset == ZoneOffset.ofHours(9) }
 
@@ -285,7 +293,9 @@ class RSSUpdaterTest(
             assertThat(items).isEmpty()
         }
 
-        @Test
+        @RepeatedTest(5)
+        // Reason: https://github.com/wiremock/wiremock/issues/3144
+        // Affects only MacOS, based on investigation in this ticket
         fun `should support item without enclosure's length`(backend: WireMockServer) {
             /* Given */
             val xml = """

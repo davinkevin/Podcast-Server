@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.update
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemForCreation
 import com.github.davinkevin.podcastserver.item.ItemRepository
@@ -25,13 +26,14 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.Mockito
 import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.core.task.SimpleAsyncTaskExecutor
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.time.*
 import java.util.*
@@ -39,8 +41,8 @@ import java.util.concurrent.TimeUnit
 
 private val fixedDate = Clock.fixed(OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC).toInstant(), ZoneId.of("UTC"))
 
-@ExtendWith(SpringExtension::class)
-@AutoConfigureObservability
+@NestedSpringTest
+@AutoConfigureMetrics
 class UpdateServiceTest(
     @Autowired private val service: UpdateService
 ) {

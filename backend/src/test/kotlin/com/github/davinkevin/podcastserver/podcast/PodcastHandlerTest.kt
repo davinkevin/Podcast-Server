@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.podcast
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.item.ItemService
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.service.storage.ExternalUrlRequest
@@ -15,11 +16,14 @@ import org.mockito.kotlin.any
 import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.servlet.client.RestTestClient
 import java.net.URI
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -30,10 +34,12 @@ import kotlin.io.path.Path
 /**
  * Created by kevin on 2019-02-16
  */
+@NestedSpringTest
 @WebMvcTest(controllers = [PodcastHandler::class])
 @Import(PodcastRoutingConfig::class, PodcastXmlHandler::class, MockMvcRestExceptionConfiguration::class)
+@AutoConfigureRestTestClient
 class PodcastHandlerTest(
-        @Autowired val rest: WebTestClient
+        @Autowired val rest: RestTestClient
 ) {
 
     @MockitoBean private lateinit var itemService: ItemService
@@ -251,7 +257,7 @@ class PodcastHandlerTest(
                     .post()
                     .uri("/api/v1/podcasts")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(""" {
+                    .body(""" {
                         "title": "foo",
                         "url": "http://foo.bar.com/val.rss",
                         "type": "RSS",
@@ -262,7 +268,8 @@ class PodcastHandlerTest(
                         ],
                         "cover": {
                             "width": 1400, "height": 1200, "url": "http://foo.bar.com/cover.png"
-                        }
+                        },
+                        "hasToBeDeleted": true
                     }""")
                     /* Then */
                     .exchange()
@@ -322,13 +329,14 @@ class PodcastHandlerTest(
                     .post()
                     .uri("/api/v1/podcasts")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(""" {
+                    .body(""" {
                         "title": "foo",
                         "type": "upload",
                         "tags": [],
                         "cover": {
                             "width": 1400, "height": 1200, "url": "http://foo.bar.com/cover.png"
-                        }
+                        },
+                        "hasToBeDeleted": true
                     }""")
                     /* Then */
                     .exchange()
@@ -375,12 +383,13 @@ class PodcastHandlerTest(
                 .post()
                 .uri("/api/v1/podcasts")
                 .contentType(MediaType.APPLICATION_JSON)
-                .bodyValue(""" {
+                .body(""" {
                         "title": "foo",
                         "type": "upload",
                         "cover": {
                             "width": 1400, "height": 1200, "url": "http://foo.bar.com/cover.png"
-                        }
+                        },
+                        "hasToBeDeleted": true
                     }""")
                 /* Then */
                 .exchange()
@@ -442,7 +451,7 @@ class PodcastHandlerTest(
                     .put()
                     .uri("/api/v1/podcasts/${p.id}")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(""" {
+                    .body(""" {
                         "id": "dbb18cac-58bb-4d89-b9ec-afc9da00afc5",
                         "title": "foo",
                         "url": "http://foo.bar.com/val.rss",
@@ -502,7 +511,7 @@ class PodcastHandlerTest(
                     .put()
                     .uri("/api/v1/podcasts/${p.id}")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(""" {
+                    .body(""" {
                         "id": "dbb18cac-58bb-4d89-b9ec-afc9da00afc5",
                         "title": "foo",
                         "url": null,
@@ -563,7 +572,7 @@ class PodcastHandlerTest(
                     .put()
                     .uri("/api/v1/podcasts/${p.id}")
                     .contentType(MediaType.APPLICATION_JSON)
-                    .bodyValue(""" {
+                    .body(""" {
                         "id": "dbb18cac-58bb-4d89-b9ec-afc9da00afc5",
                         "title": "foo",
                         "url": null,

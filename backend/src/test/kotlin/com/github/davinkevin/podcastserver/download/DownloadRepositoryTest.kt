@@ -3,10 +3,11 @@ package com.github.davinkevin.podcastserver.download
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.DownloadingState
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
+import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.toDb
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
-import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.within
 import org.jooq.DSLContext
@@ -16,7 +17,7 @@ import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jooq.JooqTest
+import org.springframework.boot.jooq.test.autoconfigure.JooqTest
 import org.springframework.context.annotation.Import
 import java.net.URI
 import java.time.Clock
@@ -35,6 +36,7 @@ private val fixedDate = Clock.fixed(OffsetDateTime.of(2022, 3, 4, 5, 6, 7, 0, Zo
 @JooqTest
 @Import(DownloadRepository::class)
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@NestedSpringTest
 class DownloadRepositoryTest(
     @Autowired private val repo: DownloadRepository,
     @Autowired private val query: DSLContext
@@ -63,6 +65,13 @@ class DownloadRepositoryTest(
         @Test
         fun `but found no item because item list is empty`() {
             /* Given */
+            query.batch(
+                truncate(DOWNLOADING_ITEM).cascade(),
+                truncate(ITEM).cascade(),
+                truncate(PODCAST).cascade(),
+                truncate(COVER).cascade(),
+            )
+                .execute()
             /* When */
             repo.initQueue(OffsetDateTime.now(fixedDate), 5)
 
@@ -1224,8 +1233,6 @@ class DownloadRepositoryTest(
             assertThat(numberOfStoppedItems).isEqualTo(1)
         }
 
-
-
         @Test
         fun `and let others in same state as before`() {
             /* Given */
@@ -1268,6 +1275,14 @@ class DownloadRepositoryTest(
 
         @BeforeAll
         fun beforeAll() {
+            query.batch(
+                truncate(DOWNLOADING_ITEM).cascade(),
+                truncate(ITEM).cascade(),
+                truncate(PODCAST).cascade(),
+                truncate(COVER).cascade(),
+            )
+                .execute()
+
             val itemCoverId2 = UUID.fromString("5a75e2de-5393-4f5e-9707-e5e806ada10f")
             val itemCoverId3 = UUID.fromString("4e9e654c-7c30-4ff5-826b-a39eb1f57e79")
             val itemCoverId4 = UUID.fromString("bd567872-55da-4801-8d3e-4bf2e79c2b65")
@@ -1301,7 +1316,6 @@ class DownloadRepositoryTest(
                     .values(itemId3, twoDayAgo, twoDayAgo, twoDayAgo, "desc item 3", Path(""), 1, "video/mp4", 6, ItemStatus.NOT_DOWNLOADED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId)
                     .values(itemId4, threeDayAgo, threeDayAgo, threeDayAgo, "desc item 4", Path(""), 1, "video/mp4", 6, ItemStatus.NOT_DOWNLOADED, "item_4", "https://foo.bar.com/item/4", "https://foo.bar.com/item/4", itemCoverId4, podcastId),
             )
-
                 .execute()
 
         }

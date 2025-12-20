@@ -1,11 +1,11 @@
 package com.github.davinkevin.podcastserver.update.updaters.gulli
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.web.client.RestClient
+import tools.jackson.databind.ObjectMapper
 
 /**
  * Created by kevin on 14/03/2020

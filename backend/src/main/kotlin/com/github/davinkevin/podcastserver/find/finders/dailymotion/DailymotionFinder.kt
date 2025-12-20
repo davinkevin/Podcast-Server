@@ -56,7 +56,7 @@ private val USER_NAME_EXTRACTOR = "^.+dailymotion.com/(?<id>.*)".toRegex()
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 private class DailymotionUserDetail(
-        @JsonProperty("avatar_720_url") val avatar: String,
-        val username: String,
-        val description: String?
+    @param:JsonProperty("avatar_720_url") val avatar: String,
+    val username: String,
+    val description: String?
 )

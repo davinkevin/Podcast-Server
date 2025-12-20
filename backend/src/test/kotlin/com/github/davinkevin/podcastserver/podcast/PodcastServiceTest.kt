@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.podcast
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.cover.CoverRepository
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.service.storage.DownloadAndUploadRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
@@ -18,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -27,7 +29,7 @@ import java.util.*
 /**
  * Created by kevin on 2019-02-16
  */
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 @Import(PodcastService::class)
 class PodcastServiceTest(
     @Autowired val service: PodcastService

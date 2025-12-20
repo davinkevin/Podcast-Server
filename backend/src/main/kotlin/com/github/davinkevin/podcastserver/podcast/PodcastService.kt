@@ -42,7 +42,7 @@ class PodcastService(
         val newTags = p.tags.filter { it.id == null }.map { tagRepository.save(it.name) }
 
         val tags = oldTags + newTags
-        val cover = coverRepository.save(p.cover)!!
+        val cover = coverRepository.save(p.cover)
 
         val podcast = repository.save(
             title = p.title,

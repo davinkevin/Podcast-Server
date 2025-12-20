@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.podcast
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.item.*
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
@@ -17,19 +18,24 @@ import org.mockito.kotlin.anyOrNull
 import org.mockito.kotlin.eq
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.servlet.client.RestTestClient
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
 
+@NestedSpringTest
 @WebMvcTest(controllers = [PodcastXmlHandler::class])
 @Import(PodcastRoutingConfig::class, PodcastHandler::class, MockMvcRestExceptionConfiguration::class)
+@AutoConfigureRestTestClient
 class PodcastXmlHandlerTest(
-    @Autowired val rest: WebTestClient
+    @Autowired val rest: RestTestClient
 ) {
 
     @MockitoBean private lateinit var fileService: FileStorageService

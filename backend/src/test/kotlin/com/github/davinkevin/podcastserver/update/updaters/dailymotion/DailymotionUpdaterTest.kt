@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.update.updaters.dailymotion
 
 import com.github.davinkevin.podcastserver.MockServer
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.remapRestClientToMockServer
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
@@ -19,21 +20,22 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.any
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
-import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
+import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
+import org.springframework.boot.restclient.autoconfigure.RestClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.util.*
 
-@ExtendWith(SpringExtension::class)
-@AutoConfigureObservability
+@NestedSpringTest
+@AutoConfigureMetrics
 class DailymotionUpdaterTest(
         @Autowired private val updater: DailymotionUpdater
 ) {

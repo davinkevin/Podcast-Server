@@ -88,8 +88,8 @@ private class DailymotionDetailsResult(val list: Set<DailymotionVideoDetail> = e
         val id: String,
         val title: String,
         val description: String? = null,
-        @JsonProperty("created_time") val creationDate: Long? = null,
-        @JsonProperty("thumbnail_720_url") val cover: URI? = null
+        @param:JsonProperty("created_time") val creationDate: Long? = null,
+        @param:JsonProperty("thumbnail_720_url") val cover: URI? = null
     )
 }
 

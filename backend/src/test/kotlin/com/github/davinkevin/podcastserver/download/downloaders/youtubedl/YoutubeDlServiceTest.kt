@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
 import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDL
 import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLRequest
@@ -20,9 +21,10 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.nio.file.Paths
 
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 @Import(YoutubeDlService::class)
 class YoutubeDlServiceTest(
         @Autowired private val youtube: YoutubeDlService

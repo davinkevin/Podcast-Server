@@ -124,6 +124,7 @@ class RSSUpdater(
                 .retrieve()
                 .body<ByteArrayResource>()
         }
+            .onFailure { log.error("Error during getting rss updates.", it) }
             .getOrNull()
     }
 

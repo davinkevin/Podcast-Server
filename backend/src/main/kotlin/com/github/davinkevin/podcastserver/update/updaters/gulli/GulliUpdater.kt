@@ -1,7 +1,5 @@
 package com.github.davinkevin.podcastserver.update.updaters.gulli
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformation
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
@@ -13,6 +11,8 @@ import org.jsoup.Jsoup
 import org.springframework.util.DigestUtils
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.readValue
 import java.net.URI
 import java.time.ZonedDateTime
 

@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.download.downloaders.rtmp.RTMPDownloa
 import com.github.davinkevin.podcastserver.download.downloaders.rtmp.RTMPDownloaderFactory
 import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.YoutubeDlDownloaderFactory
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -21,13 +22,14 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.ApplicationContext
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.util.*
 import java.util.stream.Stream
 import kotlin.io.path.Path
 import kotlin.reflect.KClass
 
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 @MockitoSettings(strictness = Strictness.LENIENT)
 class DownloaderSelectorTest(
     @Autowired val applicationContext: ApplicationContext

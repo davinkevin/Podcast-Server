@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.service.storage
 
 import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.fileAsByteArray
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.toCoverExistsRequest
@@ -27,11 +28,12 @@ import org.junit.jupiter.params.provider.Arguments
 import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
+import org.springframework.boot.restclient.autoconfigure.RestClientAutoConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.test.context.TestPropertySource
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import org.springframework.util.DigestUtils
 import org.springframework.web.client.RestClient
 import java.net.URI
@@ -59,7 +61,7 @@ const val s3MockBackendPort = 1234
     "podcastserver.storage.password=bar",
     "podcastserver.storage.url=http://localhost:$s3MockBackendPort/",
 ])
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 @ImportAutoConfiguration(RestClientAutoConfiguration::class)
 class FileStorageServiceTest(
     @Autowired val fileService: FileStorageService

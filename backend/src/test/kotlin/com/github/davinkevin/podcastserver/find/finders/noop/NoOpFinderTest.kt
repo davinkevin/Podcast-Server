@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.find.finders.noop
 
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.find.FindPodcastInformation
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
@@ -9,12 +10,13 @@ import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 
 /**
  * Created by kevin on 09/03/2016 for Podcast Server
  */
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 @Import(NoopConfig::class)
 class NoOpFinderTest(
         @Autowired val finder: NoOpFinder

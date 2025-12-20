@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelper
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
 import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
@@ -25,6 +26,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.nio.file.Files
 import java.nio.file.Path
@@ -41,7 +43,7 @@ private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC
 /**
  * Created by kevin on 08/05/2020
  */
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 class YoutubeDlDownloaderTest(
     @Autowired private val downloader: YoutubeDlDownloader,
     @Autowired private val helper: DownloaderHelper,

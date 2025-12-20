@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.cover
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
@@ -12,15 +13,23 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jooq.JooqTest
+import org.springframework.boot.jooq.test.autoconfigure.JooqTest
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.ContextConfiguration
+import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import org.springframework.transaction.annotation.Propagation.NEVER
 import org.springframework.transaction.annotation.Transactional
+import java.lang.annotation.*
+import java.lang.annotation.Retention
+import java.lang.annotation.Target
 import java.net.URI
 import java.time.OffsetDateTime.now
 import java.util.UUID.fromString
 import kotlin.io.path.Path
+
 
 /**
  * Created by kevin on 14/09/2019
@@ -28,9 +37,10 @@ import kotlin.io.path.Path
 @JooqTest
 @Transactional(propagation = NEVER)
 @Import(CoverRepository::class)
+@NestedSpringTest
 class CoverRepositoryTest(
-        @Autowired val repository: CoverRepository,
-        @Autowired val query: DSLContext
+    @Autowired val repository: CoverRepository,
+    @Autowired val query: DSLContext,
 ) {
 
     @BeforeEach

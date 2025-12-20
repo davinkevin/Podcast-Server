@@ -1,17 +1,16 @@
 package com.github.davinkevin.podcastserver.extension.mockmvc
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import jakarta.servlet.RequestDispatcher
 import jakarta.servlet.http.HttpServletRequest
 import jakarta.servlet.http.HttpServletResponse
-import org.springframework.boot.autoconfigure.web.servlet.error.BasicErrorController
-import org.springframework.lang.Nullable
+import org.springframework.boot.webmvc.autoconfigure.error.BasicErrorController
 import org.springframework.web.server.ResponseStatusException
 import org.springframework.web.servlet.DispatcherServlet
 import org.springframework.web.servlet.HandlerInterceptor
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer
 import org.springframework.web.util.WebUtils
+import tools.jackson.databind.ObjectMapper
 
 class MockMvcRestExceptionConfiguration(
     private val errorController: BasicErrorController,
@@ -24,7 +23,7 @@ class MockMvcRestExceptionConfiguration(
                 request: HttpServletRequest,
                 response: HttpServletResponse,
                 handler: Any,
-                @Nullable ex: java.lang.Exception?
+                ex: java.lang.Exception?
             ) {
                 val status: Int = response.status
 

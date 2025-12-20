@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInfor
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import org.assertj.core.api.Assertions.assertThat
@@ -19,11 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.util.*
 import kotlin.io.path.Path
 
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 @Import(RTMPDownloaderFactory::class)
 class RTMPDownloaderFactoryTest(
     @Autowired private val factory: RTMPDownloaderFactory

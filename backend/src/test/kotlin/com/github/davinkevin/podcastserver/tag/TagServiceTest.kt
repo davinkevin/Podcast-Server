@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.tag
 
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import org.assertj.core.api.AssertionsForInterfaceTypes.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -10,12 +11,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.util.*
 
 /**
  * Created by kevin on 2019-03-24
  */
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 @Import(TagService::class)
 class TagServiceTest (
     @Autowired val service: TagService

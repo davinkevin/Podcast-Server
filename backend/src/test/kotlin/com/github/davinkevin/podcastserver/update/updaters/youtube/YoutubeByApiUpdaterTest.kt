@@ -1,6 +1,7 @@
 package com.github.davinkevin.podcastserver.update.updaters.youtube
 
 import com.github.davinkevin.podcastserver.MockServer
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.fileAsString
 import com.github.davinkevin.podcastserver.remapRestClientToMockServer
 import com.github.davinkevin.podcastserver.service.image.ImageService
@@ -16,26 +17,27 @@ import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.ValueSource
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.autoconfigure.jackson.JacksonAutoConfiguration
-import org.springframework.boot.autoconfigure.web.client.RestClientAutoConfiguration
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
+import org.springframework.boot.jackson.autoconfigure.JacksonAutoConfiguration
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
+import org.springframework.boot.restclient.autoconfigure.RestClientAutoConfiguration
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.TestPropertySource
+import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.util.*
 
 /**
  * Created by kevin on 31/08/2019
  */
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 @TestPropertySource(properties = [
     "podcastserver.api.youtube = key"
 ])
-@AutoConfigureObservability
+@AutoConfigureMetrics
 class YoutubeByApiUpdaterTest(
         @Autowired val updater: YoutubeByApiUpdater
 ) {

@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.config.JacksonConfig
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.service.storage.CoverExistsRequest
 import com.github.davinkevin.podcastserver.service.storage.ExternalUrlRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
@@ -12,14 +13,18 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.*
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient
 import org.springframework.boot.test.context.TestConfiguration
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.http.HttpEntity
 import org.springframework.http.client.MultipartBodyBuilder
 import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.servlet.client.RestTestClient
 import org.springframework.web.reactive.function.BodyInserters
 import java.net.URI
 import java.time.Clock
@@ -30,8 +35,10 @@ import java.time.ZoneOffset
 import java.util.*
 import kotlin.io.path.Path
 
+@NestedSpringTest
 @WebMvcTest(controllers = [ItemHandler::class])
 @Import(ItemRoutingConfig::class, JacksonConfig::class, MockMvcRestExceptionConfiguration::class)
+@AutoConfigureWebTestClient
 class ItemHandlerTest(
     @Autowired val rest: WebTestClient,
     @Autowired val clock: Clock
@@ -1478,6 +1485,7 @@ class ItemHandlerTest(
                 .body(BodyInserters.fromMultipartData(body))
                 /* Then */
                 .exchange()
+//                .expectStatus().is5xxServerError
                 .expectStatus().isCreated
                 .expectHeader()
                 .valueEquals("Location", "http://localhost:8080/api/v1/items/6a287582-e181-48f9-a23d-c88d03879feb")

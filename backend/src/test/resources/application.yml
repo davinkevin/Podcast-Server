@@ -7,9 +7,9 @@ spring:
   threads:
     virtual:
       enabled: false
-server:
-  error:
-    include-message: always
+  web:
+    error:
+      include-message: always
 
 logging:
   level:

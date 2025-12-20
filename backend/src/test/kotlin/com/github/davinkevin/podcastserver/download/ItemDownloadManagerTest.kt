@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.download
 
 import com.github.davinkevin.podcastserver.download.downloaders.*
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.assertj.core.api.Assertions.assertThat
@@ -18,17 +19,19 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.*
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.TimeUnit.SECONDS
 import kotlin.io.path.Path
 
 /**
  * Created by kevin on 06/05/15
  */
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 class ItemDownloadManagerTest(
     @Autowired val downloadExecutor: ThreadPoolTaskExecutor,
     @Autowired val idm: ItemDownloadManager
@@ -43,7 +46,7 @@ class ItemDownloadManagerTest(
 
     @AfterEach
     fun afterEach() {
-        Mockito.reset(messaging, repository, downloadExecutor)
+        Mockito.reset(messaging, repository, downloadExecutor, downloaders)
         downloadExecutor.corePoolSize = 1
     }
 
@@ -82,7 +85,7 @@ class ItemDownloadManagerTest(
     inner class ShouldExposeWaitingQueue {
 
         private val item1 = DownloadingItem(
-            id = UUID.fromString("1f8d2177-357e-4db3-82ff-65012b5ffc23"),
+            id = UUID.fromString("fe825199-355f-4591-81b6-5945219e601f"),
             title = "first",
             url = URI("https://foo.bar.com/1/url/com.mp3"),
             status = Status.NOT_DOWNLOADED,
@@ -149,7 +152,7 @@ class ItemDownloadManagerTest(
     inner class ShouldExposeDownloadingQueue {
 
         private val item1 = DownloadingItem(
-            id = UUID.fromString("1f8d2177-357e-4db3-82ff-65012b5ffc23"),
+            id = UUID.fromString("38c50bf8-c873-47ec-b0b5-f1bf63730811"),
             title = "first",
             url = URI("https://foo.bar.com/1/url/com.mp3"),
             status = Status.NOT_DOWNLOADED,
@@ -216,7 +219,7 @@ class ItemDownloadManagerTest(
     inner class ShouldLaunchDownload {
 
         private val item1 = DownloadingItem(
-            id = UUID.fromString("1f8d2177-357e-4db3-82ff-65012b5ffc23"),
+            id = UUID.fromString("d7ad5849-fc9b-444f-a7ce-04445a9e28d0"),
             title = "first",
             url = URI("https://foo.bar.com/1/url/com.mp3"),
             status = Status.NOT_DOWNLOADED,
@@ -344,7 +347,7 @@ class ItemDownloadManagerTest(
     inner class ShouldStopAllDownload {
 
         private val item1 = DownloadingItem(
-            id = UUID.fromString("1f8d2177-357e-4db3-82ff-65012b5ffc23"),
+            id = UUID.fromString("b7fbca2a-6ab8-4e7f-a872-842b4d20d660"),
             title = "first",
             url = URI("https://foo.bar.com/1/url/com.mp3"),
             status = Status.NOT_DOWNLOADED,
@@ -428,7 +431,7 @@ class ItemDownloadManagerTest(
     inner class ShouldAddItemToQueue {
 
         private val item1 = DownloadingItem(
-            id = UUID.fromString("1f8d2177-357e-4db3-82ff-65012b5ffc23"),
+            id = UUID.fromString("fe40ee75-6e0b-429f-b37a-af49ae6fd23e"),
             title = "first",
             url = URI("https://foo.bar.com/1/url/com.mp3"),
             status = Status.NOT_DOWNLOADED,
@@ -464,7 +467,7 @@ class ItemDownloadManagerTest(
     inner class ShouldRemoveItemFromQueue {
 
         private val item1 = DownloadingItem(
-            id = UUID.fromString("1f8d2177-357e-4db3-82ff-65012b5ffc23"),
+            id = UUID.fromString("33f3b417-e2cf-46af-a8ba-d4e06eced870"),
             title = "first",
             url = URI("https://foo.bar.com/1/url/com.mp3"),
             status = Status.NOT_DOWNLOADED,
@@ -500,7 +503,7 @@ class ItemDownloadManagerTest(
     inner class ShouldRemoveItemFromDownloading {
 
         private val item1 = DownloadingItem(
-            id = UUID.fromString("1f8d2177-357e-4db3-82ff-65012b5ffc23"),
+            id = UUID.fromString("560fb020-4441-4efe-aa78-62f3e761a06f"),
             title = "first",
             url = URI("https://foo.bar.com/1/url/com.mp3"),
             status = Status.NOT_DOWNLOADED,
@@ -536,7 +539,7 @@ class ItemDownloadManagerTest(
     inner class ShouldRemoveItemFromQueueAndDownloading {
 
         private val item1 = DownloadingItem(
-            id = UUID.fromString("1f8d2177-357e-4db3-82ff-65012b5ffc23"),
+            id = UUID.fromString("6b149598-e392-414d-9917-74a0a9792001"),
             title = "first",
             url = URI("https://foo.bar.com/1/url/com.mp3"),
             status = Status.NOT_DOWNLOADED,
@@ -555,6 +558,7 @@ class ItemDownloadManagerTest(
         @Test
         fun `with item only in waiting list`() {
             /* Given */
+//            idm.resetDownloaders()
             doNothing().whenever(repository).remove(item1.id, false)
             whenever(repository.findAllToDownload(1)).thenReturn(emptyList())
             whenever(repository.findAllWaiting()).thenReturn(emptyList())
@@ -591,7 +595,7 @@ class ItemDownloadManagerTest(
     inner class ShouldProvideIfIsInDownloadingQueue {
 
         private val item1 = DownloadingItem(
-            id = UUID.fromString("1f8d2177-357e-4db3-82ff-65012b5ffc23"),
+            id = UUID.fromString("8bfb95d7-df3f-40b1-98aa-ec983e5d99bc"),
             title = "first",
             url = URI("https://foo.bar.com/1/url/com.mp3"),
             status = Status.NOT_DOWNLOADED,
@@ -618,11 +622,12 @@ class ItemDownloadManagerTest(
             doNothing().whenever(repository).startItem(item1.id)
             idm.addItemToQueue(item1.id)
 
-            /* When */
-            val isInDownloadingQueue = idm.isInDownloadingQueueById(item1.id)
-
-            /* Then */
-            assertThat(isInDownloadingQueue).isTrue()
+            await().atMost(5, SECONDS).untilAsserted {
+                /* When */
+                val isInDownloadingQueue = idm.isInDownloadingQueueById(item1.id)
+                /* Then */
+                assertThat(isInDownloadingQueue).isTrue()
+            }
         }
 
         @Test

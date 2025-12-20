@@ -1,7 +1,7 @@
 import org.gradle.internal.deprecation.DeprecatableConfiguration
 
 plugins {
-    id("org.springframework.boot") version "3.5.9"
+    id("org.springframework.boot") version "4.0.1"
     id("io.spring.dependency-management") version "1.1.7"
 
     id("java")

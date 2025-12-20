@@ -1,9 +1,8 @@
 package com.github.davinkevin.podcastserver.messaging
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.kotlin.readValue
-import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
+import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility
 import org.junit.jupiter.api.Disabled
@@ -13,11 +12,13 @@ import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
 import org.springframework.http.codec.ServerSentEvent
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import org.springframework.test.util.ReflectionTestUtils
 import org.springframework.test.web.reactive.server.WebTestClient
 import org.springframework.test.web.reactive.server.returnResult
@@ -25,14 +26,18 @@ import org.springframework.web.servlet.function.ServerResponse.SseBuilder
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Sinks
 import reactor.test.StepVerifier
+import tools.jackson.databind.ObjectMapper
+import tools.jackson.module.kotlin.readValue
 import java.net.URI
 import java.time.Duration
 import java.util.*
 import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 
+@NestedSpringTest
 @WebMvcTest(controllers = [MessageHandler::class])
 @Import(MessagingRoutingConfig::class)
+@AutoConfigureWebTestClient
 class MessageHandlerTest(
     @Autowired val rest: WebTestClient,
     @Autowired val mapper: ObjectMapper

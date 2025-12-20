@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters.upload
 
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -7,18 +8,19 @@ import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.util.*
 
 /**
  * Created by kevin on 28/06/15 for Podcast Server
  */
-@ExtendWith(SpringExtension::class)
-@AutoConfigureObservability
+@NestedSpringTest
+@AutoConfigureMetrics
 class UploadUpdaterTest(
         @Autowired private val updater: UploadUpdater
 ) {

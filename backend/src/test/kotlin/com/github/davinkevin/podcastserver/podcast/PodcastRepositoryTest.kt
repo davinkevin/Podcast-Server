@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.cover.Cover
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.tag.Tag
 import org.assertj.core.api.Assertions.assertThat
@@ -15,8 +16,9 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jooq.JooqTest
+import org.springframework.boot.jooq.test.autoconfigure.JooqTest
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.time.LocalDate
 import java.time.OffsetDateTime
@@ -29,6 +31,7 @@ import kotlin.io.path.Path
  * Created by kevin on 2019-02-16
  */
 @JooqTest
+@NestedSpringTest
 @Import(PodcastRepository::class)
 class PodcastRepositoryTest(
     @Autowired val repository: PodcastRepository,

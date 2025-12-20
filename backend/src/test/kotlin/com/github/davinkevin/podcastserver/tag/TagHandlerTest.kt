@@ -2,21 +2,26 @@ package com.github.davinkevin.podcastserver.tag
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Import
-import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
+import org.springframework.test.web.servlet.client.RestTestClient
 import java.util.*
 
+@NestedSpringTest
 @WebMvcTest(controllers = [TagHandler::class])
 @Import(TagRoutingConfig::class, MockMvcRestExceptionConfiguration::class)
+@AutoConfigureRestTestClient
 class TagHandlerTest(
-    @Autowired val rest: WebTestClient
+    @Autowired val rest: RestTestClient
 ) {
 
     @MockitoBean private lateinit var tagService: TagService

@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.entity.Status.FINISH
 import com.github.davinkevin.podcastserver.entity.Status.NOT_DOWNLOADED
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.podcast.Podcast
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
@@ -26,13 +27,14 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.nio.file.Paths
 import java.time.*
 import java.util.*
 import kotlin.io.path.Path
 
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 @Import(ItemService::class)
 @Suppress("UnassignedFluxMonoInstance")
 class ItemServiceTest(

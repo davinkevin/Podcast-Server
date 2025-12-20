@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.service.image.CoverInformation
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
@@ -16,13 +17,15 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.util.*
 
 /**
  * Created by kevin on 2019-07-06
  */
-@ExtendWith(SpringExtension::class)
+
+@NestedSpringTest
 @Import(PlaylistService::class)
 class PlaylistServiceTest(
     @Autowired val service: PlaylistService

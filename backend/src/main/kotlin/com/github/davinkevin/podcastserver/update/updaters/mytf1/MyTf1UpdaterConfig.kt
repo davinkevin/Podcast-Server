@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.update.updaters.mytf1
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.service.image.ImageServiceConfig
 import io.micrometer.core.instrument.MeterRegistry
@@ -10,6 +9,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.web.client.RestClient
 import org.springframework.web.util.DefaultUriBuilderFactory
 import org.springframework.web.util.DefaultUriBuilderFactory.EncodingMode
+import tools.jackson.databind.ObjectMapper
 
 /**
  * Created by kevin on 11/03/2020

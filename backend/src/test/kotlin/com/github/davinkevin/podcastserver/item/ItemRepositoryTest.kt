@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import org.assertj.core.api.Assertions.*
 import org.jooq.DSLContext
@@ -14,10 +15,11 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.actuate.observability.AutoConfigureObservability
-import org.springframework.boot.test.autoconfigure.jooq.JooqTest
+import org.springframework.boot.jooq.test.autoconfigure.JooqTest
+import org.springframework.boot.micrometer.metrics.test.autoconfigure.AutoConfigureMetrics
 import org.springframework.context.annotation.Import
 import org.springframework.dao.DataIntegrityViolationException
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.OffsetDateTime.now
@@ -33,7 +35,8 @@ import kotlin.io.path.Path
  */
 @JooqTest
 @Import(ItemRepository::class)
-@AutoConfigureObservability
+@AutoConfigureMetrics
+@NestedSpringTest
 class ItemRepositoryTest(
     @Autowired val query: DSLContext,
     @Autowired val repository: ItemRepository

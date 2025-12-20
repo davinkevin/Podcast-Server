@@ -1,19 +1,23 @@
 package com.github.davinkevin.podcastserver.cover
 
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
-import org.mockito.kotlin.times
 import org.mockito.kotlin.verify
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient
 import org.springframework.boot.test.context.TestConfiguration
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.boot.webmvc.autoconfigure.error.ErrorMvcAutoConfiguration
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import org.springframework.test.web.reactive.server.WebTestClient
+import org.springframework.test.web.servlet.client.RestTestClient
 import java.time.Clock
 import java.time.OffsetDateTime
 import java.time.ZoneId
@@ -21,11 +25,13 @@ import java.time.ZoneOffset
 
 private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
+@NestedSpringTest
 @WebMvcTest(controllers = [CoverHandler::class])
 @Import(CoverRoutingConfig::class)
 @ImportAutoConfiguration(ErrorMvcAutoConfiguration::class)
+@AutoConfigureRestTestClient
 class CoverHandlerTest(
-    @Autowired val rest: WebTestClient
+    @Autowired val rest: RestTestClient
 ) {
 
     @MockitoBean private lateinit var cover: CoverService

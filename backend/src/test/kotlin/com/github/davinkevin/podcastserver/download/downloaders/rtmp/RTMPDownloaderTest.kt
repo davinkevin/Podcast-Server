@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelper
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
@@ -25,6 +26,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.io.ByteArrayInputStream
 import java.io.File
 import java.net.URI
@@ -45,7 +47,7 @@ private val fixedDate = OffsetDateTime.of(2019, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC
 /**
  * Created by kevin on 27/03/2016 for Podcast Server
  */
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 class RTMPDownloaderTest(
     @Autowired private val downloader: RTMPDownloader,
     @Autowired private val helper: DownloaderHelper,

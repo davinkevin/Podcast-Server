@@ -8,6 +8,7 @@ import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.download.downloaders.DownloaderSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import com.google.common.annotations.VisibleForTesting
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import java.util.*
 import java.util.concurrent.ConcurrentHashMap
@@ -116,6 +117,14 @@ class ItemDownloadManager (
 
         convertAndSendWaitingQueueInBackground()
     }
+
+//   @VisibleForTesting
+//   fun resetDownloaders() {
+//       println("before clear")
+//       this.downloaders.clear()
+//       println("after clear")
+//   }
+
 }
 
 private fun DownloadingItem.toInformation(): DownloadingInformation {

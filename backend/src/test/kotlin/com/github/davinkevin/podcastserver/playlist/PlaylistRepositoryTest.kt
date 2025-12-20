@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.playlist
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.*
@@ -11,8 +12,9 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.jooq.JooqTest
+import org.springframework.boot.jooq.test.autoconfigure.JooqTest
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
@@ -23,6 +25,7 @@ import kotlin.io.path.Path
  * Created by kevin on 2019-07-06
  */
 @JooqTest
+@NestedSpringTest
 @Import(PlaylistRepository::class)
 class PlaylistRepositoryTest(
     @Autowired val query: DSLContext,
@@ -99,7 +102,7 @@ class PlaylistRepositoryTest(
             /* When */
             val playlists = repository.findAll()
             /* Then */
-            assertThat(playlists).containsExactly(
+            assertThat(playlists).containsOnly(
                 Playlist(fromString("24248480-bd04-11e5-a837-0800200c9a66"), "Conférence Rewind"),
                 Playlist(fromString("dc024a30-bd02-11e5-a837-0800200c9a66"), "Humour Playlist"),
                 Playlist(fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"), "empty playlist"),

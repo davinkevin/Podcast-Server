@@ -2,11 +2,12 @@ package com.github.davinkevin.podcastserver
 
 import com.github.tomakehurst.wiremock.WireMockServer
 import org.junit.jupiter.api.extension.*
-import org.springframework.boot.web.client.RestClientCustomizer
+import org.springframework.boot.restclient.RestClientCustomizer
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpMethod
 import org.springframework.http.HttpRequest
 import java.net.URI
+import java.util.concurrent.TimeUnit
 
 private const val port = 5555
 
@@ -14,12 +15,12 @@ class MockServer: BeforeEachCallback, AfterEachCallback, ParameterResolver {
 
     private lateinit var server: WireMockServer
 
-    override fun beforeEach(p0: ExtensionContext?) {
+    override fun beforeEach(p0: ExtensionContext) {
         server = WireMockServer(port)
         server.start()
     }
 
-    override fun afterEach(context: ExtensionContext?) {
+    override fun afterEach(context: ExtensionContext) {
         server.stop()
         server.resetAll()
     }
@@ -28,7 +29,10 @@ class MockServer: BeforeEachCallback, AfterEachCallback, ParameterResolver {
         return parameterContext.parameter.type == WireMockServer::class.java
     }
 
-    override fun resolveParameter(parameterContext: ParameterContext?, extensionContext: ExtensionContext): Any {
+    override fun resolveParameter(
+        parameterContext: ParameterContext,
+        extensionContext: ExtensionContext,
+    ): Any? {
         return server
     }
 }

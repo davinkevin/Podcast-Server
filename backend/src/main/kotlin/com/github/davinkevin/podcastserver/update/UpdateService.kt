@@ -13,6 +13,7 @@ import com.github.davinkevin.podcastserver.service.storage.DownloadAndUploadRequ
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
 import com.github.davinkevin.podcastserver.update.updaters.PodcastToUpdate
+import com.github.davinkevin.podcastserver.update.updaters.UpdatePodcastInformation
 import com.github.davinkevin.podcastserver.update.updaters.UpdaterSelector
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Timer
@@ -43,8 +44,8 @@ class UpdateService(
         .description("Time to update all podcasts")
         .register(registry)
 
-    private val numberOfItemGauge = registry.gauge("update.all.numberOfItems", AtomicInteger(0))!!
-    private val numberOfPodcastGauge = registry.gauge("update.all.numberOfPodcast", AtomicInteger(0))!!
+    private val numberOfItemGauge = registry.gauge("update.all.numberOfItems", AtomicInteger(0))
+    private val numberOfPodcastGauge = registry.gauge("update.all.numberOfPodcast", AtomicInteger(0))
 
     fun updateAll(force: Boolean, download: Boolean) {
         updateExecutor.execute { updateTimer.record(Supplier{updateAllSync(force, download)}) }
@@ -65,11 +66,11 @@ class UpdateService(
                     PodcastToUpdate(it.id, URI(it.url!!), signature)
                 }
 
-            val results = allRequests
-                .map { Callable { updaters.of(it.url).update(it) } }
+            val results: List<UpdatePodcastInformation> = allRequests
+                .map<PodcastToUpdate, Callable<UpdatePodcastInformation>> { Callable { updaters.of(it.url).update(it) } }
                 .map { updateExecutor.submitCompletable(it).exceptionally { null } }
                 .mapNotNull { it.get(5, TimeUnit.MINUTES) }
-                .also {
+                .also { it: List<UpdatePodcastInformation> ->
                     numberOfItemGauge.set(it.size)
                     numberOfPodcastGauge.set(it.flatMap { v -> v.items }.size)
                 }

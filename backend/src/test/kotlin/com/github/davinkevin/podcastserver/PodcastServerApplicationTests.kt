@@ -32,14 +32,14 @@ private class MockS3Server: BeforeAllCallback, AfterAllCallback {
 
     private lateinit var server: WireMockServer
 
-    override fun beforeAll(p0: ExtensionContext?) {
+    override fun beforeAll(p0: ExtensionContext) {
         server = WireMockServer(9000).apply {
             start()
             stubFor(head(urlEqualTo("/bucket")).willReturn(ok()))
         }
     }
 
-    override fun afterAll(context: ExtensionContext?) {
+    override fun afterAll(context: ExtensionContext) {
         server.stop()
     }
 }

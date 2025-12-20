@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.messaging
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
@@ -14,6 +15,7 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
 import org.springframework.context.annotation.Primary
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -21,7 +23,7 @@ import java.util.concurrent.TimeUnit
 /**
  * Created by kevin on 02/05/2020
  */
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 class MessagingTemplateTest(
         @Autowired private val messages: MessagingTemplate,
         @Autowired private val event: ApplicationEventPublisher,

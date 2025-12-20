@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.cover
 
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.service.storage.CoverExistsRequest
 import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
@@ -14,12 +15,13 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.annotation.Import
 import org.springframework.test.context.junit.jupiter.SpringExtension
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.time.OffsetDateTime
 import java.time.ZoneOffset
 import java.util.UUID.randomUUID
 import kotlin.io.path.Path
 
-@ExtendWith(SpringExtension::class)
+@NestedSpringTest
 @Import(CoverService::class)
 @Suppress("UnassignedFluxMonoInstance")
 class CoverServiceTest (

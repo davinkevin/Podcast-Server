@@ -1,23 +1,28 @@
 package com.github.davinkevin.podcastserver.podcast.type
 
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
-import com.github.davinkevin.podcastserver.update.updaters.UpdaterSelector
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.update.updaters.Type
+import com.github.davinkevin.podcastserver.update.updaters.UpdaterSelector
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import org.springframework.test.web.reactive.server.WebTestClient
 
 /**
  * Created by kevin on 2019-03-03
  */
+@NestedSpringTest
 @WebMvcTest(controllers = [TypeHandler::class])
 @Import(TypeRoutingConfig::class)
+@AutoConfigureWebTestClient
 class TypeHandlerTest(
     @Autowired val rest: WebTestClient
 ) {

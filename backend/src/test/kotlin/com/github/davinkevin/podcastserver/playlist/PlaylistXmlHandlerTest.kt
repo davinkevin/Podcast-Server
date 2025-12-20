@@ -1,16 +1,19 @@
 package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
 import org.springframework.context.annotation.Import
 import org.springframework.http.MediaType
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.net.URI
 import java.time.OffsetDateTime
@@ -18,8 +21,10 @@ import java.time.ZoneOffset
 import java.util.*
 import kotlin.io.path.Path
 
+@NestedSpringTest
 @WebMvcTest(controllers = [PlaylistXmlHandler::class])
 @Import(PlaylistRoutingConfig::class, PlaylistHandler::class, PlaylistXmlHandler::class, MockMvcRestExceptionConfiguration::class)
+@AutoConfigureWebTestClient
 class PlaylistXmlHandlerTest (
     @Autowired val rest: WebTestClient
 ) {

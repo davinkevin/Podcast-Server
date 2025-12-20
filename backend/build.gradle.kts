@@ -6,15 +6,15 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-	id("org.springframework.boot") version "3.5.9"
+	kotlin("jvm") version "2.3.0"
+	kotlin("plugin.spring") version "2.3.0"
+
+	id("org.springframework.boot") version "4.0.1"
 	id("io.spring.dependency-management") version "1.1.7"
 
 	id("com.gorylenko.gradle-git-properties") version "2.5.4"
 	id("com.google.cloud.tools.jib") version "3.5.2"
 	id("org.jetbrains.kotlinx.kover") version "0.9.4"
-
-	kotlin("jvm") version "2.3.0"
-	kotlin("plugin.spring") version "2.3.0"
 
 	id("build-plugin-database")
 	id("build-plugin-docker-images")
@@ -24,18 +24,20 @@ group = "com.github.davinkevin.podcastserver"
 version = "2026.1.0"
 
 java {
-	sourceCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_25
 	toolchain {
-		languageVersion = JavaLanguageVersion.of(21)
+		languageVersion = JavaLanguageVersion.of(25)
 	}
 }
 
 tasks.withType<KotlinCompile> {
 	compilerOptions {
-		freeCompilerArgs = listOf(
-			"-Xjsr305=strict",
+		freeCompilerArgs.addAll(
+				"-Xjsr305=strict",
+			"-Xannotation-default-target=param-property"
 		)
-		jvmTarget = JvmTarget.JVM_21
+
+		jvmTarget = JvmTarget.JVM_25
 	}
 }
 
@@ -44,29 +46,25 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter")
-	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-webmvc")
+	implementation("org.springframework.boot:spring-boot-starter-restclient")
+	implementation("org.springframework.boot:spring-boot-starter-jooq")
+	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-webflux") {
 		exclude("org.springframework.boot:spring-boot-starter-reactor-netty")
 	}
-	implementation("org.springframework.boot:spring-boot-starter-jooq")
-	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("io.micrometer:micrometer-registry-prometheus")
-
-	implementation("com.fasterxml.jackson.datatype:jackson-datatype-jsr310")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
-
 	implementation("org.postgresql:postgresql")
 	implementation(project(":backend-lib-database"))
 
+	implementation("tools.jackson.module:jackson-module-kotlin")
+	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
+	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jdom:jdom2:2.0.6.1")
 	implementation("org.jsoup:jsoup:1.22.1")
 
 	implementation(project(":backend-lib-youtubedl"))
 	implementation("net.bramp.ffmpeg:ffmpeg:0.8.0")
-
-	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
 
 	implementation(platform("software.amazon.awssdk:bom:2.41.1"))
 	implementation("software.amazon.awssdk:s3")
@@ -74,9 +72,16 @@ dependencies {
 
 	testImplementation("io.projectreactor:reactor-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-webflux-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-micrometer-metrics-test")
+	testImplementation("org.springframework.boot:spring-boot-starter-jooq-test")
 	testImplementation("org.mockito.kotlin:mockito-kotlin:6.1.0")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:5.1.0")
-	testImplementation("com.github.tomakehurst:wiremock-jre8-standalone:3.0.1")
+	testImplementation("org.wiremock:wiremock-standalone:3.13.2")
+	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
+	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 }
 
 configure<com.gorylenko.GitPropertiesPluginExtension> {

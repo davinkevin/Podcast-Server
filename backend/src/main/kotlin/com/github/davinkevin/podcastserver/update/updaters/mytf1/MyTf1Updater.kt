@@ -1,6 +1,5 @@
 package com.github.davinkevin.podcastserver.update.updaters.mytf1
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformation
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
@@ -12,6 +11,7 @@ import io.micrometer.core.instrument.MeterRegistry
 import org.springframework.util.DigestUtils
 import org.springframework.web.client.RestClient
 import org.springframework.web.client.body
+import tools.jackson.databind.ObjectMapper
 import java.net.URI
 import java.net.URLEncoder
 import java.nio.charset.StandardCharsets

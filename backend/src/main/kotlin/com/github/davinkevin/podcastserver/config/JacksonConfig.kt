@@ -1,13 +1,13 @@
 package com.github.davinkevin.podcastserver.config
 
-import com.fasterxml.jackson.databind.DeserializationFeature
-import com.fasterxml.jackson.databind.SerializationFeature
-import com.fasterxml.jackson.databind.ser.std.ToStringSerializer
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule
-import com.fasterxml.jackson.module.kotlin.kotlinModule
-import org.springframework.boot.autoconfigure.jackson.Jackson2ObjectMapperBuilderCustomizer
+import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
+import tools.jackson.databind.DeserializationFeature
+import tools.jackson.databind.cfg.DateTimeFeature
+import tools.jackson.databind.module.SimpleModule
+import tools.jackson.databind.ser.std.ToStringSerializer
+import tools.jackson.module.kotlin.kotlinModule
 import java.nio.file.Path
 
 /**
@@ -17,15 +17,12 @@ import java.nio.file.Path
 class JacksonConfig {
 
     @Bean
-    fun mapperCustomization() = Jackson2ObjectMapperBuilderCustomizer {
-        it.featuresToDisable(
-            SerializationFeature.WRITE_DATES_AS_TIMESTAMPS,
-            DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES
-        )
-            .serializerByType(Path::class.java, ToStringSerializer())
-            .modules(
-                JavaTimeModule(),
-                kotlinModule()
+    fun mapperCustomization() = JsonMapperBuilderCustomizer {
+        it
+            .disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS)
+            .addModules(
+                SimpleModule("PathToString").apply { addSerializer(Path::class.java, ToStringSerializer.instance) },
+                kotlinModule(),
             )
     }
 

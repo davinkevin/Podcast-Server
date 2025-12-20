@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.update
 
+import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -8,19 +9,23 @@ import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
-import org.springframework.boot.autoconfigure.web.servlet.error.ErrorMvcAutoConfiguration
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
-import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.boot.webmvc.autoconfigure.error.ErrorMvcAutoConfiguration
+import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
+import org.springframework.boot.webtestclient.autoconfigure.AutoConfigureWebTestClient
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import org.springframework.test.web.reactive.server.WebTestClient
 import java.util.*
 
 /**
  * Created by kevin on 14/07/2020
  */
+@NestedSpringTest
 @WebMvcTest(controllers = [UpdateHandler::class])
 @Import(UpdateRouterConfig::class)
 @ImportAutoConfiguration(ErrorMvcAutoConfiguration::class)
+@AutoConfigureWebTestClient
 class UpdateHandlerTest(
         @Autowired val rest: WebTestClient
 ) {
