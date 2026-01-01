@@ -1,6 +1,54 @@
 # Changelog
 All notable changes to this project will be documented in this file.
 
+## 2026.1.0
+
+### Bug Fixes
+
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.37.2 ([d8ff0e4](d8ff0e487f0f410f1e3f0284f509b16ac4b4e69a))
+- **deps:** Update all-flyway to v11.16.0 ([22c56de](22c56de5f44b9e0fd6bcb064b240fca91d21a16a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.38.2 ([6b1afe6](6b1afe681ae1e04d43cf9315d431a4d2fcbc12c6))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.38.3 ([452a368](452a368d84924a0c1569b17db32889720ebed81c))
+- **deps:** Update all-flyway to v11.17.0 ([f836af4](f836af457553efd8e2828c56e5080d475c882597))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.38.4 ([8ab1740](8ab17408a11786c65472a05de1ed0abe88f7364c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.38.5 ([5ec90e1](5ec90e1f977845248ae5637d9b3f64fa81b905d3))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.38.6 ([fb857a1](fb857a14c3f7e4a4099087ef7b3ea6e14e9b3c41))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.38.7 ([0dee666](0dee666428dc09074a489ec07f10fe26fad70726))
+- **deps:** Update dependency net.javacrumbs.json-unit:json-unit-assertj to v5.1.0 ([60b9651](60b9651a903abd8f93587e5b0861ca3cd61fee2f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.38.8 ([75102ea](75102ea601521e96e904fed687ec15b3485c0179))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.38.9 ([5aee670](5aee670b551723a207ddddccff05b0f2167b6f90))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.39.0 ([6a49b7d](6a49b7dad4fc48dc01a02b2b3198d81ba40053c0))
+- **deps:** Update all-flyway to v11.17.1 ([4ca44eb](4ca44ebdd4d5211e4ae1b4a2d396ec3490b55d92))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.39.1 ([ecf3de4](ecf3de406d3430b483667bd930fcd5bb9fdd4e5c))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.39.2 ([a34e144](a34e14453cd72c27f62d0070bc39234d18e29ded))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.39.3 ([518d88c](518d88c674596ffa15d2833dcab8c042ac08acc5))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.39.4 ([fa7a276](fa7a276415929cf191dfbcae2c73dbd2605ba759))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.39.5 ([d598e67](d598e67c61c8daa35ea86c40a14b7aedfeb847a7))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.39.6 ([fc57e59](fc57e5951e6ed0ace1f60336263cb4118fcc5d33))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.0 ([d37cfed](d37cfeda1b5f6845377f2eb08782ebfa7543fce9))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.1 ([92adfcd](92adfcd369b194474f783a8739767fbeaa862cc6))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.2 ([fff733b](fff733b1f39693f70bc5c4ec7634049ee3bb22af))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.3 ([9d25d5a](9d25d5a6895afd0951876b87ebe73d1ade005619))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.4 ([00a418d](00a418db5934e8ad46ff0bfccb8a08b3d6832db6))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.5 ([e0768d3](e0768d3dcb9d0aa1b8257ae212ce3b9f2494a2da))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.6 ([a25c6b8](a25c6b8ef734967f981a6ee102a53a92f400b4e3))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.7 ([97d0e8e](97d0e8efa816b2a577e64856f64ac446f999639a))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.8 ([865dbd9](865dbd99375a47574def2bb5f54bc613477da8d0))
+- **deps:** Update all-flyway to v11.19.0 ([c111e7a](c111e7ae63dee63d715dc5885abbd06d5df50b68))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.9 ([2a573b2](2a573b213873960d85266c25e6dab2a85b30a3ca))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.10 ([deab508](deab508bb6a8df56ab191ff445ab8b133dd911ba))
+- **deps:** Update all-flyway to v11.19.1 ([865d2fa](865d2fa2963ce4e839ce51ea7d461036be4ad730))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.11 ([5055360](5055360cbe72a9246673c7a239e4aeda17674d78))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.12 ([14d102d](14d102d853f7247ad70f331c78a6dd7608d8605f))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.13 ([0e52d46](0e52d4614135de1e0777c8e5fb85c65c9151a267))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.14 ([a6a8d4b](a6a8d4b7d7420478cd378145d093a0487639e60a))
+- **deps:** Update all-flyway to v11.20.0 ([8cf5785](8cf5785c4ae6ad19b3965c6316afbff83218f7eb))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.15 ([4e21287](4e21287d50ff435d97d246d9ddcfdf5dd10de9bc))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.16 ([8a71d25](8a71d25e8de9ab0a88abc96ced4071b9634c07fe))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.40.17 ([6537121](6537121cc2d4bae1cbb6d7e937ec5dd4b5aeab31))
+- **deps:** Update dependency software.amazon.awssdk:bom to v2.41.0 ([2958e83](2958e83fb02b2a38b158851d3f9ec5ffb2496e90))
+- **deps:** Update dependency org.jsoup:jsoup to v1.22.1 ([586493d](586493d529d486cc00ba01fb521f3b8c6942801c))
+
 ## 2025.11.0
 
 ### Bug Fixes
