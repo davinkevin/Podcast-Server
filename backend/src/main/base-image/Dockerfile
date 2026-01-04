@@ -13,7 +13,7 @@ RUN echo "install dependencies" && \
   echo "Print content of downloader folder" && \
   tree /opt/
 
-FROM bellsoft/liberica-openjdk-debian:25@sha256:89d1251423e0f33452bd88239b74d23e869d19535281862d6e949b00e3d526f8 AS base-image
+FROM bellsoft/liberica-openjdk-debian:25.0.1@sha256:89d1251423e0f33452bd88239b74d23e869d19535281862d6e949b00e3d526f8 AS base-image
 
 COPY --from=downloader /opt/ /opt/
 COPY --from=deno /deno /opt/deno/deno
