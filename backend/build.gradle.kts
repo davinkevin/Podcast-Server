@@ -77,7 +77,7 @@ dependencies {
 	testImplementation("org.springframework.boot:spring-boot-starter-restclient-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-micrometer-metrics-test")
 	testImplementation("org.springframework.boot:spring-boot-starter-jooq-test")
-	testImplementation("org.mockito.kotlin:mockito-kotlin:6.1.0")
+	testImplementation("org.mockito.kotlin:mockito-kotlin:6.2.2")
 	testImplementation("net.javacrumbs.json-unit:json-unit-assertj:5.1.0")
 	testImplementation("org.wiremock:wiremock-standalone:3.13.2")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
