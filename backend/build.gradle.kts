@@ -13,7 +13,7 @@ plugins {
 	id("io.spring.dependency-management") version "1.1.7"
 
 	id("com.gorylenko.gradle-git-properties") version "2.5.5"
-	id("com.google.cloud.tools.jib") version "3.5.2"
+	id("com.google.cloud.tools.jib") version "3.5.3"
 	id("org.jetbrains.kotlinx.kover") version "0.9.6"
 
 	id("build-plugin-database")
