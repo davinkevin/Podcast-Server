@@ -8,7 +8,7 @@ RUN echo "Remove useless drivers for additional databases" && \
 
 COPY backend-lib-database/src/main/migrations/*.sql /flyway/sql/
 
-FROM gcr.io/distroless/java25-debian13:latest@sha256:f93ba1e7fd6acec85f63c14e326ebabfe9beede446adeeeae968bca7d4232707 AS base-image
+FROM gcr.io/distroless/java25-debian13:latest@sha256:202ae7b10d0929fec7590927e5d14fad9b9a9b886ead6df4c555b8ae9ebeec17 AS base-image
 
 COPY --from=flyway-base /flyway/ /database/
 WORKDIR /database/
