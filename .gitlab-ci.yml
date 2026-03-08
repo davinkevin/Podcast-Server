@@ -43,6 +43,8 @@ stages:
   extends: [ .only-on-frontend-changes ]
   needs: [⬇ build-tool]
   image: gradle:jdk21
+  variables:
+    NODE_TLS_REJECT_UNAUTHORIZED: "0"
   before_script:
     - apt update && apt install bzip2
   script:
@@ -178,6 +180,8 @@ stages:
   stage: 👷‍ build
   extends: [ .only-on-frontend-changes ]
   image: gradle:jdk21
+  variables:
+    NODE_TLS_REJECT_UNAUTHORIZED: "0"
   needs: [⬇ ui-v1]
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angularjs:build

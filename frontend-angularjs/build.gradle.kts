@@ -26,6 +26,11 @@ tasks.register<NpmTask>("jspm_config") {
   dependsOn("npmInstall")
 }
 
+tasks.register<NpmTask>("jspm_config_ssl") {
+  args.addAll("run", "--silent", "jspm", "config", "strictSSL", "false")
+  dependsOn("npmInstall")
+}
+
 tasks.register<NpmTask>("jspm_install") {
   args.addAll("run", "jspm", "install")
 
@@ -34,7 +39,7 @@ tasks.register<NpmTask>("jspm_install") {
 
   outputs.dir(file("$projectDir/www/jspm_packages"))
 
-  dependsOn("jspm_config")
+  dependsOn("jspm_config", "jspm_config_ssl")
 }
 
 tasks.register<NpmTask>("build_app") {
