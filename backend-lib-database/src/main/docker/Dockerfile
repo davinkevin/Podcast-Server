@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.22.0
 
-FROM flyway/flyway:12.0.3 AS flyway-base
+FROM flyway/flyway:12.1.0 AS flyway-base
 
 RUN echo "Remove useless drivers for additional databases" && \
     find /flyway/drivers -iname *.jar | grep -v postgresql | grep -v jackson | xargs rm && \
