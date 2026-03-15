@@ -15,9 +15,9 @@ variables:
 
 stages:
   - ⬇ download
-  - 🧪 test
   - 👷‍ build
   - 🐳 packaging
+  - 🧪 test
   - 🔎 Security Analysis
 
 ⬇ backend:
@@ -294,8 +294,9 @@ stages:
     - !reference [ .cicd_utils ]
     - kaniko_auth_docker_hub
   script:
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend-lib-database/src/main/docker/Dockerfile --destination podcastserver/init-db:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
-    - if [ "${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}" == "$CI_DEFAULT_BRANCH" ]; then /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend-lib-database/src/main/docker/Dockerfile --destination podcastserver/init-db:latest ; fi
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend-lib-database/src/main/docker/Dockerfile --destination podcastserver/init-db:$CI_COMMIT_REF_SLUG
+    - if [ -n "$CI_COMMIT_TAG" ]; then /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend-lib-database/src/main/docker/Dockerfile --destination podcastserver/init-db:${CI_COMMIT_TAG} ; fi
+    - if [ "$CI_COMMIT_REF_SLUG" == "$CI_DEFAULT_BRANCH" ]; then /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend-lib-database/src/main/docker/Dockerfile --destination podcastserver/init-db:latest ; fi
   environment:
     name: init-db/$CI_COMMIT_REF_SLUG
     url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/init-db/tags
@@ -313,6 +314,35 @@ stages:
   environment:
     name: init-db/$CI_COMMIT_REF_SLUG
     action: stop
+
+🧪 init-db:
+  stage: 🧪 test
+  extends: [ .only-on-backend-changes ]
+  needs: [ 🐳 init-db ]
+  image: postgres:18.3-alpine
+  services:
+    - name: postgres:18.3-alpine
+      alias: db
+      variables:
+        POSTGRES_USER: pg-user
+        POSTGRES_PASSWORD: pg-password
+        POSTGRES_DB: podcast-server-db
+    - name: podcastserver/init-db:$CI_COMMIT_REF_SLUG
+      alias: flyway
+      variables:
+        FLYWAY_URL: jdbc:postgresql://db:5432/podcast-server-db
+        FLYWAY_USER: pg-user
+        FLYWAY_PASSWORD: pg-password
+        FLYWAY_CONNECT_RETRIES: 10
+  variables:
+    PGHOST: db
+    PGUSER: pg-user
+    PGPASSWORD: pg-password
+    PGDATABASE: podcast-server-db
+  script:
+    - sleep 15
+    - psql -c "SELECT count(*) FROM flyway_schema_history"
+    - psql -c "SELECT tablename FROM pg_tables WHERE schemaname = 'public'" | grep podcast
 
 🐳 storage:
   stage: 🐳 packaging
@@ -350,7 +380,7 @@ stages:
 🐳 ui:
   stage: 🐳 packaging
   extends: [ .only-on-frontend-changes ]
-  needs: [👷 ui-v1, 👷 ui-v2, 🧪 ui-v2]
+  needs: [👷 ui-v1, 👷 ui-v2]
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]
