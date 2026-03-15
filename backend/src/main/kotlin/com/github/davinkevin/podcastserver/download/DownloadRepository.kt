@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.download
 
 import com.github.davinkevin.podcastserver.database.Tables.DOWNLOADING_ITEM
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
+import com.github.davinkevin.podcastserver.database.Tables.PODCAST
 import com.github.davinkevin.podcastserver.database.enums.DownloadingState
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus.*
@@ -11,6 +12,8 @@ import com.github.davinkevin.podcastserver.entity.toDb
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem.Cover
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem.Podcast
+import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.AutomaticDownload
+import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.YoutubeDownloaderProperties
 import org.jooq.DSLContext
 import org.jooq.Record9
 import org.jooq.impl.DSL.*
@@ -22,7 +25,10 @@ import java.util.*
 /**
  * Created by kevin on 22/09/2019
  */
-class DownloadRepository(private val query: DSLContext) {
+class DownloadRepository(
+    private val query: DSLContext,
+    private val youtubeDownloaderProperties: YoutubeDownloaderProperties,
+) {
 
     fun initQueue(fromDate: OffsetDateTime, withMaxNumberOfTry: Int) {
         val positionInQueue = rowNumber()
@@ -30,14 +36,20 @@ class DownloadRepository(private val query: DSLContext) {
           select(coalesce(max(DOWNLOADING_ITEM.POSITION), 0))
               .from(DOWNLOADING_ITEM).asField<Int>()
 
+        val typeExclusion = when (youtubeDownloaderProperties.automaticDownload) {
+            AutomaticDownload.DISABLED -> PODCAST.TYPE.notIn("Youtube")
+            AutomaticDownload.ENABLED -> noCondition()
+        }
+
         query.insertInto(DOWNLOADING_ITEM, DOWNLOADING_ITEM.ITEM_ID, DOWNLOADING_ITEM.POSITION)
             .select(
                 select(ITEM.ID, positionInQueue)
-                    .from(ITEM)
+                    .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
                     .where(ITEM.PUB_DATE.greaterThan(fromDate))
                     .and(ITEM.STATUS.eq(NOT_DOWNLOADED))
                     .and(ITEM.NUMBER_OF_FAIL.lt(withMaxNumberOfTry))
                     .and(ITEM.ID.notIn(select(DOWNLOADING_ITEM.ITEM_ID).from(DOWNLOADING_ITEM)))
+                    .and(typeExclusion)
                     .orderBy(ITEM.PUB_DATE.asc())
             )
             .execute()

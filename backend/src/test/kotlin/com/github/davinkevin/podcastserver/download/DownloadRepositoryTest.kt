@@ -16,9 +16,13 @@ import org.junit.jupiter.api.*
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.EnumSource
 import org.junit.jupiter.params.provider.ValueSource
+import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.AutomaticDownload
+import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.YoutubeDownloaderProperties
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.jooq.test.autoconfigure.JooqTest
 import org.springframework.context.annotation.Import
+import org.springframework.test.context.bean.override.mockito.MockitoBean
+import org.mockito.kotlin.whenever
 import java.net.URI
 import java.time.Clock
 import java.time.OffsetDateTime
@@ -42,6 +46,8 @@ class DownloadRepositoryTest(
     @Autowired private val query: DSLContext
 ) {
 
+    @MockitoBean private lateinit var youtubeDownloaderProperties: YoutubeDownloaderProperties
+
     private val p = PODCAST
     private val c = COVER
     private val i = ITEM
@@ -55,6 +61,11 @@ class DownloadRepositoryTest(
             truncate(COVER).cascade(),
         )
             .execute()
+    }
+
+    @BeforeEach
+    fun setupParameters() {
+        whenever(youtubeDownloaderProperties.automaticDownload).thenReturn(AutomaticDownload.ENABLED)
     }
 
     @Nested
@@ -305,6 +316,91 @@ class DownloadRepositoryTest(
                         assertThat(state).isEqualTo(DownloadingState.WAITING)
                     }
                 }
+            }
+
+        }
+
+        @Nested
+        @DisplayName("and filter on podcast type")
+        @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+        inner class AndFilterOnPodcastType {
+
+            private val ytCoverId = UUID.fromString("a0a0a0a0-b880-11ea-b3de-0242ac130004")
+            private val ytPodcastId = UUID.fromString("a1a1a1a1-b880-11ea-b3de-0242ac130004")
+            private val ytItemCoverId = UUID.fromString("a2a2a2a2-b880-11ea-b3de-0242ac130004")
+            private val ytItemId = UUID.fromString("a3a3a3a3-b880-11ea-b3de-0242ac130004")
+
+            private val rssCoverId = UUID.fromString("b0b0b0b0-b880-11ea-b3de-0242ac130004")
+            private val rssPodcastId = UUID.fromString("b1b1b1b1-b880-11ea-b3de-0242ac130004")
+            private val rssItemCoverId = UUID.fromString("b2b2b2b2-b880-11ea-b3de-0242ac130004")
+            private val rssItemId = UUID.fromString("b3b3b3b3-b880-11ea-b3de-0242ac130004")
+
+            private val now = OffsetDateTime.now(fixedDate)
+
+            @BeforeAll
+            fun beforeAll() {
+                query.batch(
+                    truncate(DOWNLOADING_ITEM).cascade(),
+                    truncate(ITEM).cascade(),
+                    truncate(PODCAST).cascade(),
+                    truncate(COVER).cascade(),
+
+                    insertInto(COVER)
+                        .columns(COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL)
+                        .values(ytCoverId, 100, 100, "https://foo.bac.com/yt-cover.jpg")
+                        .values(ytItemCoverId, 100, 100, "https://foo.bac.com/yt-item-cover.jpg")
+                        .values(rssCoverId, 100, 100, "https://foo.bac.com/rss-cover.jpg")
+                        .values(rssItemCoverId, 100, 100, "https://foo.bac.com/rss-item-cover.jpg"),
+
+                    insertInto(p)
+                        .columns(p.ID, p.DESCRIPTION, p.HAS_TO_BE_DELETED, p.LAST_UPDATE, p.SIGNATURE, p.TITLE, p.TYPE, p.URL, p.COVER_ID)
+                        .values(ytPodcastId, "desc", true, now, "sign", "Youtube Podcast", "Youtube", "https://www.youtube.com/channel/UCx83f-KzDd3o1QK2AdJIftg", ytCoverId)
+                        .values(rssPodcastId, "desc", true, now, "sign", "RSS Podcast", "RSS", "https://foo.bar.com/rss", rssCoverId),
+
+                    insertInto(i)
+                        .columns(i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
+                        .values(ytItemId, now, now, now, "desc yt item", Path(""), 123, "video/mp4", 0, ItemStatus.NOT_DOWNLOADED, "yt_item", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", ytItemCoverId, ytPodcastId)
+                        .values(rssItemId, now, now, now, "desc rss item", Path(""), 123, "audio/mp3", 0, ItemStatus.NOT_DOWNLOADED, "rss_item", "https://foo.bar.com/rss/item/1", "https://foo.bar.com/rss/item/1", rssItemCoverId, rssPodcastId),
+                )
+                    .execute()
+            }
+
+            @BeforeEach
+            fun beforeEach() {
+                query.batch(
+                    selectOne(),
+                    truncate(DOWNLOADING_ITEM).cascade(),
+                )
+                    .execute()
+            }
+
+            @Test
+            fun `should exclude youtube items when automatic download is disabled`() {
+                /* Given */
+                whenever(youtubeDownloaderProperties.automaticDownload).thenReturn(AutomaticDownload.DISABLED)
+
+                /* When */
+                repo.initQueue(now.minusYears(1), 999)
+
+                /* Then */
+                val items = query.selectFrom(DOWNLOADING_ITEM).fetch()
+                assertThat(items).hasSize(1)
+                items.first().apply {
+                    assertThat(itemId).isEqualTo(rssItemId)
+                }
+            }
+
+            @Test
+            fun `should include all items when automatic download is enabled`() {
+                /* Given */
+                whenever(youtubeDownloaderProperties.automaticDownload).thenReturn(AutomaticDownload.ENABLED)
+
+                /* When */
+                repo.initQueue(now.minusYears(1), 999)
+
+                /* Then */
+                val items = query.selectFrom(DOWNLOADING_ITEM).fetch()
+                assertThat(items).hasSize(2)
             }
         }
 

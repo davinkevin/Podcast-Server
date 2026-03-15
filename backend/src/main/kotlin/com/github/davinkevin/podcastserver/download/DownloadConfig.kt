@@ -1,7 +1,9 @@
 package com.github.davinkevin.podcastserver.download
 
+import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.YoutubeDownloaderProperties
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.springframework.boot.CommandLineRunner
+import org.springframework.boot.context.properties.EnableConfigurationProperties
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.context.annotation.Import
@@ -43,6 +45,7 @@ class DownloadRouterConfig {
 }
 
 @Configuration
+@EnableConfigurationProperties(YoutubeDownloaderProperties::class)
 @Import(
         DownloadRouterConfig::class,
         ItemDownloadManager::class,
