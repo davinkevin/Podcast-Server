@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.22.0
 
 # renovate: datasource=pypi depName=yt-dlp
-ARG YT_DLP_VERSION=2026.3.13
+ARG YT_DLP_VERSION=2026.3.17
 
 FROM denoland/deno:bin-2.6.3@sha256:9ac6b95faa289ad20ba55e51c9a09fcd96fa8b65365f460ec2880b6c9e2a4e86 AS deno
 FROM debian:trixie-20260316 AS downloader
