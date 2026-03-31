@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.22.0
+# syntax=docker/dockerfile:1.23.0
 
 # renovate: datasource=pypi depName=yt-dlp
 ARG YT_DLP_VERSION=2026.3.17
