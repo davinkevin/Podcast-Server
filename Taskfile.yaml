@@ -58,7 +58,7 @@ tasks:
           -v {{.TEMP_MINIO_DATA_FOLDER}}:/data 
           -e "MINIO_ROOT_USER=podcast-server-user" 
           -e "MINIO_ROOT_PASSWORD=nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa" 
-          quay.io/minio/minio:{{.MINIO_VERSION}} server /data --console-address ":9001"
+          pgsty/minio:{{.MINIO_VERSION}} server /data --console-address ":9001"
 
   release:
     env:
