@@ -67,6 +67,7 @@ class FfmpegDownloader(
         val command = FFmpegBuilder()
             .addUserAgent(userAgent)
             .addInput(url)
+            .done()
             .addOutput(subTarget.toAbsolutePath().toString())
             .setFormat("mp4")
             .setAudioBitStreamFilter(FfmpegService.AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC)

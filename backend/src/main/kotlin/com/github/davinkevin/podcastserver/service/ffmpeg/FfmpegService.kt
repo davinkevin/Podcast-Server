@@ -47,8 +47,9 @@ class FfmpegService(
             Files.write(listOfFiles, filesStrings.toByteArray())
 
             val builder = FFmpegBuilder()
-                    .setInput(listOfFiles.toAbsolutePath().toString())
+                    .addInput(listOfFiles.toAbsolutePath().toString())
                     .setFormat(FORMAT_CONCAT)
+                    .done()
                     .addOutput(target.toAbsolutePath().toString())
                     .setAudioCodec(CODEC_COPY)
                     .setVideoCodec(CODEC_COPY)
@@ -70,8 +71,10 @@ class FfmpegService(
         val tmpFile = generateTempFileFor(dest, videoFile)
 
         val builder = FFmpegBuilder()
-                .setInput(convertedAudio.toAbsolutePath().toString())
+                .addInput(convertedAudio.toAbsolutePath().toString())
+                .done()
                 .addInput(videoFile.toAbsolutePath().toString())
+                .done()
                 .addOutput(tmpFile.toAbsolutePath().toString())
                 .setAudioBitStreamFilter(AUDIO_BITSTREAM_FILTER_AAC_ADTSTOASC)
                 .setAudioCodec(CODEC_COPY)
@@ -88,7 +91,8 @@ class FfmpegService(
 
     private fun convert(source: Path, dest: Path): Path {
         val converter = FFmpegBuilder()
-                .setInput(source.toAbsolutePath().toString())
+                .addInput(source.toAbsolutePath().toString())
+                .done()
                 .addOutput(dest.toAbsolutePath().toString())
                 .disableVideo()
                 .done()
