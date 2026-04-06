@@ -64,7 +64,7 @@ dependencies {
 	implementation("org.jsoup:jsoup:1.22.1")
 
 	implementation(project(":backend-lib-youtubedl"))
-	implementation("net.bramp.ffmpeg:ffmpeg:0.9.1")
+	implementation("net.bramp.ffmpeg:ffmpeg:0.9.2")
 
 	implementation(platform("software.amazon.awssdk:bom:2.42.29"))
 	implementation("software.amazon.awssdk:s3")
