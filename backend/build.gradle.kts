@@ -66,7 +66,7 @@ dependencies {
 	implementation(project(":backend-lib-youtubedl"))
 	implementation("net.bramp.ffmpeg:ffmpeg:0.9.1")
 
-	implementation(platform("software.amazon.awssdk:bom:2.42.28"))
+	implementation(platform("software.amazon.awssdk:bom:2.42.29"))
 	implementation("software.amazon.awssdk:s3")
 	implementation("software.amazon.awssdk:netty-nio-client")
 
