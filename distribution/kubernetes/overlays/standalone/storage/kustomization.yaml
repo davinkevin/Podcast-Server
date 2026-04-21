@@ -1,0 +1,48 @@
+apiVersion: kustomize.config.k8s.io/v1alpha1
+kind: Component
+
+patchesStrategicMerge:
+  - all.yaml
+
+replacements:
+  - source:
+      version: v1
+      kind: ConfigMap
+      name: installation-parameters
+      fieldPath: .data.location
+    targets:
+      - select:
+          group: apps
+          version: v1
+          kind: Deployment
+          name: storage
+        fieldPaths:
+          - spec.template.spec.volumes.[name=data].hostPath.path
+        options:
+          delimiter: "/"
+          index: 0
+          create: true
+      - select:
+          group: apps
+          version: v1
+          kind: Deployment
+          name: database
+        fieldPaths:
+          - spec.template.spec.volumes.[name=data].hostPath.path
+          - spec.template.spec.volumes.[name=init].hostPath.path
+        options:
+          delimiter: "/"
+          index: 0
+          create: true
+      - select:
+          group: batch
+          version: v1
+          kind: CronJob
+          name: database-backup
+        fieldPaths:
+          - spec.jobTemplate.spec.template.spec.volumes.[name=backup].hostPath.path
+        options:
+          delimiter: "/"
+          index: 0
+          create: true
+
