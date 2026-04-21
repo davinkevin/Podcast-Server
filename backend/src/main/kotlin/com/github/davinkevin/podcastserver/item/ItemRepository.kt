@@ -101,7 +101,7 @@ class ItemRepository(
             .from(ITEM.innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID)))
             .where(ITEM.ID.eq(id))
             .fetchOne()
-            ?.let { (it) -> it }
+            ?.let { [it] -> it }
             ?: false
     }
 
@@ -172,7 +172,7 @@ class ItemRepository(
             )
             .orderBy(page.sort.toOrderBy(fi.field(ITEM.DOWNLOAD_DATE)!!, fi.field(ITEM.PUB_DATE)!!), fi.field(ITEM.ID))
             .fetch()
-            .map { (
+            .map { [
                        id, title, url,
                        pubDate, downloadDate, creationDate,
                        description, mimeType, length,
@@ -180,7 +180,7 @@ class ItemRepository(
 
                        podcastId, podcastTitle, podcastUrl,
                        coverId, coverUrl, coverWidth, coverHeight
-                   ) ->
+                   ] ->
                 Item(
                     id, title, url,
                     pubDate, downloadDate, creationDate,
@@ -196,7 +196,7 @@ class ItemRepository(
             .from(ITEM)
             .where(filterConditions)
             .fetchOne()!!
-            .let { (v) -> v }
+            .let { [v] -> v }
 
         return PageItem.of(content, totalElements, page)
     }
@@ -294,8 +294,8 @@ class ItemRepository(
             .execute()
             .also { itemsCreation.increment(it.sum().toDouble()) }
             .withIndex()
-            .filter { (_, isCreated) -> isCreated >= 1 }
-            .map { (idx, _) -> itemsWithIds[idx].id }
+            .filter { [_, isCreated] -> isCreated >= 1 }
+            .map { [idx, _] -> itemsWithIds[idx].id }
 
         return findById(ids)
     }
@@ -321,7 +321,7 @@ class ItemRepository(
                 .where(PLAYLIST_ITEMS.ITEMS_ID.eq(itemId))
                 .orderBy(PLAYLIST.ID)
             .fetch()
-            .map { (id, name) -> ItemPlaylist(id, name) }
+            .map { [id, name] -> ItemPlaylist(id, name) }
     }
 }
 

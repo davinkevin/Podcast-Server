@@ -7,7 +7,7 @@ import java.util.*
 class TagRepository(val query: DSLContext) {
 
     fun findById(id: UUID): Tag?  {
-        val (name) = query
+        val [name] = query
             .select(TAG.NAME)
             .from(TAG)
             .where(TAG.ID.eq(id))
@@ -24,11 +24,11 @@ class TagRepository(val query: DSLContext) {
             .where(TAG.NAME.containsIgnoreCase(name))
             .orderBy(TAG.NAME.asc())
             .fetch()
-            .map { (id, name) -> Tag(id, name) }
+            .map { [id, name] -> Tag(id, name) }
     }
 
     fun save(name: String): Tag {
-        val (id) = query
+        val [id] = query
             .select(TAG.ID, TAG.NAME)
             .from(TAG)
             .where(TAG.NAME.eq(name))

@@ -67,7 +67,7 @@ fun ServerRequest.extractHost(): URI {
 fun ServerRequest.toPageRequest(): ItemPageRequest {
     val page = paramOrNull("page")?.toInt() ?: 0
     val size  = paramOrNull("size")?.toInt() ?: 12
-    val (field, direction) = paramOrNull("sort")?.split(",") ?: listOf("pubDate", "DESC")
+    val [field, direction] = paramOrNull("sort")?.split(",") ?: listOf("pubDate", "DESC")
 
     return ItemPageRequest(page, size, ItemSort(direction, field))
 }

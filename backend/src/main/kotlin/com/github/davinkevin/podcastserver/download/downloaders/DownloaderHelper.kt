@@ -82,13 +82,13 @@ class DownloaderHelper(
     private fun finishDownloadSync() = runCatching {
         file.upload(UploadRequest.ForItemFromPath(info.item.podcast.title, target))
 
-        val (mimeType, size) = file.metadata(info.item.podcast.title, target)
+        val (contentType, size) = file.metadata(info.item.podcast.title, target)
             ?: return@runCatching
 
         downloadRepository.finishDownload(
             id = info.item.id,
             length = size,
-            mimeType = mimeType,
+            mimeType = contentType,
             fileName = target.fileName,
             downloadDate = OffsetDateTime.now(clock)
         )

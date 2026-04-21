@@ -149,7 +149,7 @@ class PodcastRepositoryTest(
             val podcasts = repository.findAll()
             /* Then */
             assertThat(podcasts).hasSize(3)
-            val (first, second, third) = podcasts
+            val [first, second, third] = podcasts
             assertAll {
                 assertThat(first.id).isEqualTo(fromString("0311361c-cc97-48ab-b02a-0bd19eec8a45"))
                 assertThat(first.title).isEqualTo("Without tags")
@@ -283,7 +283,7 @@ class PodcastRepositoryTest(
 
                 /* Then */
                 assertThat(stats).hasSize(2)
-                val (first, second) = stats
+                val [first, second] = stats
                 assertAll {
                     assertThat(first.type).isEqualTo("RSS")
                     assertThat(first.values).contains(
@@ -308,7 +308,7 @@ class PodcastRepositoryTest(
 
                 /* Then */
                 assertThat(stats).hasSize(2)
-                val (first, second) = stats
+                val [first, second] = stats
                 assertAll {
                     assertThat(first.type).isEqualTo("YOUTUBE")
                     assertThat(first.values).contains(

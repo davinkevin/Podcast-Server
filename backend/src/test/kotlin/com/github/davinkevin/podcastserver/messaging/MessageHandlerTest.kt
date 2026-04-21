@@ -120,7 +120,7 @@ class MessageHandlerTest(
                         messages.tryEmitNext(DownloadingItemMessage(item1))
                         messages.tryEmitNext(DownloadingItemMessage(item4))
                     }
-                    .assertNext { (event, body) ->
+                    .assertNext { [event, body] ->
                         assertThat(event).isEqualTo("downloading")
                         assertThat(body.id).isEqualTo(item1.id)
                         assertThat(body.title).isEqualTo(item1.title)
@@ -133,7 +133,7 @@ class MessageHandlerTest(
                         assertThat(body.cover.url).isEqualTo(item1.cover.url)
                         assertThat(body.isDownloaded).isEqualTo(false)
                     }
-                    .assertNext { (event, body) ->
+                    .assertNext { [event, body] ->
                         assertThat(event).isEqualTo("downloading")
                         assertThat(body.id).isEqualTo(item4.id)
                         assertThat(body.title).isEqualTo(item4.title)
@@ -223,25 +223,25 @@ class MessageHandlerTest(
                         messages.tryEmitNext(WaitingQueueMessage(listOf(item3)))
                         messages.tryEmitNext(WaitingQueueMessage(emptyList()))
                     }
-                    .assertNext { (event, body) ->
+                    .assertNext { [event, body] ->
                         assertThat(event).isEqualTo("waiting")
                         assertThat(body).hasSize(3)
                         assertThat(body[0].id).isEqualTo(item1.id)
                         assertThat(body[1].id).isEqualTo(item2.id)
                         assertThat(body[2].id).isEqualTo(item3.id)
                     }
-                    .assertNext { (event, body) ->
+                    .assertNext { [event, body] ->
                         assertThat(event).isEqualTo("waiting")
                         assertThat(body).hasSize(2)
                         assertThat(body[0].id).isEqualTo(item2.id)
                         assertThat(body[1].id).isEqualTo(item3.id)
                     }
-                    .assertNext { (event, body) ->
+                    .assertNext { [event, body] ->
                         assertThat(event).isEqualTo("waiting")
                         assertThat(body).hasSize(1)
                         assertThat(body[0].id).isEqualTo(item3.id)
                     }
-                    .assertNext { (event, body) ->
+                    .assertNext { [event, body] ->
                         assertThat(event).isEqualTo("waiting")
                         assertThat(body).hasSize(0)
                     }
@@ -367,7 +367,7 @@ class MessageHandlerTest(
                 @Test
                 fun `should receive items`() {
                     /* Given */
-                    val (sse, events) = sseBuilderToFlux()
+                    val [sse, events] = sseBuilderToFlux()
                     startConsumer(messageTemplate, sse)
 
                     /* When */
@@ -379,7 +379,7 @@ class MessageHandlerTest(
                     )
                         /* Then */
                         .expectSubscription()
-                        .assertNext { (event, body) ->
+                        .assertNext { [event, body] ->
                             assertThat(event).isEqualTo("downloading")
                             assertThat(body.id).isEqualTo(item1.id)
                             assertThat(body.title).isEqualTo(item1.title)
@@ -392,7 +392,7 @@ class MessageHandlerTest(
                             assertThat(body.cover.url).isEqualTo(item1.cover.url)
                             assertThat(body.isDownloaded).isEqualTo(false)
                         }
-                        .assertNext { (event, body) ->
+                        .assertNext { [event, body] ->
                             assertThat(event).isEqualTo("downloading")
                             assertThat(body.id).isEqualTo(item4.id)
                             assertThat(body.title).isEqualTo(item4.title)
@@ -416,7 +416,7 @@ class MessageHandlerTest(
                 @Test
                 fun `should receive updates`() {
                     /* Given */
-                    val (sse, events) = sseBuilderToFlux()
+                    val [sse, events] = sseBuilderToFlux()
                     startConsumer(messageTemplate, sse)
 
                     /* When */
@@ -445,7 +445,7 @@ class MessageHandlerTest(
                 @Test
                 fun `should receive new waiting list`() {
                     /* Given */
-                    val (sse, events) = sseBuilderToFlux()
+                    val [sse, events] = sseBuilderToFlux()
                     startConsumer(messageTemplate, sse)
 
                     /* When */
@@ -457,25 +457,25 @@ class MessageHandlerTest(
                     )
                         /* Then */
                         .expectSubscription()
-                        .assertNext { (event, body) ->
+                        .assertNext { [event, body] ->
                             assertThat(event).isEqualTo("waiting")
                             assertThat(body).hasSize(3)
                             assertThat(body[0].id).isEqualTo(item1.id)
                             assertThat(body[1].id).isEqualTo(item2.id)
                             assertThat(body[2].id).isEqualTo(item3.id)
                         }
-                        .assertNext { (event, body) ->
+                        .assertNext { [event, body] ->
                             assertThat(event).isEqualTo("waiting")
                             assertThat(body).hasSize(2)
                             assertThat(body[0].id).isEqualTo(item2.id)
                             assertThat(body[1].id).isEqualTo(item3.id)
                         }
-                        .assertNext { (event, body) ->
+                        .assertNext { [event, body] ->
                             assertThat(event).isEqualTo("waiting")
                             assertThat(body).hasSize(1)
                             assertThat(body[0].id).isEqualTo(item3.id)
                         }
-                        .assertNext { (event, body) ->
+                        .assertNext { [event, body] ->
                             assertThat(event).isEqualTo("waiting")
                             assertThat(body).hasSize(0)
                         }
@@ -487,7 +487,7 @@ class MessageHandlerTest(
         @Test
         fun `should receive heartbeat`() {
             /* Given */
-            val (sse, events) = sseBuilderToFlux()
+            val [sse, events] = sseBuilderToFlux()
             startConsumer(messageTemplate, sse)
 
             /* When */
@@ -571,7 +571,7 @@ class MessageHandlerTest(
                             listOf(DownloadingItemMessage(item1), DownloadingItemMessage(item4))
                                 .forEach(handler::receive)
                         }
-                        .assertNext { (event, body) ->
+                        .assertNext { [event, body] ->
                             assertThat(event).isEqualTo("downloading")
                             assertThat(body.id).isEqualTo(item1.id)
                             assertThat(body.title).isEqualTo(item1.title)
@@ -584,7 +584,7 @@ class MessageHandlerTest(
                             assertThat(body.cover.url).isEqualTo(item1.cover.url)
                             assertThat(body.isDownloaded).isEqualTo(false)
                         }
-                        .assertNext { (event, body) ->
+                        .assertNext { [event, body] ->
                             assertThat(event).isEqualTo("downloading")
                             assertThat(body.id).isEqualTo(item4.id)
                             assertThat(body.title).isEqualTo(item4.title)
@@ -660,25 +660,25 @@ class MessageHandlerTest(
                             )
                                 .forEach(handler::receive)
                         }
-                        .assertNext { (event, body) ->
+                        .assertNext { [event, body] ->
                             assertThat(event).isEqualTo("waiting")
                             assertThat(body).hasSize(3)
                             assertThat(body[0].id).isEqualTo(item1.id)
                             assertThat(body[1].id).isEqualTo(item2.id)
                             assertThat(body[2].id).isEqualTo(item3.id)
                         }
-                        .assertNext { (event, body) ->
+                        .assertNext { [event, body] ->
                             assertThat(event).isEqualTo("waiting")
                             assertThat(body).hasSize(2)
                             assertThat(body[0].id).isEqualTo(item2.id)
                             assertThat(body[1].id).isEqualTo(item3.id)
                         }
-                        .assertNext { (event, body) ->
+                        .assertNext { [event, body] ->
                             assertThat(event).isEqualTo("waiting")
                             assertThat(body).hasSize(1)
                             assertThat(body[0].id).isEqualTo(item3.id)
                         }
-                        .assertNext { (event, body) ->
+                        .assertNext { [event, body] ->
                             assertThat(event).isEqualTo("waiting")
                             assertThat(body).hasSize(0)
                         }

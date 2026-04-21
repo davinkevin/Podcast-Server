@@ -76,7 +76,7 @@ class UpdateService(
                 }
 
             results
-                .forEach { (p, i, s) -> saveSignatureAndCreateItems(p, i, s) }
+                .forEach { [p, i, s] -> saveSignatureAndCreateItems(p, i, s) }
 
             liveUpdate.isUpdating(false)
 

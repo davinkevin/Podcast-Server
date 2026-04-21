@@ -172,7 +172,7 @@ class DownloadRepositoryTest(
                     repo.initQueue(oneDayAgo, 999)
                     /* Then */
 
-                    val (first) = query.selectFrom(DOWNLOADING_ITEM).fetch()
+                    val [first] = query.selectFrom(DOWNLOADING_ITEM).fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId1)
                         assertThat(position).isEqualTo(1)
@@ -187,7 +187,7 @@ class DownloadRepositoryTest(
                     repo.initQueue(twoDaysAgo, 999)
 
                     /* Then */
-                    val (first, second) = query.selectFrom(DOWNLOADING_ITEM).fetch()
+                    val [first, second] = query.selectFrom(DOWNLOADING_ITEM).fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId2)
                         assertThat(position).isEqualTo(1)
@@ -207,7 +207,7 @@ class DownloadRepositoryTest(
                     repo.initQueue(threeDaysAgo, 999)
 
                     /* Then */
-                    val (first, second, third) = query.selectFrom(DOWNLOADING_ITEM).fetch()
+                    val [first, second, third] = query.selectFrom(DOWNLOADING_ITEM).fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId3)
                         assertThat(position).isEqualTo(1)
@@ -264,7 +264,7 @@ class DownloadRepositoryTest(
                     repo.initQueue(now.minusYears(1) , 5+1)
 
                     /* Then */
-                    val (first) = query.selectFrom(DOWNLOADING_ITEM).fetch()
+                    val [first] = query.selectFrom(DOWNLOADING_ITEM).fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId1)
                         assertThat(position).isEqualTo(1)
@@ -279,7 +279,7 @@ class DownloadRepositoryTest(
                     repo.initQueue(now.minusYears(1) , 10+1)
 
                     /* Then */
-                    val (first, second) = query.selectFrom(DOWNLOADING_ITEM).fetch()
+                    val [first, second] = query.selectFrom(DOWNLOADING_ITEM).fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId2)
                         assertThat(position).isEqualTo(1)
@@ -299,7 +299,7 @@ class DownloadRepositoryTest(
                     repo.initQueue(now.minusYears(1) , 20+1)
 
                     /* Then */
-                    val (first, second, third) = query.selectFrom(DOWNLOADING_ITEM).fetch()
+                    val [first, second, third] = query.selectFrom(DOWNLOADING_ITEM).fetch()
                     first.apply {
                         assertThat(itemId).isEqualTo(itemId3)
                         assertThat(position).isEqualTo(1)
@@ -725,7 +725,7 @@ class DownloadRepositoryTest(
 
                 /* Then */
                 assertThat(items).hasSize(4)
-                val (first, second, third, fourth) = items
+                val [first, second, third, fourth] = items
                 assertAll {
                     assertThat(first.id).isEqualTo(itemId1)
                     assertThat(second.id).isEqualTo(itemId2)
@@ -776,7 +776,7 @@ class DownloadRepositoryTest(
                 /* Then */
 
                 assertThat(items).hasSize(2)
-                val (first, second) = items
+                val [first, second] = items
                 assertThat(first.id).isEqualTo(itemId1)
                 assertThat(second.id).isEqualTo(itemId2)
             }
@@ -805,7 +805,7 @@ class DownloadRepositoryTest(
 
                 /* Then */
                 assertThat(items).hasSize(2)
-                val (first, second) = items
+                val [first, second] = items
                 assertThat(first.id).isEqualTo(itemId2)
                 assertThat(second.id).isEqualTo(itemId3)
             }
@@ -1023,7 +1023,7 @@ class DownloadRepositoryTest(
 
             /* Then */
             assertThat(items).hasSize(2)
-            val (first, second) = items
+            val [first, second] = items
             assertAll {
                 assertThat(first).isEqualTo(
                     DownloadingItem(
@@ -1215,7 +1215,7 @@ class DownloadRepositoryTest(
 
             /* Then */
             assertThat(items).hasSize(2)
-            val (first, second) = items
+            val [first, second] = items
             assertAll {
                 assertThat(first).isEqualTo(
                     DownloadingItem(
@@ -1897,7 +1897,7 @@ class DownloadRepositoryTest(
             repo.startItem(UUID.fromString("1811fadd-45e6-4761-8ad0-6a72951cb255"))
 
             /* Then */
-            val (first, second, third, fourth) = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION)
+            val [first, second, third, fourth] = query.selectFrom(DOWNLOADING_ITEM).orderBy(DOWNLOADING_ITEM.POSITION)
                 .fetch()
 
             assertThat(first.itemId).isEqualTo(itemId1)

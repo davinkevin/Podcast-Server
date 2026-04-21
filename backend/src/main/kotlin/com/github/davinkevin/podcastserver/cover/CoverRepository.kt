@@ -41,7 +41,7 @@ class CoverRepository(private val query: DSLContext) {
             .where(ITEM.CREATION_DATE.lessOrEqual(date))
             .orderBy(COVER.ID.asc())
             .fetch()
-            .map { (podcastId, podcastTitle, itemId, itemTitle, coverId, coverUrl) ->
+            .map { [podcastId, podcastTitle, itemId, itemTitle, coverId, coverUrl] ->
                 DeleteRequest.ForCover(
                     id = coverId,
                     extension = Path(coverUrl).extension,

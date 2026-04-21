@@ -34,7 +34,8 @@ tasks.withType<KotlinCompile> {
 	compilerOptions {
 		freeCompilerArgs.addAll(
 				"-Xjsr305=strict",
-			"-Xannotation-default-target=param-property"
+			"-Xannotation-default-target=param-property",
+			"-Xname-based-destructuring=complete"
 		)
 
 		jvmTarget = JvmTarget.JVM_25

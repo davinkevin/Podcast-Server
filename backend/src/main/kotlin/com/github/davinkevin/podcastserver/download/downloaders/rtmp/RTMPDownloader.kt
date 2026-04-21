@@ -68,7 +68,7 @@ class RTMPDownloader(
             .lines()
             .peek { log.info("log is: $it") }
             .forEach {
-                val (isProgression, progression) = isProgressionLine(it)
+                val [isProgression, progression] = isProgressionLine(it)
                 when {
                     isProgression -> broadcastProgression(state.info.item, progression)
                     isDownloadComplete(it) -> { endReached = true; finishDownload() }

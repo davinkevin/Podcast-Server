@@ -86,14 +86,14 @@ class YoutubeByXmlUpdater(
     }
 
     private fun fetchXml(url: URI): ByteArrayResource? {
-        val (key, value) = queryParamsOf(url)
+        val [key, queryValue] = queryParamsOf(url)
             ?: return null
 
         return youtube
             .get()
             .uri { it
                 .path("/feeds/videos.xml")
-                .queryParam(key, value)
+                .queryParam(key, queryValue)
                 .build()
             }
             .retrieve()

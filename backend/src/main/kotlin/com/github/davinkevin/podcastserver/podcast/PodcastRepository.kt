@@ -86,8 +86,8 @@ class PodcastRepository(private val query: DSLContext) {
 
         return stats
             .groupBy { it[PODCAST.TYPE] }
-            .mapValues { (_, values) -> values
-                .map { (_, number, date) -> NumberOfItemByDateWrapper(date.toLocalDate(), number) }
+            .mapValues { [_, values] -> values
+                .map { [_, number, date] -> NumberOfItemByDateWrapper(date.toLocalDate(), number) }
                 .toSet()
             }
             .map { StatsPodcastType(it.key, it.value) }
@@ -113,7 +113,7 @@ class PodcastRepository(private val query: DSLContext) {
             .fetch()
 
         return results
-            .map { (count, date) -> NumberOfItemByDateWrapper(date.toLocalDate(), count) }
+            .map { [count, date] -> NumberOfItemByDateWrapper(date.toLocalDate(), count) }
     }
 
     fun save(title: String, url: String?, hasToBeDeleted: Boolean, type: String, tags: Collection<Tag>, cover: Cover): Podcast {

@@ -103,7 +103,7 @@ class PlaylistRepository(
                 .doUpdate()
                 .set(PLAYLIST.COVER_ID, coverId)
                 .returningResult(PLAYLIST.ID)
-                .fetchOne { (v) -> v }
+                .fetchOne { [v] -> v }
         }
 
         return findById(playlistId)!!

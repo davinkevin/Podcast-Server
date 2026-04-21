@@ -93,7 +93,7 @@ class ItemService(
 
         val metadata = file.metadata(podcast.title, filename)!!
 
-        val (_, p2, p3) = uploadedFile.filename.split(" - ")
+        val [_, p2, p3] = uploadedFile.filename.split(" - ")
         val title = p3.substringBeforeLast(".")
         val date = LocalDate.parse(p2, DateTimeFormatter.ofPattern("yyyy-MM-dd"))
         val time = LocalTime.of(0, 0)

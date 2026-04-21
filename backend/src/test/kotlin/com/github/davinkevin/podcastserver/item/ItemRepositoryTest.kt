@@ -304,7 +304,7 @@ class ItemRepositoryTest(
                 /* Then */
                 assertThat(response).isNull()
                 val items = query.select(ITEM.ID).from(ITEM)
-                    .fetch { (id) -> id }
+                    .fetch { [id] -> id }
 
                 assertThat(items).hasSize(6).contains(
                     fromString("817a4626-6fd2-457e-8d27-69ea5acdc828"),

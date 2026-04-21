@@ -17,7 +17,7 @@ class KodiRepository(
             .from(PODCAST)
             .orderBy(PODCAST.TITLE)
             .fetch()
-            .map { (id, title) -> Podcast(id, title) }
+            .map { [id, title] -> Podcast(id, title) }
     }
 
     fun items(podcastId: UUID): List<Item> {
@@ -28,7 +28,7 @@ class KodiRepository(
             .and(ITEM.STATUS.eq(Status.FINISH.toDb()))
             .orderBy(ITEM.PUB_DATE.desc())
             .fetch()
-            .map { (id, title, pubDate, length, fileName, mimeType) -> Item(id, title, pubDate, length, fileName, mimeType) }
+            .map { [id, title, pubDate, length, fileName, mimeType] -> Item(id, title, pubDate, length, fileName, mimeType) }
     }
 
 }
