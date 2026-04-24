@@ -17,7 +17,7 @@ RUN echo "install dependencies" && \
   echo "Print content of downloader folder" && \
   tree /opt/
 
-FROM bellsoft/liberica-openjdk-debian:25.0.2@sha256:431632ec42fcd6943d6b47a4ef4f8ff726f0ef359087ab929895b8da847ca9e0 AS base-image
+FROM bellsoft/liberica-openjdk-debian:25.0.3@sha256:6959dea4841151ea2cc307d0ea3f036e645372ec2439e36852aa8167df83aa50 AS base-image
 
 ARG YT_DLP_VERSION
 
