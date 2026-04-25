@@ -21,7 +21,7 @@ RUN echo "Remove useless drivers and plugins, keep only postgresql and jackson" 
 
 COPY backend-lib-database/src/main/migrations/*.sql /flyway/sql/
 
-FROM gcr.io/distroless/java25-debian13:latest@sha256:715cc45365cece7bc74f76b282b889d6cff6a4d863edc6b45672af1f3f955a46 AS base-image
+FROM gcr.io/distroless/java25-debian13:latest@sha256:b3eab8bcaa9abc92c4d5580b661adfae79289e7f22df2e029967fb8cb325f711 AS base-image
 
 COPY --from=flyway-base /flyway/ /database/
 WORKDIR /database/
