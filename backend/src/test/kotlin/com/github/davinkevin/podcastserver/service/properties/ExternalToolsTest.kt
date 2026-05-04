@@ -15,7 +15,6 @@ class ExternalToolsTest {
         val externalTools = ExternalTools()
         /* Then */
         assertThat(externalTools.ffmpeg).isEqualTo("/usr/local/bin/ffmpeg")
-        assertThat(externalTools.rtmpdump).isEqualTo("/usr/local/bin/rtmpdump")
     }
 
     @Test
@@ -24,10 +23,8 @@ class ExternalToolsTest {
         /* When */
         val externalTools = ExternalTools(
                 ffmpeg = "/tmp/ffmpeg",
-                rtmpdump = "/tmp/rtmpdump"
         )
         /* Then */
         assertThat(externalTools.ffmpeg).isEqualTo("/tmp/ffmpeg")
-        assertThat(externalTools.rtmpdump).isEqualTo("/tmp/rtmpdump")
     }
 }

@@ -5,7 +5,6 @@ import com.github.davinkevin.podcastserver.download.downloaders.Downloader
 import com.github.davinkevin.podcastserver.download.downloaders.DownloaderFactory
 import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelperFactory
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
-import com.github.davinkevin.podcastserver.download.downloaders.rtmp.RTMPDownloader
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.ffmpeg.FfmpegService
 import java.util.*

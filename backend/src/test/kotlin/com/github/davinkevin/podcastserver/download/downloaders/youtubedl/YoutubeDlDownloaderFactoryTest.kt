@@ -133,7 +133,7 @@ class YoutubeDlDownloaderFactoryTest(
             /* Given */
             val dItem = DownloadingInformation(
                 item = item,
-                urls = listOf(URI.create("rtmp://foo.bar.com/one.mp3")),
+                urls = listOf(URI.create("ftp://foo.bar.com/one.mp3")),
                 filename = Path("one.mp3"),
                 userAgent = null
             )

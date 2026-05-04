@@ -1,5 +1,4 @@
 podcastserver:
  externaltools:
-  #rtmpdump: /usr/local/bin/rtmpdump
   ffmpeg: /opt/homebrew/bin/ffmpeg
   ffprobe: /opt/homebrew/bin/ffprobe

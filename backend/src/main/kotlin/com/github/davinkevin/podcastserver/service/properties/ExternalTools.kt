@@ -9,5 +9,4 @@ import org.springframework.boot.context.properties.ConfigurationProperties
 data class ExternalTools(
         val ffmpeg: String = "/usr/local/bin/ffmpeg",
         val ffprobe: String = "/usr/local/bin/ffprobe",
-        val rtmpdump: String = "/usr/local/bin/rtmpdump",
 )

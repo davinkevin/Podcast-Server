@@ -27,16 +27,14 @@ COPY --from=deno /deno /opt/deno/deno
 ENV PATH="/opt/deno:/opt/ffmpeg:/opt/youtube-dl/:/opt/yt-dl/:${PATH}"
 ENV PODCASTSERVER_EXTERNALTOOLS_FFMPEG="/opt/ffmpeg/ffmpeg"
 ENV PODCASTSERVER_EXTERNALTOOLS_FFPROBE="/opt/ffmpeg/ffprobe"
-ENV PODCASTSERVER_EXTERNALTOOLS_RTMPDUMP="/usr/bin/rtmpdump"
 ENV PODCASTSERVER_EXTERNALTOOLS_YTDLP_PATH="/usr/local/bin/yt-dlp"
 
 RUN echo "install runtime dependencies" && \
-  apt-get update && apt-get install python3 python3-pip rtmpdump procps -y --no-install-recommends && \
+  apt-get update && apt-get install python3 python3-pip procps -y --no-install-recommends && \
   python3 -m pip install --break-system-packages yt-dlp[default]==${YT_DLP_VERSION} && \
   rm -rf /var/lib/apt/lists/* && apt-get autoremove && \
   echo "print version of built in tools" && \
   ffmpeg -version | head -n 1 && \
   yt-dlp --version && \
-  rtmpdump --help 2>&1 | head -n 1 && \
   python3 -c "import yt_dlp_ejs; print('Plugin EJS présent')" && \
   deno --version

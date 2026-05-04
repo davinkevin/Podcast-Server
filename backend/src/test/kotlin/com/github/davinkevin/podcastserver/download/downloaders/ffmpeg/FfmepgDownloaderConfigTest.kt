@@ -16,7 +16,7 @@ class FfmepgDownloaderConfigTest {
         .withConfiguration(AutoConfigurations.of(LocalTestConfiguration::class.java, FfmpegDownloaderConfig::class.java))
 
     @Test
-    fun `should provide a rtmp downloader factory`() {
+    fun `should provide a ffmpeg downloader factory`() {
         /* Given */
         /* When */
         contextRunner.run {
