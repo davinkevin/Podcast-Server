@@ -85,7 +85,6 @@ dependencies {
 }
 
 configure<com.gorylenko.GitPropertiesPluginExtension> {
-	dotGitDirectory = project.rootProject.layout.projectDirectory.dir(".git")
 	customProperty("git.build.host", "none")
 	customProperty("git.build.user.email", "none")
 	customProperty("git.build.user.name", "none")
