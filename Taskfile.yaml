@@ -15,7 +15,6 @@ tasks:
       - kubectl apply -k distribution/kubernetes/.infrastructure/gateway/ --server-side=true
 
   skaffold:dev:
-    dir: ~/Workspace/gitlab.com/davinkevin/Podcast-Server
     env:
       SKAFFOLD: true
     deps:
