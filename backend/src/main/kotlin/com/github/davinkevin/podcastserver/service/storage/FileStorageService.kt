@@ -104,7 +104,7 @@ class FileStorageService(
             })
         }
 
-        retry { operation.join() }
+        retry { operation.join() }.getOrThrow()
     }
 
     private fun download(url: URI): ByteArrayResource? = rcb.clone()
@@ -148,13 +148,14 @@ class FileStorageService(
             val result = runCatching { block() }
             if (result.isSuccess) return result
             errors += result
+            log.warn("attempt $i/$retries failed: {}", result.exceptionOrNull()?.message)
 
             val waitTime = delay.plusSeconds(Random.nextDouble(0.0, 0.5).toLong())
             Thread.sleep(waitTime)
         }
 
         return errors.first()
-            .also { log.error("error during operation, operation canceled", it.exceptionOrNull()) }
+            .also { log.error("operation failed after $retries attempts", it.exceptionOrNull()) }
     }
 
     fun metadata(title: String, file: Path): FileMetaData? {

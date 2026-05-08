@@ -112,7 +112,6 @@ public class YoutubeDL {
         InputStream outStream = process.getInputStream();
         InputStream errStream = process.getErrorStream();
 
-        System.out.println("before stream extractor creation");
         StreamProcessExtractor stdOutProcessor = new StreamProcessExtractor(outBuffer, outStream, callback);
         StreamGobbler stdErrProcessor = new StreamGobbler(errBuffer, errStream);
 

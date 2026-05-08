@@ -17,6 +17,7 @@ import com.github.tomakehurst.wiremock.http.RequestMethod
 import com.github.tomakehurst.wiremock.junit5.WireMockExtension
 import com.github.tomakehurst.wiremock.matching.RequestPatternBuilder.newRequestPattern
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -533,6 +534,10 @@ class FileStorageServiceTest(
                         </Contents>
                     </ListBucketResult>
                 """.trimIndent())))
+                stubFor(head(urlEqualTo("/data/origin/first.mp3"))
+                    .willReturn(ok().withHeader("Content-Length", "100")))
+                stubFor(head(urlEqualTo("/data/origin/second.mp3"))
+                    .willReturn(ok().withHeader("Content-Length", "100")))
                 stubFor(put("/data/destination/first.mp3")
                     .withHeader("x-amz-copy-source", equalTo("data/origin/first.mp3"))
                     .willReturn(ok()))
@@ -620,11 +625,8 @@ class FileStorageServiceTest(
                 stubFor(put(urlMatching("/data/foo/bar.*txt")).willReturn(badRequest()))
             }
 
-            /* When */
-            fileService.upload(request)
-
-            /* Then */
-            // no exception are thrown, system just ignore the upload
+            /* When */ /* Then */
+            assertThatThrownBy { fileService.upload(request) }
         }
     }
 

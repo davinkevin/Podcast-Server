@@ -36,6 +36,8 @@ class FileStorageConfig {
             .serviceConfiguration(s3conf)
             .endpointOverride(properties.url)
             .region(Region.AWS_GLOBAL)
+            .multipartEnabled(true)
+
             .asyncConfiguration {  }
             .build()
 

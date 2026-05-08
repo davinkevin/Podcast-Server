@@ -80,10 +80,11 @@ class DownloaderHelper(
     }
 
     private fun finishDownloadSync() = runCatching {
+        log.info("Uploading downloaded file to storage for ${info.item.url}")
         file.upload(UploadRequest.ForItemFromPath(info.item.podcast.title, target))
 
         val (mimeType, size) = file.metadata(info.item.podcast.title, target)
-            ?: return@runCatching
+            ?: error("metadata not found after upload for ${info.item.url}")
 
         downloadRepository.finishDownload(
             id = info.item.id,
