@@ -41,7 +41,7 @@ import './search.css!';
 })
 @Constant({
     name : 'DefaultItemSearchParameters',
-    value : { page: 0, size: 12, q: undefined, tags: [], sort: [{ direction : 'DESC', property : 'pubDate'}], status: 'downloaded'}
+    value : { page: 0, size: 12, q: undefined, tags: [], sort: [{ direction : 'DESC', property : 'pubDate'}], status: 'all'}
 })
 export default class ItemSearchCtrl {
 
