@@ -1,19 +1,80 @@
+@let result = itemsResource.value();
+@let loading = itemsResource.isLoading();
+@let err = itemsResource.error();
+
 <section class="library">
   <header class="library__header">
-    <h1 class="library__title">Library</h1>
-    <p class="library__subtitle">Latest episodes across all your podcasts</p>
+    <div class="library__heading">
+      <h1 class="library__title">Library</h1>
+      @if (result) {
+        <span class="library__count">{{ result.totalElements }} episodes</span>
+      }
+    </div>
+
+    <form class="library__search" (submit)="onSubmitSearch(); $event.preventDefault()">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic">
+        <mat-icon matPrefix>search</mat-icon>
+        <input
+          matInput
+          type="search"
+          name="q"
+          placeholder="Search episodes…"
+          [ngModel]="searchDraft()"
+          (ngModelChange)="searchDraft.set($event)"
+        />
+        @if (searchDraft()) {
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            aria-label="Clear search"
+            (click)="onClearSearch()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
+    </form>
   </header>
 
-  <div class="library__grid">
-    @for (item of items(); track item.id) {
-      <ps-cover-card
-        [title]="item.title"
-        [subtitle]="item.podcast"
-        [coverUrl]="item.coverUrl"
-        [actions]="cardActions"
-        (play)="onPlay(item)"
-        (open)="onOpen(item)"
+  @if (loading) {
+    <div class="library__state">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (err) {
+    <ps-empty-state
+      icon="error_outline"
+      title="Couldn't load episodes"
+      subtitle="Try refreshing in a moment."
+    />
+  } @else if (result) {
+    @if (result.empty) {
+      <ps-empty-state
+        icon="inbox"
+        title="No episodes yet"
+        [subtitle]="
+          q()
+            ? 'No match for your search. Try a different query.'
+            : 'Add a podcast to start downloading episodes.'
+        "
       />
+    } @else {
+      <div class="library__grid">
+        @for (item of result.content; track item.id) {
+          <ps-cover-card
+            [title]="item.title"
+            [subtitle]="item.podcast.title"
+            [coverUrl]="coverUrl(item)"
+            [actions]="cardActions"
+            (play)="onPlay(item)"
+            (open)="onOpen(item)"
+          />
+        }
+      </div>
+
+      <footer class="library__footer">
+        <ps-pager [page]="result.number" [first]="result.first" [last]="result.last" />
+      </footer>
     }
-  </div>
+  }
 </section>

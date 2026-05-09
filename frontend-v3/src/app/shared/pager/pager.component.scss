@@ -1,0 +1,13 @@
+.pager {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 999px;
+  background: var(--mat-sys-surface-container);
+}
+
+.pager__btn--disabled {
+  pointer-events: none;
+  opacity: 0.4;
+}
