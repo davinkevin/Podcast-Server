@@ -17,8 +17,13 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CoverCardComponent } from '../../shared/cover-card/cover-card.component';
 import { PagerComponent } from '../../shared/pager/pager.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
+import {
+  StatusBadgeComponent,
+  StatusBadgeKind,
+} from '../../shared/status-badge/status-badge.component';
 import { ItemApi, ItemSearchInput } from '../../core/api/item.api';
 import { ItemHAL } from '../../core/models/item.model';
+import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 
 const DEFAULT_PAGE_SIZE = 24;
 
@@ -35,6 +40,7 @@ const DEFAULT_PAGE_SIZE = 24;
     CoverCardComponent,
     PagerComponent,
     EmptyStateComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './library.component.html',
   styleUrl: './library.component.scss',
@@ -53,6 +59,7 @@ export default class LibraryComponent {
 
   private readonly router = inject(Router);
   private readonly itemApi = inject(ItemApi);
+  private readonly stream = inject(DownloadStreamService);
 
   protected readonly searchDraft = signal('');
 
@@ -94,6 +101,20 @@ export default class LibraryComponent {
 
   protected coverUrl(item: ItemHAL): string {
     return item.cover.url;
+  }
+
+  protected statusFor(item: ItemHAL): { kind: StatusBadgeKind; progression: number | null } | null {
+    const downloading = this.stream.downloading().find((d) => d.id === item.id);
+    if (downloading) {
+      return { kind: 'downloading', progression: downloading.progression };
+    }
+    if (this.stream.queue().some((q) => q.id === item.id)) {
+      return { kind: 'queued', progression: null };
+    }
+    if (item.status === 'FAILED') {
+      return { kind: 'failed', progression: null };
+    }
+    return null;
   }
 
   protected onPlay(item: ItemHAL) {

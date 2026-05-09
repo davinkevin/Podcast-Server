@@ -1,27 +1,27 @@
-<nav class="pager" aria-label="Pagination">
-  <a
-    mat-icon-button
-    aria-label="Previous page"
-    queryParamsHandling="merge"
-    [queryParams]="prevQuery()"
-    [routerLink]="[]"
-    [attr.aria-disabled]="first()"
-    [class.pager__btn--disabled]="first()"
-    [tabindex]="first() ? -1 : 0"
-  >
-    <mat-icon>chevron_left</mat-icon>
-  </a>
+@if (!first() || !last()) {
+  <nav class="pager" aria-label="Pagination">
+    @if (!first()) {
+      <a
+        mat-icon-button
+        aria-label="Previous page"
+        queryParamsHandling="merge"
+        [queryParams]="prevQuery()"
+        [routerLink]="[]"
+      >
+        <mat-icon>chevron_left</mat-icon>
+      </a>
+    }
 
-  <a
-    mat-icon-button
-    aria-label="Next page"
-    queryParamsHandling="merge"
-    [queryParams]="nextQuery()"
-    [routerLink]="[]"
-    [attr.aria-disabled]="last()"
-    [class.pager__btn--disabled]="last()"
-    [tabindex]="last() ? -1 : 0"
-  >
-    <mat-icon>chevron_right</mat-icon>
-  </a>
-</nav>
+    @if (!last()) {
+      <a
+        mat-icon-button
+        aria-label="Next page"
+        queryParamsHandling="merge"
+        [queryParams]="nextQuery()"
+        [routerLink]="[]"
+      >
+        <mat-icon>chevron_right</mat-icon>
+      </a>
+    }
+  </nav>
+}

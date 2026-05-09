@@ -18,15 +18,18 @@
 
   <button
     mat-icon-button
-    aria-label="Downloads"
+    [attr.aria-label]="
+      downloadCount() > 0 ? 'Downloads (' + downloadCount() + ' active)' : 'Downloads'
+    "
     matTooltip="Downloads"
     class="topbar__action"
+    [matBadge]="downloadCount()"
+    [matBadgeHidden]="downloadCount() === 0"
+    matBadgeColor="accent"
+    matBadgeSize="small"
+    matBadgeOverlap="true"
   >
-    @if (downloadCount > 0) {
-      <mat-icon [matBadge]="downloadCount" matBadgeColor="accent">downloading</mat-icon>
-    } @else {
-      <mat-icon>downloading</mat-icon>
-    }
+    <mat-icon>downloading</mat-icon>
   </button>
 
   <button

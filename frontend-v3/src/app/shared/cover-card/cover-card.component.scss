@@ -91,6 +91,8 @@
   right: 8px;
   display: flex;
   gap: 4px;
+  z-index: 1;
+  pointer-events: none;
 }
 
 .cover__meta {

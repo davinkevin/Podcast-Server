@@ -1,6 +1,10 @@
 <button type="button" class="cover" matRipple (click)="onOpen()">
   <img class="cover__image" [src]="coverUrl()" [alt]="title()" loading="lazy" />
 
+  <div class="cover__badge-slot">
+    <ng-content select="[coverBadge]" />
+  </div>
+
   <div class="cover__overlay">
     @if (playable()) {
       <button
@@ -33,10 +37,6 @@
         }
       </mat-menu>
     }
-
-    <div class="cover__badge-slot">
-      <ng-content select="[coverBadge]" />
-    </div>
   </div>
 </button>
 

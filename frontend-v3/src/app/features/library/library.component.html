@@ -37,11 +37,11 @@
     </form>
   </header>
 
-  @if (loading) {
+  @if (loading && !result) {
     <div class="library__state">
       <mat-spinner diameter="32" />
     </div>
-  } @else if (err) {
+  } @else if (err && !result) {
     <ps-empty-state
       icon="error_outline"
       title="Couldn't load episodes"
@@ -61,6 +61,7 @@
     } @else {
       <div class="library__grid">
         @for (item of result.content; track item.id) {
+          @let badge = statusFor(item);
           <ps-cover-card
             [title]="item.title"
             [subtitle]="item.podcast.title"
@@ -69,7 +70,15 @@
             [actions]="cardActions"
             (play)="onPlay(item)"
             (open)="onOpen(item)"
-          />
+          >
+            @if (badge) {
+              <ps-status-badge
+                coverBadge
+                [kind]="badge.kind"
+                [progression]="badge.progression"
+              />
+            }
+          </ps-cover-card>
         }
       </div>
 
