@@ -1,0 +1,9 @@
+node_modules
+dist
+coverage
+.angular
+out-tsc
+playwright-report
+test-results
+.eslintcache
+*.log

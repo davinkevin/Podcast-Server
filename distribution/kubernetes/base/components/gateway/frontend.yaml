@@ -6,6 +6,12 @@ spec:
   rules:
     - matches:
         - path:
+            value: "/v3"
+      backendRefs:
+        - name: ui-v3
+          port: 8080
+    - matches:
+        - path:
             value: "/v2"
       backendRefs:
         - name: ui-v2

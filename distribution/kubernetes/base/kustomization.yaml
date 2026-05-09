@@ -5,6 +5,7 @@ resources:
   - backend.yaml
   - ui-v1.yaml
   - ui-v2.yaml
+  - ui-v3.yaml
 
 configMapGenerator:
   - name: podcast-server

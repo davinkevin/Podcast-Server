@@ -14,3 +14,7 @@ cp -r frontend-angularjs/target/dist ${UI_FOLDER}/target/docker/podcast-server
 echo "Injection of ui-v2 files"
 mkdir -p ${UI_FOLDER}/target/docker/podcast-server/v2/
 cp frontend-angular/dist/* ${UI_FOLDER}/target/docker/podcast-server/v2/
+
+echo "Injection of ui-v3 files"
+mkdir -p ${UI_FOLDER}/target/docker/podcast-server/v3/
+cp -r frontend-v3/dist/* ${UI_FOLDER}/target/docker/podcast-server/v3/

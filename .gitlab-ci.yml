@@ -84,6 +84,25 @@ stages:
         - frontend-angular/.gradle
         - frontend-angular/node_modules/
 
+⬇ ui-v3:
+  stage: ⬇ download
+  extends: [ .only-on-frontend-changes ]
+  needs: [⬇ build-tool]
+  image: gradle:jdk21
+  script:
+    - ./gradlew $GRADLE_OPTS :frontend-v3:downloadDependencies
+  cache:
+    - !reference [ .using-build-tool ]
+    - key:
+        files:
+          - frontend-v3/package-lock.json
+        prefix: "ui-v3"
+      paths:
+        - .gradle
+        - .gradle_home/caches
+        - frontend-v3/.gradle
+        - frontend-v3/node_modules/
+
 🧪 backend:
   stage: 🧪 test
   extends: [ .only-on-backend-changes ]
@@ -163,6 +182,26 @@ stages:
         - frontend-angular/.gradle
         - frontend-angular/node_modules/
 
+🧪 ui-v3:
+  stage: 🧪 test
+  extends: [ .only-on-frontend-changes ]
+  image: gradle:jdk21
+  needs: [⬇ ui-v3]
+  script:
+    - ./gradlew $GRADLE_OPTS :frontend-v3:npm_run_test
+  cache:
+    - !reference [ .using-build-tool ]
+    - key:
+        files:
+          - frontend-v3/package-lock.json
+        prefix: "ui-v3"
+      policy: pull
+      paths:
+        - .gradle
+        - .gradle_home/caches
+        - frontend-v3/.gradle
+        - frontend-v3/node_modules/
+
 👷 backend-base-image:
   stage: 👷‍ build
   extends: [ .only-on-backend-changes ]
@@ -227,6 +266,29 @@ stages:
         - .yarn
         - frontend-angular/.gradle
         - frontend-angular/node_modules/
+
+👷 ui-v3:
+  stage: 👷‍ build
+  extends: [ .only-on-frontend-changes ]
+  image: gradle:jdk21
+  needs: [⬇ ui-v3]
+  script:
+    - ./gradlew $GRADLE_OPTS :frontend-v3:build
+  artifacts:
+    paths:
+      - frontend-v3/dist/
+  cache:
+    - !reference [ .using-build-tool ]
+    - key:
+        files:
+          - frontend-v3/package-lock.json
+        prefix: "ui-v3"
+      policy: pull
+      paths:
+        - .gradle
+        - .gradle_home/caches
+        - frontend-v3/.gradle
+        - frontend-v3/node_modules/
 
 👷 documentation:
   stage: 👷‍ build
@@ -380,7 +442,7 @@ stages:
 🐳 ui:
   stage: 🐳 packaging
   extends: [ .only-on-frontend-changes ]
-  needs: [👷 ui-v1, 👷 ui-v2]
+  needs: [👷 ui-v1, 👷 ui-v2, 👷 ui-v3]
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]

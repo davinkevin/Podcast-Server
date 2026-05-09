@@ -20,6 +20,14 @@ frontend-angularjs/**/*.css
 frontend-angular/dist
 frontend-angular/coverage
 
+# Front End v3 (Angular 19) :
+frontend-v3/dist
+frontend-v3/coverage
+frontend-v3/.angular
+frontend-v3/playwright-report
+frontend-v3/test-results
+frontend-v3/out-tsc
+
 # Back End
 Backend/lib/
 Backend/src/main/**/application.yml
