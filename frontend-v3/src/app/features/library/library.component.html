@@ -65,6 +65,7 @@
             [title]="item.title"
             [subtitle]="item.podcast.title"
             [coverUrl]="coverUrl(item)"
+            [playable]="item.isDownloaded"
             [actions]="cardActions"
             (play)="onPlay(item)"
             (open)="onOpen(item)"

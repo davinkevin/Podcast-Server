@@ -2,14 +2,16 @@
   <img class="cover__image" [src]="coverUrl()" [alt]="title()" loading="lazy" />
 
   <div class="cover__overlay">
-    <button
-      mat-icon-button
-      class="cover__play"
-      aria-label="Play"
-      (click)="onPlay($event)"
-    >
-      <mat-icon>play_arrow</mat-icon>
-    </button>
+    @if (playable()) {
+      <button
+        mat-icon-button
+        class="cover__play"
+        aria-label="Play"
+        (click)="onPlay($event)"
+      >
+        <mat-icon>play_arrow</mat-icon>
+      </button>
+    }
 
     @if (actions().length > 0) {
       <button

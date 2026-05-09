@@ -25,6 +25,7 @@ export class CoverCardComponent {
   readonly subtitle = input<string | undefined>(undefined);
   readonly coverUrl = input.required<string>();
   readonly actions = input<readonly CoverCardAction[]>([]);
+  readonly playable = input<boolean>(true);
 
   readonly play = output<void>();
   readonly action = output<CoverCardAction>();
