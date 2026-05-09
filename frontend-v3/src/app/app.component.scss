@@ -1,5 +1,20 @@
 .shell {
-  padding: 2rem;
-  max-width: 64rem;
-  margin: 0 auto;
+  height: 100vh;
+  background: var(--mat-sys-surface);
+}
+
+.shell__sidenav {
+  width: 240px;
+  border: 0;
+}
+
+.shell__content {
+  display: flex;
+  flex-direction: column;
+  background: var(--mat-sys-surface);
+}
+
+.shell__outlet {
+  flex: 1;
+  overflow: auto;
 }

@@ -1,0 +1,47 @@
+<mat-toolbar class="topbar">
+  <div class="topbar__brand">
+    <mat-icon class="topbar__logo">graphic_eq</mat-icon>
+    <span class="topbar__title">Podcast Server</span>
+    <span class="topbar__version">v3</span>
+  </div>
+
+  <div class="topbar__spacer"></div>
+
+  <button
+    mat-icon-button
+    aria-label="Search"
+    matTooltip="Search (⌘K)"
+    class="topbar__action"
+  >
+    <mat-icon>search</mat-icon>
+  </button>
+
+  <button
+    mat-icon-button
+    aria-label="Downloads"
+    matTooltip="Downloads"
+    class="topbar__action"
+  >
+    @if (downloadCount > 0) {
+      <mat-icon [matBadge]="downloadCount" matBadgeColor="accent">downloading</mat-icon>
+    } @else {
+      <mat-icon>downloading</mat-icon>
+    }
+  </button>
+
+  <button
+    mat-icon-button
+    [matMenuTriggerFor]="userMenu"
+    aria-label="Account"
+    class="topbar__action"
+  >
+    <mat-icon>account_circle</mat-icon>
+  </button>
+
+  <mat-menu #userMenu="matMenu">
+    <button mat-menu-item disabled>
+      <mat-icon>settings</mat-icon>
+      <span>Settings</span>
+    </button>
+  </mat-menu>
+</mat-toolbar>

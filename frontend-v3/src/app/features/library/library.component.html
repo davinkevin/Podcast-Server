@@ -1,0 +1,19 @@
+<section class="library">
+  <header class="library__header">
+    <h1 class="library__title">Library</h1>
+    <p class="library__subtitle">Latest episodes across all your podcasts</p>
+  </header>
+
+  <div class="library__grid">
+    @for (item of items(); track item.id) {
+      <ps-cover-card
+        [title]="item.title"
+        [subtitle]="item.podcast"
+        [coverUrl]="item.coverUrl"
+        [actions]="cardActions"
+        (play)="onPlay(item)"
+        (open)="onOpen(item)"
+      />
+    }
+  </div>
+</section>

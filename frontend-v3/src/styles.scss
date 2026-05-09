@@ -1,7 +1,7 @@
 @use '@angular/material' as mat;
 
-// Material 3 Expressive theme — accent #6750A4 (M3 default purple), dark mode by default.
-// Real expressive overrides (corner radius, motion) come in PR 2 alongside the shell.
+// Material 3 Expressive theme — accent #6750A4 (M3 default purple = mat.$violet-palette).
+// Dark by default (set color-scheme to "light dark" later if a theme toggle lands).
 
 html {
   color-scheme: dark;
@@ -11,10 +11,20 @@ html {
       color: (
         primary: mat.$violet-palette,
         tertiary: mat.$rose-palette,
-        theme-type: dark,
       ),
       typography: Roboto,
       density: 0,
+    )
+  );
+
+  // Expressive overrides: bigger corner radius, stronger surface tints.
+  @include mat.theme-overrides(
+    (
+      corner-extra-small: 8px,
+      corner-small: 12px,
+      corner-medium: 16px,
+      corner-large: 20px,
+      corner-extra-large: 28px,
     )
   );
 }
@@ -29,4 +39,9 @@ body {
   background: var(--mat-sys-surface);
   color: var(--mat-sys-on-surface);
   font-family: Roboto, 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
 }

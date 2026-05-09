@@ -1,0 +1,30 @@
+.library {
+  padding: 1.5rem clamp(1rem, 4vw, 2rem) 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.library__header {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.library__title {
+  font: var(--mat-sys-display-small);
+  margin: 0;
+  letter-spacing: -0.01em;
+}
+
+.library__subtitle {
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0;
+}
+
+.library__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+}

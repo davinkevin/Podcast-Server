@@ -1,0 +1,46 @@
+<button type="button" class="cover" matRipple (click)="onOpen()">
+  <img class="cover__image" [src]="coverUrl()" [alt]="title()" loading="lazy" />
+
+  <div class="cover__overlay">
+    <button
+      mat-icon-button
+      class="cover__play"
+      aria-label="Play"
+      (click)="onPlay($event)"
+    >
+      <mat-icon>play_arrow</mat-icon>
+    </button>
+
+    @if (actions().length > 0) {
+      <button
+        mat-icon-button
+        class="cover__more"
+        aria-label="More actions"
+        [matMenuTriggerFor]="menu"
+        (click)="$event.stopPropagation()"
+      >
+        <mat-icon>more_vert</mat-icon>
+      </button>
+
+      <mat-menu #menu="matMenu">
+        @for (entry of actions(); track entry.label) {
+          <button mat-menu-item (click)="onAction($event, entry)">
+            <mat-icon>{{ entry.icon }}</mat-icon>
+            <span>{{ entry.label }}</span>
+          </button>
+        }
+      </mat-menu>
+    }
+
+    <div class="cover__badge-slot">
+      <ng-content select="[coverBadge]" />
+    </div>
+  </div>
+</button>
+
+<div class="cover__meta">
+  <div class="cover__title" [title]="title()">{{ title() }}</div>
+  @if (subtitle(); as s) {
+    <div class="cover__subtitle" [title]="s">{{ s }}</div>
+  }
+</div>

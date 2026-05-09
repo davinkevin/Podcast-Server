@@ -1,5 +1,17 @@
-<main class="shell">
-  <h1>{{ title }}</h1>
-  <p>Greenfield Angular 19 — shell, theme, and Library skeleton land in PR 2.</p>
-  <router-outlet />
-</main>
+<mat-sidenav-container class="shell" autosize>
+  <mat-sidenav
+    class="shell__sidenav"
+    mode="side"
+    opened
+    disableClose
+  >
+    <ps-sidenav />
+  </mat-sidenav>
+
+  <mat-sidenav-content class="shell__content">
+    <ps-topbar />
+    <main class="shell__outlet">
+      <router-outlet />
+    </main>
+  </mat-sidenav-content>
+</mat-sidenav-container>
