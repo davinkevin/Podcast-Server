@@ -67,8 +67,10 @@
             [subtitle]="item.podcast.title"
             [coverUrl]="coverUrl(item)"
             [playable]="item.isDownloaded"
+            [downloadable]="!item.isDownloaded && !isInProgress(item)"
             [actions]="cardActions"
             (play)="onPlay(item)"
+            (download)="onDownload(item)"
             (open)="onOpen(item)"
           >
             @if (badge) {

@@ -63,15 +63,12 @@
   transition: opacity 180ms cubic-bezier(0.2, 0, 0, 1);
 }
 
-.cover__play {
+.cover__primary {
   position: absolute;
   bottom: 12px;
   left: 12px;
-  background: var(--mat-sys-primary);
-  color: var(--mat-sys-on-primary);
 
   &:hover {
-    background: var(--mat-sys-primary);
     filter: brightness(1.1);
   }
 }

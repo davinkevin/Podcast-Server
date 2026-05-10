@@ -75,7 +75,6 @@ export default class LibraryComponent {
   protected readonly cardActions = [
     { label: 'Open podcast', icon: 'open_in_new' },
     { label: 'Add to playlist', icon: 'playlist_add' },
-    { label: 'Download', icon: 'download' },
   ] as const;
 
   constructor() {
@@ -117,9 +116,20 @@ export default class LibraryComponent {
     return null;
   }
 
+  protected isInProgress(item: ItemHAL): boolean {
+    return (
+      this.stream.downloading().some((d) => d.id === item.id) ||
+      this.stream.queue().some((q) => q.id === item.id)
+    );
+  }
+
   protected onPlay(item: ItemHAL) {
     // PR 5: PlayerService.open(item).
     console.debug('[library] play', item.id, item.proxyURL);
+  }
+
+  protected onDownload(item: ItemHAL) {
+    this.itemApi.triggerDownload(item.podcastId, item.id).subscribe();
   }
 
   protected onOpen(item: ItemHAL) {

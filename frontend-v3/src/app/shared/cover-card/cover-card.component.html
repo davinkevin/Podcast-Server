@@ -8,12 +8,23 @@
   <div class="cover__overlay">
     @if (playable()) {
       <button
-        mat-icon-button
-        class="cover__play"
+        mat-fab
+        color="primary"
+        class="cover__primary"
         aria-label="Play"
         (click)="onPlay($event)"
       >
         <mat-icon>play_arrow</mat-icon>
+      </button>
+    } @else if (downloadable()) {
+      <button
+        mat-fab
+        color="primary"
+        class="cover__primary"
+        aria-label="Download"
+        (click)="onDownload($event)"
+      >
+        <mat-icon>download</mat-icon>
       </button>
     }
 

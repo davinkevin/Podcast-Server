@@ -1,5 +1,5 @@
-import { Injectable, Signal } from '@angular/core';
-import { httpResource, HttpResourceRef } from '@angular/common/http';
+import { inject, Injectable, Signal } from '@angular/core';
+import { HttpClient, httpResource, HttpResourceRef } from '@angular/common/http';
 
 import { PageHAL } from '../models/page.model';
 import { ItemHAL, ItemStatus } from '../models/item.model';
@@ -15,6 +15,16 @@ export interface ItemSearchInput {
 
 @Injectable({ providedIn: 'root' })
 export class ItemApi {
+  private readonly http = inject(HttpClient);
+
+  triggerDownload(podcastId: string, itemId: string) {
+    return this.http.post(
+      `/api/v1/podcasts/${podcastId}/items/${itemId}/download`,
+      null,
+      { responseType: 'text' },
+    );
+  }
+
   search(input: Signal<ItemSearchInput>): HttpResourceRef<PageHAL<ItemHAL> | undefined> {
     return httpResource<PageHAL<ItemHAL>>(() => {
       const f = input();

@@ -26,14 +26,21 @@ export class CoverCardComponent {
   readonly coverUrl = input.required<string>();
   readonly actions = input<readonly CoverCardAction[]>([]);
   readonly playable = input<boolean>(true);
+  readonly downloadable = input<boolean>(false);
 
   readonly play = output<void>();
+  readonly download = output<void>();
   readonly action = output<CoverCardAction>();
   readonly open = output<void>();
 
   protected onPlay(event: Event) {
     event.stopPropagation();
     this.play.emit();
+  }
+
+  protected onDownload(event: Event) {
+    event.stopPropagation();
+    this.download.emit();
   }
 
   protected onAction(event: Event, action: CoverCardAction) {
