@@ -2,6 +2,7 @@ import { computed, inject, Injectable, Signal } from '@angular/core';
 import { HttpClient, httpResource, HttpResourceRef } from '@angular/common/http';
 
 import {
+  PodcastCreationHAL,
   PodcastHAL,
   PodcastsContainerHAL,
   PodcastUpdateHAL,
@@ -46,6 +47,10 @@ export class PodcastApi {
         },
       };
     });
+  }
+
+  create(body: PodcastCreationHAL) {
+    return this.http.post<PodcastHAL>('/api/v1/podcasts', body);
   }
 
   update(id: string, body: PodcastUpdateHAL) {

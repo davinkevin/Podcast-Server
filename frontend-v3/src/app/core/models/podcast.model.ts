@@ -39,3 +39,13 @@ export interface PodcastUpdateHAL {
   readonly tags: readonly { readonly id?: string; readonly name: string }[];
   readonly cover: { readonly width: number; readonly height: number; readonly url: string };
 }
+
+/** Body shape of `POST /api/v1/podcasts`. Mirrors backend `PodcastCreationHAL`. */
+export interface PodcastCreationHAL {
+  readonly title: string;
+  readonly url: string | null;
+  readonly type: string;
+  readonly hasToBeDeleted: boolean;
+  readonly tags: readonly { readonly id?: string; readonly name: string }[];
+  readonly cover: { readonly width: number; readonly height: number; readonly url: string };
+}

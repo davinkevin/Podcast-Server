@@ -8,6 +8,15 @@
     @if (result) {
       <span class="podcasts__count">{{ result.content.length }} podcasts</span>
     }
+    <button
+      mat-flat-button
+      color="primary"
+      class="podcasts__add"
+      (click)="onAdd()"
+    >
+      <mat-icon>add</mat-icon>
+      Add podcast
+    </button>
   </header>
 
   @if (loading && !result) {

@@ -14,7 +14,7 @@
   <article class="pod">
    <section class="pod__hero">
     <header class="pod__header">
-      <img class="pod__cover" [src]="podcast.cover.url" [alt]="podcast.title" />
+      <img class="pod__cover" [src]="coverSrc()" [alt]="podcast.title" />
       <div class="pod__meta">
         <h1 class="pod__title">{{ podcast.title }}</h1>
         <p class="pod__sub">
@@ -40,20 +40,21 @@
         }
 
         <div class="pod__actions">
-          <button mat-flat-button color="primary" (click)="onUpdateNow(podcast)">
-            <mat-icon>refresh</mat-icon>
-            Update now
-          </button>
+          @if (podcast.type === 'upload') {
+            <button mat-flat-button color="primary" (click)="onOpenUpload(podcast)">
+              <mat-icon>upload</mat-icon>
+              Upload episode
+            </button>
+          } @else {
+            <button mat-flat-button color="primary" (click)="onUpdateNow(podcast)">
+              <mat-icon>refresh</mat-icon>
+              Update now
+            </button>
+          }
           <button mat-stroked-button (click)="onOpenSettings(podcast)">
             <mat-icon>settings</mat-icon>
             Settings
           </button>
-          @if (podcast.type === 'upload') {
-            <button mat-stroked-button (click)="onOpenUpload(podcast)">
-              <mat-icon>upload</mat-icon>
-              Upload episode
-            </button>
-          }
           <button
             mat-icon-button
             aria-label="More actions"

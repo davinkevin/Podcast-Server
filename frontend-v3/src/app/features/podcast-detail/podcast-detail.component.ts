@@ -4,6 +4,7 @@ import {
   computed,
   inject,
   input,
+  signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { DatePipe } from '@angular/common';
@@ -72,6 +73,17 @@ export default class PodcastDetailComponent {
   protected readonly id = computed(() => this.idPodcast());
   protected readonly podcastResource = this.api.getById(this.id);
 
+  /* Bumped on every successful Settings save to bust the browser cache for the
+     cover, whose URL stays the same (`/api/v1/podcasts/{id}/cover.jpg`) even
+     after the backend swaps the file on disk. */
+  protected readonly coverVersion = signal(0);
+  protected readonly coverSrc = computed(() => {
+    const podcast = this.podcastResource.value();
+    if (!podcast) return '';
+    const v = this.coverVersion();
+    return v === 0 ? podcast.cover.url : `${podcast.cover.url}?v=${v}`;
+  });
+
   protected readonly itemsInput = computed<PodcastItemsInput>(() => ({
     podcastId: this.idPodcast(),
     page: this.page(),
@@ -123,10 +135,17 @@ export default class PodcastDetailComponent {
 
   protected onOpenSettings(podcast: PodcastHAL) {
     this.dialog
-      .open(PodcastEditDialogComponent, { data: podcast, autoFocus: 'first-tabbable' })
+      .open(PodcastEditDialogComponent, {
+        data: podcast,
+        autoFocus: 'first-tabbable',
+        panelClass: 'ps-fitting-dialog',
+      })
       .afterClosed()
       .subscribe((saved) => {
-        if (saved) this.podcastResource.reload();
+        if (saved) {
+          this.podcastResource.reload();
+          this.coverVersion.update((n) => n + 1);
+        }
       });
   }
 

@@ -46,9 +46,12 @@ body {
   box-sizing: border-box;
 }
 
-// Dialogs whose content is small and fixed don't need an internal scrollbar.
+// Dialogs whose content fits without needing a scrollbar.
 // Apply via `panelClass: 'ps-fitting-dialog'` on `dialog.open(...)`.
+// Suppresses Material's default 65vh ceiling + the spurious 1px scrollbar that
+// appears when content lands within a sub-pixel of the limit.
 .ps-fitting-dialog .mat-mdc-dialog-content {
   overflow: hidden;
+  max-height: 90vh;
 }
 

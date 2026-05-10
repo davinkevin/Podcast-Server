@@ -23,6 +23,10 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
+.podcasts__add {
+  margin-left: auto;
+}
+
 .podcasts__grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
