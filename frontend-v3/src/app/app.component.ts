@@ -4,11 +4,18 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 
 import { TopbarComponent } from './layout/topbar/topbar.component';
 import { SidenavComponent } from './layout/sidenav/sidenav.component';
+import { FloatingPlayerComponent } from './layout/floating-player/floating-player.component';
 
 @Component({
   selector: 'ps-root',
   standalone: true,
-  imports: [RouterOutlet, MatSidenavModule, TopbarComponent, SidenavComponent],
+  imports: [
+    RouterOutlet,
+    MatSidenavModule,
+    TopbarComponent,
+    SidenavComponent,
+    FloatingPlayerComponent,
+  ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

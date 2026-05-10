@@ -17,4 +17,6 @@
 .shell__outlet {
   flex: 1;
   overflow: auto;
+  // Reserve room for the floating-player mini bar (80px) plus a small gap.
+  padding-bottom: 96px;
 }

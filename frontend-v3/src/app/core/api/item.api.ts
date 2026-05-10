@@ -1,4 +1,4 @@
-import { inject, Injectable, Signal } from '@angular/core';
+import { computed, inject, Injectable, Signal } from '@angular/core';
 import { HttpClient, httpResource, HttpResourceRef } from '@angular/common/http';
 
 import { PageHAL } from '../models/page.model';
@@ -13,17 +13,14 @@ export interface ItemSearchInput {
   readonly sort?: string;
 }
 
+export interface ItemRef {
+  readonly podcastId: string;
+  readonly id: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class ItemApi {
   private readonly http = inject(HttpClient);
-
-  triggerDownload(podcastId: string, itemId: string) {
-    return this.http.post(
-      `/api/v1/podcasts/${podcastId}/items/${itemId}/download`,
-      null,
-      { responseType: 'text' },
-    );
-  }
 
   search(input: Signal<ItemSearchInput>): HttpResourceRef<PageHAL<ItemHAL> | undefined> {
     return httpResource<PageHAL<ItemHAL>>(() => {
@@ -44,6 +41,35 @@ export class ItemApi {
         url: '/api/v1/items/search',
         params,
       };
+    });
+  }
+
+  getById(input: Signal<ItemRef | undefined>): HttpResourceRef<ItemHAL | undefined> {
+    return httpResource<ItemHAL>(() => {
+      const ref = input();
+      if (!ref) return undefined;
+      return { url: `/api/v1/podcasts/${ref.podcastId}/items/${ref.id}` };
+    });
+  }
+
+  triggerDownload(podcastId: string, itemId: string) {
+    return this.http.post(
+      `/api/v1/podcasts/${podcastId}/items/${itemId}/download`,
+      null,
+      { responseType: 'text' },
+    );
+  }
+
+  reset(podcastId: string, itemId: string) {
+    return this.http.post<ItemHAL>(
+      `/api/v1/podcasts/${podcastId}/items/${itemId}/reset`,
+      null,
+    );
+  }
+
+  delete(podcastId: string, itemId: string) {
+    return this.http.delete(`/api/v1/podcasts/${podcastId}/items/${itemId}`, {
+      responseType: 'text',
     });
   }
 }

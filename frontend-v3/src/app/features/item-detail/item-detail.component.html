@@ -1,0 +1,70 @@
+@let item = itemResource.value();
+@let loading = itemResource.isLoading();
+@let err = itemResource.error();
+
+@if (loading && !item) {
+  <div class="state">
+    <mat-spinner diameter="32" />
+  </div>
+} @else if (err && !item) {
+  <ps-empty-state
+    icon="error_outline"
+    title="Couldn't load this episode"
+    subtitle="Try refreshing in a moment."
+  />
+} @else if (item) {
+  @let badge = statusFor(item);
+  @let inProgress = isInProgress(item);
+
+  <article class="detail">
+    <div class="detail__cover-wrap">
+      <img class="detail__cover" [src]="item.cover.url" [alt]="item.title" />
+      @if (badge) {
+        <ps-status-badge
+          class="detail__badge"
+          [kind]="badge.kind"
+          [progression]="badge.progression"
+        />
+      }
+    </div>
+
+    <div class="detail__body">
+      <header class="detail__header">
+        <p class="detail__podcast">{{ item.podcast.title }}</p>
+        <h1 class="detail__title">{{ item.title }}</h1>
+        @if (item.pubDate; as d) {
+          <p class="detail__date">Published {{ d | date: 'mediumDate' }}</p>
+        }
+      </header>
+
+      <div class="detail__actions">
+        @if (item.isDownloaded) {
+          <button mat-fab extended color="primary" (click)="onPlay(item)">
+            <mat-icon>play_arrow</mat-icon>
+            Play
+          </button>
+          <button mat-stroked-button (click)="onReset(item)">
+            <mat-icon>restart_alt</mat-icon>
+            Reset
+          </button>
+        } @else if (!inProgress) {
+          <button mat-fab extended color="primary" (click)="onDownload(item)">
+            <mat-icon>download</mat-icon>
+            Download
+          </button>
+        }
+        <button mat-stroked-button color="warn" (click)="onDelete(item)">
+          <mat-icon>delete</mat-icon>
+          Delete
+        </button>
+      </div>
+
+      @if (item.description) {
+        <section class="detail__description">
+          <h2 class="detail__section-title">Description</h2>
+          <p>{{ item.description }}</p>
+        </section>
+      }
+    </div>
+  </article>
+}

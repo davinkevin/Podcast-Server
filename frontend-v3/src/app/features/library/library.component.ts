@@ -24,6 +24,7 @@ import {
 import { ItemApi, ItemSearchInput } from '../../core/api/item.api';
 import { ItemHAL } from '../../core/models/item.model';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
+import { PlayerService } from '../../core/player/player.service';
 
 const DEFAULT_PAGE_SIZE = 24;
 
@@ -60,6 +61,7 @@ export default class LibraryComponent {
   private readonly router = inject(Router);
   private readonly itemApi = inject(ItemApi);
   private readonly stream = inject(DownloadStreamService);
+  private readonly player = inject(PlayerService);
 
   protected readonly searchDraft = signal('');
 
@@ -119,8 +121,7 @@ export default class LibraryComponent {
   }
 
   protected onPlay(item: ItemHAL) {
-    // PR 5: PlayerService.open(item).
-    console.debug('[library] play', item.id, item.proxyURL);
+    this.player.open(item);
   }
 
   protected onDownload(item: ItemHAL) {
@@ -128,7 +129,6 @@ export default class LibraryComponent {
   }
 
   protected onOpen(item: ItemHAL) {
-    // PR 5: navigate to /podcasts/:id/items/:itemId.
-    console.debug('[library] open', item.id);
+    this.router.navigate(['/podcasts', item.podcastId, 'items', item.id]);
   }
 }

@@ -11,4 +11,8 @@ export const routes: Routes = [
     loadComponent: () => import('./features/library/library.component'),
     title: 'Library — Podcast Server',
   },
+  {
+    path: 'podcasts/:idPodcast/items/:id',
+    loadComponent: () => import('./features/item-detail/item-detail.component'),
+  },
 ];
