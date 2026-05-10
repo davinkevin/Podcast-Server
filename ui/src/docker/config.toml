@@ -5,7 +5,6 @@ port = 8080
 root = "/podcast-server"
 log-level = "error"
 
-page-fallback = "/podcast-server/index.html"
 cache-control-headers = true
 compression = true
 compression-static = true

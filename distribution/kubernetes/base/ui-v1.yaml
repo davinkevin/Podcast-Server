@@ -49,3 +49,6 @@ spec:
             - name: http
               containerPort: 8080
               protocol: TCP
+          env:
+            - name: SERVER_FALLBACK_PAGE
+              value: "/podcast-server/index.html"
