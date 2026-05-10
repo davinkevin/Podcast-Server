@@ -1,0 +1,197 @@
+<section class="settings">
+  <header class="settings__header">
+    <h1 class="settings__title">Settings</h1>
+  </header>
+
+  <article class="card">
+    <header class="card__head">
+      <mat-icon class="card__icon">refresh</mat-icon>
+      <div>
+        <h2 class="card__title">Podcasts updates</h2>
+        <p class="card__subtitle">
+          Refresh feeds across the whole library, optionally fetching the new episodes immediately.
+        </p>
+      </div>
+    </header>
+    <div class="card__actions">
+      <button
+        mat-flat-button
+        color="primary"
+        [disabled]="updating()"
+        (click)="onUpdateAll(false)"
+      >
+        @if (updating()) {
+          <mat-spinner diameter="18" />
+        } @else {
+          <mat-icon>refresh</mat-icon>
+        }
+        Update all
+      </button>
+      <button
+        mat-flat-button
+        color="primary"
+        [disabled]="updating()"
+        (click)="onUpdateAll(true)"
+      >
+        @if (updating()) {
+          <mat-spinner diameter="18" />
+        } @else {
+          <mat-icon>cloud_download</mat-icon>
+        }
+        Update all &amp; download
+      </button>
+    </div>
+  </article>
+
+  <article class="card">
+    <header class="card__head">
+      <mat-icon class="card__icon">download</mat-icon>
+      <div>
+        <h2 class="card__title">Parallel downloads</h2>
+        <p class="card__subtitle">
+          How many episodes the server downloads at the same time.
+        </p>
+      </div>
+    </header>
+    @let limit = limitResource.value();
+    @let limitLoading = limitResource.isLoading();
+    <div class="card__row">
+      @if (limitLoading && limit === undefined) {
+        <mat-spinner diameter="20" />
+      } @else {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="card__limit">
+          <mat-label>Limit</mat-label>
+          <input
+            matInput
+            type="number"
+            min="1"
+            [ngModel]="limitDraft()"
+            (ngModelChange)="onLimitInput($event)"
+            [disabled]="savingLimit()"
+          />
+        </mat-form-field>
+        <button
+          mat-flat-button
+          color="primary"
+          [disabled]="!limitDirty() || savingLimit()"
+          (click)="onSaveLimit()"
+        >
+          @if (savingLimit()) {
+            <mat-spinner diameter="18" />
+          }
+          Save
+        </button>
+      }
+    </div>
+  </article>
+
+  <article class="card">
+    <header class="card__head">
+      <mat-icon class="card__icon">delete_sweep</mat-icon>
+      <div>
+        <h2 class="card__title">Storage cleanup</h2>
+        <p class="card__subtitle">
+          Free disk space by removing downloaded files and unused covers older than the chosen window.
+        </p>
+      </div>
+    </header>
+    <div class="card__row">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="card__limit">
+        <mat-label>Items older than (days)</mat-label>
+        <input
+          matInput
+          type="number"
+          min="0"
+          [ngModel]="itemsRetentionDays()"
+          (ngModelChange)="itemsRetentionDays.set($event)"
+          [disabled]="cleaningItems()"
+        />
+      </mat-form-field>
+      <button
+        mat-stroked-button
+        [disabled]="cleaningItems()"
+        (click)="onCleanItems()"
+      >
+        @if (cleaningItems()) {
+          <mat-spinner diameter="18" />
+        } @else {
+          <mat-icon>delete_outline</mat-icon>
+        }
+        Clean items
+      </button>
+    </div>
+    <div class="card__row">
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="card__limit">
+        <mat-label>Covers older than (days)</mat-label>
+        <input
+          matInput
+          type="number"
+          min="0"
+          [ngModel]="coversRetentionDays()"
+          (ngModelChange)="coversRetentionDays.set($event)"
+          [disabled]="cleaningCovers()"
+        />
+      </mat-form-field>
+      <button
+        mat-stroked-button
+        [disabled]="cleaningCovers()"
+        (click)="onCleanCovers()"
+      >
+        @if (cleaningCovers()) {
+          <mat-spinner diameter="18" />
+        } @else {
+          <mat-icon>image_not_supported</mat-icon>
+        }
+        Clean covers
+      </button>
+    </div>
+  </article>
+
+  <article class="card">
+    <header class="card__head">
+      <mat-icon class="card__icon">description</mat-icon>
+      <div>
+        <h2 class="card__title">OPML export</h2>
+        <p class="card__subtitle">
+          Download the full podcast list as an OPML file you can import into any other reader.
+        </p>
+      </div>
+    </header>
+    <div class="card__actions">
+      <button mat-stroked-button (click)="onDownloadOpml()">
+        <mat-icon>download</mat-icon>
+        Download OPML
+      </button>
+    </div>
+  </article>
+
+  <article class="card">
+    <header class="card__head">
+      <mat-icon class="card__icon">palette</mat-icon>
+      <div>
+        <h2 class="card__title">Appearance</h2>
+        <p class="card__subtitle">Choose between light, dark, or your system preference.</p>
+      </div>
+    </header>
+    <div class="card__actions">
+      <mat-button-toggle-group
+        [value]="theme()"
+        (change)="onThemeChange($event.value)"
+        hideSingleSelectionIndicator
+      >
+        <mat-button-toggle value="system">
+          <mat-icon>devices</mat-icon>
+          System
+        </mat-button-toggle>
+        <mat-button-toggle value="light">
+          <mat-icon>light_mode</mat-icon>
+          Light
+        </mat-button-toggle>
+        <mat-button-toggle value="dark">
+          <mat-icon>dark_mode</mat-icon>
+          Dark
+        </mat-button-toggle>
+      </mat-button-toggle-group>
+    </div>
+  </article>
+</section>

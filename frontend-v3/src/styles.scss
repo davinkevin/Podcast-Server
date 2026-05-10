@@ -1,10 +1,10 @@
 @use '@angular/material' as mat;
 
 // Material 3 Expressive theme — accent #6750A4 (M3 default purple = mat.$violet-palette).
-// Dark by default (set color-scheme to "light dark" later if a theme toggle lands).
+// SettingsService overrides color-scheme inline; "light dark" here = follow OS until then.
 
 html {
-  color-scheme: dark;
+  color-scheme: light dark;
 
   @include mat.theme(
     (

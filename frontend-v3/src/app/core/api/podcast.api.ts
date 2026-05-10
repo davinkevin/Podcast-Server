@@ -61,6 +61,16 @@ export class PodcastApi {
     return this.http.get(`/api/v1/podcasts/${id}/update`, { responseType: 'text' });
   }
 
+  updateAll(options: { readonly download?: boolean; readonly force?: boolean } = {}) {
+    const params: Record<string, string> = {};
+    if (options.download) params['download'] = 'true';
+    if (options.force) params['force'] = 'true';
+    return this.http.get('/api/v1/podcasts/update', {
+      params,
+      responseType: 'text',
+    });
+  }
+
   delete(id: string) {
     return this.http.delete(`/api/v1/podcasts/${id}`, { responseType: 'text' });
   }

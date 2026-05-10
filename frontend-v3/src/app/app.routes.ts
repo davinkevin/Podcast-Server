@@ -38,4 +38,10 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./features/playlist-detail/playlist-detail.component'),
   },
+  {
+    path: 'settings',
+    pathMatch: 'full',
+    loadComponent: () => import('./features/settings/settings.component'),
+    title: 'Settings — Podcast Server',
+  },
 ];

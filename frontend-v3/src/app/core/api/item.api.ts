@@ -74,6 +74,13 @@ export class ItemApi {
     });
   }
 
+  /** Deletes downloaded items older than `days` (defaults to backend's 30). */
+  cleanup(days: number) {
+    return this.http.delete(`/api/v1/items?days=${days}`, {
+      responseType: 'text',
+    });
+  }
+
   /** Lists playlists currently containing the given item. */
   playlistsContaining(
     ref: Signal<{ readonly podcastId: string; readonly itemId: string } | undefined>,
