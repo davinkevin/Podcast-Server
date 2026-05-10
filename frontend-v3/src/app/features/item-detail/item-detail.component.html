@@ -53,6 +53,10 @@
             Download
           </button>
         }
+        <button mat-stroked-button (click)="onAddToPlaylist(item)">
+          <mat-icon>playlist_add</mat-icon>
+          Add to playlist
+        </button>
         <button mat-stroked-button color="warn" (click)="onDelete(item)">
           <mat-icon>delete</mat-icon>
           Delete

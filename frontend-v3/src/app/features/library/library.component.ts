@@ -13,8 +13,12 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog } from '@angular/material/dialog';
 
-import { CoverCardComponent } from '../../shared/cover-card/cover-card.component';
+import {
+  CoverCardAction,
+  CoverCardComponent,
+} from '../../shared/cover-card/cover-card.component';
 import { PagerComponent } from '../../shared/pager/pager.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import {
@@ -25,8 +29,13 @@ import { ItemApi, ItemSearchInput } from '../../core/api/item.api';
 import { ItemHAL } from '../../core/models/item.model';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import { PlayerService } from '../../core/player/player.service';
+import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialog.component';
 
 const DEFAULT_PAGE_SIZE = 24;
+const ADD_TO_PLAYLIST_ACTION: CoverCardAction = {
+  label: 'Add to playlist',
+  icon: 'playlist_add',
+};
 
 @Component({
   selector: 'ps-library',
@@ -62,6 +71,9 @@ export default class LibraryComponent {
   private readonly itemApi = inject(ItemApi);
   private readonly stream = inject(DownloadStreamService);
   private readonly player = inject(PlayerService);
+  private readonly dialog = inject(MatDialog);
+
+  protected readonly cardActions = [ADD_TO_PLAYLIST_ACTION] as const;
 
   protected readonly searchDraft = signal('');
 
@@ -130,5 +142,15 @@ export default class LibraryComponent {
 
   protected onOpen(item: ItemHAL) {
     this.router.navigate(['/podcasts', item.podcastId, 'items', item.id]);
+  }
+
+  protected onAction(item: ItemHAL, action: CoverCardAction) {
+    if (action.label === ADD_TO_PLAYLIST_ACTION.label) {
+      this.dialog.open(AddToPlaylistDialogComponent, {
+        data: { itemId: item.id, itemTitle: item.title, podcastId: item.podcastId },
+        autoFocus: 'first-tabbable',
+        panelClass: 'ps-fitting-dialog',
+      });
+    }
   }
 }

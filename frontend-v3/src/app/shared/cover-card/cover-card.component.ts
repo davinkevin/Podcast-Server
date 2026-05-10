@@ -5,6 +5,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatRippleModule } from '@angular/material/core';
 
 export interface CoverCardAction {
+  /** Optional stable identifier for action matching by callers. */
+  readonly id?: string;
   readonly label: string;
   readonly icon: string;
 }
@@ -43,8 +45,7 @@ export class CoverCardComponent {
     this.download.emit();
   }
 
-  protected onAction(event: Event, action: CoverCardAction) {
-    event.stopPropagation();
+  protected onAction(action: CoverCardAction) {
     this.action.emit(action);
   }
 

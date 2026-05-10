@@ -1,0 +1,78 @@
+@let playlist = playlistResource.value();
+@let loading = playlistResource.isLoading();
+@let err = playlistResource.error();
+
+@if (loading && !playlist) {
+  <div class="state"><mat-spinner diameter="32" /></div>
+} @else if (err && !playlist) {
+  <ps-empty-state
+    icon="error_outline"
+    title="Couldn't load this playlist"
+    subtitle="Try refreshing in a moment."
+  />
+} @else if (playlist) {
+  <article class="pl">
+    <section class="pl__hero">
+      <header class="pl__header">
+        <img class="pl__cover" [src]="coverUrl(playlist)" [alt]="playlist.name" />
+        <div class="pl__meta">
+          <h1 class="pl__title">{{ playlist.name }}</h1>
+          <p class="pl__sub">
+            {{ playlist.items.length }}
+            episode{{ playlist.items.length === 1 ? '' : 's' }}
+          </p>
+
+          <div class="pl__actions">
+            <button mat-flat-button color="primary" (click)="onCopyRss()">
+              <mat-icon>{{ copyHint() === 'copied' ? 'check' : 'rss_feed' }}</mat-icon>
+              {{ copyHint() === 'copied' ? 'Copied!' : 'Copy RSS link' }}
+            </button>
+            <button
+              mat-icon-button
+              aria-label="More actions"
+              [matMenuTriggerFor]="menu"
+              class="pl__more"
+            >
+              <mat-icon>more_vert</mat-icon>
+            </button>
+            <mat-menu #menu="matMenu">
+              <button mat-menu-item (click)="onDelete(playlist)">
+                <mat-icon>delete</mat-icon>
+                <span>Delete playlist</span>
+              </button>
+            </mat-menu>
+          </div>
+        </div>
+      </header>
+    </section>
+
+    <header class="pl__section-header">
+      <h2 class="pl__section-title">Episodes</h2>
+      <span class="pl__section-count">{{ playlist.items.length }}</span>
+    </header>
+
+    @if (playlist.items.length === 0) {
+      <ps-empty-state
+        icon="playlist_add"
+        title="This playlist is empty"
+        subtitle="Add episodes to it from the Library or any podcast page."
+      />
+    } @else {
+      <div class="pl__grid">
+        @for (item of playlist.items; track item.id) {
+          <ps-cover-card
+            [title]="item.title"
+            [subtitle]="item.podcast.title"
+            [coverUrl]="itemCoverUrl(item)"
+            [playable]="true"
+            [downloadable]="false"
+            [actions]="cardActions"
+            (play)="onPlay(item)"
+            (open)="onOpenItem(item)"
+            (action)="onAction(item, $event)"
+          />
+        }
+      </div>
+    }
+  </article>
+}

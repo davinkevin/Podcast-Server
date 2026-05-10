@@ -15,7 +15,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { CoverCardComponent } from '../../shared/cover-card/cover-card.component';
+import {
+  CoverCardAction,
+  CoverCardComponent,
+} from '../../shared/cover-card/cover-card.component';
 import { PagerComponent } from '../../shared/pager/pager.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import {
@@ -31,8 +34,13 @@ import { PlayerService } from '../../core/player/player.service';
 
 import { PodcastEditDialogComponent } from './podcast-edit-dialog.component';
 import { PodcastUploadDialogComponent } from './podcast-upload-dialog.component';
+import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialog.component';
 
 const DEFAULT_PAGE_SIZE = 24;
+const ADD_TO_PLAYLIST_ACTION: CoverCardAction = {
+  label: 'Add to playlist',
+  icon: 'playlist_add',
+};
 
 @Component({
   selector: 'ps-podcast-detail',
@@ -91,6 +99,8 @@ export default class PodcastDetailComponent {
   }));
   protected readonly itemsResource = this.api.items(this.itemsInput);
 
+  protected readonly cardActions = [ADD_TO_PLAYLIST_ACTION] as const;
+
   protected statusFor(item: ItemHAL): { kind: StatusBadgeKind; progression: number | null } | null {
     const downloading = this.stream.downloading().find((d) => d.id === item.id);
     if (downloading) {
@@ -122,6 +132,16 @@ export default class PodcastDetailComponent {
 
   protected onOpenItem(item: ItemHAL) {
     this.router.navigate(['/podcasts', item.podcastId, 'items', item.id]);
+  }
+
+  protected onItemAction(item: ItemHAL, action: CoverCardAction) {
+    if (action.label === ADD_TO_PLAYLIST_ACTION.label) {
+      this.dialog.open(AddToPlaylistDialogComponent, {
+        data: { itemId: item.id, itemTitle: item.title },
+        autoFocus: 'first-tabbable',
+        panelClass: 'ps-fitting-dialog',
+      });
+    }
   }
 
   protected onUpdateNow(podcast: PodcastHAL) {

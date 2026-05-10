@@ -13,6 +13,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 
 import { ItemApi, ItemRef } from '../../core/api/item.api';
 import { ItemHAL } from '../../core/models/item.model';
@@ -23,6 +24,7 @@ import {
   StatusBadgeKind,
 } from '../../shared/status-badge/status-badge.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
+import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialog.component';
 
 @Component({
   selector: 'ps-item-detail',
@@ -50,6 +52,7 @@ export default class ItemDetailComponent {
   private readonly router = inject(Router);
   private readonly title = inject(Title);
   private readonly snackbar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
 
   protected readonly ref = computed<ItemRef>(() => ({
     podcastId: this.idPodcast(),
@@ -117,6 +120,14 @@ export default class ItemDetailComponent {
         this.router.navigate(['/library']);
       },
       error: () => this.snackbar.open('Could not delete item', 'Dismiss', { duration: 4000 }),
+    });
+  }
+
+  protected onAddToPlaylist(item: ItemHAL) {
+    this.dialog.open(AddToPlaylistDialogComponent, {
+      data: { itemId: item.id, itemTitle: item.title, podcastId: item.podcastId },
+      autoFocus: 'first-tabbable',
+      panelClass: 'ps-fitting-dialog',
     });
   }
 }

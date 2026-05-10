@@ -1,0 +1,53 @@
+@let result = playlistsResource.value();
+@let loading = playlistsResource.isLoading();
+@let err = playlistsResource.error();
+
+<section class="playlists">
+  <header class="playlists__header">
+    <h1 class="playlists__title">Playlists</h1>
+    @if (result) {
+      <span class="playlists__count">{{ result.content.length }} playlists</span>
+    }
+    <button
+      mat-flat-button
+      color="primary"
+      class="playlists__add"
+      (click)="onCreate()"
+    >
+      <mat-icon>add</mat-icon>
+      Create playlist
+    </button>
+  </header>
+
+  @if (loading && !result) {
+    <div class="playlists__state">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (err && !result) {
+    <ps-empty-state
+      icon="error_outline"
+      title="Couldn't load playlists"
+      subtitle="Try refreshing in a moment."
+    />
+  } @else if (result) {
+    @if (result.content.length === 0) {
+      <ps-empty-state
+        icon="playlist_play"
+        title="No playlists yet"
+        subtitle="Create one to start grouping episodes."
+      />
+    } @else {
+      <div class="playlists__grid">
+        @for (p of result.content; track p.id) {
+          <ps-cover-card
+            [title]="p.name"
+            [coverUrl]="coverUrl(p)"
+            [playable]="false"
+            [downloadable]="false"
+            (open)="onOpen(p)"
+          />
+        }
+      </div>
+    }
+  }
+</section>

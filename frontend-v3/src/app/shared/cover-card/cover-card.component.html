@@ -41,7 +41,7 @@
 
       <mat-menu #menu="matMenu">
         @for (entry of actions(); track entry.label) {
-          <button mat-menu-item (click)="onAction($event, entry)">
+          <button mat-menu-item (click)="onAction(entry)">
             <mat-icon>{{ entry.icon }}</mat-icon>
             <span>{{ entry.label }}</span>
           </button>

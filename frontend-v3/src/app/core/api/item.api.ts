@@ -3,6 +3,7 @@ import { HttpClient, httpResource, HttpResourceRef } from '@angular/common/http'
 
 import { PageHAL } from '../models/page.model';
 import { ItemHAL, ItemStatus } from '../models/item.model';
+import { PlaylistsContainerHAL } from '../models/playlist.model';
 
 export interface ItemSearchInput {
   readonly q?: string;
@@ -70,6 +71,18 @@ export class ItemApi {
   delete(podcastId: string, itemId: string) {
     return this.http.delete(`/api/v1/podcasts/${podcastId}/items/${itemId}`, {
       responseType: 'text',
+    });
+  }
+
+  /** Lists playlists currently containing the given item. */
+  playlistsContaining(
+    ref: Signal<{ readonly podcastId: string; readonly itemId: string } | undefined>,
+  ): HttpResourceRef<PlaylistsContainerHAL | undefined> {
+    return httpResource<PlaylistsContainerHAL>(() => {
+      const r = ref();
+      return r
+        ? { url: `/api/v1/podcasts/${r.podcastId}/items/${r.itemId}/playlists` }
+        : undefined;
     });
   }
 }

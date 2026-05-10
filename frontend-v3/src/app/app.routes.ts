@@ -27,4 +27,15 @@ export const routes: Routes = [
     path: 'podcasts/:idPodcast',
     loadComponent: () => import('./features/podcast-detail/podcast-detail.component'),
   },
+  {
+    path: 'playlists',
+    pathMatch: 'full',
+    loadComponent: () => import('./features/playlists/playlists.component'),
+    title: 'Playlists — Podcast Server',
+  },
+  {
+    path: 'playlists/:idPlaylist',
+    loadComponent: () =>
+      import('./features/playlist-detail/playlist-detail.component'),
+  },
 ];

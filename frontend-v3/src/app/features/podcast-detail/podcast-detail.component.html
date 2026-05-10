@@ -111,9 +111,11 @@
               [coverUrl]="item.cover.url"
               [playable]="item.isDownloaded"
               [downloadable]="!item.isDownloaded && !isInProgress(item)"
+              [actions]="cardActions"
               (play)="onPlay(item)"
               (download)="onDownload(item)"
               (open)="onOpenItem(item)"
+              (action)="onItemAction(item, $event)"
             >
               @if (badge) {
                 <ps-status-badge
