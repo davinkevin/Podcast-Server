@@ -12,7 +12,6 @@ interface NavLink {
 const NAV_LINKS: readonly NavLink[] = [
   { label: 'Library', icon: 'library_music', path: '/library' },
   { label: 'Podcasts', icon: 'podcasts', path: '/podcasts' },
-  { label: 'Downloads', icon: 'downloading', path: '/downloads' },
   { label: 'Playlists', icon: 'playlist_play', path: '/playlists' },
   { label: 'Settings', icon: 'settings', path: '/settings' },
 ];

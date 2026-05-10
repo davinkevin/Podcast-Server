@@ -1,0 +1,94 @@
+@let downloading = stream.downloading();
+@let queue = stream.queue();
+
+<section class="popover" role="dialog" aria-label="Downloads">
+  <header class="popover__header">
+    <h2 class="popover__title">Downloads</h2>
+    @if (downloading.length > 0 || queue.length > 0) {
+      <span class="popover__count">
+        {{ downloading.length }} active · {{ queue.length }} queued
+      </span>
+    }
+    <button
+      mat-icon-button
+      class="popover__close"
+      aria-label="Close downloads"
+      (click)="close.emit()"
+    >
+      <mat-icon>close</mat-icon>
+    </button>
+  </header>
+
+  @if (!hasContent()) {
+    <div class="popover__empty">
+      <mat-icon>downloading</mat-icon>
+      <p>No active downloads. Click the download button on a card to enqueue an episode.</p>
+    </div>
+  } @else {
+    <div class="popover__body">
+      @if (downloading.length > 0) {
+        <h3 class="popover__section-title">Now downloading</h3>
+        <ul class="popover__list">
+          @for (item of downloading; track item.id) {
+            <li class="row">
+              <img class="row__cover" [src]="item.cover.url" [alt]="item.title" />
+              <div class="row__meta">
+                <div class="row__title" [title]="item.title">{{ item.title }}</div>
+                <div class="row__sub" [title]="item.podcast.title">
+                  {{ item.podcast.title }} · {{ item.progression }}%
+                </div>
+                <mat-progress-bar
+                  class="row__progress"
+                  [mode]="progressMode(item)"
+                  [value]="item.progression"
+                />
+              </div>
+              <button
+                mat-icon-button
+                aria-label="Stop"
+                matTooltip="Stop"
+                (click)="onStopOne(item)"
+              >
+                <mat-icon>stop</mat-icon>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+
+      @if (queue.length > 0) {
+        <h3 class="popover__section-title">In queue</h3>
+        <ul class="popover__list">
+          @for (item of queue; track item.id) {
+            <li class="row row--queued">
+              <img class="row__cover" [src]="item.cover.url" [alt]="item.title" />
+              <div class="row__meta">
+                <div class="row__title" [title]="item.title">{{ item.title }}</div>
+                <div class="row__sub" [title]="item.podcast.title">
+                  {{ item.podcast.title }}
+                </div>
+              </div>
+              <button
+                mat-icon-button
+                aria-label="Remove from queue"
+                matTooltip="Remove from queue"
+                (click)="onRemoveFromQueue(item)"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            </li>
+          }
+        </ul>
+      }
+    </div>
+
+    @if (downloading.length > 0) {
+      <footer class="popover__footer">
+        <button mat-stroked-button color="warn" (click)="onStopAll()">
+          <mat-icon>stop</mat-icon>
+          Stop all
+        </button>
+      </footer>
+    }
+  }
+</section>

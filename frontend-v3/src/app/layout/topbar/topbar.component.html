@@ -18,9 +18,12 @@
 
   <button
     mat-icon-button
+    cdkOverlayOrigin
+    #downloadsTrigger="cdkOverlayOrigin"
     [attr.aria-label]="
       downloadCount() > 0 ? 'Downloads (' + downloadCount() + ' active)' : 'Downloads'
     "
+    [attr.aria-expanded]="downloadsOpen()"
     matTooltip="Downloads"
     class="topbar__action"
     [matBadge]="downloadCount()"
@@ -28,9 +31,23 @@
     matBadgeColor="accent"
     matBadgeSize="small"
     matBadgeOverlap="true"
+    (click)="toggleDownloads()"
   >
     <mat-icon>downloading</mat-icon>
   </button>
+
+  <ng-template
+    cdkConnectedOverlay
+    [cdkConnectedOverlayOrigin]="downloadsTrigger"
+    [cdkConnectedOverlayOpen]="downloadsOpen()"
+    [cdkConnectedOverlayHasBackdrop]="true"
+    cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+    [cdkConnectedOverlayPositions]="overlayPositions"
+    (backdropClick)="closeDownloads()"
+    (detach)="closeDownloads()"
+  >
+    <ps-downloads-popover (close)="closeDownloads()" />
+  </ng-template>
 
   <button
     mat-icon-button

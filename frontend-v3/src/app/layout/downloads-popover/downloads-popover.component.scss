@@ -1,0 +1,139 @@
+.popover {
+  width: min(420px, 92vw);
+  max-height: min(80vh, 720px);
+  background: var(--mat-sys-surface-container-high);
+  color: var(--mat-sys-on-surface);
+  border-radius: 16px;
+  box-shadow: var(--mat-sys-level3);
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.popover__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.popover__title {
+  font: var(--mat-sys-title-medium);
+  margin: 0;
+}
+
+.popover__count {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.popover__close {
+  margin-left: auto;
+}
+
+.popover__empty {
+  padding: 2rem 1.5rem;
+  text-align: center;
+  color: var(--mat-sys-on-surface-variant);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.popover__empty mat-icon {
+  font-size: 36px;
+  width: 36px;
+  height: 36px;
+  opacity: 0.6;
+}
+
+.popover__empty p {
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  max-width: 28ch;
+}
+
+.popover__body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 0.5rem 0.75rem 1rem;
+}
+
+.popover__section-title {
+  font: var(--mat-sys-label-large);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0.75rem 0.25rem 0.5rem;
+}
+
+.popover__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 12px;
+  transition: background 120ms ease;
+}
+
+.row:hover {
+  background: var(--mat-sys-surface-container-highest);
+}
+
+.row__cover {
+  width: 48px;
+  height: 48px;
+  object-fit: cover;
+  border-radius: 8px;
+  flex: 0 0 auto;
+  display: block;
+}
+
+.row__meta {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.row__title {
+  font: var(--mat-sys-body-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row__sub {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row__progress {
+  margin-top: 4px;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.popover__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--mat-sys-outline-variant);
+}
