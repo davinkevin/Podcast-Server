@@ -1,20 +1,22 @@
-<mat-sidenav-container class="shell" autosize>
-  <mat-sidenav
-    class="shell__sidenav"
-    mode="side"
-    opened
-    disableClose
-  >
-    <ps-sidenav />
-  </mat-sidenav>
+<div class="shell">
+  <ps-topbar class="shell__topbar" />
 
-  <mat-sidenav-content class="shell__content">
-    <ps-topbar />
-    <main class="shell__outlet">
-      <router-outlet />
-    </main>
-  </mat-sidenav-content>
-</mat-sidenav-container>
+  <mat-sidenav-container class="shell__container" autosize>
+    <mat-sidenav
+      class="shell__sidenav"
+      mode="side"
+      opened
+      disableClose
+    >
+      <ps-sidenav />
+    </mat-sidenav>
+
+    <mat-sidenav-content class="shell__content">
+      <main class="shell__outlet">
+        <router-outlet />
+      </main>
+    </mat-sidenav-content>
+  </mat-sidenav-container>
+</div>
 
 <ps-floating-player />
-
