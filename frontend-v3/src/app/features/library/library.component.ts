@@ -72,11 +72,6 @@ export default class LibraryComponent {
 
   protected readonly itemsResource = this.itemApi.search(this.searchInput);
 
-  protected readonly cardActions = [
-    { label: 'Open podcast', icon: 'open_in_new' },
-    { label: 'Add to playlist', icon: 'playlist_add' },
-  ] as const;
-
   constructor() {
     // Mirror the URL into the search input on first load / direct nav.
     this.searchDraft.set(this.q());
