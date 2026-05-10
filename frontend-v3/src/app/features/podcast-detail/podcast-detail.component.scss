@@ -1,0 +1,130 @@
+.state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem;
+}
+
+.pod {
+  padding: clamp(1rem, 4vw, 2rem);
+  max-width: 80rem;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.pod__hero {
+  background: var(--mat-sys-surface-container-low);
+  border-radius: 24px;
+  padding: clamp(1.25rem, 3vw, 2rem);
+}
+
+.pod__section-header {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0 0.25rem;
+}
+
+.pod__section-title {
+  font: var(--mat-sys-headline-small);
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+
+.pod__section-count {
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+}
+
+.pod__header {
+  display: grid;
+  grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
+  gap: clamp(1rem, 4vw, 2rem);
+  align-items: stretch;
+}
+
+@media (max-width: 600px) {
+  .pod__header {
+    grid-template-columns: 1fr;
+  }
+}
+
+.pod__cover {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  object-fit: cover;
+  border-radius: 24px;
+  box-shadow: var(--mat-sys-level3);
+  display: block;
+}
+
+.pod__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  justify-content: flex-end;
+}
+
+.pod__title {
+  font: var(--mat-sys-display-small);
+  letter-spacing: -0.01em;
+  margin: 0;
+}
+
+.pod__sub {
+  font: var(--mat-sys-body-medium);
+  color: var(--mat-sys-on-surface-variant);
+  margin: 0;
+}
+
+.pod__sub-sep {
+  margin: 0 0.4em;
+}
+
+.pod__sub-type {
+  text-transform: capitalize;
+}
+
+.pod__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.pod__tag {
+  font: var(--mat-sys-label-medium);
+  background: var(--mat-sys-secondary-container);
+  color: var(--mat-sys-on-secondary-container);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+.pod__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+}
+
+.pod__more {
+  margin-left: auto;
+}
+
+.pod__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.25rem;
+}
+
+.pod__footer {
+  display: flex;
+  justify-content: center;
+  margin-top: 1rem;
+}

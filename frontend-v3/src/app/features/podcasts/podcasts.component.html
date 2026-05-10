@@ -1,0 +1,45 @@
+@let result = podcastsResource.value();
+@let loading = podcastsResource.isLoading();
+@let err = podcastsResource.error();
+
+<section class="podcasts">
+  <header class="podcasts__header">
+    <h1 class="podcasts__title">Podcasts</h1>
+    @if (result) {
+      <span class="podcasts__count">{{ result.content.length }} podcasts</span>
+    }
+  </header>
+
+  @if (loading && !result) {
+    <div class="podcasts__state">
+      <mat-spinner diameter="32" />
+    </div>
+  } @else if (err && !result) {
+    <ps-empty-state
+      icon="error_outline"
+      title="Couldn't load podcasts"
+      subtitle="Try refreshing in a moment."
+    />
+  } @else if (result) {
+    @if (result.content.length === 0) {
+      <ps-empty-state
+        icon="podcasts"
+        title="No podcasts yet"
+        subtitle="Add a podcast to get started."
+      />
+    } @else {
+      <div class="podcasts__grid">
+        @for (p of result.content; track p.id) {
+          <ps-cover-card
+            [title]="p.title"
+            [subtitle]="p.type"
+            [coverUrl]="coverUrl(p)"
+            [playable]="false"
+            [downloadable]="false"
+            (open)="onOpen(p)"
+          />
+        }
+      </div>
+    }
+  }
+</section>

@@ -93,9 +93,61 @@
   margin: 0;
 }
 
-.detail__description p {
+// `[innerHTML]` content is inserted dynamically — emulated view encapsulation
+// doesn't scope it. We use `::ng-deep` to style the typical tags an RSS-style
+// HTML description ships with (p, a, img, ul, blockquote, code).
+.detail__description-body {
   font: var(--mat-sys-body-large);
   color: var(--mat-sys-on-surface);
-  white-space: pre-wrap;
-  margin: 0;
+
+  ::ng-deep {
+    p {
+      margin: 0 0 0.75em;
+    }
+    p:last-child {
+      margin-bottom: 0;
+    }
+    a {
+      color: var(--mat-sys-primary);
+      text-decoration: underline;
+    }
+    img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 8px;
+      margin: 0.5rem 0;
+      display: block;
+    }
+    ul,
+    ol {
+      padding-left: 1.5em;
+      margin: 0 0 0.75em;
+    }
+    li {
+      margin-bottom: 0.25em;
+    }
+    blockquote {
+      border-left: 3px solid var(--mat-sys-outline-variant);
+      padding-left: 1rem;
+      margin: 0.5rem 0;
+      color: var(--mat-sys-on-surface-variant);
+    }
+    code {
+      background: var(--mat-sys-surface-container);
+      padding: 0.1em 0.3em;
+      border-radius: 4px;
+      font-family: 'Roboto Mono', ui-monospace, monospace;
+      font-size: 0.92em;
+    }
+    pre {
+      background: var(--mat-sys-surface-container);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      overflow-x: auto;
+    }
+    h1, h2, h3, h4 {
+      font: var(--mat-sys-title-medium);
+      margin: 1rem 0 0.5rem;
+    }
+  }
 }

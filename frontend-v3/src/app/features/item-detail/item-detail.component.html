@@ -62,7 +62,7 @@
       @if (item.description) {
         <section class="detail__description">
           <h2 class="detail__section-title">Description</h2>
-          <p>{{ item.description }}</p>
+          <div class="detail__description-body" [innerHTML]="item.description"></div>
         </section>
       }
     </div>

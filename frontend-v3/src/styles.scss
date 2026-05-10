@@ -45,3 +45,10 @@ body {
 * {
   box-sizing: border-box;
 }
+
+// Dialogs whose content is small and fixed don't need an internal scrollbar.
+// Apply via `panelClass: 'ps-fitting-dialog'` on `dialog.open(...)`.
+.ps-fitting-dialog .mat-mdc-dialog-content {
+  overflow: hidden;
+}
+

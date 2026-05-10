@@ -12,7 +12,19 @@ export const routes: Routes = [
     title: 'Library — Podcast Server',
   },
   {
+    path: 'podcasts',
+    pathMatch: 'full',
+    loadComponent: () => import('./features/podcasts/podcasts.component'),
+    title: 'Podcasts — Podcast Server',
+  },
+  {
+    // Item detail must come before the podcast-detail route so that
+    // /podcasts/:idPodcast/items/:id matches here instead of falling through.
     path: 'podcasts/:idPodcast/items/:id',
     loadComponent: () => import('./features/item-detail/item-detail.component'),
+  },
+  {
+    path: 'podcasts/:idPodcast',
+    loadComponent: () => import('./features/podcast-detail/podcast-detail.component'),
   },
 ];

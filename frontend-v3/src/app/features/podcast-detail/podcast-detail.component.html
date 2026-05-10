@@ -1,0 +1,134 @@
+@let podcast = podcastResource.value();
+@let podcastLoading = podcastResource.isLoading();
+@let podcastErr = podcastResource.error();
+
+@if (podcastLoading && !podcast) {
+  <div class="state"><mat-spinner diameter="32" /></div>
+} @else if (podcastErr && !podcast) {
+  <ps-empty-state
+    icon="error_outline"
+    title="Couldn't load this podcast"
+    subtitle="Try refreshing in a moment."
+  />
+} @else if (podcast) {
+  <article class="pod">
+   <section class="pod__hero">
+    <header class="pod__header">
+      <img class="pod__cover" [src]="podcast.cover.url" [alt]="podcast.title" />
+      <div class="pod__meta">
+        <h1 class="pod__title">{{ podcast.title }}</h1>
+        <p class="pod__sub">
+          <span class="pod__sub-type">{{ podcast.type }}</span>
+          <span class="pod__sub-sep">·</span>
+          @if (podcast.lastUpdate; as d) {
+            Last update {{ d | date: 'medium' }}
+          } @else {
+            Never updated
+          }
+          @let total = itemsResource.value()?.totalElements;
+          @if (total !== undefined) {
+            <span class="pod__sub-sep">·</span>
+            {{ total }} episode{{ total === 1 ? '' : 's' }}
+          }
+        </p>
+        @if (podcast.tags.length > 0) {
+          <ul class="pod__tags">
+            @for (tag of podcast.tags; track tag.id) {
+              <li class="pod__tag">{{ tag.name }}</li>
+            }
+          </ul>
+        }
+
+        <div class="pod__actions">
+          <button mat-flat-button color="primary" (click)="onUpdateNow(podcast)">
+            <mat-icon>refresh</mat-icon>
+            Update now
+          </button>
+          <button mat-stroked-button (click)="onOpenSettings(podcast)">
+            <mat-icon>settings</mat-icon>
+            Settings
+          </button>
+          @if (podcast.type === 'upload') {
+            <button mat-stroked-button (click)="onOpenUpload(podcast)">
+              <mat-icon>upload</mat-icon>
+              Upload episode
+            </button>
+          }
+          <button
+            mat-icon-button
+            aria-label="More actions"
+            [matMenuTriggerFor]="menu"
+            class="pod__more"
+          >
+            <mat-icon>more_vert</mat-icon>
+          </button>
+          <mat-menu #menu="matMenu">
+            <button mat-menu-item (click)="onDelete(podcast)">
+              <mat-icon>delete</mat-icon>
+              <span>Delete podcast</span>
+            </button>
+          </mat-menu>
+        </div>
+      </div>
+    </header>
+   </section>
+
+    <header class="pod__section-header">
+      <h2 class="pod__section-title">Episodes</h2>
+      @let episodesTotal = itemsResource.value()?.totalElements;
+      @if (episodesTotal !== undefined) {
+        <span class="pod__section-count">{{ episodesTotal }}</span>
+      }
+    </header>
+
+    @let result = itemsResource.value();
+    @let loading = itemsResource.isLoading();
+    @let err = itemsResource.error();
+
+    @if (loading && !result) {
+      <div class="state"><mat-spinner diameter="32" /></div>
+    } @else if (err && !result) {
+      <ps-empty-state
+        icon="error_outline"
+        title="Couldn't load episodes"
+        subtitle="Try refreshing in a moment."
+      />
+    } @else if (result) {
+      @if (result.empty) {
+        <ps-empty-state
+          icon="inbox"
+          title="No episodes yet"
+          subtitle="Trigger an update or upload an episode to fill this podcast."
+        />
+      } @else {
+        <div class="pod__grid">
+          @for (item of result.content; track item.id) {
+            @let badge = statusFor(item);
+            <ps-cover-card
+              [title]="item.title"
+              [subtitle]="item.podcast.title"
+              [coverUrl]="item.cover.url"
+              [playable]="item.isDownloaded"
+              [downloadable]="!item.isDownloaded && !isInProgress(item)"
+              (play)="onPlay(item)"
+              (download)="onDownload(item)"
+              (open)="onOpenItem(item)"
+            >
+              @if (badge) {
+                <ps-status-badge
+                  coverBadge
+                  [kind]="badge.kind"
+                  [progression]="badge.progression"
+                />
+              }
+            </ps-cover-card>
+          }
+        </div>
+
+        <footer class="pod__footer">
+          <ps-pager [page]="result.number" [first]="result.first" [last]="result.last" />
+        </footer>
+      }
+    }
+  </article>
+}
