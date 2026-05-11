@@ -31,7 +31,7 @@
           } @else {
             Never updated
           }
-          @let total = itemsResource.value()?.totalElements;
+          @let total = itemsQuery.data()?.totalElements;
           @if (total !== undefined) {
             <span class="pod__sub-sep">·</span>
             {{ total }} episode{{ total === 1 ? '' : 's' }}
@@ -87,7 +87,7 @@
 
     <header class="pod__section-header">
       <h2 class="pod__section-title">Episodes</h2>
-      @let episodesTotal = itemsResult()?.totalElements;
+      @let episodesTotal = itemsQuery.data()?.totalElements;
       @if (episodesTotal !== undefined) {
         <span class="pod__section-count">{{ episodesTotal }}</span>
       }
@@ -97,9 +97,9 @@
          immediately on return navigation. Reverse view-transition morphs
          from the item detail page back to the matching card need that
          destination element present at snapshot time. -->
-    @let result = itemsResult();
-    @let loading = itemsResource.isLoading();
-    @let err = itemsResource.error();
+    @let result = itemsQuery.data();
+    @let loading = itemsQuery.isPending();
+    @let err = itemsQuery.error();
 
     @if (loading && !result) {
       <div class="state"><mat-spinner diameter="32" /></div>

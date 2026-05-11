@@ -1,5 +1,10 @@
 import { computed, inject, Injectable, Signal } from '@angular/core';
-import { HttpClient, httpResource, HttpResourceRef } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpParams,
+  httpResource,
+  HttpResourceRef,
+} from '@angular/common/http';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { lastValueFrom } from 'rxjs';
 
@@ -40,18 +45,27 @@ export class PodcastApi {
     });
   }
 
-  items(input: Signal<PodcastItemsInput | undefined>): HttpResourceRef<PageHAL<ItemHAL> | undefined> {
-    return httpResource<PageHAL<ItemHAL>>(() => {
+  items(input: Signal<PodcastItemsInput | undefined>) {
+    return injectQuery(() => {
       const f = input();
-      if (!f) return undefined;
       return {
-        url: `/api/v1/podcasts/${f.podcastId}/items`,
-        params: {
-          q: f.q ?? '',
-          page: f.page ?? 0,
-          size: f.size ?? 24,
-          sort: f.sort ?? 'pubDate,DESC',
+        queryKey: f
+          ? queryKeys.podcasts.items(f)
+          : ['podcasts', 'items', 'noop'],
+        queryFn: () => {
+          const params = new HttpParams()
+            .set('q', f!.q ?? '')
+            .set('page', f!.page ?? 0)
+            .set('size', f!.size ?? 24)
+            .set('sort', f!.sort ?? 'pubDate,DESC');
+          return lastValueFrom(
+            this.http.get<PageHAL<ItemHAL>>(
+              `/api/v1/podcasts/${f!.podcastId}/items`,
+              { params },
+            ),
+          );
         },
+        enabled: !!f,
       };
     });
   }

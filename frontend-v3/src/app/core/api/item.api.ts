@@ -1,9 +1,17 @@
 import { computed, inject, Injectable, Signal } from '@angular/core';
-import { HttpClient, httpResource, HttpResourceRef } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpParams,
+  httpResource,
+  HttpResourceRef,
+} from '@angular/common/http';
+import { injectQuery } from '@tanstack/angular-query-experimental';
+import { lastValueFrom } from 'rxjs';
 
 import { PageHAL } from '../models/page.model';
 import { ItemHAL, ItemStatus } from '../models/item.model';
 import { PlaylistsContainerHAL } from '../models/playlist.model';
+import { queryKeys } from './query-keys';
 
 export interface ItemSearchInput {
   readonly q?: string;
@@ -23,24 +31,27 @@ export interface ItemRef {
 export class ItemApi {
   private readonly http = inject(HttpClient);
 
-  search(input: Signal<ItemSearchInput>): HttpResourceRef<PageHAL<ItemHAL> | undefined> {
-    return httpResource<PageHAL<ItemHAL>>(() => {
+  search(input: Signal<ItemSearchInput>) {
+    return injectQuery(() => {
       const f = input();
-      const params: Record<string, string | number> = {
-        q: f.q ?? '',
-        page: f.page ?? 0,
-        size: f.size ?? 12,
-        sort: f.sort ?? 'pubDate,DESC',
-      };
-      if (f.tags && f.tags.length > 0) {
-        params['tags'] = f.tags.join(',');
-      }
-      if (f.status && f.status.length > 0) {
-        params['status'] = f.status.join(',');
-      }
       return {
-        url: '/api/v1/items/search',
-        params,
+        queryKey: queryKeys.items.search(f),
+        queryFn: () => {
+          let params = new HttpParams()
+            .set('q', f.q ?? '')
+            .set('page', f.page ?? 0)
+            .set('size', f.size ?? 12)
+            .set('sort', f.sort ?? 'pubDate,DESC');
+          if (f.tags && f.tags.length > 0) {
+            params = params.set('tags', f.tags.join(','));
+          }
+          if (f.status && f.status.length > 0) {
+            params = params.set('status', f.status.join(','));
+          }
+          return lastValueFrom(
+            this.http.get<PageHAL<ItemHAL>>('/api/v1/items/search', { params }),
+          );
+        },
       };
     });
   }

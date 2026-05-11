@@ -1,6 +1,6 @@
-@let result = itemsResult();
-@let loading = itemsResource.isLoading();
-@let err = itemsResource.error();
+@let result = itemsQuery.data();
+@let loading = itemsQuery.isPending();
+@let err = itemsQuery.error();
 
 <section class="library">
   <header class="library__header">

@@ -8,6 +8,7 @@ import {
   signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { QueryClient } from '@tanstack/angular-query-experimental';
 import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,9 +30,7 @@ import {
 import { PodcastApi, PodcastItemsInput } from '../../core/api/podcast.api';
 import { ItemApi } from '../../core/api/item.api';
 import { ItemHAL } from '../../core/models/item.model';
-import { PageHAL } from '../../core/models/page.model';
 import { PodcastHAL } from '../../core/models/podcast.model';
-import { PageCache } from '../../core/page-cache/page-cache.service';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import { PlayerService } from '../../core/player/player.service';
 import {
@@ -41,6 +40,7 @@ import {
   CoverPalette,
 } from '../../core/cover-color/cover-color.service';
 import { SettingsService } from '../../core/settings/settings.service';
+import { queryKeys } from '../../core/api/query-keys';
 
 import { PodcastEditDialogComponent } from './podcast-edit-dialog.component';
 import { PodcastUploadDialogComponent } from './podcast-upload-dialog.component';
@@ -89,7 +89,7 @@ export default class PodcastDetailComponent {
   private readonly snackbar = inject(MatSnackBar);
   private readonly coverColor = inject(CoverColorService);
   private readonly settings = inject(SettingsService);
-  private readonly pageCache = inject(PageCache);
+  private readonly queryClient = inject(QueryClient);
 
   protected readonly id = computed(() => this.idPodcast());
   protected readonly podcastResource = this.api.getById(this.id);
@@ -114,20 +114,7 @@ export default class PodcastDetailComponent {
     page: this.page(),
     size: DEFAULT_PAGE_SIZE,
   }));
-  protected readonly itemsResource = this.api.items(this.itemsInput);
-
-  // Last-known items page, served while the resource refetches on return
-  // navigation. Required so view-transition morphs from the item detail page
-  // back to the matching card find a destination in the new DOM snapshot.
-  protected readonly itemsResult = computed<PageHAL<ItemHAL> | undefined>(() => {
-    const live = this.itemsResource.value();
-    if (live) return live;
-    return this.pageCache.get<PageHAL<ItemHAL>>(this.itemsCacheKey());
-  });
-
-  private readonly itemsCacheKey = computed(
-    () => `podcast-items:${this.idPodcast()}:${this.page()}`,
-  );
+  protected readonly itemsQuery = this.api.items(this.itemsInput);
 
   // Palette extracted from the cover via node-vibrant. Pushed onto the global
   // --page-tint / --page-tint-bottom variables so the shell paints a faded
@@ -167,13 +154,6 @@ export default class PodcastDetailComponent {
       const dark = this.settings.effectiveTheme() === 'dark';
       applyCoverTint(p, dark);
       onCleanup(() => clearCoverTint());
-    });
-
-    // Mirror live items into the cache so subsequent return navigations can
-    // render them immediately (essential for reverse view-transition morphs).
-    effect(() => {
-      const value = this.itemsResource.value();
-      if (value) this.pageCache.put(this.itemsCacheKey(), value);
     });
   }
 
@@ -258,7 +238,11 @@ export default class PodcastDetailComponent {
       })
       .afterClosed()
       .subscribe((uploaded) => {
-        if (uploaded) this.itemsResource.reload();
+        if (uploaded) {
+          this.queryClient.invalidateQueries({
+            queryKey: queryKeys.podcasts.items(this.itemsInput()),
+          });
+        }
       });
   }
 
