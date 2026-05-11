@@ -1,11 +1,14 @@
-import { computed, DestroyRef, Injectable, signal } from '@angular/core';
+import { computed, DestroyRef, inject, Injectable, signal } from '@angular/core';
+import { QueryClient } from '@tanstack/angular-query-experimental';
 
 import { DownloadingItemHAL } from '../models/downloading-item.model';
+import { queryKeys } from '../api/query-keys';
 
 const SSE_URL = '/api/v1/sse';
 
 @Injectable({ providedIn: 'root' })
 export class DownloadStreamService {
+  private readonly queryClient = inject(QueryClient);
   private readonly downloadingMap = signal<ReadonlyMap<string, DownloadingItemHAL>>(new Map());
   private readonly queueState = signal<readonly DownloadingItemHAL[]>([]);
   private readonly updatingState = signal<boolean>(false);
@@ -32,15 +35,30 @@ export class DownloadStreamService {
       const item = parse<DownloadingItemHAL>(ev);
       if (!item) return;
 
+      const inProgress = item.status === 'STARTED' || item.status === 'PAUSED';
+
       this.downloadingMap.update((current) => {
         const next = new Map(current);
-        if (item.status === 'STARTED' || item.status === 'PAUSED') {
+        if (inProgress) {
           next.set(item.id, item);
         } else {
           next.delete(item.id);
         }
         return next;
       });
+
+      // Once a download has settled (FINISH/FAILED/STOPPED), refetch any
+      // visible items list so the row picks up the new `isDownloaded`
+      // (and the item-detail page picks up its new status).
+      if (!inProgress) {
+        this.queryClient.invalidateQueries({ queryKey: queryKeys.items.all });
+        this.queryClient.invalidateQueries({
+          queryKey: ['podcasts', item.podcast.id, 'items'],
+        });
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.items.detail(item.podcast.id, item.id),
+        });
+      }
     });
 
     es.addEventListener('waiting', (ev) => {
