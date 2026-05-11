@@ -25,6 +25,7 @@
     "@angular/platform-browser": "^19.2.0",
     "@angular/platform-browser-dynamic": "^19.2.0",
     "@angular/router": "^19.2.0",
+    "node-vibrant": "^4.0.4",
     "rxjs": "~7.8.1",
     "tslib": "^2.6.3",
     "zone.js": "~0.15.0"

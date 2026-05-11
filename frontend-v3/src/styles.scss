@@ -10,6 +10,21 @@
   --sidenav-width: 240px;
 }
 
+// Per-route page tint. Route components set/clear these on documentElement
+// (e.g. PodcastDetailComponent uses the cover's dominant colors via vibrant).
+// Registered as <color> so transitions interpolate smoothly when navigating.
+@property --page-tint {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --page-tint-bottom {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
 html {
   color-scheme: light dark;
 

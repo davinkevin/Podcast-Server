@@ -2,6 +2,7 @@ import { Injectable, signal } from '@angular/core';
 
 export type ThemePreference = 'system' | 'light' | 'dark';
 export type SidenavMode = 'expanded' | 'rail';
+export type EffectiveTheme = 'light' | 'dark';
 
 const THEME_KEY = 'ps.theme';
 const THEME_VALUES: readonly ThemePreference[] = ['system', 'light', 'dark'];
@@ -13,16 +14,24 @@ const SIDENAV_VALUES: readonly SidenavMode[] = ['expanded', 'rail'];
 export class SettingsService {
   readonly theme = signal<ThemePreference>(this.readInitialTheme());
   readonly sidenavMode = signal<SidenavMode>(this.readInitialSidenav());
+  readonly effectiveTheme = signal<EffectiveTheme>(this.computeEffectiveTheme());
 
   constructor() {
     this.applyTheme(this.theme());
     this.applySidenav(this.sidenavMode());
+
+    // Re-evaluate the effective theme when the OS preference changes while
+    // the user is on 'system' (otherwise the explicit choice always wins).
+    window
+      .matchMedia('(prefers-color-scheme: dark)')
+      .addEventListener('change', () => this.refreshEffectiveTheme());
   }
 
   setTheme(value: ThemePreference) {
     this.theme.set(value);
     this.writeKey(THEME_KEY, value);
     this.applyTheme(value);
+    this.refreshEffectiveTheme();
   }
 
   setSidenavMode(value: SidenavMode) {
@@ -76,5 +85,17 @@ export class SettingsService {
       '--sidenav-width',
       value === 'rail' ? '80px' : '240px',
     );
+  }
+
+  private computeEffectiveTheme(): EffectiveTheme {
+    const t = this.theme();
+    if (t === 'light' || t === 'dark') return t;
+    return window.matchMedia('(prefers-color-scheme: dark)').matches
+      ? 'dark'
+      : 'light';
+  }
+
+  private refreshEffectiveTheme() {
+    this.effectiveTheme.set(this.computeEffectiveTheme());
   }
 }

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   signal,
@@ -31,6 +32,11 @@ import { ItemHAL } from '../../core/models/item.model';
 import { PodcastHAL } from '../../core/models/podcast.model';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import { PlayerService } from '../../core/player/player.service';
+import {
+  CoverColorService,
+  CoverPalette,
+} from '../../core/cover-color/cover-color.service';
+import { SettingsService } from '../../core/settings/settings.service';
 
 import { PodcastEditDialogComponent } from './podcast-edit-dialog.component';
 import { PodcastUploadDialogComponent } from './podcast-upload-dialog.component';
@@ -77,6 +83,8 @@ export default class PodcastDetailComponent {
   private readonly player = inject(PlayerService);
   private readonly dialog = inject(MatDialog);
   private readonly snackbar = inject(MatSnackBar);
+  private readonly coverColor = inject(CoverColorService);
+  private readonly settings = inject(SettingsService);
 
   protected readonly id = computed(() => this.idPodcast());
   protected readonly podcastResource = this.api.getById(this.id);
@@ -98,6 +106,39 @@ export default class PodcastDetailComponent {
     size: DEFAULT_PAGE_SIZE,
   }));
   protected readonly itemsResource = this.api.items(this.itemsInput);
+
+  // Palette extracted from the cover via node-vibrant. Pushed onto the global
+  // --page-tint / --page-tint-bottom variables so the shell paints a faded
+  // gradient across the whole content area (Spotify/Apple Music feel).
+  private readonly palette = signal<CoverPalette | null>(null);
+
+  constructor() {
+    effect(() => {
+      const url = this.coverSrc();
+      if (!url) return;
+      this.coverColor.extract(url).then((p) => this.palette.set(p));
+    });
+
+    effect((onCleanup) => {
+      const p = this.palette();
+      const dark = this.settings.effectiveTheme() === 'dark';
+      const top = dark
+        ? p?.darkVibrant ?? p?.vibrant
+        : p?.vibrant ?? p?.lightVibrant;
+      const bottom = dark
+        ? p?.darkMuted ?? p?.muted
+        : p?.muted ?? p?.lightMuted;
+      const root = document.documentElement;
+      if (top) root.style.setProperty('--page-tint', top);
+      else root.style.removeProperty('--page-tint');
+      if (bottom) root.style.setProperty('--page-tint-bottom', bottom);
+      else root.style.removeProperty('--page-tint-bottom');
+      onCleanup(() => {
+        root.style.removeProperty('--page-tint');
+        root.style.removeProperty('--page-tint-bottom');
+      });
+    });
+  }
 
   protected readonly cardActions = [ADD_TO_PLAYLIST_ACTION] as const;
 

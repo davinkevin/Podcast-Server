@@ -15,8 +15,9 @@
 }
 
 .pod__hero {
-  background: var(--mat-sys-surface-container-low);
-  border-radius: 24px;
+  // Transparent — the tint comes from the global --page-tint gradient on
+  // .shell__outlet so it can span the full content width.
+  background: transparent;
   padding: clamp(1.25rem, 3vw, 2rem);
 }
 

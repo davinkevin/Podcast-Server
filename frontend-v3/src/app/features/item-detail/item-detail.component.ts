@@ -5,6 +5,7 @@ import {
   effect,
   inject,
   input,
+  signal,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { Title } from '@angular/platform-browser';
@@ -19,6 +20,11 @@ import { ItemApi, ItemRef } from '../../core/api/item.api';
 import { ItemHAL } from '../../core/models/item.model';
 import { PlayerService } from '../../core/player/player.service';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
+import {
+  CoverColorService,
+  CoverPalette,
+} from '../../core/cover-color/cover-color.service';
+import { SettingsService } from '../../core/settings/settings.service';
 import {
   StatusBadgeComponent,
   StatusBadgeKind,
@@ -53,6 +59,8 @@ export default class ItemDetailComponent {
   private readonly title = inject(Title);
   private readonly snackbar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
+  private readonly coverColor = inject(CoverColorService);
+  private readonly settings = inject(SettingsService);
 
   protected readonly ref = computed<ItemRef>(() => ({
     podcastId: this.idPodcast(),
@@ -60,10 +68,40 @@ export default class ItemDetailComponent {
   }));
   protected readonly itemResource = this.itemApi.getById(this.ref);
 
+  // Palette from the item's cover, propagated via --page-tint / --page-tint-
+  // bottom so the whole content area picks up the color like the podcast page.
+  private readonly palette = signal<CoverPalette | null>(null);
+
   constructor() {
     effect(() => {
       const item = this.itemResource.value();
       if (item) this.title.setTitle(`${item.title} — Podcast Server`);
+    });
+
+    effect(() => {
+      const item = this.itemResource.value();
+      if (!item) return;
+      this.coverColor.extract(item.cover.url).then((p) => this.palette.set(p));
+    });
+
+    effect((onCleanup) => {
+      const p = this.palette();
+      const dark = this.settings.effectiveTheme() === 'dark';
+      const top = dark
+        ? p?.darkVibrant ?? p?.vibrant
+        : p?.vibrant ?? p?.lightVibrant;
+      const bottom = dark
+        ? p?.darkMuted ?? p?.muted
+        : p?.muted ?? p?.lightMuted;
+      const root = document.documentElement;
+      if (top) root.style.setProperty('--page-tint', top);
+      else root.style.removeProperty('--page-tint');
+      if (bottom) root.style.setProperty('--page-tint-bottom', bottom);
+      else root.style.removeProperty('--page-tint-bottom');
+      onCleanup(() => {
+        root.style.removeProperty('--page-tint');
+        root.style.removeProperty('--page-tint-bottom');
+      });
     });
   }
 
