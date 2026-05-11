@@ -1,44 +1,24 @@
 @if (player.currentItem(); as item) {
   <aside
     class="player"
-    [class.player--expanded]="player.isExpanded()"
     [class.player--video]="player.isVideo()"
     [class.player--audio]="!player.isVideo()"
     [attr.aria-label]="'Now playing: ' + item.title"
   >
-    <!-- Video: one element kept in the DOM in every mode so playback never stops.
-         Wrapped in a frame whose absolute position changes between mini and expanded;
-         the <video> itself just fills the frame so its intrinsic size is irrelevant. -->
     @if (player.isVideo()) {
       <div class="player__video-frame">
         <video
           class="player__video"
           [src]="item.proxyURL"
-          [attr.controls]="player.isExpanded() ? '' : null"
+          controls
           autoplay
-          (click)="player.isExpanded() ? null : player.toggleExpanded()"
         ></video>
       </div>
     }
 
-    <!-- Audio: large cover only in expanded mode. -->
-    @if (!player.isVideo() && player.isExpanded()) {
-      <img class="player__cover-large" [src]="item.cover.url" [alt]="item.title" />
-    }
-
     <div class="player__bar">
       @if (!player.isVideo()) {
-        <button
-          class="player__thumb"
-          type="button"
-          aria-label="Expand"
-          (click)="player.toggleExpanded()"
-        >
-          <img [src]="item.cover.url" [alt]="item.title" />
-        </button>
-      } @else {
-        <!-- 56px slot reserved in the bar layout — the frame's absolute box overlaps this slot in mini mode. -->
-        <div class="player__video-slot" aria-hidden="true"></div>
+        <img class="player__thumb" [src]="item.cover.url" [alt]="item.title" />
       }
 
       <div class="player__meta">
@@ -51,25 +31,6 @@
       }
 
       <div class="player__controls">
-        @if (player.isExpanded()) {
-          <button
-            mat-icon-button
-            type="button"
-            aria-label="Collapse"
-            (click)="player.collapse()"
-          >
-            <mat-icon>keyboard_arrow_down</mat-icon>
-          </button>
-        } @else {
-          <button
-            mat-icon-button
-            type="button"
-            aria-label="Expand"
-            (click)="player.toggleExpanded()"
-          >
-            <mat-icon>open_in_full</mat-icon>
-          </button>
-        }
         <button
           mat-icon-button
           type="button"

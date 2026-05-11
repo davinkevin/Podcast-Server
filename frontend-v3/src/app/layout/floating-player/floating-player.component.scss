@@ -4,59 +4,38 @@
 
 .player {
   position: fixed;
-  bottom: 0;
-  left: 240px;
-  right: 0;
   z-index: 6;
   background: var(--mat-sys-surface-container-high);
   color: var(--mat-sys-on-surface);
-  border-top: 1px solid var(--mat-sys-outline-variant);
   box-shadow: var(--mat-sys-level3);
   overflow: hidden;
 }
 
-.player--expanded {
-  inset: 0;
+/* Audio: full-width strip at the bottom. */
+.player--audio {
+  bottom: 0;
   left: 240px;
+  right: 0;
+  border-top: 1px solid var(--mat-sys-outline-variant);
 }
 
-/* Audio expanded: large cover centered above the bar. */
-.player__cover-large {
-  position: absolute;
-  inset: 0 0 80px 0;
-  margin: auto;
-  width: min(60vmin, 480px);
-  height: min(60vmin, 480px);
-  object-fit: cover;
-  border-radius: 24px;
+/* Video: small PiP card in the bottom-right corner. Use the native fullscreen
+   control in <video> for actual fullscreen — no in-app expand mode. */
+.player--video {
+  bottom: 16px;
+  right: 16px;
+  width: min(360px, calc(100vw - 32px));
+  border-radius: 16px;
+  border: 1px solid var(--mat-sys-outline-variant);
   box-shadow: var(--mat-sys-level5);
 }
 
-/* The frame is what carries absolute positioning; the <video> just fills it.
-   This keeps `<video>` width/height predictable regardless of intrinsic media size
-   (portrait, square, ultrawide all behave identically). */
-.player__video-frame {
-  position: absolute;
-  z-index: 1;
-}
-
-/* Mini: 56×56 thumb pinned to the left of the bar. */
-.player--video:not(.player--expanded) .player__video-frame {
-  left: 16px;
-  top: 12px;
-  width: 56px;
-  height: 56px;
-  border-radius: 12px;
-  overflow: hidden;
-  cursor: pointer;
-}
-
-/* Expanded: fill the area above the bar. The frame is a hard box, so the video
-   is letterboxed/pillarboxed by `object-fit: contain` and never causes scroll. */
-.player--video.player--expanded .player__video-frame {
-  inset: 16px 16px 96px 16px;
-  border-radius: 16px;
+.player--video .player__video-frame {
+  width: 100%;
+  aspect-ratio: 16 / 9;
   background: black;
+  border-radius: 16px 16px 0 0;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -65,14 +44,10 @@
 .player__video {
   width: 100%;
   height: 100%;
-  object-fit: cover;
-  display: block;
-  outline: none;
-}
-
-.player--video.player--expanded .player__video {
   object-fit: contain;
   background: black;
+  display: block;
+  outline: none;
 }
 
 .player__bar {
@@ -86,38 +61,20 @@
   z-index: 2;
 }
 
-.player--expanded .player__bar {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  border-top: 1px solid var(--mat-sys-outline-variant);
-  background: var(--mat-sys-surface-container-high);
+/* PiP bar is shorter — the video already carries the visual weight above. */
+.player--video .player__bar {
+  height: 56px;
+  min-height: 56px;
+  padding: 0.5rem 0.75rem;
 }
 
 .player__thumb {
   flex: 0 0 auto;
   width: 56px;
   height: 56px;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  border-radius: 12px;
-  overflow: hidden;
-}
-
-.player__thumb img {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
+  border-radius: 12px;
   display: block;
-}
-
-.player__video-slot {
-  flex: 0 0 56px;
-  width: 56px;
-  height: 56px;
 }
 
 .player__meta {
@@ -127,6 +84,11 @@
   display: flex;
   flex-direction: column;
   gap: 2px;
+}
+
+.player--video .player__meta {
+  flex: 1 1 auto;
+  max-width: none;
 }
 
 .player__title {
