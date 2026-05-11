@@ -9,6 +9,10 @@ import {
   withViewTransitions,
 } from '@angular/router';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import {
+  provideTanStackQuery,
+  QueryClient,
+} from '@tanstack/angular-query-experimental';
 
 import { routes } from './app.routes';
 
@@ -24,5 +28,17 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHttpClient(withFetch()),
     provideAnimationsAsync(),
+    // TanStack Query — server state caching, stale-while-revalidate,
+    // invalidation. Replaces the ad-hoc PageCache + httpResource pattern.
+    provideTanStackQuery(
+      new QueryClient({
+        defaultOptions: {
+          queries: {
+            staleTime: 60_000,
+            gcTime: 5 * 60_000,
+          },
+        },
+      }),
+    ),
   ],
 };

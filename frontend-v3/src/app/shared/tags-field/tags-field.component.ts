@@ -80,10 +80,10 @@ export class TagsFieldComponent {
     const q = this.query().trim();
     return q.length > 0 ? { name: q } : undefined;
   });
-  private readonly suggestionsResource = this.tagApi.search(this.searchInput);
+  private readonly suggestionsQuery = this.tagApi.search(this.searchInput);
 
   protected readonly suggestions = computed(() => {
-    const result = this.suggestionsResource.value();
+    const result = this.suggestionsQuery.data();
     if (!result) return [];
     const taken = new Set(this.tags().map((t) => t.name.toLowerCase()));
     return result.content.filter((s) => !taken.has(s.name.toLowerCase()));
