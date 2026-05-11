@@ -74,6 +74,20 @@ body {
   box-sizing: border-box;
 }
 
+// View Transitions API (Angular Router's `withViewTransitions()`).
+// Root cross-fade stays snappy; named element morphs (cover images) get a
+// longer cinematic easing so the source → destination motion is perceptible.
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-group(*) {
+  animation-duration: 480ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
 // Dialogs whose content fits without needing a scrollbar.
 // Apply via `panelClass: 'ps-fitting-dialog'` on `dialog.open(...)`.
 // Suppresses Material's default 65vh ceiling + the spurious 1px scrollbar that

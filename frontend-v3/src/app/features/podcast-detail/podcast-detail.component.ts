@@ -29,7 +29,9 @@ import {
 import { PodcastApi, PodcastItemsInput } from '../../core/api/podcast.api';
 import { ItemApi } from '../../core/api/item.api';
 import { ItemHAL } from '../../core/models/item.model';
+import { PageHAL } from '../../core/models/page.model';
 import { PodcastHAL } from '../../core/models/podcast.model';
+import { PageCache } from '../../core/page-cache/page-cache.service';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import { PlayerService } from '../../core/player/player.service';
 import {
@@ -87,6 +89,7 @@ export default class PodcastDetailComponent {
   private readonly snackbar = inject(MatSnackBar);
   private readonly coverColor = inject(CoverColorService);
   private readonly settings = inject(SettingsService);
+  private readonly pageCache = inject(PageCache);
 
   protected readonly id = computed(() => this.idPodcast());
   protected readonly podcastResource = this.api.getById(this.id);
@@ -95,11 +98,15 @@ export default class PodcastDetailComponent {
      cover, whose URL stays the same (`/api/v1/podcasts/{id}/cover.jpg`) even
      after the backend swaps the file on disk. */
   protected readonly coverVersion = signal(0);
+  // Derive cover URL from the route param so the cover renders before the
+  // podcast resource resolves — required for view-transition morphs from the
+  // list page to have a destination element in the new DOM snapshot.
   protected readonly coverSrc = computed(() => {
-    const podcast = this.podcastResource.value();
-    if (!podcast) return '';
+    const id = this.idPodcast();
+    if (!id) return '';
     const v = this.coverVersion();
-    return v === 0 ? podcast.cover.url : `${podcast.cover.url}?v=${v}`;
+    const base = `/api/v1/podcasts/${id}/cover.jpg`;
+    return v === 0 ? base : `${base}?v=${v}`;
   });
 
   protected readonly itemsInput = computed<PodcastItemsInput>(() => ({
@@ -108,6 +115,19 @@ export default class PodcastDetailComponent {
     size: DEFAULT_PAGE_SIZE,
   }));
   protected readonly itemsResource = this.api.items(this.itemsInput);
+
+  // Last-known items page, served while the resource refetches on return
+  // navigation. Required so view-transition morphs from the item detail page
+  // back to the matching card find a destination in the new DOM snapshot.
+  protected readonly itemsResult = computed<PageHAL<ItemHAL> | undefined>(() => {
+    const live = this.itemsResource.value();
+    if (live) return live;
+    return this.pageCache.get<PageHAL<ItemHAL>>(this.itemsCacheKey());
+  });
+
+  private readonly itemsCacheKey = computed(
+    () => `podcast-items:${this.idPodcast()}:${this.page()}`,
+  );
 
   // Palette extracted from the cover via node-vibrant. Pushed onto the global
   // --page-tint / --page-tint-bottom variables so the shell paints a faded
@@ -148,6 +168,13 @@ export default class PodcastDetailComponent {
       applyCoverTint(p, dark);
       onCleanup(() => clearCoverTint());
     });
+
+    // Mirror live items into the cache so subsequent return navigations can
+    // render them immediately (essential for reverse view-transition morphs).
+    effect(() => {
+      const value = this.itemsResource.value();
+      if (value) this.pageCache.put(this.itemsCacheKey(), value);
+    });
   }
 
   protected readonly cardActions = [ADD_TO_PLAYLIST_ACTION] as const;
@@ -182,7 +209,9 @@ export default class PodcastDetailComponent {
   }
 
   protected onOpenItem(item: ItemHAL) {
-    this.router.navigate(['/podcasts', item.podcastId, 'items', item.id]);
+    this.router.navigate(['/podcasts', item.podcastId, 'items', item.id], {
+      queryParams: { from: 'podcast' },
+    });
   }
 
   protected onItemAction(item: ItemHAL, action: CoverCardAction) {

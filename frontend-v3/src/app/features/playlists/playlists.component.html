@@ -1,4 +1,4 @@
-@let result = playlistsResource.value();
+@let result = playlistsResult();
 @let loading = playlistsResource.isLoading();
 @let err = playlistsResource.error();
 
@@ -44,6 +44,7 @@
             [coverUrl]="coverUrl(p)"
             [playable]="false"
             [downloadable]="false"
+            [viewTransitionName]="'playlist-cover-' + p.id"
             (open)="onOpen(p)"
           />
         }

@@ -1,20 +1,26 @@
 @let podcast = podcastResource.value();
-@let podcastLoading = podcastResource.isLoading();
 @let podcastErr = podcastResource.error();
 
-@if (podcastLoading && !podcast) {
-  <div class="state"><mat-spinner diameter="32" /></div>
-} @else if (podcastErr && !podcast) {
+@if (podcastErr && !podcast) {
   <ps-empty-state
     icon="error_outline"
     title="Couldn't load this podcast"
     subtitle="Try refreshing in a moment."
   />
-} @else if (podcast) {
+} @else {
   <article class="pod">
    <section class="pod__hero">
     <header class="pod__header">
-      <img class="pod__cover" [src]="coverSrc()" [alt]="podcast.title" />
+      <!-- Cover is rendered immediately from the route id so the view
+           transition coming from the list page has a destination element
+           in the new DOM snapshot (before podcastResource resolves). -->
+      <img
+        class="pod__cover"
+        [src]="coverSrc()"
+        [alt]="podcast?.title ?? ''"
+        [style.view-transition-name]="'pod-cover-' + idPodcast()"
+      />
+      @if (podcast) {
       <div class="pod__meta">
         <h1 class="pod__title">{{ podcast.title }}</h1>
         <p class="pod__sub">
@@ -71,18 +77,27 @@
           </mat-menu>
         </div>
       </div>
+      } @else {
+        <div class="pod__meta pod__meta--loading">
+          <mat-spinner diameter="24" />
+        </div>
+      }
     </header>
    </section>
 
     <header class="pod__section-header">
       <h2 class="pod__section-title">Episodes</h2>
-      @let episodesTotal = itemsResource.value()?.totalElements;
+      @let episodesTotal = itemsResult()?.totalElements;
       @if (episodesTotal !== undefined) {
         <span class="pod__section-count">{{ episodesTotal }}</span>
       }
     </header>
 
-    @let result = itemsResource.value();
+    <!-- `result` uses the cached-fallback computed so we render the grid
+         immediately on return navigation. Reverse view-transition morphs
+         from the item detail page back to the matching card need that
+         destination element present at snapshot time. -->
+    @let result = itemsResult();
     @let loading = itemsResource.isLoading();
     @let err = itemsResource.error();
 
@@ -112,6 +127,7 @@
               [playable]="item.isDownloaded"
               [downloadable]="!item.isDownloaded && !isInProgress(item)"
               [actions]="cardActions"
+              [viewTransitionName]="'podcast-item-cover-' + item.id"
               (play)="onPlay(item)"
               (download)="onDownload(item)"
               (open)="onOpenItem(item)"

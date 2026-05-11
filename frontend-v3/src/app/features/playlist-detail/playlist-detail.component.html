@@ -1,20 +1,25 @@
-@let playlist = playlistResource.value();
-@let loading = playlistResource.isLoading();
+@let playlist = playlistResult();
 @let err = playlistResource.error();
 
-@if (loading && !playlist) {
-  <div class="state"><mat-spinner diameter="32" /></div>
-} @else if (err && !playlist) {
+@if (err && !playlist) {
   <ps-empty-state
     icon="error_outline"
     title="Couldn't load this playlist"
     subtitle="Try refreshing in a moment."
   />
-} @else if (playlist) {
+} @else {
   <article class="pl">
     <section class="pl__hero">
       <header class="pl__header">
-        <img class="pl__cover" [src]="coverUrl(playlist)" [alt]="playlist.name" />
+        <!-- Cover rendered from the route so the view-transition morph
+             has a destination element before playlistResource resolves. -->
+        <img
+          class="pl__cover"
+          [src]="coverSrc()"
+          [alt]="playlist?.name ?? ''"
+          [style.view-transition-name]="'playlist-cover-' + idPlaylist()"
+        />
+        @if (playlist) {
         <div class="pl__meta">
           <h1 class="pl__title">{{ playlist.name }}</h1>
           <p class="pl__sub">
@@ -43,9 +48,15 @@
             </mat-menu>
           </div>
         </div>
+        } @else {
+          <div class="pl__meta pl__meta--loading">
+            <mat-spinner diameter="24" />
+          </div>
+        }
       </header>
     </section>
 
+    @if (playlist) {
     <header class="pl__section-header">
       <h2 class="pl__section-title">Episodes</h2>
       <span class="pl__section-count">{{ playlist.items.length }}</span>
@@ -67,12 +78,14 @@
             [playable]="true"
             [downloadable]="false"
             [actions]="cardActions"
+            [viewTransitionName]="'playlist-item-cover-' + item.id"
             (play)="onPlay(item)"
             (open)="onOpenItem(item)"
             (action)="onAction(item, $event)"
           />
         }
       </div>
+    }
     }
   </article>
 }

@@ -7,7 +7,7 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -34,10 +34,13 @@ import {
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialog.component';
 
+type FromScope = 'library' | 'podcast' | 'playlist';
+
 @Component({
   selector: 'ps-item-detail',
   standalone: true,
   imports: [
+    RouterLink,
     DatePipe,
     MatIconModule,
     MatButtonModule,
@@ -53,6 +56,21 @@ export default class ItemDetailComponent {
   // Bound from /podcasts/:idPodcast/items/:id via withComponentInputBinding().
   readonly idPodcast = input.required<string>();
   readonly id = input.required<string>();
+  // Optional `?from=...` query param — set by the list that linked here so
+  // the view-transition-name on the hero cover matches that list's scope
+  // only (avoids cross-list morphs that aren't a natural navigation).
+  readonly from = input<string | undefined>(undefined);
+
+  protected readonly heroTransitionName = computed<string | null>(() => {
+    const scope = this.fromScope();
+    if (!scope) return null;
+    return `${scope}-item-cover-${this.id()}`;
+  });
+
+  private readonly fromScope = computed<FromScope | null>(() => {
+    const v = this.from();
+    return v === 'library' || v === 'podcast' || v === 'playlist' ? v : null;
+  });
 
   private readonly itemApi = inject(ItemApi);
   private readonly player = inject(PlayerService);
@@ -69,6 +87,16 @@ export default class ItemDetailComponent {
     id: this.id(),
   }));
   protected readonly itemResource = this.itemApi.getById(this.ref);
+
+  // Cover URL derived from the route so the cover img can render before the
+  // item resource resolves — required for view-transition morphs from the
+  // list page. Once the item arrives, swap to its real URL (handles non-jpg
+  // covers gracefully).
+  protected readonly coverSrc = computed(() => {
+    const item = this.itemResource.value();
+    if (item) return item.cover.url;
+    return `/api/v1/podcasts/${this.idPodcast()}/items/${this.id()}/cover.jpg`;
+  });
 
   // Palette from the item's cover, propagated via --page-tint / --page-tint-
   // bottom so the whole content area picks up the color like the podcast page.

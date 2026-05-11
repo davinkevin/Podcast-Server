@@ -1,4 +1,4 @@
-@let result = itemsResource.value();
+@let result = itemsResult();
 @let loading = itemsResource.isLoading();
 @let err = itemsResource.error();
 
@@ -69,6 +69,7 @@
             [playable]="item.isDownloaded"
             [downloadable]="!item.isDownloaded && !isInProgress(item)"
             [actions]="cardActions"
+            [viewTransitionName]="'library-item-cover-' + item.id"
             (play)="onPlay(item)"
             (download)="onDownload(item)"
             (open)="onOpen(item)"

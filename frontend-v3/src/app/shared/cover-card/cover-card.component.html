@@ -1,5 +1,11 @@
 <button type="button" class="cover" matRipple (click)="onOpen()">
-  <img class="cover__image" [src]="coverUrl()" [alt]="title()" loading="lazy" />
+  <img
+    class="cover__image"
+    [src]="coverUrl()"
+    [alt]="title()"
+    loading="lazy"
+    [style.view-transition-name]="viewTransitionName()"
+  />
 
   <div class="cover__badge-slot">
     <ng-content select="[coverBadge]" />

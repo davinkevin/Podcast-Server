@@ -1,24 +1,27 @@
 @let item = itemResource.value();
-@let loading = itemResource.isLoading();
 @let err = itemResource.error();
 
-@if (loading && !item) {
-  <div class="state">
-    <mat-spinner diameter="32" />
-  </div>
-} @else if (err && !item) {
+@if (err && !item) {
   <ps-empty-state
     icon="error_outline"
     title="Couldn't load this episode"
     subtitle="Try refreshing in a moment."
   />
-} @else if (item) {
-  @let badge = statusFor(item);
-  @let inProgress = isInProgress(item);
+} @else {
+  @let badge = item ? statusFor(item) : null;
+  @let inProgress = item ? isInProgress(item) : false;
 
   <article class="detail">
     <div class="detail__cover-wrap">
-      <img class="detail__cover" [src]="item.cover.url" [alt]="item.title" />
+      <!-- Cover rendered from the route id so the view-transition morph
+           from the list page has a destination element ready before the
+           item resource resolves. -->
+      <img
+        class="detail__cover"
+        [src]="coverSrc()"
+        [alt]="item?.title ?? ''"
+        [style.view-transition-name]="heroTransitionName()"
+      />
       @if (badge) {
         <ps-status-badge
           class="detail__badge"
@@ -28,9 +31,15 @@
       }
     </div>
 
+    @if (item) {
     <div class="detail__body">
       <header class="detail__header">
-        <p class="detail__podcast">{{ item.podcast.title }}</p>
+        <p class="detail__podcast">
+          <a
+            class="detail__podcast-link"
+            [routerLink]="['/podcasts', item.podcastId]"
+          >{{ item.podcast.title }}</a>
+        </p>
         <h1 class="detail__title">{{ item.title }}</h1>
         @if (item.pubDate; as d) {
           <p class="detail__date">Published {{ d | date: 'mediumDate' }}</p>
@@ -70,5 +79,10 @@
         </section>
       }
     </div>
+    } @else {
+      <div class="detail__body">
+        <mat-spinner diameter="24" />
+      </div>
+    }
   </article>
 }

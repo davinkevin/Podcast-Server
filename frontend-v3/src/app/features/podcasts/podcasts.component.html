@@ -1,4 +1,4 @@
-@let result = podcastsResource.value();
+@let result = podcastsResult();
 @let loading = podcastsResource.isLoading();
 @let err = podcastsResource.error();
 
@@ -45,6 +45,7 @@
             [coverUrl]="coverUrl(p)"
             [playable]="false"
             [downloadable]="false"
+            [viewTransitionName]="'pod-cover-' + p.id"
             (open)="onOpen(p)"
           />
         }

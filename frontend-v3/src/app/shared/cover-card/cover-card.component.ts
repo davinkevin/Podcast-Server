@@ -29,6 +29,10 @@ export class CoverCardComponent {
   readonly actions = input<readonly CoverCardAction[]>([]);
   readonly playable = input<boolean>(true);
   readonly downloadable = input<boolean>(false);
+  /** When set, used as `view-transition-name` on the cover image so a
+   *  matching element on the destination route (Apple-Music-style cover
+   *  morph). Must be unique across all cards on screen at any time. */
+  readonly viewTransitionName = input<string | undefined>(undefined);
 
   readonly play = output<void>();
   readonly download = output<void>();

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   signal,
@@ -24,6 +25,7 @@ import {
   PlaylistWithItemsHAL,
 } from '../../core/models/playlist.model';
 import { PlayerService } from '../../core/player/player.service';
+import { PageCache } from '../../core/page-cache/page-cache.service';
 
 const REMOVE_ACTION: CoverCardAction = {
   id: 'remove',
@@ -54,9 +56,28 @@ export default class PlaylistDetailComponent {
   private readonly api = inject(PlaylistApi);
   private readonly snackbar = inject(MatSnackBar);
   private readonly player = inject(PlayerService);
+  private readonly pageCache = inject(PageCache);
 
   protected readonly id = computed(() => this.idPlaylist());
   protected readonly playlistResource = this.api.getById(this.id);
+
+  // Last-known playlist (with items) served while the resource refetches on
+  // return navigation. Required so view-transition morphs from the item
+  // detail page back to the matching card find a destination element.
+  protected readonly playlistResult = computed<PlaylistWithItemsHAL | undefined>(() => {
+    const live = this.playlistResource.value();
+    if (live) return live;
+    return this.pageCache.get<PlaylistWithItemsHAL>(this.cacheKey());
+  });
+
+  private readonly cacheKey = computed(() => `playlist:${this.idPlaylist()}`);
+
+  constructor() {
+    effect(() => {
+      const value = this.playlistResource.value();
+      if (value) this.pageCache.put(this.cacheKey(), value);
+    });
+  }
 
   // RSS URL is built from the path; the same URL is what podcast clients subscribe to.
   protected readonly rssUrl = computed(() => `${location.origin}/api/v1/playlists/${this.idPlaylist()}/rss`);
@@ -66,6 +87,12 @@ export default class PlaylistDetailComponent {
   protected coverUrl(playlist: PlaylistWithItemsHAL): string {
     return `/api/v1/playlists/${playlist.id}/cover.jpg`;
   }
+
+  // Derived from the route so the cover renders immediately for view-
+  // transition morphing, before the playlist resource resolves.
+  protected readonly coverSrc = computed(
+    () => `/api/v1/playlists/${this.idPlaylist()}/cover.jpg`,
+  );
 
   protected itemCoverUrl(item: PlaylistItemHAL): string {
     return item.cover.url;
@@ -101,7 +128,9 @@ export default class PlaylistDetailComponent {
   }
 
   protected onOpenItem(item: PlaylistItemHAL) {
-    this.router.navigate(['/podcasts', item.podcast.id, 'items', item.id]);
+    this.router.navigate(['/podcasts', item.podcast.id, 'items', item.id], {
+      queryParams: { from: 'playlist' },
+    });
   }
 
   protected onAction(item: PlaylistItemHAL, action: CoverCardAction) {
