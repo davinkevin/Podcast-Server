@@ -37,7 +37,7 @@
         }
       </header>
 
-      <div class="detail__actions">
+      <div class="detail__actions" [style]="actionStyles()">
         @if (item.isDownloaded) {
           <button mat-fab extended color="primary" (click)="onPlay(item)">
             <mat-icon>play_arrow</mat-icon>

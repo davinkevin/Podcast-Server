@@ -25,6 +25,12 @@
   initial-value: transparent;
 }
 
+@property --page-accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
 html {
   color-scheme: light dark;
 

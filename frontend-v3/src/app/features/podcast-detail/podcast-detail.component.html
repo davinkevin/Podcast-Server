@@ -39,7 +39,7 @@
           </ul>
         }
 
-        <div class="pod__actions">
+        <div class="pod__actions" [style]="actionStyles()">
           @if (podcast.type === 'upload') {
             <button mat-flat-button color="primary" (click)="onOpenUpload(podcast)">
               <mat-icon>upload</mat-icon>

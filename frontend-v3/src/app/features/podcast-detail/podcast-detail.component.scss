@@ -57,8 +57,14 @@
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 24px;
-  box-shadow: var(--mat-sys-level3);
   display: block;
+  // Standard elevation plus a colored glow that picks up the dominant cover
+  // color when --page-accent is set (vibrant). Falls back to transparent → no
+  // visible second shadow when no palette is available yet.
+  box-shadow:
+    var(--mat-sys-level3),
+    0 24px 64px -16px color-mix(in srgb, var(--page-accent) 38%, transparent);
+  transition: box-shadow 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .pod__meta {
@@ -73,12 +79,15 @@
   font: var(--mat-sys-display-small);
   letter-spacing: -0.01em;
   margin: 0;
+  color: var(--hero-title-color, var(--mat-sys-on-surface));
+  transition: color 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .pod__sub {
   font: var(--mat-sys-body-medium);
-  color: var(--mat-sys-on-surface-variant);
+  color: var(--hero-body-color, var(--mat-sys-on-surface-variant));
   margin: 0;
+  transition: color 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .pod__sub-sep {

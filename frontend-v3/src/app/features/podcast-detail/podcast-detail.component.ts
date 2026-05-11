@@ -33,6 +33,8 @@ import { PodcastHAL } from '../../core/models/podcast.model';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import { PlayerService } from '../../core/player/player.service';
 import {
+  applyCoverTint,
+  clearCoverTint,
   CoverColorService,
   CoverPalette,
 } from '../../core/cover-color/cover-color.service';
@@ -112,6 +114,27 @@ export default class PodcastDetailComponent {
   // gradient across the whole content area (Spotify/Apple Music feel).
   private readonly palette = signal<CoverPalette | null>(null);
 
+  // Per-button accent override. Material 19 uses per-component MDC tokens
+  // (--mdc-filled-button-container-color, --mdc-fab-container-color, ...)
+  // — overriding --mat-sys-primary on a parent isn't enough since those
+  // tokens are resolved at theme-compile time. We set the relevant tokens
+  // inline so flat-button and fab variants pick up the cover accent. Null
+  // when no palette → Angular removes the styles and theme defaults apply.
+  protected readonly actionStyles = computed(() => {
+    const p = this.palette();
+    const primary = p?.vibrant?.hex ?? p?.darkVibrant?.hex;
+    const onPrimary = p?.vibrant?.titleText ?? p?.darkVibrant?.titleText;
+    if (!primary || !onPrimary) return null;
+    return {
+      '--mdc-filled-button-container-color': primary,
+      '--mdc-filled-button-label-text-color': onPrimary,
+      '--mdc-fab-container-color': primary,
+      '--mat-fab-foreground-color': onPrimary,
+      '--mat-sys-primary': primary,
+      '--mat-sys-on-primary': onPrimary,
+    };
+  });
+
   constructor() {
     effect(() => {
       const url = this.coverSrc();
@@ -122,21 +145,8 @@ export default class PodcastDetailComponent {
     effect((onCleanup) => {
       const p = this.palette();
       const dark = this.settings.effectiveTheme() === 'dark';
-      const top = dark
-        ? p?.darkVibrant ?? p?.vibrant
-        : p?.vibrant ?? p?.lightVibrant;
-      const bottom = dark
-        ? p?.darkMuted ?? p?.muted
-        : p?.muted ?? p?.lightMuted;
-      const root = document.documentElement;
-      if (top) root.style.setProperty('--page-tint', top);
-      else root.style.removeProperty('--page-tint');
-      if (bottom) root.style.setProperty('--page-tint-bottom', bottom);
-      else root.style.removeProperty('--page-tint-bottom');
-      onCleanup(() => {
-        root.style.removeProperty('--page-tint');
-        root.style.removeProperty('--page-tint-bottom');
-      });
+      applyCoverTint(p, dark);
+      onCleanup(() => clearCoverTint());
     });
   }
 
