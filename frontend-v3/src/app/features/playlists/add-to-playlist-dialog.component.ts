@@ -245,11 +245,11 @@ export class AddToPlaylistDialogComponent {
 
   protected readonly mode = signal<Mode>('pick');
   protected readonly playlistsQuery = this.playlists.list();
-  private readonly containingResource = this.items.playlistsContaining(
+  private readonly containingQuery = this.items.playlistsContaining(
     signal({ podcastId: this.data.podcastId, itemId: this.data.itemId }),
   );
   protected readonly containingIds = computed(
-    () => new Set(this.containingResource.value()?.content.map((p) => p.id) ?? []),
+    () => new Set(this.containingQuery.data()?.content.map((p) => p.id) ?? []),
   );
   protected readonly busy = signal<string | undefined>(undefined);
   // Dialog returns a "changed" flag to callers that want to reload state.
@@ -284,7 +284,12 @@ export class AddToPlaylistDialogComponent {
           undefined,
           { duration: 2500 },
         );
-        this.containingResource.reload();
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.items.playlistsContaining(
+            this.data.podcastId,
+            this.data.itemId,
+          ),
+        });
       },
       error: () => {
         this.busy.set(undefined);
@@ -314,7 +319,12 @@ export class AddToPlaylistDialogComponent {
             this.queryClient.invalidateQueries({
               queryKey: queryKeys.playlists.list(),
             });
-            this.containingResource.reload();
+            this.queryClient.invalidateQueries({
+          queryKey: queryKeys.items.playlistsContaining(
+            this.data.podcastId,
+            this.data.itemId,
+          ),
+        });
           },
           error: () => {
             this.creating.set(false);

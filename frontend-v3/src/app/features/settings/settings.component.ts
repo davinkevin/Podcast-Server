@@ -14,11 +14,13 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { QueryClient } from '@tanstack/angular-query-experimental';
 
 import { DownloadApi } from '../../core/api/download.api';
 import { PodcastApi } from '../../core/api/podcast.api';
 import { ItemApi } from '../../core/api/item.api';
 import { CoverApi } from '../../core/api/cover.api';
+import { queryKeys } from '../../core/api/query-keys';
 import {
   SettingsService,
   ThemePreference,
@@ -50,13 +52,14 @@ export default class SettingsComponent {
   private readonly covers = inject(CoverApi);
   private readonly settings = inject(SettingsService);
   private readonly snackbar = inject(MatSnackBar);
+  private readonly queryClient = inject(QueryClient);
 
-  protected readonly limitResource = this.downloads.limit;
+  protected readonly limitQuery = this.downloads.limit();
   protected readonly limitDraft = signal<number | null>(null);
   protected readonly savingLimit = signal(false);
   protected readonly limitDirty = computed(() => {
     const draft = this.limitDraft();
-    const remote = this.limitResource.value();
+    const remote = this.limitQuery.data();
     return draft !== null && remote !== undefined && draft !== remote && draft >= 1;
   });
 
@@ -72,7 +75,7 @@ export default class SettingsComponent {
   constructor() {
     // Mirror the loaded limit into the draft once.
     effect(() => {
-      const remote = this.limitResource.value();
+      const remote = this.limitQuery.data();
       if (remote !== undefined && this.limitDraft() === null) {
         this.limitDraft.set(remote);
       }
@@ -91,7 +94,9 @@ export default class SettingsComponent {
     this.downloads.updateLimit(v).subscribe({
       next: () => {
         this.savingLimit.set(false);
-        this.limitResource.reload();
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.downloads.limit(),
+        });
         this.snackbar.open('Parallel limit updated', undefined, { duration: 2500 });
       },
       error: () => {

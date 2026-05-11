@@ -1,12 +1,21 @@
 import { inject, Injectable } from '@angular/core';
-import { HttpClient, httpResource } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
+import { injectQuery } from '@tanstack/angular-query-experimental';
+import { lastValueFrom } from 'rxjs';
+
+import { queryKeys } from './query-keys';
 
 @Injectable({ providedIn: 'root' })
 export class DownloadApi {
   private readonly http = inject(HttpClient);
 
   /** Parallel-download limit. Backend serves it as a plain integer body. */
-  readonly limit = httpResource<number>(() => '/api/v1/downloads/limit');
+  limit() {
+    return injectQuery(() => ({
+      queryKey: queryKeys.downloads.limit(),
+      queryFn: () => lastValueFrom(this.http.get<number>('/api/v1/downloads/limit')),
+    }));
+  }
 
   updateLimit(value: number) {
     return this.http.post<number>('/api/v1/downloads/limit', value);

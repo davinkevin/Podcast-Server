@@ -1,5 +1,5 @@
-@let playlist = playlistResult();
-@let err = playlistResource.error();
+@let playlist = playlistQuery.data();
+@let err = playlistQuery.error();
 
 @if (err && !playlist) {
   <ps-empty-state

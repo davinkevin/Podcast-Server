@@ -38,10 +38,15 @@ export class PodcastApi {
     }));
   }
 
-  getById(id: Signal<string | undefined>): HttpResourceRef<PodcastHAL | undefined> {
-    return httpResource<PodcastHAL>(() => {
+  getById(id: Signal<string | undefined>) {
+    return injectQuery(() => {
       const v = id();
-      return v ? { url: `/api/v1/podcasts/${v}` } : undefined;
+      return {
+        queryKey: v ? queryKeys.podcasts.detail(v) : ['podcasts', 'detail', 'noop'],
+        queryFn: () =>
+          lastValueFrom(this.http.get<PodcastHAL>(`/api/v1/podcasts/${v}`)),
+        enabled: !!v,
+      };
     });
   }
 

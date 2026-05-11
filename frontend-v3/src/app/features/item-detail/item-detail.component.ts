@@ -15,8 +15,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
+import { QueryClient } from '@tanstack/angular-query-experimental';
 
 import { ItemApi, ItemRef } from '../../core/api/item.api';
+import { queryKeys } from '../../core/api/query-keys';
 import { ItemHAL } from '../../core/models/item.model';
 import { PlayerService } from '../../core/player/player.service';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
@@ -80,20 +82,21 @@ export default class ItemDetailComponent {
   private readonly snackbar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly coverColor = inject(CoverColorService);
+  private readonly queryClient = inject(QueryClient);
   private readonly settings = inject(SettingsService);
 
   protected readonly ref = computed<ItemRef>(() => ({
     podcastId: this.idPodcast(),
     id: this.id(),
   }));
-  protected readonly itemResource = this.itemApi.getById(this.ref);
+  protected readonly itemQuery = this.itemApi.getById(this.ref);
 
   // Cover URL derived from the route so the cover img can render before the
   // item resource resolves — required for view-transition morphs from the
   // list page. Once the item arrives, swap to its real URL (handles non-jpg
   // covers gracefully).
   protected readonly coverSrc = computed(() => {
-    const item = this.itemResource.value();
+    const item = this.itemQuery.data();
     if (item) return item.cover.url;
     return `/api/v1/podcasts/${this.idPodcast()}/items/${this.id()}/cover.jpg`;
   });
@@ -124,12 +127,12 @@ export default class ItemDetailComponent {
 
   constructor() {
     effect(() => {
-      const item = this.itemResource.value();
+      const item = this.itemQuery.data();
       if (item) this.title.setTitle(`${item.title} — Podcast Server`);
     });
 
     effect(() => {
-      const item = this.itemResource.value();
+      const item = this.itemQuery.data();
       if (!item) return;
       this.coverColor.extract(item.cover.url).then((p) => this.palette.set(p));
     });
@@ -180,7 +183,9 @@ export default class ItemDetailComponent {
         // Reset deletes the file on disk; if it's playing, the proxyURL would 404 — close.
         this.player.closeIf(item.id);
         this.snackbar.open('Item reset', undefined, { duration: 2500 });
-        this.itemResource.reload();
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.items.detail(item.podcastId, item.id),
+        });
       },
       error: () => this.snackbar.open('Could not reset item', 'Dismiss', { duration: 4000 }),
     });

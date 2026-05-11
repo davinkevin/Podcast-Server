@@ -1,5 +1,5 @@
-@let podcast = podcastResource.value();
-@let podcastErr = podcastResource.error();
+@let podcast = podcastQuery.data();
+@let podcastErr = podcastQuery.error();
 
 @if (podcastErr && !podcast) {
   <ps-empty-state

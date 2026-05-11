@@ -1,5 +1,5 @@
-@let item = itemResource.value();
-@let err = itemResource.error();
+@let item = itemQuery.data();
+@let err = itemQuery.error();
 
 @if (err && !item) {
   <ps-empty-state

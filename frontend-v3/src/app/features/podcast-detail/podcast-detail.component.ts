@@ -92,7 +92,7 @@ export default class PodcastDetailComponent {
   private readonly queryClient = inject(QueryClient);
 
   protected readonly id = computed(() => this.idPodcast());
-  protected readonly podcastResource = this.api.getById(this.id);
+  protected readonly podcastQuery = this.api.getById(this.id);
 
   /* Bumped on every successful Settings save to bust the browser cache for the
      cover, whose URL stays the same (`/api/v1/podcasts/{id}/cover.jpg`) even
@@ -223,7 +223,9 @@ export default class PodcastDetailComponent {
       .afterClosed()
       .subscribe((saved) => {
         if (saved) {
-          this.podcastResource.reload();
+          this.queryClient.invalidateQueries({
+            queryKey: queryKeys.podcasts.detail(this.idPodcast()),
+          });
           this.coverVersion.update((n) => n + 1);
         }
       });

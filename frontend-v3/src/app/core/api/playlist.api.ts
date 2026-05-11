@@ -23,12 +23,17 @@ export class PlaylistApi {
     }));
   }
 
-  getById(
-    id: Signal<string | undefined>,
-  ): HttpResourceRef<PlaylistWithItemsHAL | undefined> {
-    return httpResource<PlaylistWithItemsHAL>(() => {
+  getById(id: Signal<string | undefined>) {
+    return injectQuery(() => {
       const v = id();
-      return v ? { url: `/api/v1/playlists/${v}` } : undefined;
+      return {
+        queryKey: v ? queryKeys.playlists.detail(v) : ['playlists', 'detail', 'noop'],
+        queryFn: () =>
+          lastValueFrom(
+            this.http.get<PlaylistWithItemsHAL>(`/api/v1/playlists/${v}`),
+          ),
+        enabled: !!v,
+      };
     });
   }
 

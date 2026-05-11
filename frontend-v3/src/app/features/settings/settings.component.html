@@ -53,8 +53,8 @@
         </p>
       </div>
     </header>
-    @let limit = limitResource.value();
-    @let limitLoading = limitResource.isLoading();
+    @let limit = limitQuery.data();
+    @let limitLoading = limitQuery.isPending();
     <div class="card__row">
       @if (limitLoading && limit === undefined) {
         <mat-spinner diameter="20" />

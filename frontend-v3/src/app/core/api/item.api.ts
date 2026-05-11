@@ -56,11 +56,21 @@ export class ItemApi {
     });
   }
 
-  getById(input: Signal<ItemRef | undefined>): HttpResourceRef<ItemHAL | undefined> {
-    return httpResource<ItemHAL>(() => {
+  getById(input: Signal<ItemRef | undefined>) {
+    return injectQuery(() => {
       const ref = input();
-      if (!ref) return undefined;
-      return { url: `/api/v1/podcasts/${ref.podcastId}/items/${ref.id}` };
+      return {
+        queryKey: ref
+          ? queryKeys.items.detail(ref.podcastId, ref.id)
+          : ['items', 'detail', 'noop'],
+        queryFn: () =>
+          lastValueFrom(
+            this.http.get<ItemHAL>(
+              `/api/v1/podcasts/${ref!.podcastId}/items/${ref!.id}`,
+            ),
+          ),
+        enabled: !!ref,
+      };
     });
   }
 
@@ -95,12 +105,21 @@ export class ItemApi {
   /** Lists playlists currently containing the given item. */
   playlistsContaining(
     ref: Signal<{ readonly podcastId: string; readonly itemId: string } | undefined>,
-  ): HttpResourceRef<PlaylistsContainerHAL | undefined> {
-    return httpResource<PlaylistsContainerHAL>(() => {
+  ) {
+    return injectQuery(() => {
       const r = ref();
-      return r
-        ? { url: `/api/v1/podcasts/${r.podcastId}/items/${r.itemId}/playlists` }
-        : undefined;
+      return {
+        queryKey: r
+          ? queryKeys.items.playlistsContaining(r.podcastId, r.itemId)
+          : ['items', 'playlists-containing', 'noop'],
+        queryFn: () =>
+          lastValueFrom(
+            this.http.get<PlaylistsContainerHAL>(
+              `/api/v1/podcasts/${r!.podcastId}/items/${r!.itemId}/playlists`,
+            ),
+          ),
+        enabled: !!r,
+      };
     });
   }
 }

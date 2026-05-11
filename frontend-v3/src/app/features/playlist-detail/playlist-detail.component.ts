@@ -2,7 +2,6 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
-  effect,
   inject,
   input,
   signal,
@@ -25,7 +24,8 @@ import {
   PlaylistWithItemsHAL,
 } from '../../core/models/playlist.model';
 import { PlayerService } from '../../core/player/player.service';
-import { PageCache } from '../../core/page-cache/page-cache.service';
+import { queryKeys } from '../../core/api/query-keys';
+import { QueryClient } from '@tanstack/angular-query-experimental';
 
 const REMOVE_ACTION: CoverCardAction = {
   id: 'remove',
@@ -56,28 +56,10 @@ export default class PlaylistDetailComponent {
   private readonly api = inject(PlaylistApi);
   private readonly snackbar = inject(MatSnackBar);
   private readonly player = inject(PlayerService);
-  private readonly pageCache = inject(PageCache);
+  private readonly queryClient = inject(QueryClient);
 
   protected readonly id = computed(() => this.idPlaylist());
-  protected readonly playlistResource = this.api.getById(this.id);
-
-  // Last-known playlist (with items) served while the resource refetches on
-  // return navigation. Required so view-transition morphs from the item
-  // detail page back to the matching card find a destination element.
-  protected readonly playlistResult = computed<PlaylistWithItemsHAL | undefined>(() => {
-    const live = this.playlistResource.value();
-    if (live) return live;
-    return this.pageCache.get<PlaylistWithItemsHAL>(this.cacheKey());
-  });
-
-  private readonly cacheKey = computed(() => `playlist:${this.idPlaylist()}`);
-
-  constructor() {
-    effect(() => {
-      const value = this.playlistResource.value();
-      if (value) this.pageCache.put(this.cacheKey(), value);
-    });
-  }
+  protected readonly playlistQuery = this.api.getById(this.id);
 
   // RSS URL is built from the path; the same URL is what podcast clients subscribe to.
   protected readonly rssUrl = computed(() => `${location.origin}/api/v1/playlists/${this.idPlaylist()}/rss`);
@@ -141,7 +123,9 @@ export default class PlaylistDetailComponent {
     this.api.removeItem(this.idPlaylist(), item.id).subscribe({
       next: () => {
         this.snackbar.open('Removed from playlist', undefined, { duration: 2500 });
-        this.playlistResource.reload();
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.playlists.detail(this.idPlaylist()),
+        });
       },
       error: () =>
         this.snackbar.open('Could not remove the item', 'Dismiss', { duration: 4000 }),
