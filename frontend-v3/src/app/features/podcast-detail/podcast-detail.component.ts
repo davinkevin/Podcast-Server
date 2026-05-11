@@ -17,10 +17,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import {
-  CoverCardAction,
-  CoverCardComponent,
-} from '../../shared/cover-card/cover-card.component';
+import { CoverCardAction } from '../../shared/cover-card/cover-card.component';
+import { TrackRowComponent } from '../../shared/track-row/track-row.component';
 import { PagerComponent } from '../../shared/pager/pager.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import {
@@ -61,7 +59,7 @@ const ADD_TO_PLAYLIST_ACTION: CoverCardAction = {
     MatButtonModule,
     MatMenuModule,
     MatProgressSpinnerModule,
-    CoverCardComponent,
+    TrackRowComponent,
     PagerComponent,
     EmptyStateComponent,
     StatusBadgeComponent,
@@ -159,6 +157,15 @@ export default class PodcastDetailComponent {
   }
 
   protected readonly cardActions = [ADD_TO_PLAYLIST_ACTION] as const;
+
+  protected subtitleFor(item: ItemHAL): string {
+    if (!item.pubDate) return 'No date';
+    return new Date(item.pubDate).toLocaleDateString(undefined, {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    });
+  }
 
   protected statusFor(item: ItemHAL): { kind: StatusBadgeKind; progression: number | null } | null {
     const downloading = this.stream.downloading().find((d) => d.id === item.id);

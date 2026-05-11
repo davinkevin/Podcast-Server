@@ -117,12 +117,12 @@
           subtitle="Trigger an update or upload an episode to fill this podcast."
         />
       } @else {
-        <div class="pod__grid">
+        <div class="pod__list">
           @for (item of result.content; track item.id) {
             @let badge = statusFor(item);
-            <ps-cover-card
+            <ps-track-row
               [title]="item.title"
-              [subtitle]="item.podcast.title"
+              [subtitle]="subtitleFor(item)"
               [coverUrl]="item.cover.url"
               [playable]="item.isDownloaded"
               [downloadable]="!item.isDownloaded && !isInProgress(item)"
@@ -140,7 +140,7 @@
                   [progression]="badge.progression"
                 />
               }
-            </ps-cover-card>
+            </ps-track-row>
           }
         </div>
 

@@ -1,0 +1,79 @@
+:host {
+  display: block;
+}
+
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 56px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.875rem;
+  width: 100%;
+  border: 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  color: inherit;
+  transition: background 160ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.row:hover,
+.row:focus-visible {
+  background: var(--mat-sys-surface-container);
+}
+
+.row:focus-visible {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: -2px;
+}
+
+.row__cover {
+  width: 56px;
+  height: 56px;
+  object-fit: cover;
+  border-radius: 8px;
+  display: block;
+  background: var(--mat-sys-surface-container-low);
+}
+
+.row__badge-slot {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  display: flex;
+  gap: 2px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.row__meta {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  gap: 2px;
+}
+
+.row__title {
+  font: var(--mat-sys-title-small);
+  color: var(--mat-sys-on-surface);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row__subtitle {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row__actions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}

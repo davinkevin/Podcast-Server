@@ -13,10 +13,8 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import {
-  CoverCardAction,
-  CoverCardComponent,
-} from '../../shared/cover-card/cover-card.component';
+import { CoverCardAction } from '../../shared/cover-card/cover-card.component';
+import { TrackRowComponent } from '../../shared/track-row/track-row.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { PlaylistApi } from '../../core/api/playlist.api';
 import {
@@ -39,7 +37,7 @@ const REMOVE_ACTION: CoverCardAction = {
     MatButtonModule,
     MatMenuModule,
     MatProgressSpinnerModule,
-    CoverCardComponent,
+    TrackRowComponent,
     EmptyStateComponent,
   ],
   templateUrl: './playlist-detail.component.html',

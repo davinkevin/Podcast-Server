@@ -69,9 +69,9 @@
         subtitle="Add episodes to it from the Library or any podcast page."
       />
     } @else {
-      <div class="pl__grid">
+      <div class="pl__list">
         @for (item of playlist.items; track item.id) {
-          <ps-cover-card
+          <ps-track-row
             [title]="item.title"
             [subtitle]="item.podcast.title"
             [coverUrl]="itemCoverUrl(item)"

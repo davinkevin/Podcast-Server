@@ -92,8 +92,8 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
-.pl__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.25rem;
+.pl__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }

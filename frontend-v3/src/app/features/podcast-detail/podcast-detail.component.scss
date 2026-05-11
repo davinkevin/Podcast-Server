@@ -127,10 +127,10 @@
   margin-left: auto;
 }
 
-.pod__grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1.25rem;
+.pod__list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
 }
 
 .pod__footer {

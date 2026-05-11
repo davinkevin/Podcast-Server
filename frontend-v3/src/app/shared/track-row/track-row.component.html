@@ -1,0 +1,63 @@
+<button type="button" class="row" matRipple (click)="onOpen()">
+  <img
+    class="row__cover"
+    [src]="coverUrl()"
+    [alt]="title()"
+    loading="lazy"
+    [style.view-transition-name]="viewTransitionName()"
+  />
+
+  <div class="row__badge-slot">
+    <ng-content select="[coverBadge]" />
+  </div>
+
+  <div class="row__meta">
+    <div class="row__title" [title]="title()">{{ title() }}</div>
+    @if (subtitle(); as s) {
+      <div class="row__subtitle" [title]="s">{{ s }}</div>
+    }
+  </div>
+
+  <div class="row__actions">
+    @if (playable()) {
+      <button
+        mat-icon-button
+        class="row__primary"
+        aria-label="Play"
+        (click)="onPlay($event)"
+      >
+        <mat-icon>play_arrow</mat-icon>
+      </button>
+    } @else if (downloadable()) {
+      <button
+        mat-icon-button
+        class="row__primary"
+        aria-label="Download"
+        (click)="onDownload($event)"
+      >
+        <mat-icon>download</mat-icon>
+      </button>
+    }
+
+    @if (actions().length > 0) {
+      <button
+        mat-icon-button
+        class="row__more"
+        aria-label="More actions"
+        [matMenuTriggerFor]="menu"
+        (click)="$event.stopPropagation()"
+      >
+        <mat-icon>more_vert</mat-icon>
+      </button>
+
+      <mat-menu #menu="matMenu">
+        @for (entry of actions(); track entry.label) {
+          <button mat-menu-item (click)="onAction(entry)">
+            <mat-icon>{{ entry.icon }}</mat-icon>
+            <span>{{ entry.label }}</span>
+          </button>
+        }
+      </mat-menu>
+    }
+  </div>
+</button>
