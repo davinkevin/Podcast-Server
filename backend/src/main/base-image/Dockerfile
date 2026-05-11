@@ -46,7 +46,7 @@ RUN echo "Print versions of bundled tools" && \
   /opt/yt-dlp/yt-dlp --version && \
   /opt/deno/deno --version | head -n 1
 
-FROM gcr.io/distroless/java25-debian13:latest@sha256:70036fed3c5ba28821c5fad98b613a2fb173cc52fa893b509abedaa2e82ba9c1 AS base-image
+FROM gcr.io/distroless/java25-debian13:latest@sha256:3e0a1496b365a18d2c01ccfe27c8bc93b1a6b8ca7460c02b8badb791bf296fce AS base-image
 
 COPY --from=downloader /opt/ffmpeg/ /opt/ffmpeg/
 COPY --from=downloader /opt/yt-dlp/ /opt/yt-dlp/
