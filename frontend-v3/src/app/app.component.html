@@ -1,6 +1,7 @@
 <mat-sidenav-container class="shell" autosize>
   <mat-sidenav
     class="shell__sidenav"
+    [class.shell__sidenav--rail]="settings.sidenavMode() === 'rail'"
     mode="side"
     opened
     disableClose

@@ -11,12 +11,13 @@
   overflow: hidden;
 }
 
-/* Audio: full-width strip at the bottom. */
+/* Audio: full-width strip at the bottom, anchored to the sidenav edge. */
 .player--audio {
   bottom: 0;
-  left: 240px;
+  left: var(--sidenav-width, 240px);
   right: 0;
   border-top: 1px solid var(--mat-sys-outline-variant);
+  transition: left 200ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Video: small PiP card in the bottom-right corner. Use the native fullscreen

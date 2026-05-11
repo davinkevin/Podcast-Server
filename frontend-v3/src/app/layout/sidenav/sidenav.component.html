@@ -1,4 +1,4 @@
-<nav class="sidenav" aria-label="Main navigation">
+<nav class="sidenav" [class.sidenav--rail]="isRail()" aria-label="Main navigation">
   <a class="sidenav__brand" routerLink="/" aria-label="Go to library">
     <mat-icon class="sidenav__logo">graphic_eq</mat-icon>
     <span class="sidenav__brand-name">Podcast Server</span>
@@ -14,9 +14,12 @@
         #rla="routerLinkActive"
         [activated]="rla.isActive"
         class="sidenav__link"
+        [matTooltip]="link.label"
+        matTooltipPosition="right"
+        [matTooltipDisabled]="!isRail()"
       >
         <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
-        <span matListItemTitle>{{ link.label }}</span>
+        <span matListItemTitle class="sidenav__link-label">{{ link.label }}</span>
       </a>
     }
   </mat-nav-list>
@@ -29,6 +32,9 @@
       cdkOverlayOrigin
       #downloadsTrigger="cdkOverlayOrigin"
       [activated]="downloadsOpen()"
+      [matTooltip]="'Downloads'"
+      matTooltipPosition="right"
+      [matTooltipDisabled]="!isRail()"
       [attr.aria-label]="
         downloadCount() > 0 ? 'Downloads (' + downloadCount() + ' active)' : 'Downloads'
       "
@@ -44,7 +50,7 @@
         matBadgeOverlap="true"
         >downloading</mat-icon
       >
-      <span matListItemTitle>Downloads</span>
+      <span matListItemTitle class="sidenav__link-label">Downloads</span>
     </button>
 
     <ng-template
@@ -68,10 +74,28 @@
         #rla="routerLinkActive"
         [activated]="rla.isActive"
         class="sidenav__link"
+        [matTooltip]="link.label"
+        matTooltipPosition="right"
+        [matTooltipDisabled]="!isRail()"
       >
         <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
-        <span matListItemTitle>{{ link.label }}</span>
+        <span matListItemTitle class="sidenav__link-label">{{ link.label }}</span>
       </a>
     }
+
+    <button
+      mat-list-item
+      type="button"
+      class="sidenav__link sidenav__link--button"
+      [matTooltip]="isRail() ? 'Expand sidebar' : 'Collapse sidebar'"
+      matTooltipPosition="right"
+      [matTooltipDisabled]="!isRail()"
+      [attr.aria-label]="isRail() ? 'Expand sidebar' : 'Collapse sidebar'"
+      [attr.aria-expanded]="!isRail()"
+      (click)="toggleRail($event)"
+    >
+      <mat-icon matListItemIcon>{{ isRail() ? 'chevron_right' : 'chevron_left' }}</mat-icon>
+      <span matListItemTitle class="sidenav__link-label">Collapse Sidebar</span>
+    </button>
   </mat-nav-list>
 </nav>

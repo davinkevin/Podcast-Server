@@ -3,6 +3,13 @@
 // Material 3 Expressive theme — accent #6750A4 (M3 default purple = mat.$violet-palette).
 // SettingsService overrides color-scheme inline; "light dark" here = follow OS until then.
 
+:root {
+  // Live sidenav width — SettingsService updates this when the user toggles
+  // between expanded (240px) and rail (80px). Layout pieces pinned next to
+  // the sidenav (floating-player) read this variable to stay aligned.
+  --sidenav-width: 240px;
+}
+
 html {
   color-scheme: light dark;
 

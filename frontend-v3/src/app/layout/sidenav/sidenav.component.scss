@@ -8,12 +8,13 @@
 
 .sidenav__brand {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   gap: 0.5rem;
   padding: 16px;
   color: inherit;
   text-decoration: none;
   border-bottom: 1px solid var(--mat-sys-outline-variant);
+  overflow: hidden;
 }
 
 .sidenav__brand:hover {
@@ -30,7 +31,7 @@
   font-size: 28px;
   width: 28px;
   height: 28px;
-  align-self: center;
+  flex: 0 0 auto;
 }
 
 .sidenav__brand-name {
@@ -38,6 +39,7 @@
   font-weight: 600;
   letter-spacing: 0.01em;
   flex: 1 1 auto;
+  white-space: nowrap;
 }
 
 .sidenav__brand-version {
@@ -46,6 +48,7 @@
   background: var(--mat-sys-surface-container-highest);
   border-radius: 999px;
   padding: 2px 8px;
+  flex: 0 0 auto;
 }
 
 .sidenav__list {
@@ -73,4 +76,41 @@
   cursor: pointer;
   text-align: inherit;
   width: 100%;
+}
+
+// --- Rail mode -----------------------------------------------------------
+
+.sidenav--rail .sidenav__brand-name,
+.sidenav--rail .sidenav__brand-version,
+.sidenav--rail .sidenav__link-label {
+  display: none;
+}
+
+.sidenav--rail .sidenav__brand {
+  justify-content: center;
+  padding: 16px 8px;
+}
+
+.sidenav--rail .sidenav__list {
+  padding: 12px 4px;
+}
+
+// In rail mode the title is hidden, but Material's leading-icon slot keeps
+// the icon pinned to the left. Collapse the (empty) content slot and reset
+// all left/right padding & margin so what remains — the icon — sits centered.
+.sidenav--rail ::ng-deep .mat-mdc-list-item {
+  padding-left: 0;
+  padding-right: 0;
+  justify-content: center;
+}
+
+.sidenav--rail ::ng-deep .mat-mdc-list-item .mdc-list-item__start,
+.sidenav--rail ::ng-deep .mat-mdc-list-item .mat-mdc-list-item-icon {
+  margin-left: 0;
+  margin-right: 0;
+}
+
+.sidenav--rail ::ng-deep .mdc-list-item__content,
+.sidenav--rail ::ng-deep .mat-mdc-list-item-unscoped-content {
+  display: none;
 }

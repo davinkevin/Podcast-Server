@@ -1,7 +1,8 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { MatSidenavModule } from '@angular/material/sidenav';
 
+import { SettingsService } from './core/settings/settings.service';
 import { SidenavComponent } from './layout/sidenav/sidenav.component';
 import { FloatingPlayerComponent } from './layout/floating-player/floating-player.component';
 
@@ -18,4 +19,6 @@ import { FloatingPlayerComponent } from './layout/floating-player/floating-playe
   styleUrl: './app.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent {}
+export class AppComponent {
+  protected readonly settings = inject(SettingsService);
+}
