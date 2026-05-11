@@ -1,6 +1,6 @@
-@let result = podcastsResult();
-@let loading = podcastsResource.isLoading();
-@let err = podcastsResource.error();
+@let result = podcastsQuery.data();
+@let loading = podcastsQuery.isPending();
+@let err = podcastsQuery.error();
 
 <section class="podcasts">
   <header class="podcasts__header">

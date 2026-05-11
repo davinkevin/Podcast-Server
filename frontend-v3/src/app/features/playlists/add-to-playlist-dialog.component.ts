@@ -17,10 +17,12 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { QueryClient } from '@tanstack/angular-query-experimental';
 
 import { PlaylistApi } from '../../core/api/playlist.api';
 import { ItemApi } from '../../core/api/item.api';
 import { PlaylistHAL } from '../../core/models/playlist.model';
+import { queryKeys } from '../../core/api/query-keys';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 
 export interface AddToPlaylistDialogData {
@@ -56,8 +58,8 @@ type Mode = 'pick' | 'create';
       <p class="dialog__hint" [title]="data.itemTitle">{{ data.itemTitle }}</p>
 
       @if (mode() === 'pick') {
-        @let result = playlistsResource.value();
-        @let loading = playlistsResource.isLoading();
+        @let result = playlistsQuery.data();
+        @let loading = playlistsQuery.isPending();
         @if (loading && !result) {
           <div class="dialog__state"><mat-spinner diameter="24" /></div>
         } @else if (result && result.content.length === 0) {
@@ -239,9 +241,10 @@ export class AddToPlaylistDialogComponent {
     MatDialogRef<AddToPlaylistDialogComponent, boolean>,
   );
   private readonly snackbar = inject(MatSnackBar);
+  private readonly queryClient = inject(QueryClient);
 
   protected readonly mode = signal<Mode>('pick');
-  protected readonly playlistsResource = this.playlists.list();
+  protected readonly playlistsQuery = this.playlists.list();
   private readonly containingResource = this.items.playlistsContaining(
     signal({ podcastId: this.data.podcastId, itemId: this.data.itemId }),
   );
@@ -308,7 +311,9 @@ export class AddToPlaylistDialogComponent {
             this.newName.set('');
             this.newCoverUrl.set('');
             this.mode.set('pick');
-            this.playlistsResource.reload();
+            this.queryClient.invalidateQueries({
+              queryKey: queryKeys.playlists.list(),
+            });
             this.containingResource.reload();
           },
           error: () => {

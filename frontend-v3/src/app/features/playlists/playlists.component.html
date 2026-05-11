@@ -1,6 +1,6 @@
-@let result = playlistsResult();
-@let loading = playlistsResource.isLoading();
-@let err = playlistsResource.error();
+@let result = playlistsQuery.data();
+@let loading = playlistsQuery.isPending();
+@let err = playlistsQuery.error();
 
 <section class="playlists">
   <header class="playlists__header">

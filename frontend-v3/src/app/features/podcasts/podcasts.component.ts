@@ -1,24 +1,17 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
+import { QueryClient } from '@tanstack/angular-query-experimental';
 
 import { CoverCardComponent } from '../../shared/cover-card/cover-card.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { PodcastApi } from '../../core/api/podcast.api';
-import { PodcastHAL, PodcastsContainerHAL } from '../../core/models/podcast.model';
-import { PageCache } from '../../core/page-cache/page-cache.service';
+import { PodcastHAL } from '../../core/models/podcast.model';
+import { queryKeys } from '../../core/api/query-keys';
 import { PodcastCreateDialogComponent } from './podcast-create-dialog.component';
-
-const CACHE_KEY = 'podcasts:list';
 
 @Component({
   selector: 'ps-podcasts',
@@ -38,25 +31,12 @@ export default class PodcastsComponent {
   private readonly router = inject(Router);
   private readonly api = inject(PodcastApi);
   private readonly dialog = inject(MatDialog);
-  private readonly pageCache = inject(PageCache);
+  private readonly queryClient = inject(QueryClient);
 
-  protected readonly podcastsResource = this.api.list();
-
-  // Cached fallback so the grid is in DOM right at mount (return navigation)
-  // — required for view-transition morphs from the detail page back to the
-  // matching card to find a destination element at snapshot time.
-  protected readonly podcastsResult = computed<PodcastsContainerHAL | undefined>(() => {
-    const live = this.podcastsResource.value();
-    if (live) return live;
-    return this.pageCache.get<PodcastsContainerHAL>(CACHE_KEY);
-  });
-
-  constructor() {
-    effect(() => {
-      const value = this.podcastsResource.value();
-      if (value) this.pageCache.put(CACHE_KEY, value);
-    });
-  }
+  // TanStack Query provides stale-while-revalidate out of the box — on return
+  // navigation the cached list renders instantly while a background refetch
+  // happens. No more PageCache + computed fallback boilerplate.
+  protected readonly podcastsQuery = this.api.list();
 
   protected coverUrl(p: PodcastHAL): string {
     return p.cover.url;
@@ -75,7 +55,9 @@ export default class PodcastsComponent {
       .afterClosed()
       .subscribe((created: PodcastHAL | undefined) => {
         if (!created) return;
-        this.podcastsResource.reload();
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.podcasts.list(),
+        });
         this.router.navigate(['/podcasts', created.id]);
       });
   }

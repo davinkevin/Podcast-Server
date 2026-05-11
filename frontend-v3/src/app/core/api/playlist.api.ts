@@ -1,17 +1,26 @@
 import { inject, Injectable, Signal } from '@angular/core';
 import { HttpClient, httpResource, HttpResourceRef } from '@angular/common/http';
+import { injectQuery } from '@tanstack/angular-query-experimental';
+import { lastValueFrom } from 'rxjs';
 
 import {
   PlaylistsContainerHAL,
   PlaylistWithItemsHAL,
 } from '../models/playlist.model';
+import { queryKeys } from './query-keys';
 
 @Injectable({ providedIn: 'root' })
 export class PlaylistApi {
   private readonly http = inject(HttpClient);
 
-  list(): HttpResourceRef<PlaylistsContainerHAL | undefined> {
-    return httpResource<PlaylistsContainerHAL>(() => ({ url: '/api/v1/playlists' }));
+  list() {
+    return injectQuery(() => ({
+      queryKey: queryKeys.playlists.list(),
+      queryFn: () =>
+        lastValueFrom(
+          this.http.get<PlaylistsContainerHAL>('/api/v1/playlists'),
+        ),
+    }));
   }
 
   getById(

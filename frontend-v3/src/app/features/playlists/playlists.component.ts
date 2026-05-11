@@ -1,28 +1,20 @@
-import {
-  ChangeDetectionStrategy,
-  Component,
-  computed,
-  effect,
-  inject,
-} from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialog } from '@angular/material/dialog';
+import { QueryClient } from '@tanstack/angular-query-experimental';
 
 import { CoverCardComponent } from '../../shared/cover-card/cover-card.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { PlaylistApi } from '../../core/api/playlist.api';
 import {
   PlaylistHAL,
-  PlaylistsContainerHAL,
   PlaylistWithItemsHAL,
 } from '../../core/models/playlist.model';
-import { PageCache } from '../../core/page-cache/page-cache.service';
+import { queryKeys } from '../../core/api/query-keys';
 import { PlaylistCreateDialogComponent } from './playlist-create-dialog.component';
-
-const CACHE_KEY = 'playlists:list';
 
 @Component({
   selector: 'ps-playlists',
@@ -42,22 +34,9 @@ export default class PlaylistsComponent {
   private readonly router = inject(Router);
   private readonly api = inject(PlaylistApi);
   private readonly dialog = inject(MatDialog);
-  private readonly pageCache = inject(PageCache);
+  private readonly queryClient = inject(QueryClient);
 
-  protected readonly playlistsResource = this.api.list();
-
-  protected readonly playlistsResult = computed<PlaylistsContainerHAL | undefined>(() => {
-    const live = this.playlistsResource.value();
-    if (live) return live;
-    return this.pageCache.get<PlaylistsContainerHAL>(CACHE_KEY);
-  });
-
-  constructor() {
-    effect(() => {
-      const value = this.playlistsResource.value();
-      if (value) this.pageCache.put(CACHE_KEY, value);
-    });
-  }
+  protected readonly playlistsQuery = this.api.list();
 
   protected coverUrl(p: PlaylistHAL): string {
     return `/api/v1/playlists/${p.id}/cover.jpg`;
@@ -76,7 +55,9 @@ export default class PlaylistsComponent {
       .afterClosed()
       .subscribe((created: PlaylistWithItemsHAL | undefined) => {
         if (!created) return;
-        this.playlistsResource.reload();
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.playlists.list(),
+        });
         this.router.navigate(['/playlists', created.id]);
       });
   }

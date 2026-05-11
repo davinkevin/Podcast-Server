@@ -1,5 +1,7 @@
 import { computed, inject, Injectable, Signal } from '@angular/core';
 import { HttpClient, httpResource, HttpResourceRef } from '@angular/common/http';
+import { injectQuery } from '@tanstack/angular-query-experimental';
+import { lastValueFrom } from 'rxjs';
 
 import {
   PodcastCreationHAL,
@@ -9,6 +11,7 @@ import {
 } from '../models/podcast.model';
 import { PageHAL } from '../models/page.model';
 import { ItemHAL } from '../models/item.model';
+import { queryKeys } from './query-keys';
 
 export interface PodcastItemsInput {
   readonly podcastId: string;
@@ -22,8 +25,12 @@ export interface PodcastItemsInput {
 export class PodcastApi {
   private readonly http = inject(HttpClient);
 
-  list(): HttpResourceRef<PodcastsContainerHAL | undefined> {
-    return httpResource<PodcastsContainerHAL>(() => ({ url: '/api/v1/podcasts' }));
+  list() {
+    return injectQuery(() => ({
+      queryKey: queryKeys.podcasts.list(),
+      queryFn: () =>
+        lastValueFrom(this.http.get<PodcastsContainerHAL>('/api/v1/podcasts')),
+    }));
   }
 
   getById(id: Signal<string | undefined>): HttpResourceRef<PodcastHAL | undefined> {
