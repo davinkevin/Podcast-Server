@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, inject } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatButtonModule } from '@angular/material/button';
@@ -37,6 +37,17 @@ export default class PodcastsComponent {
   // navigation the cached list renders instantly while a background refetch
   // happens. No more PageCache + computed fallback boilerplate.
   protected readonly podcastsQuery = this.api.list();
+
+  // Backend orders by id; sort by lastUpdate DESC like v1 (nulls last).
+  protected readonly sortedPodcasts = computed<readonly PodcastHAL[]>(() => {
+    const data = this.podcastsQuery.data();
+    if (!data) return [];
+    return [...data.content].sort((a, b) => {
+      const at = a.lastUpdate ? Date.parse(a.lastUpdate) : Number.NEGATIVE_INFINITY;
+      const bt = b.lastUpdate ? Date.parse(b.lastUpdate) : Number.NEGATIVE_INFINITY;
+      return bt - at;
+    });
+  });
 
   protected coverUrl(p: PodcastHAL): string {
     return p.cover.url;

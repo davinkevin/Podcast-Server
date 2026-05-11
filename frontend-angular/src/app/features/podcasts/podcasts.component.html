@@ -38,7 +38,7 @@
       />
     } @else {
       <div class="podcasts__grid">
-        @for (p of result.content; track p.id) {
+        @for (p of sortedPodcasts(); track p.id) {
           <ps-cover-card
             [title]="p.title"
             [subtitle]="p.type"
