@@ -1,14 +1,19 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { injectMutation } from '@tanstack/angular-query-experimental';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class CoverApi {
   private readonly http = inject(HttpClient);
 
-  /** Deletes covers no longer referenced by any item, older than `days` (default 365 server-side). */
-  cleanup(days: number) {
-    return this.http.delete(`/api/v1/covers?days=${days}`, {
-      responseType: 'text',
-    });
+  /** Deletes covers no longer referenced by any item, older than `days`. */
+  cleanupMutation() {
+    return injectMutation(() => ({
+      mutationFn: (days: number) =>
+        lastValueFrom(
+          this.http.delete(`/api/v1/covers?days=${days}`, { responseType: 'text' }),
+        ),
+    }));
   }
 }

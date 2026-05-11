@@ -269,7 +269,8 @@ export class PodcastCreateDialogComponent {
   );
 
   // ── shared ────────────────────────────────────────────────────────────
-  protected readonly creating = signal(false);
+  private readonly createMutation = this.podcastApi.createMutation();
+  protected readonly creating = this.createMutation.isPending;
   protected readonly hasToBeDeleted = signal(true);
 
   protected readonly canCreate = computed(() =>
@@ -348,17 +349,13 @@ export class PodcastCreateDialogComponent {
   protected onCreate() {
     const body: PodcastCreationHAL | null = this.buildBody();
     if (!body) return;
-    this.creating.set(true);
-    this.podcastApi.create(body).subscribe({
-      next: (created) => {
-        this.creating.set(false);
+    this.createMutation.mutate(body, {
+      onSuccess: (created) => {
         this.snackbar.open('Podcast created', undefined, { duration: 2500 });
         this.dialogRef.close(created);
       },
-      error: () => {
-        this.creating.set(false);
-        this.snackbar.open('Could not create podcast', 'Dismiss', { duration: 4000 });
-      },
+      onError: () =>
+        this.snackbar.open('Could not create podcast', 'Dismiss', { duration: 4000 }),
     });
   }
 

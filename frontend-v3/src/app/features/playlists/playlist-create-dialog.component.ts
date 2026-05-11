@@ -91,7 +91,8 @@ export class PlaylistCreateDialogComponent {
 
   protected readonly name = signal<string>('');
   protected readonly coverUrl = signal<string>('');
-  protected readonly creating = signal(false);
+  private readonly createMutation = this.api.createMutation();
+  protected readonly creating = this.createMutation.isPending;
 
   protected onCancel() {
     this.dialogRef.close();
@@ -100,17 +101,16 @@ export class PlaylistCreateDialogComponent {
   protected onCreate() {
     const n = this.name().trim();
     if (!n) return;
-    this.creating.set(true);
-    this.api.create(n, this.coverUrl().trim() || undefined).subscribe({
-      next: (created) => {
-        this.creating.set(false);
-        this.snackbar.open('Playlist created', undefined, { duration: 2500 });
-        this.dialogRef.close(created);
+    this.createMutation.mutate(
+      { name: n, coverUrl: this.coverUrl().trim() || undefined },
+      {
+        onSuccess: (created) => {
+          this.snackbar.open('Playlist created', undefined, { duration: 2500 });
+          this.dialogRef.close(created);
+        },
+        onError: () =>
+          this.snackbar.open('Could not create playlist', 'Dismiss', { duration: 4000 }),
       },
-      error: () => {
-        this.creating.set(false);
-        this.snackbar.open('Could not create playlist', 'Dismiss', { duration: 4000 });
-      },
-    });
+    );
   }
 }

@@ -15,10 +15,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
-import { QueryClient } from '@tanstack/angular-query-experimental';
 
 import { ItemApi, ItemRef } from '../../core/api/item.api';
-import { queryKeys } from '../../core/api/query-keys';
 import { ItemHAL } from '../../core/models/item.model';
 import { PlayerService } from '../../core/player/player.service';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
@@ -82,7 +80,6 @@ export default class ItemDetailComponent {
   private readonly snackbar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly coverColor = inject(CoverColorService);
-  private readonly queryClient = inject(QueryClient);
   private readonly settings = inject(SettingsService);
 
   protected readonly ref = computed<ItemRef>(() => ({
@@ -90,6 +87,8 @@ export default class ItemDetailComponent {
     id: this.id(),
   }));
   protected readonly itemQuery = this.itemApi.getById(this.ref);
+  private readonly resetMutation = this.itemApi.resetMutation();
+  private readonly deleteMutation = this.itemApi.deleteMutation();
 
   // Cover URL derived from the route so the cover img can render before the
   // item resource resolves — required for view-transition morphs from the
@@ -178,29 +177,34 @@ export default class ItemDetailComponent {
   }
 
   protected onReset(item: ItemHAL) {
-    this.itemApi.reset(item.podcastId, item.id).subscribe({
-      next: () => {
-        // Reset deletes the file on disk; if it's playing, the proxyURL would 404 — close.
-        this.player.closeIf(item.id);
-        this.snackbar.open('Item reset', undefined, { duration: 2500 });
-        this.queryClient.invalidateQueries({
-          queryKey: queryKeys.items.detail(item.podcastId, item.id),
-        });
+    this.resetMutation.mutate(
+      { podcastId: item.podcastId, itemId: item.id },
+      {
+        onSuccess: () => {
+          // Reset deletes the file on disk; if it's playing, the proxyURL would 404 — close.
+          this.player.closeIf(item.id);
+          this.snackbar.open('Item reset', undefined, { duration: 2500 });
+        },
+        onError: () =>
+          this.snackbar.open('Could not reset item', 'Dismiss', { duration: 4000 }),
       },
-      error: () => this.snackbar.open('Could not reset item', 'Dismiss', { duration: 4000 }),
-    });
+    );
   }
 
   protected onDelete(item: ItemHAL) {
     if (!confirm(`Delete "${item.title}"?`)) return;
-    this.itemApi.delete(item.podcastId, item.id).subscribe({
-      next: () => {
-        this.player.closeIf(item.id);
-        this.snackbar.open('Item deleted', undefined, { duration: 2500 });
-        this.router.navigate(['/library']);
+    this.deleteMutation.mutate(
+      { podcastId: item.podcastId, itemId: item.id },
+      {
+        onSuccess: () => {
+          this.player.closeIf(item.id);
+          this.snackbar.open('Item deleted', undefined, { duration: 2500 });
+          this.router.navigate(['/library']);
+        },
+        onError: () =>
+          this.snackbar.open('Could not delete item', 'Dismiss', { duration: 4000 }),
       },
-      error: () => this.snackbar.open('Could not delete item', 'Dismiss', { duration: 4000 }),
-    });
+    );
   }
 
   protected onAddToPlaylist(item: ItemHAL) {

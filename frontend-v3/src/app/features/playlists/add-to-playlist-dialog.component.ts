@@ -17,12 +17,10 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { QueryClient } from '@tanstack/angular-query-experimental';
 
 import { PlaylistApi } from '../../core/api/playlist.api';
 import { ItemApi } from '../../core/api/item.api';
 import { PlaylistHAL } from '../../core/models/playlist.model';
-import { queryKeys } from '../../core/api/query-keys';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 
 export interface AddToPlaylistDialogData {
@@ -241,7 +239,6 @@ export class AddToPlaylistDialogComponent {
     MatDialogRef<AddToPlaylistDialogComponent, boolean>,
   );
   private readonly snackbar = inject(MatSnackBar);
-  private readonly queryClient = inject(QueryClient);
 
   protected readonly mode = signal<Mode>('pick');
   protected readonly playlistsQuery = this.playlists.list();
@@ -251,13 +248,16 @@ export class AddToPlaylistDialogComponent {
   protected readonly containingIds = computed(
     () => new Set(this.containingQuery.data()?.content.map((p) => p.id) ?? []),
   );
+  private readonly addItemMutation = this.playlists.addItemMutation();
+  private readonly removeItemMutation = this.playlists.removeItemMutation();
+  private readonly createMutation = this.playlists.createMutation();
   protected readonly busy = signal<string | undefined>(undefined);
   // Dialog returns a "changed" flag to callers that want to reload state.
   private changed = false;
 
   protected readonly newName = signal<string>('');
   protected readonly newCoverUrl = signal<string>('');
-  protected readonly creating = signal(false);
+  protected readonly creating = this.createMutation.isPending;
 
   protected coverUrl(p: PlaylistHAL): string {
     return `/api/v1/playlists/${p.id}/cover.jpg`;
@@ -270,11 +270,14 @@ export class AddToPlaylistDialogComponent {
   protected onToggle(playlist: PlaylistHAL, isMember: boolean) {
     if (this.busy()) return;
     this.busy.set(playlist.id);
-    const op = isMember
-      ? this.playlists.removeItem(playlist.id, this.data.itemId)
-      : this.playlists.addItem(playlist.id, this.data.itemId);
-    op.subscribe({
-      next: () => {
+    const vars = {
+      playlistId: playlist.id,
+      itemId: this.data.itemId,
+      podcastId: this.data.podcastId,
+    };
+    const mutation = isMember ? this.removeItemMutation : this.addItemMutation;
+    mutation.mutate(vars, {
+      onSuccess: () => {
         this.busy.set(undefined);
         this.changed = true;
         this.snackbar.open(
@@ -284,14 +287,8 @@ export class AddToPlaylistDialogComponent {
           undefined,
           { duration: 2500 },
         );
-        this.queryClient.invalidateQueries({
-          queryKey: queryKeys.items.playlistsContaining(
-            this.data.podcastId,
-            this.data.itemId,
-          ),
-        });
       },
-      error: () => {
+      onError: () => {
         this.busy.set(undefined);
         this.snackbar.open(
           isMember ? 'Could not remove' : 'Could not add',
@@ -305,41 +302,36 @@ export class AddToPlaylistDialogComponent {
   protected onCreateAndAdd() {
     const name = this.newName().trim();
     if (!name) return;
-    this.creating.set(true);
-    this.playlists.create(name, this.newCoverUrl().trim() || undefined).subscribe({
-      next: (created) => {
-        this.playlists.addItem(created.id, this.data.itemId).subscribe({
-          next: () => {
-            this.creating.set(false);
-            this.changed = true;
-            this.snackbar.open(`Added to "${created.name}"`, undefined, { duration: 2500 });
-            this.newName.set('');
-            this.newCoverUrl.set('');
-            this.mode.set('pick');
-            this.queryClient.invalidateQueries({
-              queryKey: queryKeys.playlists.list(),
-            });
-            this.queryClient.invalidateQueries({
-          queryKey: queryKeys.items.playlistsContaining(
-            this.data.podcastId,
-            this.data.itemId,
-          ),
-        });
-          },
-          error: () => {
-            this.creating.set(false);
-            this.snackbar.open(
-              `Playlist "${created.name}" was created, but the item could not be added.`,
-              'Dismiss',
-              { duration: 4000 },
-            );
-          },
-        });
+    this.createMutation.mutate(
+      { name, coverUrl: this.newCoverUrl().trim() || undefined },
+      {
+        onSuccess: (created) => {
+          this.addItemMutation.mutate(
+            {
+              playlistId: created.id,
+              itemId: this.data.itemId,
+              podcastId: this.data.podcastId,
+            },
+            {
+              onSuccess: () => {
+                this.changed = true;
+                this.snackbar.open(`Added to "${created.name}"`, undefined, { duration: 2500 });
+                this.newName.set('');
+                this.newCoverUrl.set('');
+                this.mode.set('pick');
+              },
+              onError: () =>
+                this.snackbar.open(
+                  `Playlist "${created.name}" was created, but the item could not be added.`,
+                  'Dismiss',
+                  { duration: 4000 },
+                ),
+            },
+          );
+        },
+        onError: () =>
+          this.snackbar.open('Could not create playlist', 'Dismiss', { duration: 4000 }),
       },
-      error: () => {
-        this.creating.set(false);
-        this.snackbar.open('Could not create playlist', 'Dismiss', { duration: 4000 });
-      },
-    });
+    );
   }
 }

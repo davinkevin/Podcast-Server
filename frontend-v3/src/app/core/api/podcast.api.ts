@@ -1,11 +1,10 @@
-import { computed, inject, Injectable, Signal } from '@angular/core';
+import { inject, Injectable, Signal } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import {
-  HttpClient,
-  HttpParams,
-  httpResource,
-  HttpResourceRef,
-} from '@angular/common/http';
-import { injectQuery } from '@tanstack/angular-query-experimental';
+  injectMutation,
+  injectQuery,
+  QueryClient,
+} from '@tanstack/angular-query-experimental';
 import { lastValueFrom } from 'rxjs';
 
 import {
@@ -29,6 +28,7 @@ export interface PodcastItemsInput {
 @Injectable({ providedIn: 'root' })
 export class PodcastApi {
   private readonly http = inject(HttpClient);
+  private readonly queryClient = inject(QueryClient);
 
   list() {
     return injectQuery(() => ({
@@ -75,14 +75,69 @@ export class PodcastApi {
     });
   }
 
-  create(body: PodcastCreationHAL) {
-    return this.http.post<PodcastHAL>('/api/v1/podcasts', body);
+  createMutation() {
+    return injectMutation(() => ({
+      mutationFn: (body: PodcastCreationHAL) =>
+        lastValueFrom(this.http.post<PodcastHAL>('/api/v1/podcasts', body)),
+      onSuccess: () => {
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.podcasts.list(),
+        });
+      },
+    }));
   }
 
-  update(id: string, body: PodcastUpdateHAL) {
-    return this.http.put<PodcastHAL>(`/api/v1/podcasts/${id}`, body);
+  updateMutation() {
+    return injectMutation(() => ({
+      mutationFn: (args: { id: string; body: PodcastUpdateHAL }) =>
+        lastValueFrom(
+          this.http.put<PodcastHAL>(`/api/v1/podcasts/${args.id}`, args.body),
+        ),
+      onSuccess: (_data, vars) => {
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.podcasts.detail(vars.id),
+        });
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.podcasts.list(),
+        });
+      },
+    }));
   }
 
+  deleteMutation() {
+    return injectMutation(() => ({
+      mutationFn: (id: string) =>
+        lastValueFrom(
+          this.http.delete(`/api/v1/podcasts/${id}`, { responseType: 'text' }),
+        ),
+      onSuccess: () => {
+        this.queryClient.invalidateQueries({ queryKey: queryKeys.podcasts.all });
+      },
+    }));
+  }
+
+  uploadMutation() {
+    return injectMutation(() => ({
+      mutationFn: (args: { podcastId: string; file: File }) => {
+        const form = new FormData();
+        form.append('file', args.file, args.file.name);
+        return lastValueFrom(
+          this.http.post<ItemHAL>(
+            `/api/v1/podcasts/${args.podcastId}/items/upload`,
+            form,
+          ),
+        );
+      },
+      onSuccess: (_data, vars) => {
+        this.queryClient.invalidateQueries({
+          queryKey: ['podcasts', vars.podcastId, 'items'],
+        });
+      },
+    }));
+  }
+
+  // Fire-and-forget HTTP, SSE drives the UI update. Kept as Observable since
+  // there's no related query to invalidate eagerly.
   triggerUpdate(id: string) {
     return this.http.get(`/api/v1/podcasts/${id}/update`, { responseType: 'text' });
   }
@@ -95,15 +150,5 @@ export class PodcastApi {
       params,
       responseType: 'text',
     });
-  }
-
-  delete(id: string) {
-    return this.http.delete(`/api/v1/podcasts/${id}`, { responseType: 'text' });
-  }
-
-  upload(podcastId: string, file: File) {
-    const form = new FormData();
-    form.append('file', file, file.name);
-    return this.http.post<ItemHAL>(`/api/v1/podcasts/${podcastId}/items/upload`, form);
   }
 }

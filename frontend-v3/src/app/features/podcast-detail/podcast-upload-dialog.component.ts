@@ -112,7 +112,8 @@ export class PodcastUploadDialogComponent {
   private readonly podcastId = inject<string>(MAT_DIALOG_DATA);
 
   protected readonly file = signal<File | undefined>(undefined);
-  protected readonly uploading = signal(false);
+  private readonly uploadMutation = this.api.uploadMutation();
+  protected readonly uploading = this.uploadMutation.isPending;
 
   protected onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
@@ -130,17 +131,16 @@ export class PodcastUploadDialogComponent {
   protected onUpload() {
     const f = this.file();
     if (!f) return;
-    this.uploading.set(true);
-    this.api.upload(this.podcastId, f).subscribe({
-      next: () => {
-        this.uploading.set(false);
-        this.snackbar.open('Episode uploaded', undefined, { duration: 2500 });
-        this.dialogRef.close(true);
+    this.uploadMutation.mutate(
+      { podcastId: this.podcastId, file: f },
+      {
+        onSuccess: () => {
+          this.snackbar.open('Episode uploaded', undefined, { duration: 2500 });
+          this.dialogRef.close(true);
+        },
+        onError: () =>
+          this.snackbar.open('Upload failed', 'Dismiss', { duration: 4000 }),
       },
-      error: () => {
-        this.uploading.set(false);
-        this.snackbar.open('Upload failed', 'Dismiss', { duration: 4000 });
-      },
-    });
+    );
   }
 }

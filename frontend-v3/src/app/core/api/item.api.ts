@@ -1,11 +1,10 @@
-import { computed, inject, Injectable, Signal } from '@angular/core';
+import { inject, Injectable, Signal } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import {
-  HttpClient,
-  HttpParams,
-  httpResource,
-  HttpResourceRef,
-} from '@angular/common/http';
-import { injectQuery } from '@tanstack/angular-query-experimental';
+  injectMutation,
+  injectQuery,
+  QueryClient,
+} from '@tanstack/angular-query-experimental';
 import { lastValueFrom } from 'rxjs';
 
 import { PageHAL } from '../models/page.model';
@@ -30,6 +29,7 @@ export interface ItemRef {
 @Injectable({ providedIn: 'root' })
 export class ItemApi {
   private readonly http = inject(HttpClient);
+  private readonly queryClient = inject(QueryClient);
 
   search(input: Signal<ItemSearchInput>) {
     return injectQuery(() => {
@@ -74,34 +74,6 @@ export class ItemApi {
     });
   }
 
-  triggerDownload(podcastId: string, itemId: string) {
-    return this.http.post(
-      `/api/v1/podcasts/${podcastId}/items/${itemId}/download`,
-      null,
-      { responseType: 'text' },
-    );
-  }
-
-  reset(podcastId: string, itemId: string) {
-    return this.http.post<ItemHAL>(
-      `/api/v1/podcasts/${podcastId}/items/${itemId}/reset`,
-      null,
-    );
-  }
-
-  delete(podcastId: string, itemId: string) {
-    return this.http.delete(`/api/v1/podcasts/${podcastId}/items/${itemId}`, {
-      responseType: 'text',
-    });
-  }
-
-  /** Deletes downloaded items older than `days` (defaults to backend's 30). */
-  cleanup(days: number) {
-    return this.http.delete(`/api/v1/items?days=${days}`, {
-      responseType: 'text',
-    });
-  }
-
   /** Lists playlists currently containing the given item. */
   playlistsContaining(
     ref: Signal<{ readonly podcastId: string; readonly itemId: string } | undefined>,
@@ -121,5 +93,65 @@ export class ItemApi {
         enabled: !!r,
       };
     });
+  }
+
+  // SSE-driven; the queue/downloading signals update on their own. Kept as
+  // Observable since there's no related query to invalidate eagerly.
+  triggerDownload(podcastId: string, itemId: string) {
+    return this.http.post(
+      `/api/v1/podcasts/${podcastId}/items/${itemId}/download`,
+      null,
+      { responseType: 'text' },
+    );
+  }
+
+  resetMutation() {
+    return injectMutation(() => ({
+      mutationFn: (args: { podcastId: string; itemId: string }) =>
+        lastValueFrom(
+          this.http.post<ItemHAL>(
+            `/api/v1/podcasts/${args.podcastId}/items/${args.itemId}/reset`,
+            null,
+          ),
+        ),
+      onSuccess: (_data, vars) => {
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.items.detail(vars.podcastId, vars.itemId),
+        });
+        this.queryClient.invalidateQueries({
+          queryKey: ['podcasts', vars.podcastId, 'items'],
+        });
+      },
+    }));
+  }
+
+  deleteMutation() {
+    return injectMutation(() => ({
+      mutationFn: (args: { podcastId: string; itemId: string }) =>
+        lastValueFrom(
+          this.http.delete(
+            `/api/v1/podcasts/${args.podcastId}/items/${args.itemId}`,
+            { responseType: 'text' },
+          ),
+        ),
+      onSuccess: (_data, vars) => {
+        this.queryClient.invalidateQueries({ queryKey: queryKeys.items.all });
+        this.queryClient.invalidateQueries({
+          queryKey: ['podcasts', vars.podcastId, 'items'],
+        });
+      },
+    }));
+  }
+
+  cleanupMutation() {
+    return injectMutation(() => ({
+      mutationFn: (days: number) =>
+        lastValueFrom(
+          this.http.delete(`/api/v1/items?days=${days}`, { responseType: 'text' }),
+        ),
+      onSuccess: () => {
+        this.queryClient.invalidateQueries({ queryKey: queryKeys.items.all });
+      },
+    }));
   }
 }

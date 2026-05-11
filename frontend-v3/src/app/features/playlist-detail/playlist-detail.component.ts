@@ -24,8 +24,6 @@ import {
   PlaylistWithItemsHAL,
 } from '../../core/models/playlist.model';
 import { PlayerService } from '../../core/player/player.service';
-import { queryKeys } from '../../core/api/query-keys';
-import { QueryClient } from '@tanstack/angular-query-experimental';
 
 const REMOVE_ACTION: CoverCardAction = {
   id: 'remove',
@@ -56,10 +54,11 @@ export default class PlaylistDetailComponent {
   private readonly api = inject(PlaylistApi);
   private readonly snackbar = inject(MatSnackBar);
   private readonly player = inject(PlayerService);
-  private readonly queryClient = inject(QueryClient);
 
   protected readonly id = computed(() => this.idPlaylist());
   protected readonly playlistQuery = this.api.getById(this.id);
+  private readonly deleteMutation = this.api.deleteMutation();
+  private readonly removeItemMutation = this.api.removeItemMutation();
 
   // RSS URL is built from the path; the same URL is what podcast clients subscribe to.
   protected readonly rssUrl = computed(() => `${location.origin}/api/v1/playlists/${this.idPlaylist()}/rss`);
@@ -120,16 +119,19 @@ export default class PlaylistDetailComponent {
   }
 
   protected onRemove(item: PlaylistItemHAL) {
-    this.api.removeItem(this.idPlaylist(), item.id).subscribe({
-      next: () => {
-        this.snackbar.open('Removed from playlist', undefined, { duration: 2500 });
-        this.queryClient.invalidateQueries({
-          queryKey: queryKeys.playlists.detail(this.idPlaylist()),
-        });
+    this.removeItemMutation.mutate(
+      {
+        playlistId: this.idPlaylist(),
+        itemId: item.id,
+        podcastId: item.podcast.id,
       },
-      error: () =>
-        this.snackbar.open('Could not remove the item', 'Dismiss', { duration: 4000 }),
-    });
+      {
+        onSuccess: () =>
+          this.snackbar.open('Removed from playlist', undefined, { duration: 2500 }),
+        onError: () =>
+          this.snackbar.open('Could not remove the item', 'Dismiss', { duration: 4000 }),
+      },
+    );
   }
 
   protected readonly copyHint = signal<'idle' | 'copied'>('idle');
@@ -149,12 +151,12 @@ export default class PlaylistDetailComponent {
 
   protected onDelete(playlist: PlaylistWithItemsHAL) {
     if (!confirm(`Delete playlist "${playlist.name}"?`)) return;
-    this.api.delete(playlist.id).subscribe({
-      next: () => {
+    this.deleteMutation.mutate(playlist.id, {
+      onSuccess: () => {
         this.snackbar.open('Playlist deleted', undefined, { duration: 2500 });
         this.router.navigate(['/playlists']);
       },
-      error: () =>
+      onError: () =>
         this.snackbar.open('Could not delete the playlist', 'Dismiss', { duration: 4000 }),
     });
   }

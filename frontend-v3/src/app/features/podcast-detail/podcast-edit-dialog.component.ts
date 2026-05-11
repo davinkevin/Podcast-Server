@@ -226,7 +226,8 @@ export class PodcastEditDialogComponent {
   protected readonly findInfo = signal<FindPodcastInformationHAL | undefined>(undefined);
   protected readonly findError = signal<string | undefined>(undefined);
   protected readonly finding = signal(false);
-  protected readonly saving = signal(false);
+  private readonly updateMutation = this.podcastApi.updateMutation();
+  protected readonly saving = this.updateMutation.isPending;
 
   private pendingFind: ReturnType<typeof setTimeout> | undefined;
   private pendingCoverDims: ReturnType<typeof setTimeout> | undefined;
@@ -316,18 +317,17 @@ export class PodcastEditDialogComponent {
       tags: this.tagsDraft().map((t) => (t.id ? { id: t.id, name: t.name } : { name: t.name })),
       cover: { width: cover.width, height: cover.height, url: cover.url },
     };
-    this.saving.set(true);
-    this.podcastApi.update(this.podcast.id, body).subscribe({
-      next: () => {
-        this.saving.set(false);
-        this.snackbar.open('Podcast saved', undefined, { duration: 2500 });
-        this.dialogRef.close(true);
+    this.updateMutation.mutate(
+      { id: this.podcast.id, body },
+      {
+        onSuccess: () => {
+          this.snackbar.open('Podcast saved', undefined, { duration: 2500 });
+          this.dialogRef.close(true);
+        },
+        onError: () =>
+          this.snackbar.open('Could not save the podcast', 'Dismiss', { duration: 4000 }),
       },
-      error: () => {
-        this.saving.set(false);
-        this.snackbar.open('Could not save the podcast', 'Dismiss', { duration: 4000 });
-      },
-    });
+    );
   }
 }
 

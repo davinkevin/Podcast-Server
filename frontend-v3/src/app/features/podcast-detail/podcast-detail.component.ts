@@ -93,6 +93,7 @@ export default class PodcastDetailComponent {
 
   protected readonly id = computed(() => this.idPodcast());
   protected readonly podcastQuery = this.api.getById(this.id);
+  private readonly deleteMutation = this.api.deleteMutation();
 
   /* Bumped on every successful Settings save to bust the browser cache for the
      cover, whose URL stays the same (`/api/v1/podcasts/{id}/cover.jpg`) even
@@ -240,6 +241,8 @@ export default class PodcastDetailComponent {
       })
       .afterClosed()
       .subscribe((uploaded) => {
+        // Upload dialog handles its own mutation; we just need to refresh the
+        // items grid for THIS podcast since the dialog only knows it changed.
         if (uploaded) {
           this.queryClient.invalidateQueries({
             queryKey: queryKeys.podcasts.items(this.itemsInput()),
@@ -250,12 +253,12 @@ export default class PodcastDetailComponent {
 
   protected onDelete(podcast: PodcastHAL) {
     if (!confirm(`Delete "${podcast.title}" and all its episodes?`)) return;
-    this.api.delete(podcast.id).subscribe({
-      next: () => {
+    this.deleteMutation.mutate(podcast.id, {
+      onSuccess: () => {
         this.snackbar.open('Podcast deleted', undefined, { duration: 2500 });
         this.router.navigate(['/podcasts']);
       },
-      error: () =>
+      onError: () =>
         this.snackbar.open('Could not delete the podcast', 'Dismiss', { duration: 4000 }),
     });
   }

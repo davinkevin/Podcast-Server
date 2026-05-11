@@ -14,13 +14,11 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { QueryClient } from '@tanstack/angular-query-experimental';
 
 import { DownloadApi } from '../../core/api/download.api';
 import { PodcastApi } from '../../core/api/podcast.api';
 import { ItemApi } from '../../core/api/item.api';
 import { CoverApi } from '../../core/api/cover.api';
-import { queryKeys } from '../../core/api/query-keys';
 import {
   SettingsService,
   ThemePreference,
@@ -52,11 +50,13 @@ export default class SettingsComponent {
   private readonly covers = inject(CoverApi);
   private readonly settings = inject(SettingsService);
   private readonly snackbar = inject(MatSnackBar);
-  private readonly queryClient = inject(QueryClient);
-
   protected readonly limitQuery = this.downloads.limit();
+  private readonly updateLimitMutation = this.downloads.updateLimitMutation();
+  private readonly cleanItemsMutation = this.items.cleanupMutation();
+  private readonly cleanCoversMutation = this.covers.cleanupMutation();
+
   protected readonly limitDraft = signal<number | null>(null);
-  protected readonly savingLimit = signal(false);
+  protected readonly savingLimit = this.updateLimitMutation.isPending;
   protected readonly limitDirty = computed(() => {
     const draft = this.limitDraft();
     const remote = this.limitQuery.data();
@@ -65,8 +65,8 @@ export default class SettingsComponent {
 
   protected readonly itemsRetentionDays = signal<number>(ITEMS_DEFAULT_DAYS);
   protected readonly coversRetentionDays = signal<number>(COVERS_DEFAULT_DAYS);
-  protected readonly cleaningItems = signal(false);
-  protected readonly cleaningCovers = signal(false);
+  protected readonly cleaningItems = this.cleanItemsMutation.isPending;
+  protected readonly cleaningCovers = this.cleanCoversMutation.isPending;
 
   protected readonly updating = signal(false);
 
@@ -90,19 +90,11 @@ export default class SettingsComponent {
   protected onSaveLimit() {
     const v = this.limitDraft();
     if (v === null || !this.limitDirty()) return;
-    this.savingLimit.set(true);
-    this.downloads.updateLimit(v).subscribe({
-      next: () => {
-        this.savingLimit.set(false);
-        this.queryClient.invalidateQueries({
-          queryKey: queryKeys.downloads.limit(),
-        });
-        this.snackbar.open('Parallel limit updated', undefined, { duration: 2500 });
-      },
-      error: () => {
-        this.savingLimit.set(false);
-        this.snackbar.open('Could not update limit', 'Dismiss', { duration: 4000 });
-      },
+    this.updateLimitMutation.mutate(v, {
+      onSuccess: () =>
+        this.snackbar.open('Parallel limit updated', undefined, { duration: 2500 }),
+      onError: () =>
+        this.snackbar.open('Could not update limit', 'Dismiss', { duration: 4000 }),
     });
   }
 
@@ -110,16 +102,11 @@ export default class SettingsComponent {
     const days = this.itemsRetentionDays();
     if (!Number.isFinite(days) || days < 0) return;
     if (!confirm(`Delete downloaded items older than ${days} days?`)) return;
-    this.cleaningItems.set(true);
-    this.items.cleanup(days).subscribe({
-      next: () => {
-        this.cleaningItems.set(false);
-        this.snackbar.open('Old items cleaned up', undefined, { duration: 2500 });
-      },
-      error: () => {
-        this.cleaningItems.set(false);
-        this.snackbar.open('Could not clean items', 'Dismiss', { duration: 4000 });
-      },
+    this.cleanItemsMutation.mutate(days, {
+      onSuccess: () =>
+        this.snackbar.open('Old items cleaned up', undefined, { duration: 2500 }),
+      onError: () =>
+        this.snackbar.open('Could not clean items', 'Dismiss', { duration: 4000 }),
     });
   }
 
@@ -127,16 +114,11 @@ export default class SettingsComponent {
     const days = this.coversRetentionDays();
     if (!Number.isFinite(days) || days < 0) return;
     if (!confirm(`Delete unused covers older than ${days} days?`)) return;
-    this.cleaningCovers.set(true);
-    this.covers.cleanup(days).subscribe({
-      next: () => {
-        this.cleaningCovers.set(false);
-        this.snackbar.open('Old covers cleaned up', undefined, { duration: 2500 });
-      },
-      error: () => {
-        this.cleaningCovers.set(false);
-        this.snackbar.open('Could not clean covers', 'Dismiss', { duration: 4000 });
-      },
+    this.cleanCoversMutation.mutate(days, {
+      onSuccess: () =>
+        this.snackbar.open('Old covers cleaned up', undefined, { duration: 2500 }),
+      onError: () =>
+        this.snackbar.open('Could not clean covers', 'Dismiss', { duration: 4000 }),
     });
   }
 

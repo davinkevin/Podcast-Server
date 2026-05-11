@@ -1,6 +1,10 @@
 import { inject, Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { injectQuery } from '@tanstack/angular-query-experimental';
+import {
+  injectMutation,
+  injectQuery,
+  QueryClient,
+} from '@tanstack/angular-query-experimental';
 import { lastValueFrom } from 'rxjs';
 
 import { queryKeys } from './query-keys';
@@ -8,6 +12,7 @@ import { queryKeys } from './query-keys';
 @Injectable({ providedIn: 'root' })
 export class DownloadApi {
   private readonly http = inject(HttpClient);
+  private readonly queryClient = inject(QueryClient);
 
   /** Parallel-download limit. Backend serves it as a plain integer body. */
   limit() {
@@ -17,10 +22,19 @@ export class DownloadApi {
     }));
   }
 
-  updateLimit(value: number) {
-    return this.http.post<number>('/api/v1/downloads/limit', value);
+  updateLimitMutation() {
+    return injectMutation(() => ({
+      mutationFn: (value: number) =>
+        lastValueFrom(this.http.post<number>('/api/v1/downloads/limit', value)),
+      onSuccess: () => {
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.downloads.limit(),
+        });
+      },
+    }));
   }
 
+  // SSE drives queue/downloading state; no client query to invalidate.
   stopAll() {
     return this.http.post('/api/v1/downloads/stop', null, { responseType: 'text' });
   }
