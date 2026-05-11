@@ -12,7 +12,6 @@
   changes:
     - frontend-angular/**/*
     - frontend-angularjs/**/*
-    - frontend-v3/**/*
     - ui/**/*
 .documentation_files:
   - &changes_documentation_files

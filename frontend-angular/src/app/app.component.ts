@@ -1,30 +1,24 @@
-import {Component, OnInit} from '@angular/core';
-import {select, Store} from '@ngrx/store';
-import {AppState, selectSideNavOpen} from './app.reducer';
-import {CloseSideNavAction} from './app.actions';
+import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { RouterOutlet } from '@angular/router';
+import { MatSidenavModule } from '@angular/material/sidenav';
+
+import { SettingsService } from './core/settings/settings.service';
+import { SidenavComponent } from './layout/sidenav/sidenav.component';
+import { FloatingPlayerComponent } from './layout/floating-player/floating-player.component';
 
 @Component({
   selector: 'ps-root',
+  standalone: true,
+  imports: [
+    RouterOutlet,
+    MatSidenavModule,
+    SidenavComponent,
+    FloatingPlayerComponent,
+  ],
   templateUrl: './app.component.html',
-  styleUrls: ['./app.component.scss']
+  styleUrl: './app.component.scss',
+  changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class AppComponent implements OnInit {
-
-  sideNavOpen = false;
-
-  constructor(private store: Store<AppState>) {}
-
-  ngOnInit(): void {
-    this.store.pipe(
-      select(selectSideNavOpen)
-    ).subscribe(v => this.sideNavOpen = v);
-  }
-
-  onOpenChange($event: boolean) {
-    if ($event === true) {
-      return;
-    }
-
-    this.store.dispatch(new CloseSideNavAction());
-  }
+export class AppComponent {
+  protected readonly settings = inject(SettingsService);
 }

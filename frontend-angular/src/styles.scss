@@ -1,11 +1,99 @@
-/* You can add global styles to this file, and also import other style files */
-@import '~@angular/material/prebuilt-themes/deeppurple-amber.css';
-@import '~font-awesome/css/font-awesome.css';
-@import '~material-design-icons/iconfont/material-icons.css';
-@import "variables";
+@use '@angular/material' as mat;
+
+// Material 3 Expressive theme — accent #6750A4 (M3 default purple = mat.$violet-palette).
+// SettingsService overrides color-scheme inline; "light dark" here = follow OS until then.
+
+:root {
+  // Live sidenav width — SettingsService updates this when the user toggles
+  // between expanded (240px) and rail (80px). Layout pieces pinned next to
+  // the sidenav (floating-player) read this variable to stay aligned.
+  --sidenav-width: 240px;
+}
+
+// Per-route page tint. Route components set/clear these on documentElement
+// (e.g. PodcastDetailComponent uses the cover's dominant colors via vibrant).
+// Registered as <color> so transitions interpolate smoothly when navigating.
+@property --page-tint {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --page-tint-bottom {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+@property --page-accent {
+  syntax: '<color>';
+  inherits: true;
+  initial-value: transparent;
+}
+
+html {
+  color-scheme: light dark;
+
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$violet-palette,
+        tertiary: mat.$rose-palette,
+      ),
+      typography: Roboto,
+      density: 0,
+    )
+  );
+
+  // Expressive overrides: bigger corner radius, stronger surface tints.
+  @include mat.theme-overrides(
+    (
+      corner-extra-small: 8px,
+      corner-small: 12px,
+      corner-medium: 16px,
+      corner-large: 20px,
+      corner-extra-large: 28px,
+    )
+  );
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
 
 body {
-  margin: 0;
-  font-family: Roboto, sans-serif;
-  background-color: $global-background-color;
+  background: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font-family: Roboto, 'Helvetica Neue', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
+
+* {
+  box-sizing: border-box;
+}
+
+// View Transitions API (Angular Router's `withViewTransitions()`).
+// Root cross-fade stays snappy; named element morphs (cover images) get a
+// longer cinematic easing so the source → destination motion is perceptible.
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 220ms;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+::view-transition-group(*) {
+  animation-duration: 480ms;
+  animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+// Dialogs whose content fits without needing a scrollbar.
+// Apply via `panelClass: 'ps-fitting-dialog'` on `dialog.open(...)`.
+// Suppresses Material's default 65vh ceiling + the spurious 1px scrollbar that
+// appears when content lands within a sub-pixel of the limit.
+.ps-fitting-dialog .mat-mdc-dialog-content {
+  overflow: hidden;
+  max-height: 90vh;
+}
+

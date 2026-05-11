@@ -31,7 +31,6 @@ build:
           paths:
             - frontend-angularjs/target/dist
             - frontend-angular/dist
-            - frontend-v3/dist
             - ui
 manifests:
   kustomize:

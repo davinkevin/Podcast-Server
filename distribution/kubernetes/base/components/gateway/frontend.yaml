@@ -12,12 +12,6 @@ spec:
           port: 8080
     - matches:
         - path:
-            value: "/v2"
-      backendRefs:
-        - name: ui-v2
-          port: 8080
-    - matches:
-        - path:
             value: "/"
       backendRefs:
         - name: ui-v1

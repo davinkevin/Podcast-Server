@@ -64,7 +64,7 @@ stages:
         - frontend-angularjs/www/jspm_packages/
         - frontend-angularjs/target/
 
-⬇ ui-v2:
+⬇ ui-v3:
   stage: ⬇ download
   extends: [ .only-on-frontend-changes ]
   needs: [⬇ build-tool]
@@ -75,33 +75,13 @@ stages:
     - !reference [ .using-build-tool ]
     - key:
         files:
-          - frontend-angular/yarn.lock
-        prefix: "ui-v2"
-      paths:
-        - .gradle
-        - .gradle_home/caches
-        - .yarn
-        - frontend-angular/.gradle
-        - frontend-angular/node_modules/
-
-⬇ ui-v3:
-  stage: ⬇ download
-  extends: [ .only-on-frontend-changes ]
-  needs: [⬇ build-tool]
-  image: gradle:jdk21
-  script:
-    - ./gradlew $GRADLE_OPTS :frontend-v3:downloadDependencies
-  cache:
-    - !reference [ .using-build-tool ]
-    - key:
-        files:
-          - frontend-v3/package-lock.json
+          - frontend-angular/package-lock.json
         prefix: "ui-v3"
       paths:
         - .gradle
         - .gradle_home/caches
-        - frontend-v3/.gradle
-        - frontend-v3/node_modules/
+        - frontend-angular/.gradle
+        - frontend-angular/node_modules/
 
 🧪 backend:
   stage: 🧪 test
@@ -161,46 +141,25 @@ stages:
         - .gradle
         - .gradle_home/caches
 
-🧪 ui-v2:
-  stage: 🧪 test
-  extends: [ .only-on-frontend-changes ]
-  image: gradle:jdk21
-  needs: [⬇ ui-v2]
-  script:
-    - ./gradlew $GRADLE_OPTS :frontend-angular:yarn_test
-  cache:
-    - !reference [ .using-build-tool ]
-    - key:
-        files:
-          - frontend-angular/yarn.lock
-        prefix: "ui-v2"
-      policy: pull
-      paths:
-        - .gradle
-        - .gradle_home/caches
-        - .yarn
-        - frontend-angular/.gradle
-        - frontend-angular/node_modules/
-
 🧪 ui-v3:
   stage: 🧪 test
   extends: [ .only-on-frontend-changes ]
   image: gradle:jdk21
   needs: [⬇ ui-v3]
   script:
-    - ./gradlew $GRADLE_OPTS :frontend-v3:npm_run_test
+    - ./gradlew $GRADLE_OPTS :frontend-angular:npm_run_test
   cache:
     - !reference [ .using-build-tool ]
     - key:
         files:
-          - frontend-v3/package-lock.json
+          - frontend-angular/package-lock.json
         prefix: "ui-v3"
       policy: pull
       paths:
         - .gradle
         - .gradle_home/caches
-        - frontend-v3/.gradle
-        - frontend-v3/node_modules/
+        - frontend-angular/.gradle
+        - frontend-angular/node_modules/
 
 👷 backend-base-image:
   stage: 👷‍ build
@@ -243,11 +202,11 @@ stages:
         - frontend-angularjs/www/jspm_packages/
         - frontend-angularjs/target/
 
-👷 ui-v2:
+👷 ui-v3:
   stage: 👷‍ build
   extends: [ .only-on-frontend-changes ]
   image: gradle:jdk21
-  needs: [⬇ ui-v2]
+  needs: [⬇ ui-v3]
   script:
     - ./gradlew $GRADLE_OPTS :frontend-angular:build
   artifacts:
@@ -257,38 +216,14 @@ stages:
     - !reference [ .using-build-tool ]
     - key:
         files:
-          - frontend-angular/yarn.lock
-        prefix: "ui-v2"
-      policy: pull
-      paths:
-        - .gradle
-        - .gradle_home/caches
-        - .yarn
-        - frontend-angular/.gradle
-        - frontend-angular/node_modules/
-
-👷 ui-v3:
-  stage: 👷‍ build
-  extends: [ .only-on-frontend-changes ]
-  image: gradle:jdk21
-  needs: [⬇ ui-v3]
-  script:
-    - ./gradlew $GRADLE_OPTS :frontend-v3:build
-  artifacts:
-    paths:
-      - frontend-v3/dist/
-  cache:
-    - !reference [ .using-build-tool ]
-    - key:
-        files:
-          - frontend-v3/package-lock.json
+          - frontend-angular/package-lock.json
         prefix: "ui-v3"
       policy: pull
       paths:
         - .gradle
         - .gradle_home/caches
-        - frontend-v3/.gradle
-        - frontend-v3/node_modules/
+        - frontend-angular/.gradle
+        - frontend-angular/node_modules/
 
 👷 documentation:
   stage: 👷‍ build
@@ -442,7 +377,7 @@ stages:
 🐳 ui:
   stage: 🐳 packaging
   extends: [ .only-on-frontend-changes ]
-  needs: [👷 ui-v1, 👷 ui-v2, 👷 ui-v3]
+  needs: [👷 ui-v1, 👷 ui-v3]
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]

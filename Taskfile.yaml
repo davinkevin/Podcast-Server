@@ -76,8 +76,6 @@ tasks:
            frontend-angularjs/build.gradle.kts
            frontend-angularjs/npm-shrinkwrap.json
            frontend-angularjs/package.json
-           frontend-v3/build.gradle.kts
-           frontend-v3/package.json
       - git cliff -t $NEW_VERSION > CHANGELOG.md
       - git add .
       - 'git ci -m "chore(release): release version $NEW_VERSION"'

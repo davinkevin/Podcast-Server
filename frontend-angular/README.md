@@ -1,28 +1,35 @@
-# PodcastServer
+# frontend-v3
 
-This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 1.0.0.
+Greenfield Angular 19 UI for Podcast-Server, served under `/v3`. Material 3 Expressive theme with cover-card-first layout. See `documentation/` and `/Users/kdavin/.claude/plans/eager-chasing-abelson.md` for the full plan.
 
-## Development server
+## Requirements
 
-Run `ng serve` for a dev server. Navigate to `http://localhost:4200/`. The app will automatically reload if you change any of the source files.
+- Node 20.x (provisioned by the Gradle `node` plugin — `./gradlew :frontend-v3:downloadDependencies`).
 
-## Code scaffolding
+## Local development
 
-Run `ng generate component component-name` to generate a new component. You can also use `ng generate directive/pipe/service/class/module`.
+```bash
+# Install deps via Gradle (uses the pinned Node)
+./gradlew :frontend-v3:downloadDependencies
 
-## Build
+# Start the dev server (proxies /api to http://localhost:8080)
+cd frontend-v3 && npm start
+# → http://localhost:4200/v3/
 
-Run `ng build` to build the project. The build artifacts will be stored in the `dist/` directory. Use the `-prod` flag for a production build.
+# Production build (output: frontend-v3/dist/)
+./gradlew :frontend-v3:build
 
-## Running unit tests
+# Unit tests (Vitest)
+./gradlew :frontend-v3:npm_run_test
 
-Run `ng test` to execute the unit tests via [Karma](https://karma-runner.github.io).
+# E2E (Playwright) — installs browsers on first run
+cd frontend-v3 && npx playwright install chromium && npm run e2e
+```
 
-## Running end-to-end tests
+## Stack
 
-Run `ng e2e` to execute the end-to-end tests via [Protractor](http://www.protractortest.org/).
-Before running the tests make sure you are serving the app via `ng serve`.
-
-## Further help
-
-To get more help on the Angular CLI use `ng help` or go check out the [Angular CLI README](https://github.com/angular/angular-cli/blob/master/README.md).
+- Angular 19 (standalone components, signals, new control flow `@if/@for/@switch`)
+- `@angular/build` (esbuild)
+- Angular Material 19 + CDK, Material 3 Expressive theme
+- Vitest (unit) + Playwright (e2e)
+- ESLint flat config + Prettier

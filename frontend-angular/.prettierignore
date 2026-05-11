@@ -1,1 +1,6 @@
-package.json
+dist
+coverage
+.angular
+node_modules
+playwright-report
+test-results

@@ -1,5 +1,4 @@
-import com.github.gradle.node.util.Platform
-import com.github.gradle.node.yarn.task.YarnTask
+import com.github.gradle.node.npm.task.NpmTask
 
 plugins {
   base
@@ -8,52 +7,40 @@ plugins {
 
 group = "com.github.davinkevin.podcastserver"
 version = "2026.1.0"
-description = "frontend-angular"
+description = "frontend-v3"
 
 node {
   download.set(true)
-  version.set("9.11.2")
-  yarnVersion.set("1.7.0")
-
-  // Node < 16 has no darwin-arm64 binary; force x64 on Apple Silicon (runs via Rosetta 2).
-  // Both `resolvedPlatform` and `resolvedNodeDir` must be overridden because the plugin reads
-  // the platform eagerly into `resolvedNodeDir` during apply, before this block runs.
-  val osName = System.getProperty("os.name").lowercase()
-  val osArch = System.getProperty("os.arch").lowercase()
-  if (osName.contains("mac") && (osArch == "aarch64" || osArch == "arm64")) {
-    resolvedPlatform.set(Platform("darwin", "x64"))
-    resolvedNodeDir.set(workDir.zip(version) { wd, v -> wd.dir("node-v$v-darwin-x64") })
-  }
-}
-
-tasks.named("yarn_test") {
-  dependsOn("yarn")
+  version.set("20.19.4")
 }
 
 tasks.register("downloadDependencies") {
-  dependsOn("nodeSetup", "yarnSetup", "yarn")
+  dependsOn("nodeSetup", "npmSetup", "npmInstall")
 }
 
-tasks.named<YarnTask>("yarn") {
-  args.addAll("--network-timeout", "100000")
+tasks.named<NpmTask>("npm_run_build") {
+  inputs.dir(file("src")).withPropertyName("source").withPathSensitivity(PathSensitivity.RELATIVE)
+  inputs.file("package.json").withPathSensitivity(PathSensitivity.RELATIVE)
+  inputs.file("package-lock.json").withPathSensitivity(PathSensitivity.RELATIVE)
+  inputs.file("angular.json").withPathSensitivity(PathSensitivity.RELATIVE)
+  inputs.file("tsconfig.json").withPathSensitivity(PathSensitivity.RELATIVE)
+  inputs.file("tsconfig.app.json").withPathSensitivity(PathSensitivity.RELATIVE)
+  inputs.dir(file("public")).withPropertyName("public").withPathSensitivity(PathSensitivity.RELATIVE)
+  outputs.dir(file("$projectDir/dist")).withPropertyName("dist")
+  dependsOn("npmInstall")
 }
 
-tasks.named<YarnTask>("yarn_build") {
-  inputs.dir(file("src"))
-    .withPropertyName("source")
-    .withPathSensitivity(PathSensitivity.RELATIVE)
-
-  outputs.dir(file("$projectDir/dist"))
-    .withPropertyName("dist")
-
-  dependsOn("yarn")
+tasks.named<NpmTask>("npm_run_test") {
+  dependsOn("npmInstall")
 }
 
 tasks.named("build") {
-  dependsOn("yarn_build")
+  dependsOn("npm_run_build")
 }
 
 tasks.named<Delete>("clean") {
   delete.add("node_modules")
   delete.add("dist")
+  delete.add("coverage")
+  delete.add(".angular")
 }
