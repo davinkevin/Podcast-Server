@@ -1,6 +1,66 @@
 <nav class="sidenav" aria-label="Main navigation">
+  <a class="sidenav__brand" routerLink="/" aria-label="Go to library">
+    <mat-icon class="sidenav__logo">graphic_eq</mat-icon>
+    <span class="sidenav__brand-name">Podcast Server</span>
+    <span class="sidenav__brand-version">v3</span>
+  </a>
+
   <mat-nav-list class="sidenav__list">
-    @for (link of links; track link.path) {
+    @for (link of topLinks; track link.path) {
+      <a
+        mat-list-item
+        [routerLink]="link.path"
+        routerLinkActive
+        #rla="routerLinkActive"
+        [activated]="rla.isActive"
+        class="sidenav__link"
+      >
+        <mat-icon matListItemIcon>{{ link.icon }}</mat-icon>
+        <span matListItemTitle>{{ link.label }}</span>
+      </a>
+    }
+  </mat-nav-list>
+
+  <mat-nav-list class="sidenav__list sidenav__list--bottom">
+    <button
+      mat-list-item
+      type="button"
+      class="sidenav__link sidenav__link--button"
+      cdkOverlayOrigin
+      #downloadsTrigger="cdkOverlayOrigin"
+      [activated]="downloadsOpen()"
+      [attr.aria-label]="
+        downloadCount() > 0 ? 'Downloads (' + downloadCount() + ' active)' : 'Downloads'
+      "
+      [attr.aria-expanded]="downloadsOpen()"
+      (click)="toggleDownloads()"
+    >
+      <mat-icon
+        matListItemIcon
+        [matBadge]="downloadCount()"
+        [matBadgeHidden]="downloadCount() === 0"
+        matBadgeColor="accent"
+        matBadgeSize="small"
+        matBadgeOverlap="true"
+        >downloading</mat-icon
+      >
+      <span matListItemTitle>Downloads</span>
+    </button>
+
+    <ng-template
+      cdkConnectedOverlay
+      [cdkConnectedOverlayOrigin]="downloadsTrigger"
+      [cdkConnectedOverlayOpen]="downloadsOpen()"
+      [cdkConnectedOverlayHasBackdrop]="true"
+      cdkConnectedOverlayBackdropClass="cdk-overlay-transparent-backdrop"
+      [cdkConnectedOverlayPositions]="downloadsOverlayPositions"
+      (backdropClick)="closeDownloads()"
+      (detach)="closeDownloads()"
+    >
+      <ps-downloads-popover (close)="closeDownloads()" />
+    </ng-template>
+
+    @for (link of bottomLinks; track link.path) {
       <a
         mat-list-item
         [routerLink]="link.path"

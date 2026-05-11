@@ -6,6 +6,48 @@
   border-right: 1px solid var(--mat-sys-outline-variant);
 }
 
+.sidenav__brand {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5rem;
+  padding: 16px;
+  color: inherit;
+  text-decoration: none;
+  border-bottom: 1px solid var(--mat-sys-outline-variant);
+}
+
+.sidenav__brand:hover {
+  background: var(--mat-sys-surface-container-high);
+}
+
+.sidenav__brand:focus-visible {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: -2px;
+}
+
+.sidenav__logo {
+  color: var(--mat-sys-primary);
+  font-size: 28px;
+  width: 28px;
+  height: 28px;
+  align-self: center;
+}
+
+.sidenav__brand-name {
+  font: var(--mat-sys-title-medium);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  flex: 1 1 auto;
+}
+
+.sidenav__brand-version {
+  font: var(--mat-sys-label-small);
+  color: var(--mat-sys-on-surface-variant);
+  background: var(--mat-sys-surface-container-highest);
+  border-radius: 999px;
+  padding: 2px 8px;
+}
+
 .sidenav__list {
   padding: 12px 8px;
   display: flex;
@@ -13,6 +55,22 @@
   gap: 2px;
 }
 
+.sidenav__list--bottom {
+  margin-top: auto;
+}
+
 .sidenav__link {
   border-radius: 999px;
+}
+
+// <button mat-list-item> renders a native button which carries its own
+// border/background. Strip those so the item visually matches the <a> items.
+.sidenav__link--button {
+  border: 0;
+  background: transparent;
+  font: inherit;
+  color: inherit;
+  cursor: pointer;
+  text-align: inherit;
+  width: 100%;
 }

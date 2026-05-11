@@ -1,18 +1,6 @@
 .shell {
   height: 100vh;
-  display: flex;
-  flex-direction: column;
   background: var(--mat-sys-surface);
-}
-
-.shell__topbar {
-  display: block;
-  flex: 0 0 auto;
-}
-
-.shell__container {
-  flex: 1 1 auto;
-  min-height: 0;
 }
 
 .shell__sidenav {
