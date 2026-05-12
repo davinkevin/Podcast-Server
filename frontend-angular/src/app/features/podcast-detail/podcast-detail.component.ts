@@ -3,9 +3,11 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
   inject,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { QueryClient } from '@tanstack/angular-query-experimental';
@@ -21,6 +23,7 @@ import { CoverCardAction } from '../../shared/cover-card/cover-card.component';
 import { TrackRowComponent } from '../../shared/track-row/track-row.component';
 import { PagerComponent } from '../../shared/pager/pager.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
+import { DetailStickyHeaderComponent } from '../../shared/detail-sticky-header/detail-sticky-header.component';
 import {
   StatusBadgeComponent,
   StatusBadgeKind,
@@ -75,6 +78,7 @@ const DELETE_ITEM_ACTION: CoverCardAction = {
     PagerComponent,
     EmptyStateComponent,
     StatusBadgeComponent,
+    DetailStickyHeaderComponent,
   ],
   templateUrl: './podcast-detail.component.html',
   styleUrl: './podcast-detail.component.scss',
@@ -156,6 +160,13 @@ export default class PodcastDetailComponent {
     };
   });
 
+  // Sticky compact header visibility: true once the hero has scrolled out
+  // of view. Driven by an IntersectionObserver on the sentinel placed right
+  // after the hero in the template.
+  private readonly heroSentinel =
+    viewChild<ElementRef<HTMLElement>>('heroSentinel');
+  protected readonly heroOffscreen = signal(false);
+
   constructor() {
     effect(() => {
       const url = this.coverSrc();
@@ -168,6 +179,22 @@ export default class PodcastDetailComponent {
       const dark = this.settings.effectiveTheme() === 'dark';
       applyCoverTint(p, dark);
       onCleanup(() => clearCoverTint());
+    });
+
+    // Watch the hero sentinel from the scrollable shell outlet's viewport.
+    // The sentinel sits at the bottom of the hero; when it intersects the
+    // viewport, the hero is visible → compact header hidden. When it
+    // scrolls out → compact header shown.
+    effect((onCleanup) => {
+      const el = this.heroSentinel()?.nativeElement;
+      if (!el) return;
+      const root = el.closest('.shell__outlet') as HTMLElement | null;
+      const observer = new IntersectionObserver(
+        ([entry]) => this.heroOffscreen.set(!entry.isIntersecting),
+        { root, threshold: 0 },
+      );
+      observer.observe(el);
+      onCleanup(() => observer.disconnect());
     });
   }
 

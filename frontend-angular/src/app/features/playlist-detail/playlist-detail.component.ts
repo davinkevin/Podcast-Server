@@ -3,9 +3,11 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
   inject,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
@@ -17,6 +19,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { CoverCardAction } from '../../shared/cover-card/cover-card.component';
 import { TrackRowComponent } from '../../shared/track-row/track-row.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
+import { DetailStickyHeaderComponent } from '../../shared/detail-sticky-header/detail-sticky-header.component';
 import { PlaylistApi } from '../../core/api/playlist.api';
 import {
   PlaylistItemHAL,
@@ -48,6 +51,7 @@ const REMOVE_ACTION: CoverCardAction = {
     MatProgressSpinnerModule,
     TrackRowComponent,
     EmptyStateComponent,
+    DetailStickyHeaderComponent,
   ],
   templateUrl: './playlist-detail.component.html',
   styleUrl: './playlist-detail.component.scss',
@@ -99,6 +103,13 @@ export default class PlaylistDetailComponent {
     };
   });
 
+  // Sticky compact header visibility: true once the hero has scrolled out
+  // of view. Driven by an IntersectionObserver on the sentinel placed right
+  // after the hero in the template.
+  private readonly heroSentinel =
+    viewChild<ElementRef<HTMLElement>>('heroSentinel');
+  protected readonly heroOffscreen = signal(false);
+
   constructor() {
     // Extract from the route-derived cover URL (always same-origin, available
     // immediately before the playlist query resolves).
@@ -112,6 +123,19 @@ export default class PlaylistDetailComponent {
       const dark = this.settings.effectiveTheme() === 'dark';
       applyCoverTint(p, dark);
       onCleanup(() => clearCoverTint());
+    });
+
+    // Watch the hero sentinel from the scrollable shell outlet's viewport.
+    effect((onCleanup) => {
+      const el = this.heroSentinel()?.nativeElement;
+      if (!el) return;
+      const root = el.closest('.shell__outlet') as HTMLElement | null;
+      const observer = new IntersectionObserver(
+        ([entry]) => this.heroOffscreen.set(!entry.isIntersecting),
+        { root, threshold: 0 },
+      );
+      observer.observe(el);
+      onCleanup(() => observer.disconnect());
     });
   }
 

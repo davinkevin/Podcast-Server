@@ -9,6 +9,11 @@
   />
 } @else {
   <article class="pl">
+    <ps-detail-sticky-header
+      [coverUrl]="coverSrc()"
+      [title]="playlist?.name ?? ''"
+      [shown]="heroOffscreen()"
+    />
     <section class="pl__hero">
       <header class="pl__header">
         <!-- Cover rendered from the route so the view-transition morph
@@ -55,6 +60,9 @@
         }
       </header>
     </section>
+    <!-- Sentinel: when this 1px slice scrolls past the top of the outlet,
+         the compact sticky header fades in. -->
+    <div #heroSentinel aria-hidden="true" class="pl__sentinel"></div>
 
     @if (playlist) {
     <header class="pl__section-header">
