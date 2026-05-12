@@ -107,6 +107,14 @@
   align-items: center;
 }
 
+// Pushes the overflow menu to the right edge of the actions row. `margin-left:
+// auto` works inside flex regardless of how many siblings precede it, and
+// behaves correctly when the row wraps on narrow screens (the button just
+// sits at the start of the wrapped line).
+.detail__more {
+  margin-left: auto;
+}
+
 .detail__description {
   display: flex;
   flex-direction: column;

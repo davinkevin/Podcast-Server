@@ -16,6 +16,7 @@ import { Title } from '@angular/platform-browser';
 import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
@@ -46,6 +47,7 @@ import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialo
     DatePipe,
     MatIconModule,
     MatButtonModule,
+    MatMenuModule,
     MatProgressSpinnerModule,
     StatusBadgeComponent,
     EmptyStateComponent,

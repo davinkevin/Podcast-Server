@@ -52,10 +52,6 @@
             <mat-icon>play_arrow</mat-icon>
             Play
           </button>
-          <button mat-stroked-button (click)="onReset(item)">
-            <mat-icon>restart_alt</mat-icon>
-            Reset
-          </button>
         } @else if (!inProgress) {
           <button mat-fab extended color="primary" (click)="onDownload(item)">
             <mat-icon>download</mat-icon>
@@ -66,10 +62,35 @@
           <mat-icon>playlist_add</mat-icon>
           Add to playlist
         </button>
-        <button mat-stroked-button color="warn" (click)="onDelete(item)">
-          <mat-icon>delete</mat-icon>
-          Delete
+        <button
+          mat-icon-button
+          aria-label="More actions"
+          [matMenuTriggerFor]="moreMenu"
+          class="detail__more"
+        >
+          <mat-icon>more_vert</mat-icon>
         </button>
+        <mat-menu #moreMenu="matMenu">
+          <a
+            mat-menu-item
+            [href]="item.url"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <mat-icon>open_in_new</mat-icon>
+            <span>Open original</span>
+          </a>
+          @if (item.isDownloaded) {
+            <button mat-menu-item (click)="onReset(item)">
+              <mat-icon>restart_alt</mat-icon>
+              <span>Reset</span>
+            </button>
+          }
+          <button mat-menu-item (click)="onDelete(item)">
+            <mat-icon>delete</mat-icon>
+            <span>Delete</span>
+          </button>
+        </mat-menu>
       </div>
 
       @if (item.description) {
