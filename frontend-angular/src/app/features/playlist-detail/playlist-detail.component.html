@@ -27,7 +27,7 @@
             episode{{ playlist.items.length === 1 ? '' : 's' }}
           </p>
 
-          <div class="pl__actions">
+          <div class="pl__actions" [style]="actionStyles()">
             <button mat-flat-button color="primary" (click)="onCopyRss()">
               <mat-icon>{{ copyHint() === 'copied' ? 'check' : 'rss_feed' }}</mat-icon>
               {{ copyHint() === 'copied' ? 'Copied!' : 'Copy RSS link' }}

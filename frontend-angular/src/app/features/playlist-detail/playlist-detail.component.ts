@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  effect,
   inject,
   input,
   signal,
@@ -23,6 +24,13 @@ import {
 } from '../../core/models/playlist.model';
 import { PlayerService } from '../../core/player/player.service';
 import { NavigationOriginService } from '../../core/navigation/navigation-origin.service';
+import {
+  applyCoverTint,
+  clearCoverTint,
+  CoverColorService,
+  CoverPalette,
+} from '../../core/cover-color/cover-color.service';
+import { SettingsService } from '../../core/settings/settings.service';
 
 const REMOVE_ACTION: CoverCardAction = {
   id: 'remove',
@@ -54,6 +62,8 @@ export default class PlaylistDetailComponent {
   private readonly snackbar = inject(MatSnackBar);
   private readonly player = inject(PlayerService);
   private readonly navOrigin = inject(NavigationOriginService);
+  private readonly coverColor = inject(CoverColorService);
+  private readonly settings = inject(SettingsService);
 
   protected readonly id = computed(() => this.idPlaylist());
   protected readonly playlistQuery = this.api.getById(this.id);
@@ -64,6 +74,46 @@ export default class PlaylistDetailComponent {
   protected readonly rssUrl = computed(() => `${location.origin}/api/v1/playlists/${this.idPlaylist()}/rss`);
 
   protected readonly cardActions = [REMOVE_ACTION] as const;
+
+  // Palette extracted from the cover via node-vibrant. Pushed onto the global
+  // --page-tint / --page-tint-bottom variables so the shell paints a faded
+  // gradient across the whole content area (Spotify/Apple Music feel).
+  private readonly palette = signal<CoverPalette | null>(null);
+
+  // Per-button accent override (see PodcastDetailComponent for the rationale
+  // — Material 19 resolves MDC tokens at theme-compile time so overriding
+  // --mat-sys-primary on a parent isn't enough for FAB/filled-button
+  // variants; the relevant tokens are set inline).
+  protected readonly actionStyles = computed(() => {
+    const p = this.palette();
+    const primary = p?.vibrant?.hex ?? p?.darkVibrant?.hex;
+    const onPrimary = p?.vibrant?.titleText ?? p?.darkVibrant?.titleText;
+    if (!primary || !onPrimary) return null;
+    return {
+      '--mdc-filled-button-container-color': primary,
+      '--mdc-filled-button-label-text-color': onPrimary,
+      '--mdc-fab-container-color': primary,
+      '--mat-fab-foreground-color': onPrimary,
+      '--mat-sys-primary': primary,
+      '--mat-sys-on-primary': onPrimary,
+    };
+  });
+
+  constructor() {
+    // Extract from the route-derived cover URL (always same-origin, available
+    // immediately before the playlist query resolves).
+    effect(() => {
+      const url = this.coverSrc();
+      this.coverColor.extract(url).then((p) => this.palette.set(p));
+    });
+
+    effect((onCleanup) => {
+      const p = this.palette();
+      const dark = this.settings.effectiveTheme() === 'dark';
+      applyCoverTint(p, dark);
+      onCleanup(() => clearCoverTint());
+    });
+  }
 
   protected coverUrl(playlist: PlaylistWithItemsHAL): string {
     return `/api/v1/playlists/${playlist.id}/cover.jpg`;
