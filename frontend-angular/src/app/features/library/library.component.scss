@@ -6,9 +6,14 @@
 }
 
 .library__header {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
+  // 3-column grid mirrors /podcasts: heading on the left, search centered in
+  // the viewport, an empty 1fr column on the right that absorbs leftover
+  // space symmetrically so the search stays centered regardless of heading
+  // width.
+  display: grid;
+  grid-template-columns: 1fr minmax(20rem, 28rem) 1fr;
+  align-items: center;
+  gap: 1rem;
 }
 
 .library__heading {
@@ -16,6 +21,7 @@
   align-items: baseline;
   gap: 0.75rem;
   flex-wrap: wrap;
+  justify-self: start;
 }
 
 .library__title {
@@ -30,12 +36,18 @@
 }
 
 .library__search {
-  max-width: 32rem;
   width: 100%;
 }
 
 .library__search mat-form-field {
   width: 100%;
+}
+
+@media (max-width: 800px) {
+  // Stack on narrow screens: heading on top, search full-width below.
+  .library__header {
+    grid-template-columns: 1fr;
+  }
 }
 
 .library__grid {
