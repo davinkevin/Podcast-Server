@@ -29,6 +29,7 @@ import { ItemApi, ItemSearchInput } from '../../core/api/item.api';
 import { ItemHAL } from '../../core/models/item.model';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import { PlayerService } from '../../core/player/player.service';
+import { NavigationOriginService } from '../../core/navigation/navigation-origin.service';
 import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialog.component';
 
 const DEFAULT_PAGE_SIZE = 24;
@@ -72,6 +73,7 @@ export default class LibraryComponent {
   private readonly stream = inject(DownloadStreamService);
   private readonly player = inject(PlayerService);
   private readonly dialog = inject(MatDialog);
+  private readonly navOrigin = inject(NavigationOriginService);
 
   protected readonly cardActions = [ADD_TO_PLAYLIST_ACTION] as const;
 
@@ -141,11 +143,10 @@ export default class LibraryComponent {
   }
 
   protected onOpen(item: ItemHAL) {
-    // `from` tags the destination's view-transition-name scope so the
-    // morph only happens between this list and item-detail (and back).
-    this.router.navigate(['/podcasts', item.podcastId, 'items', item.id], {
-      queryParams: { from: 'library' },
-    });
+    // Mark this navigation's origin so item-detail scopes the
+    // view-transition-name on the hero cover to morph only with this list.
+    this.navOrigin.set('library');
+    this.router.navigate(['/podcasts', item.podcastId, 'items', item.id]);
   }
 
   protected onAction(item: ItemHAL, action: CoverCardAction) {

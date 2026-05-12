@@ -22,6 +22,7 @@ import {
   PlaylistWithItemsHAL,
 } from '../../core/models/playlist.model';
 import { PlayerService } from '../../core/player/player.service';
+import { NavigationOriginService } from '../../core/navigation/navigation-origin.service';
 
 const REMOVE_ACTION: CoverCardAction = {
   id: 'remove',
@@ -52,6 +53,7 @@ export default class PlaylistDetailComponent {
   private readonly api = inject(PlaylistApi);
   private readonly snackbar = inject(MatSnackBar);
   private readonly player = inject(PlayerService);
+  private readonly navOrigin = inject(NavigationOriginService);
 
   protected readonly id = computed(() => this.idPlaylist());
   protected readonly playlistQuery = this.api.getById(this.id);
@@ -107,9 +109,8 @@ export default class PlaylistDetailComponent {
   }
 
   protected onOpenItem(item: PlaylistItemHAL) {
-    this.router.navigate(['/podcasts', item.podcast.id, 'items', item.id], {
-      queryParams: { from: 'playlist' },
-    });
+    this.navOrigin.set('playlist');
+    this.router.navigate(['/podcasts', item.podcast.id, 'items', item.id]);
   }
 
   protected onAction(item: PlaylistItemHAL, action: CoverCardAction) {

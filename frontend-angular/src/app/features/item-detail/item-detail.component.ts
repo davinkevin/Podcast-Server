@@ -7,6 +7,10 @@ import {
   input,
   signal,
 } from '@angular/core';
+import {
+  NavigationOrigin,
+  NavigationOriginService,
+} from '../../core/navigation/navigation-origin.service';
 import { Router, RouterLink } from '@angular/router';
 import { Title } from '@angular/platform-browser';
 import { DatePipe } from '@angular/common';
@@ -34,8 +38,6 @@ import {
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialog.component';
 
-type FromScope = 'library' | 'podcast' | 'playlist';
-
 @Component({
   selector: 'ps-item-detail',
   standalone: true,
@@ -56,20 +58,17 @@ export default class ItemDetailComponent {
   // Bound from /podcasts/:idPodcast/items/:id via withComponentInputBinding().
   readonly idPodcast = input.required<string>();
   readonly id = input.required<string>();
-  // Optional `?from=...` query param — set by the list that linked here so
-  // the view-transition-name on the hero cover matches that list's scope
-  // only (avoids cross-list morphs that aren't a natural navigation).
-  readonly from = input<string | undefined>(undefined);
+
+  // Origin of this navigation (set by the list that linked here). Consumed
+  // once at construction so the view-transition-name on the hero cover is
+  // scoped to that list only — avoids cross-list morphs that aren't a
+  // natural navigation.
+  private readonly origin: NavigationOrigin | null =
+    inject(NavigationOriginService).consume();
 
   protected readonly heroTransitionName = computed<string | null>(() => {
-    const scope = this.fromScope();
-    if (!scope) return null;
-    return `${scope}-item-cover-${this.id()}`;
-  });
-
-  private readonly fromScope = computed<FromScope | null>(() => {
-    const v = this.from();
-    return v === 'library' || v === 'podcast' || v === 'playlist' ? v : null;
+    if (!this.origin) return null;
+    return `${this.origin}-item-cover-${this.id()}`;
   });
 
   private readonly itemApi = inject(ItemApi);

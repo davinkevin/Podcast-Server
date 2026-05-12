@@ -38,6 +38,7 @@ import {
   CoverPalette,
 } from '../../core/cover-color/cover-color.service';
 import { SettingsService } from '../../core/settings/settings.service';
+import { NavigationOriginService } from '../../core/navigation/navigation-origin.service';
 import { queryKeys } from '../../core/api/query-keys';
 
 import { PodcastEditDialogComponent } from './podcast-edit-dialog.component';
@@ -88,6 +89,7 @@ export default class PodcastDetailComponent {
   private readonly coverColor = inject(CoverColorService);
   private readonly settings = inject(SettingsService);
   private readonly queryClient = inject(QueryClient);
+  private readonly navOrigin = inject(NavigationOriginService);
 
   protected readonly id = computed(() => this.idPodcast());
   protected readonly podcastQuery = this.api.getById(this.id);
@@ -197,9 +199,8 @@ export default class PodcastDetailComponent {
   }
 
   protected onOpenItem(item: ItemHAL) {
-    this.router.navigate(['/podcasts', item.podcastId, 'items', item.id], {
-      queryParams: { from: 'podcast' },
-    });
+    this.navOrigin.set('podcast');
+    this.router.navigate(['/podcasts', item.podcastId, 'items', item.id]);
   }
 
   protected onItemAction(item: ItemHAL, action: CoverCardAction) {
