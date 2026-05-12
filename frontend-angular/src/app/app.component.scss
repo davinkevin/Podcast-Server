@@ -1,5 +1,10 @@
 .shell {
-  height: 100vh;
+  // dvh follows the visible viewport as mobile browser chrome (URL bar,
+  // bottom toolbar) shows/hides — avoids the 100vh overflow that leaves the
+  // bottom of the page hidden behind the chrome on iOS Safari and Chrome
+  // Android. Universally supported in our target browsers (Safari 15.4+,
+  // Chrome 108+, Firefox 101+).
+  height: 100dvh;
   background: var(--mat-sys-surface);
 }
 
