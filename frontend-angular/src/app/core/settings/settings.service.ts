@@ -83,7 +83,7 @@ export class SettingsService {
   private applySidenav(value: SidenavMode) {
     document.documentElement.style.setProperty(
       '--sidenav-width',
-      value === 'rail' ? '80px' : '240px',
+      value === 'rail' ? '72px' : '240px',
     );
   }
 
