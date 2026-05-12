@@ -47,8 +47,19 @@ import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialo
 
 const DEFAULT_PAGE_SIZE = 24;
 const ADD_TO_PLAYLIST_ACTION: CoverCardAction = {
+  id: 'add-to-playlist',
   label: 'Add to playlist',
   icon: 'playlist_add',
+};
+const RESET_ITEM_ACTION: CoverCardAction = {
+  id: 'reset-item',
+  label: 'Reset',
+  icon: 'restart_alt',
+};
+const DELETE_ITEM_ACTION: CoverCardAction = {
+  id: 'delete-item',
+  label: 'Delete',
+  icon: 'delete',
 };
 
 @Component({
@@ -94,6 +105,8 @@ export default class PodcastDetailComponent {
   protected readonly id = computed(() => this.idPodcast());
   protected readonly podcastQuery = this.api.getById(this.id);
   private readonly deleteMutation = this.api.deleteMutation();
+  private readonly resetItemMutation = this.itemApi.resetMutation();
+  private readonly deleteItemMutation = this.itemApi.deleteMutation();
 
   /* Bumped on every successful Settings save to bust the browser cache for the
      cover, whose URL stays the same (`/api/v1/podcasts/{id}/cover.jpg`) even
@@ -158,7 +171,23 @@ export default class PodcastDetailComponent {
     });
   }
 
-  protected readonly cardActions = [ADD_TO_PLAYLIST_ACTION] as const;
+  // Per-item action list built fresh for each row so Reset only appears when
+  // there's a file on disk to reset, and "Open original" carries the item's
+  // remote URL into the menu entry (rendered as an external link).
+  protected itemActions(item: ItemHAL): readonly CoverCardAction[] {
+    const actions: CoverCardAction[] = [
+      ADD_TO_PLAYLIST_ACTION,
+      {
+        id: 'open-original',
+        label: 'Open original',
+        icon: 'open_in_new',
+        url: item.url,
+      },
+    ];
+    if (item.isDownloaded) actions.push(RESET_ITEM_ACTION);
+    actions.push(DELETE_ITEM_ACTION);
+    return actions;
+  }
 
   protected subtitleFor(item: ItemHAL): string {
     if (!item.pubDate) return 'No date';
@@ -204,13 +233,52 @@ export default class PodcastDetailComponent {
   }
 
   protected onItemAction(item: ItemHAL, action: CoverCardAction) {
-    if (action.label === ADD_TO_PLAYLIST_ACTION.label) {
-      this.dialog.open(AddToPlaylistDialogComponent, {
-        data: { itemId: item.id, itemTitle: item.title },
-        autoFocus: 'first-tabbable',
-        panelClass: 'ps-fitting-dialog',
-      });
+    switch (action.id) {
+      case ADD_TO_PLAYLIST_ACTION.id:
+        this.dialog.open(AddToPlaylistDialogComponent, {
+          data: { itemId: item.id, itemTitle: item.title },
+          autoFocus: 'first-tabbable',
+          panelClass: 'ps-fitting-dialog',
+        });
+        break;
+      case RESET_ITEM_ACTION.id:
+        this.onResetItem(item);
+        break;
+      case DELETE_ITEM_ACTION.id:
+        this.onDeleteItem(item);
+        break;
+      // "open-original" is a link (CoverCardAction.url) — handled by the
+      // browser directly, no callback needed.
     }
+  }
+
+  private onResetItem(item: ItemHAL) {
+    this.resetItemMutation.mutate(
+      { podcastId: item.podcastId, itemId: item.id },
+      {
+        onSuccess: () => {
+          this.player.closeIf(item.id);
+          this.snackbar.open('Item reset', undefined, { duration: 2500 });
+        },
+        onError: () =>
+          this.snackbar.open('Could not reset item', 'Dismiss', { duration: 4000 }),
+      },
+    );
+  }
+
+  private onDeleteItem(item: ItemHAL) {
+    if (!confirm(`Delete "${item.title}"?`)) return;
+    this.deleteItemMutation.mutate(
+      { podcastId: item.podcastId, itemId: item.id },
+      {
+        onSuccess: () => {
+          this.player.closeIf(item.id);
+          this.snackbar.open('Item deleted', undefined, { duration: 2500 });
+        },
+        onError: () =>
+          this.snackbar.open('Could not delete item', 'Dismiss', { duration: 4000 }),
+      },
+    );
   }
 
   protected onUpdateNow(podcast: PodcastHAL) {

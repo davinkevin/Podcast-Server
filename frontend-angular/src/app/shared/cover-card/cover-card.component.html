@@ -47,10 +47,22 @@
 
       <mat-menu #menu="matMenu">
         @for (entry of actions(); track entry.label) {
-          <button mat-menu-item (click)="onAction(entry)">
-            <mat-icon>{{ entry.icon }}</mat-icon>
-            <span>{{ entry.label }}</span>
-          </button>
+          @if (entry.url) {
+            <a
+              mat-menu-item
+              [href]="entry.url"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <mat-icon>{{ entry.icon }}</mat-icon>
+              <span>{{ entry.label }}</span>
+            </a>
+          } @else {
+            <button mat-menu-item (click)="onAction(entry)">
+              <mat-icon>{{ entry.icon }}</mat-icon>
+              <span>{{ entry.label }}</span>
+            </button>
+          }
         }
       </mat-menu>
     }

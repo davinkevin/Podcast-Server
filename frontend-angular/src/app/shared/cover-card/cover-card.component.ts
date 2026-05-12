@@ -9,6 +9,10 @@ export interface CoverCardAction {
   readonly id?: string;
   readonly label: string;
   readonly icon: string;
+  /** When set, renders the menu entry as an external link instead of a
+   *  button. The host page's `action` callback is not invoked — the browser
+   *  handles the navigation directly (opens in a new tab). */
+  readonly url?: string;
 }
 
 @Component({

@@ -126,7 +126,7 @@
               [coverUrl]="item.cover.url"
               [playable]="item.isDownloaded"
               [downloadable]="!item.isDownloaded && !isInProgress(item)"
-              [actions]="cardActions"
+              [actions]="itemActions(item)"
               [viewTransitionName]="'podcast-item-cover-' + item.id"
               (play)="onPlay(item)"
               (download)="onDownload(item)"
