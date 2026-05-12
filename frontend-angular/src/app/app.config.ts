@@ -1,10 +1,12 @@
 import {
   ApplicationConfig,
+  inject,
   provideExperimentalZonelessChangeDetection,
 } from '@angular/core';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import {
   provideRouter,
+  Router,
   withComponentInputBinding,
   withViewTransitions,
 } from '@angular/router';
@@ -24,7 +26,19 @@ export const appConfig: ApplicationConfig = {
       withComponentInputBinding(),
       // Native View Transitions API (Chrome 111+, Safari 18+, Firefox 129+).
       // Default behavior is a cross-fade between the old and new page.
-      withViewTransitions(),
+      //
+      // On `popstate` (browser back/forward + iOS edge-swipe-to-go-back),
+      // skip our transition. iOS Safari plays its own native swipe animation
+      // from bfcache that we can't suppress — running our morph on top of
+      // that produces a visible double-animation. Letting iOS own that
+      // navigation keeps the UX clean; forward (imperative) navigations
+      // keep their morph.
+      withViewTransitions({
+        onViewTransitionCreated: ({ transition }) => {
+          const trigger = inject(Router).getCurrentNavigation()?.trigger;
+          if (trigger === 'popstate') transition.skipTransition();
+        },
+      }),
     ),
     provideHttpClient(withFetch()),
     provideAnimationsAsync(),
