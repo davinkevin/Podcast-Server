@@ -4,10 +4,42 @@
 
 <section class="podcasts">
   <header class="podcasts__header">
-    <h1 class="podcasts__title">Podcasts</h1>
-    @if (result) {
-      <span class="podcasts__count">{{ result.content.length }} podcasts</span>
+    <div class="podcasts__heading">
+      <h1 class="podcasts__title">Podcasts</h1>
+      @if (result) {
+        <span class="podcasts__count">{{ result.content.length }} podcasts</span>
+      }
+    </div>
+
+    @if (result && result.content.length > 0) {
+      <mat-form-field
+        appearance="outline"
+        subscriptSizing="dynamic"
+        class="podcasts__search"
+      >
+        <mat-icon matPrefix>search</mat-icon>
+        <input
+          matInput
+          type="search"
+          name="q"
+          placeholder="Filter podcasts…"
+          [ngModel]="search()"
+          (ngModelChange)="search.set($event)"
+        />
+        @if (search()) {
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            aria-label="Clear search"
+            (click)="onClearSearch()"
+          >
+            <mat-icon>close</mat-icon>
+          </button>
+        }
+      </mat-form-field>
     }
+
     <button
       mat-flat-button
       color="primary"
@@ -37,19 +69,28 @@
         subtitle="Add a podcast to get started."
       />
     } @else {
-      <div class="podcasts__grid">
-        @for (p of sortedPodcasts(); track p.id) {
-          <ps-cover-card
-            [title]="p.title"
-            [subtitle]="p.type"
-            [coverUrl]="coverUrl(p)"
-            [playable]="false"
-            [downloadable]="false"
-            [viewTransitionName]="'pod-cover-' + p.id"
-            (open)="onOpen(p)"
-          />
-        }
-      </div>
+      @let visible = visiblePodcasts();
+      @if (visible.length === 0) {
+        <ps-empty-state
+          icon="search_off"
+          title="No matches"
+          subtitle="Try a different keyword."
+        />
+      } @else {
+        <div class="podcasts__grid">
+          @for (p of visible; track p.id) {
+            <ps-cover-card
+              [title]="p.title"
+              [subtitle]="p.type"
+              [coverUrl]="coverUrl(p)"
+              [playable]="false"
+              [downloadable]="false"
+              [viewTransitionName]="'pod-cover-' + p.id"
+              (open)="onOpen(p)"
+            />
+          }
+        </div>
+      }
     }
   }
 </section>

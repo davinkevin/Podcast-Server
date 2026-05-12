@@ -6,10 +6,22 @@
 }
 
 .podcasts__header {
+  // 3-column grid: heading on the left, search centered in the viewport,
+  // add button on the right. The 1fr side columns absorb leftover space
+  // symmetrically around the fixed-width search so it stays centered
+  // regardless of heading/add widths.
+  display: grid;
+  grid-template-columns: 1fr minmax(20rem, 28rem) 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+.podcasts__heading {
   display: flex;
   align-items: baseline;
   gap: 0.75rem;
   flex-wrap: wrap;
+  justify-self: start;
 }
 
 .podcasts__title {
@@ -23,8 +35,22 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
+.podcasts__search {
+  width: 100%;
+}
+
 .podcasts__add {
-  margin-left: auto;
+  justify-self: end;
+}
+
+@media (max-width: 800px) {
+  // Stack on narrow screens: heading on top, search full-width, add below.
+  .podcasts__header {
+    grid-template-columns: 1fr;
+  }
+  .podcasts__add {
+    justify-self: start;
+  }
 }
 
 .podcasts__grid {
