@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.23.0
+# syntax=docker/dockerfile:1.24.0
 
 # renovate: datasource=github-releases depName=yt-dlp/yt-dlp
 ARG YT_DLP_VERSION=2026.03.17
