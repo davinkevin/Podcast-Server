@@ -89,7 +89,7 @@ stages:
   image: gradle:jdk21
   needs: [⬇ backend]
   services:
-    - postgres:18.3-alpine
+    - postgres:18.4-alpine
   variables:
     POSTGRES_USER: pg-user
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
@@ -121,7 +121,7 @@ stages:
   image: gradle:jdk21
   needs: [⬇ backend]
   services:
-    - postgres:18.3-alpine
+    - postgres:18.4-alpine
   variables:
     POSTGRES_USER: pg-user
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
@@ -242,7 +242,7 @@ stages:
   image: gradle:jdk21
   needs: [⬇ backend, 👷 backend-base-image]
   services:
-    - postgres:18.3-alpine
+    - postgres:18.4-alpine
   variables:
     POSTGRES_USER: pg-user
     POSTGRES_PASSWORD: LUiUwCfPwhGx1rQaUJEa7L09mdifP1Es
@@ -316,9 +316,9 @@ stages:
   stage: 🧪 test
   extends: [ .only-on-backend-changes ]
   needs: [ 🐳 init-db ]
-  image: postgres:18.3-alpine
+  image: postgres:18.4-alpine
   services:
-    - name: postgres:18.3-alpine
+    - name: postgres:18.4-alpine
       alias: db
       variables:
         POSTGRES_USER: pg-user
