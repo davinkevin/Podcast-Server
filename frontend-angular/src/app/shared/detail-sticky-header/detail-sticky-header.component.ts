@@ -32,10 +32,17 @@ import { ChangeDetectionStrategy, Component, input } from '@angular/core';
       grid-template-columns: 1fr 1fr 1fr;
       align-items: center;
       padding: 0.5rem clamp(1rem, 4vw, 2rem);
-      /* Frosted glass: translucent surface + backdrop blur. The bar is an
-         overlay, not a separate panel — content beneath shows through softly,
-         removing the hard boundary that a solid background draws. */
-      background: color-mix(in srgb, var(--mat-sys-surface) 65%, transparent);
+      /* Frosted glass with a discreet cover-derived tint, à la Spotify /
+         Apple Music: the bar stays predominantly dark (surface) so it
+         doesn't compete with the content, and a small amount of the
+         vibrant --page-tint is folded in to colour-pair the bar with
+         the page below. Outer 60% / 40% transparent keeps the panel
+         translucent so the backdrop-blur stays the dominant effect. */
+      background: color-mix(
+        in srgb,
+        color-mix(in srgb, var(--page-tint) 20%, var(--mat-sys-surface)) 60%,
+        transparent
+      );
       backdrop-filter: blur(20px) saturate(160%);
       -webkit-backdrop-filter: blur(20px) saturate(160%);
       opacity: 0;
