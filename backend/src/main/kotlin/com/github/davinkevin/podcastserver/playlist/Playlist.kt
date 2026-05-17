@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.podcastserver.item.Sluggable
 import java.net.URI
 import java.nio.file.Path
@@ -30,10 +31,13 @@ data class PlaylistWithItems(
         val length: Long?,
 
         val pubDate: OffsetDateTime?,
+        val status: Status,
 
         val podcast: Podcast,
         val cover: Cover
     ): Sluggable {
+
+        fun isDownloaded(): Boolean = status == Status.FINISH && fileName != null
 
         data class Podcast(val id: UUID, val title: String)
         data class Cover(val id: UUID, val width: Int, val height: Int, val url: URI)

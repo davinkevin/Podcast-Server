@@ -143,6 +143,7 @@ private class PlaylistWithItemsHAL(val id: UUID, val name: String, val items: Co
             val proxyURL: URI,
             val description: String?,
             val mimeType: String,
+            val isDownloaded: Boolean,
 
             val podcast: Podcast,
             val cover: Cover) {
@@ -172,6 +173,7 @@ private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
 
             description = description,
             mimeType = mimeType,
+            isDownloaded = isDownloaded(),
 
             podcast = PlaylistWithItemsHAL.Item.Podcast(
                     id = podcast.id,

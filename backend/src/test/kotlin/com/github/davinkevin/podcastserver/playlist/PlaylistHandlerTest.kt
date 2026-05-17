@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
 import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
@@ -48,6 +49,7 @@ class PlaylistHandlerTest (
             fileName = Path("file.mp3"),
             length = 10L,
             pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
+            status = Status.FINISH,
             podcast = PlaylistWithItems.Item.Podcast(
                 id = UUID.fromString("3ba6411c-8fb9-4e24-afb1-adbad9a023e0"),
                 title = "a podcast"
@@ -138,6 +140,7 @@ class PlaylistHandlerTest (
                                 "proxyURL": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
                                 "description": "a desc",
                                 "mimeType": "audio/mp3",
+                                "isDownloaded": true,
                                 "podcast": {
                                   "id": "3ba6411c-8fb9-4e24-afb1-adbad9a023e0",
                                   "title": "a podcast"
@@ -192,6 +195,7 @@ class PlaylistHandlerTest (
                                 "proxyURL": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
                                 "description": "a desc",
                                 "mimeType": "audio/mp3",
+                                "isDownloaded": true,
                                 "podcast": {
                                   "id": "3ba6411c-8fb9-4e24-afb1-adbad9a023e0",
                                   "title": "a podcast"
@@ -315,6 +319,7 @@ class PlaylistHandlerTest (
                             fileName = Path("file.mp3"),
                             length = 10L,
                             pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
+                            status = Status.FINISH,
                             podcast = PlaylistWithItems.Item.Podcast(
                                 id = UUID.fromString("3ba6411c-8fb9-4e24-afb1-adbad9a023e0"),
                                 title = "a podcast"
@@ -357,6 +362,154 @@ class PlaylistHandlerTest (
                                       },
                                       "description":"a desc",
                                       "id":"c42d2a59-46e6-4c1d-b0fb-2b47d389b370",
+                                      "isDownloaded":true,
+                                      "mimeType":"audio/mp3",
+                                      "podcast":{
+                                         "id":"3ba6411c-8fb9-4e24-afb1-adbad9a023e0",
+                                         "title":"a podcast"
+                                      },
+                                      "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
+                                      "title":"a title"
+                                   }
+                                ]
+                            }""")
+                    }
+            }
+
+            @Test
+            fun `with 1 item not downloaded`() {
+                /* Given */
+                val playlist = PlaylistWithItems(
+                    id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
+                    name = "foo",
+                    items = listOf(
+                        PlaylistWithItems.Item(
+                            id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
+                            title = "a title",
+                            description = "a desc",
+                            mimeType = "audio/mp3",
+                            fileName = null,
+                            length = 10L,
+                            pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
+                            status = Status.NOT_DOWNLOADED,
+                            podcast = PlaylistWithItems.Item.Podcast(
+                                id = UUID.fromString("3ba6411c-8fb9-4e24-afb1-adbad9a023e0"),
+                                title = "a podcast"
+                            ),
+                            cover = PlaylistWithItems.Item.Cover(
+                                id = UUID.fromString("0882344b-fcaf-4332-9ab8-47e78921f929"),
+                                width = 123,
+                                height = 456,
+                                url = URI("https://foo.com/bar/podcast/image.png")
+                            )
+                        )
+                    ),
+                    cover = Cover(
+                        width = 789,
+                        height = 141,
+                        url = URI("https://foo.com/bar/playlist/image.png"),
+                        id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
+                    ),
+                )
+                whenever(service.findById(playlist.id)).thenReturn(playlist)
+                /* When */
+                rest
+                    .get()
+                    .uri("/api/v1/playlists/{id}", playlist.id)
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo("""{
+                                "id":"9706ba78-2df2-4b37-a573-04367dc6f0ea",
+                                "name":"foo",
+                                "items":[
+                                   {
+                                      "cover":{
+                                         "height":456,
+                                         "id":"0882344b-fcaf-4332-9ab8-47e78921f929",
+                                         "url":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png",
+                                         "width":123
+                                      },
+                                      "description":"a desc",
+                                      "id":"c42d2a59-46e6-4c1d-b0fb-2b47d389b370",
+                                      "isDownloaded":false,
+                                      "mimeType":"audio/mp3",
+                                      "podcast":{
+                                         "id":"3ba6411c-8fb9-4e24-afb1-adbad9a023e0",
+                                         "title":"a podcast"
+                                      },
+                                      "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
+                                      "title":"a title"
+                                   }
+                                ]
+                            }""")
+                    }
+            }
+
+            @Test
+            fun `with 1 item finished but missing file`() {
+                /* Given */
+                val playlist = PlaylistWithItems(
+                    id = UUID.fromString("9706ba78-2df2-4b37-a573-04367dc6f0ea"),
+                    name = "foo",
+                    items = listOf(
+                        PlaylistWithItems.Item(
+                            id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
+                            title = "a title",
+                            description = "a desc",
+                            mimeType = "audio/mp3",
+                            fileName = null,
+                            length = 10L,
+                            pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
+                            // Edge case: status reached FINISH but the file was wiped from
+                            // disk afterwards. isDownloaded must still be false because
+                            // playing the proxyURL would 404.
+                            status = Status.FINISH,
+                            podcast = PlaylistWithItems.Item.Podcast(
+                                id = UUID.fromString("3ba6411c-8fb9-4e24-afb1-adbad9a023e0"),
+                                title = "a podcast"
+                            ),
+                            cover = PlaylistWithItems.Item.Cover(
+                                id = UUID.fromString("0882344b-fcaf-4332-9ab8-47e78921f929"),
+                                width = 123,
+                                height = 456,
+                                url = URI("https://foo.com/bar/podcast/image.png")
+                            )
+                        )
+                    ),
+                    cover = Cover(
+                        width = 789,
+                        height = 141,
+                        url = URI("https://foo.com/bar/playlist/image.png"),
+                        id = UUID.fromString("973b321f-0cfa-4dd1-891f-19a233cbf898"),
+                    ),
+                )
+                whenever(service.findById(playlist.id)).thenReturn(playlist)
+                /* When */
+                rest
+                    .get()
+                    .uri("/api/v1/playlists/{id}", playlist.id)
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+                    .expectBody()
+                    .assertThatJson {
+                        isEqualTo("""{
+                                "id":"9706ba78-2df2-4b37-a573-04367dc6f0ea",
+                                "name":"foo",
+                                "items":[
+                                   {
+                                      "cover":{
+                                         "height":456,
+                                         "id":"0882344b-fcaf-4332-9ab8-47e78921f929",
+                                         "url":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png",
+                                         "width":123
+                                      },
+                                      "description":"a desc",
+                                      "id":"c42d2a59-46e6-4c1d-b0fb-2b47d389b370",
+                                      "isDownloaded":false,
                                       "mimeType":"audio/mp3",
                                       "podcast":{
                                          "id":"3ba6411c-8fb9-4e24-afb1-adbad9a023e0",
@@ -385,6 +538,7 @@ class PlaylistHandlerTest (
                             fileName = Path("file.mp3"),
                             length = 10L,
                             pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
+                            status = Status.FINISH,
                             podcast = PlaylistWithItems.Item.Podcast(
                                 id = UUID.fromString("3ba6411c-8fb9-4e24-afb1-adbad9a023e0"),
                                 title = "a podcast"
@@ -404,6 +558,7 @@ class PlaylistHandlerTest (
                             fileName = Path("file2.mp3"),
                             length = 10L,
                             pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
+                            status = Status.FINISH,
                             podcast = PlaylistWithItems.Item.Podcast(
                                 id = UUID.fromString("35d04720-1bc3-476b-b7b0-494a15adf45e"),
                                 title = "2 a podcast"
@@ -446,6 +601,7 @@ class PlaylistHandlerTest (
                                       },
                                       "description":"a desc",
                                       "id":"c42d2a59-46e6-4c1d-b0fb-2b47d389b370",
+                                      "isDownloaded":true,
                                       "mimeType":"audio/mp3",
                                       "podcast":{
                                          "id":"3ba6411c-8fb9-4e24-afb1-adbad9a023e0",
@@ -463,6 +619,7 @@ class PlaylistHandlerTest (
                                       },
                                       "description":"a desc",
                                       "id":"4b48996c-686f-4339-b94e-f9595094f2ea",
+                                      "isDownloaded":true,
                                       "mimeType":"audio/mp3",
                                       "podcast":{
                                          "id":"35d04720-1bc3-476b-b7b0-494a15adf45e",
@@ -512,6 +669,7 @@ class PlaylistHandlerTest (
                 fileName = Path("file.mp3"),
                 length = 10L,
                 pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
+                status = Status.FINISH,
                 podcast = PlaylistWithItems.Item.Podcast(
                     id = UUID.fromString("3ba6411c-8fb9-4e24-afb1-adbad9a023e0"),
                     title = "a podcast"
@@ -558,6 +716,7 @@ class PlaylistHandlerTest (
                                   },
                                   "description":"a desc",
                                   "id":"c42d2a59-46e6-4c1d-b0fb-2b47d389b370",
+                                  "isDownloaded":true,
                                   "mimeType":"audio/mp3",
                                   "podcast":{
                                      "id":"3ba6411c-8fb9-4e24-afb1-adbad9a023e0",

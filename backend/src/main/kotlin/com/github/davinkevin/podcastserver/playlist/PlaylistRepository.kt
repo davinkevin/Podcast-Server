@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.database.Keys
 import com.github.davinkevin.podcastserver.database.Tables.*
+import com.github.davinkevin.podcastserver.entity.fromDb
 import org.jooq.DSLContext
 import org.jooq.impl.DSL.multiset
 import org.jooq.impl.DSL.select
@@ -30,6 +31,7 @@ class PlaylistRepository(
                 select(
                     ITEM.ID, ITEM.TITLE, ITEM.URL,
                     ITEM.FILE_NAME, ITEM.DESCRIPTION, ITEM.MIME_TYPE, ITEM.LENGTH, ITEM.PUB_DATE,
+                    ITEM.STATUS,
 
                     PODCAST.ID, PODCAST.TITLE,
                     COVER.ID, COVER.URL, COVER.WIDTH, COVER.HEIGHT,
@@ -60,6 +62,7 @@ class PlaylistRepository(
                     mimeType = it[ITEM.MIME_TYPE],
                     length = it[ITEM.LENGTH],
                     pubDate = it[ITEM.PUB_DATE],
+                    status = it[ITEM.STATUS].fromDb(),
                     podcast = PlaylistWithItems.Item.Podcast(
                         id = it[PODCAST.ID],
                         title = it[PODCAST.TITLE]

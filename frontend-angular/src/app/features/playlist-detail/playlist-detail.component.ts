@@ -23,11 +23,17 @@ import { CoverCardAction } from '../../shared/cover-card/cover-card.component';
 import { TrackRowComponent } from '../../shared/track-row/track-row.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { DetailStickyHeaderComponent } from '../../shared/detail-sticky-header/detail-sticky-header.component';
+import {
+  StatusBadgeComponent,
+  StatusBadgeKind,
+} from '../../shared/status-badge/status-badge.component';
+import { ItemApi } from '../../core/api/item.api';
 import { PlaylistApi } from '../../core/api/playlist.api';
 import {
   PlaylistItemHAL,
   PlaylistWithItemsHAL,
 } from '../../core/models/playlist.model';
+import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import { PlayerService } from '../../core/player/player.service';
 import {
   applyCoverTint,
@@ -54,6 +60,7 @@ const REMOVE_ACTION: CoverCardAction = {
     TrackRowComponent,
     EmptyStateComponent,
     DetailStickyHeaderComponent,
+    StatusBadgeComponent,
   ],
   templateUrl: './playlist-detail.component.html',
   styleUrl: './playlist-detail.component.scss',
@@ -65,6 +72,8 @@ export default class PlaylistDetailComponent {
 
   private readonly router = inject(Router);
   private readonly api = inject(PlaylistApi);
+  private readonly itemApi = inject(ItemApi);
+  private readonly stream = inject(DownloadStreamService);
   private readonly snackbar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly player = inject(PlayerService);
@@ -165,9 +174,12 @@ export default class PlaylistDetailComponent {
   }
 
   protected onPlay(item: PlaylistItemHAL) {
-    // Playlist items don't carry a status; we trust the user added them on
-    // purpose and treat them as playable. PlayerService.open requires
-    // `isDownloaded`, so go through a thin shim that flips that flag.
+    // Template gates Play behind `item.isDownloaded`, but be defensive: an
+    // SSE event could land between render and click flipping the state.
+    if (!item.isDownloaded) return;
+    // PlayerService.open expects the full ItemHAL shape; the playlist HAL
+    // carries less, so we adapt it here. `status: 'FINISH'` mirrors what
+    // the backend would return for a downloaded item.
     this.player.open({
       id: item.id,
       title: item.title,
@@ -191,6 +203,38 @@ export default class PlaylistDetailComponent {
       podcastId: item.podcast.id,
       proxyURL: item.proxyURL,
     });
+  }
+
+  protected onDownload(item: PlaylistItemHAL) {
+    this.itemApi.triggerDownload(item.podcast.id, item.id).subscribe({
+      next: () =>
+        this.snackbar.open('Added to download queue', undefined, { duration: 2500 }),
+      error: () =>
+        this.snackbar.open('Could not start download', 'Dismiss', { duration: 4000 }),
+    });
+  }
+
+  protected statusFor(
+    item: PlaylistItemHAL,
+  ): { kind: StatusBadgeKind; progression: number | null } | null {
+    const downloading = this.stream.downloading().find((d) => d.id === item.id);
+    if (downloading) {
+      return { kind: 'downloading', progression: downloading.progression };
+    }
+    if (this.stream.queue().some((q) => q.id === item.id)) {
+      return { kind: 'queued', progression: null };
+    }
+    // Playlist HAL doesn't carry a FAILED status flag — only `isDownloaded`
+    // — so we can't surface "failed" badges here. SSE-driven states (queued
+    // and downloading) cover the in-flight cases.
+    return null;
+  }
+
+  protected isInProgress(item: PlaylistItemHAL): boolean {
+    return (
+      this.stream.downloading().some((d) => d.id === item.id) ||
+      this.stream.queue().some((q) => q.id === item.id)
+    );
   }
 
   protected onOpenItem(item: PlaylistItemHAL) {

@@ -83,18 +83,28 @@
     } @else {
       <div class="pl__list">
         @for (item of playlist.items; track item.id) {
+          @let badge = statusFor(item);
           <ps-track-row
             [title]="item.title"
             [subtitle]="item.podcast.title"
             [coverUrl]="itemCoverUrl(item)"
-            [playable]="true"
-            [downloadable]="false"
+            [playable]="item.isDownloaded"
+            [downloadable]="!item.isDownloaded && !isInProgress(item)"
             [actions]="cardActions"
             [viewTransitionName]="'playlist-item-cover-' + item.id"
             (play)="onPlay(item)"
+            (download)="onDownload(item)"
             (open)="onOpenItem(item)"
             (action)="onAction(item, $event)"
-          />
+          >
+            @if (badge) {
+              <ps-status-badge
+                coverBadge
+                [kind]="badge.kind"
+                [progression]="badge.progression"
+              />
+            }
+          </ps-track-row>
         }
       </div>
     }

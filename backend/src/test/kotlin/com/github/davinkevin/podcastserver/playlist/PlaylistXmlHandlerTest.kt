@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.playlist
 
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.mockmvc.MockMvcRestExceptionConfiguration
 import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
@@ -48,6 +49,7 @@ class PlaylistXmlHandlerTest (
                 fileName = Path("file.mp3"),
                 length = 10L,
                 pubDate = OffsetDateTime.of(2019, 10, 27, 10, 10, 10, 10, ZoneOffset.UTC),
+                status = Status.FINISH,
                 podcast = PlaylistWithItems.Item.Podcast(
                     id = UUID.fromString("3ba6411c-8fb9-4e24-afb1-adbad9a023e0"),
                     title = "a podcast"

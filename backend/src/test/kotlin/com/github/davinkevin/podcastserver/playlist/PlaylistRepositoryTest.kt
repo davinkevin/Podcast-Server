@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.playlist
 
 import com.github.davinkevin.podcastserver.database.Tables.*
 import com.github.davinkevin.podcastserver.database.enums.ItemStatus
+import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import org.assertj.core.api.Assertions.assertThat
@@ -164,6 +165,7 @@ class PlaylistRepositoryTest(
                             mimeType = "video/mp4",
                             length = null,
                             pubDate = fixedDate.minusDays(15),
+                            status = Status.FINISH,
                             podcast = PlaylistWithItems.Item.Podcast(
                                 id = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
                                 title = "Geek Inc HD"
@@ -197,6 +199,7 @@ class PlaylistRepositoryTest(
                         mimeType = "audio/mp3",
                         length = null,
                         pubDate = fixedDate,
+                        status = Status.NOT_DOWNLOADED,
                         podcast = PlaylistWithItems.Item.Podcast(
                             id = fromString("e9c89e7f-7a8a-43ad-8425-ba2dbad2c561"),
                             title = "AppLoad"
@@ -216,6 +219,7 @@ class PlaylistRepositoryTest(
                         mimeType = "video/mp4",
                         length = null,
                         pubDate = fixedDate.minusDays(15),
+                        status = Status.FINISH,
                         podcast = PlaylistWithItems.Item.Podcast(
                             id = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
                             title = "Geek Inc HD"
@@ -337,6 +341,7 @@ class PlaylistRepositoryTest(
                     mimeType = "video/mp4",
                     length = null,
                     pubDate = fixedDate.minusDays(1),
+                    status = Status.FAILED,
                     podcast = PlaylistWithItems.Item.Podcast(
                         id = fromString("67b56578-454b-40a5-8d55-5fe1a14673e8"),
                         title = "Geek Inc HD"

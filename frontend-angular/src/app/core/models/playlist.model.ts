@@ -13,6 +13,7 @@ export interface PlaylistItemHAL {
   readonly proxyURL: string;
   readonly description: string | null;
   readonly mimeType: string;
+  readonly isDownloaded: boolean;
   readonly podcast: { readonly id: string; readonly title: string };
   readonly cover: {
     readonly id: string;
