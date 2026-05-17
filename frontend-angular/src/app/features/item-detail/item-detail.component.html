@@ -1,7 +1,13 @@
 @let item = itemQuery.data();
 @let err = itemQuery.error();
 
-@if (err && !item) {
+@if (itemMissingFromPlaylist()) {
+  <ps-empty-state
+    icon="search_off"
+    title="Episode is no longer in this playlist"
+    subtitle="It may have been removed since you opened this link."
+  />
+} @else if (err && !item) {
   <ps-empty-state
     icon="error_outline"
     title="Couldn't load this episode"
@@ -10,6 +16,9 @@
 } @else {
   @let badge = item ? statusFor(item) : null;
   @let inProgress = item ? isInProgress(item) : false;
+  @let inPlaylist = fromPlaylist();
+  @let playlist = playlistQuery.data();
+  @let plCover = playlistCoverSrc();
 
   <article class="detail">
     <div class="detail__cover-wrap">
@@ -17,6 +26,7 @@
            from the list page has a destination element ready before the
            item resource resolves. -->
       <img
+        #coverEl
         class="detail__cover"
         [src]="coverSrc()"
         [alt]="item?.title ?? ''"
@@ -29,21 +39,64 @@
           [progression]="badge.progression"
         />
       }
+      @if (inPlaylist && plCover) {
+        <a
+          class="detail__playlist-chip"
+          [routerLink]="['/playlists', idPlaylist()]"
+          [attr.aria-label]="
+            playlist ? 'Back to playlist ' + playlist.name : 'Back to playlist'
+          "
+          [style.view-transition-name]="'playlist-cover-' + idPlaylist()"
+        >
+          <img
+            class="detail__playlist-chip-cover"
+            [src]="plCover"
+            [alt]="playlist?.name ?? ''"
+          />
+        </a>
+      }
     </div>
 
     @if (item) {
     <div class="detail__body">
       <header class="detail__header">
-        <p class="detail__podcast">
-          <a
-            class="detail__podcast-link"
-            [routerLink]="['/podcasts', item.podcastId]"
-          >{{ item.podcast.title }}</a>
-        </p>
-        <h1 class="detail__title">{{ item.title }}</h1>
-        @if (item.pubDate; as d) {
-          <p class="detail__date">Published {{ d | date: 'mediumDate' }}</p>
+        @if (inPlaylist) {
+          <p class="detail__context">
+            <a
+              class="detail__context-link"
+              [routerLink]="['/playlists', idPlaylist()]"
+            >
+              <mat-icon class="detail__context-icon">queue_music</mat-icon>
+              <span class="detail__context-label">{{ playlist?.name ?? 'Playlist' }}</span>
+            </a>
+          </p>
+        } @else {
+          <p class="detail__context">
+            <a
+              class="detail__context-link"
+              [routerLink]="['/podcasts', item.podcastId]"
+              (click)="onPodcastLinkClick($event)"
+            >{{ item.podcast.title }}</a>
+          </p>
         }
+
+        <h1 class="detail__title">{{ item.title }}</h1>
+
+        <p class="detail__meta">
+          @if (item.pubDate; as d) {
+            <span class="detail__date">Published {{ d | date: 'mediumDate' }}</span>
+          }
+          @if (inPlaylist) {
+            @if (item.pubDate) {
+              <span class="detail__meta-sep" aria-hidden="true">·</span>
+            }
+            <a
+              class="detail__meta-link"
+              [routerLink]="['/podcasts', item.podcastId]"
+              (click)="onPodcastLinkClick($event)"
+            >{{ item.podcast.title }}</a>
+          }
+        </p>
       </header>
 
       <div class="detail__actions" [style]="actionStyles()">
@@ -58,10 +111,17 @@
             Download
           </button>
         }
-        <button mat-stroked-button (click)="onAddToPlaylist(item)">
-          <mat-icon>playlist_add</mat-icon>
-          Add to playlist
-        </button>
+        @if (inPlaylist) {
+          <button mat-stroked-button (click)="onRemoveFromPlaylist(item)">
+            <mat-icon>playlist_remove</mat-icon>
+            Remove from playlist
+          </button>
+        } @else {
+          <button mat-stroked-button (click)="onAddToPlaylist(item)">
+            <mat-icon>playlist_add</mat-icon>
+            Add to playlist
+          </button>
+        }
         <button
           mat-icon-button
           aria-label="More actions"
@@ -80,6 +140,12 @@
             <mat-icon>open_in_new</mat-icon>
             <span>Open original</span>
           </a>
+          @if (inPlaylist) {
+            <button mat-menu-item (click)="onAddToPlaylist(item)">
+              <mat-icon>playlist_add</mat-icon>
+              <span>Add to another playlist</span>
+            </button>
+          }
           @if (item.isDownloaded) {
             <button mat-menu-item (click)="onReset(item)">
               <mat-icon>restart_alt</mat-icon>

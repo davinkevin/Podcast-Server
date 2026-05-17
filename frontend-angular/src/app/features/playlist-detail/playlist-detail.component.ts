@@ -26,7 +26,6 @@ import {
   PlaylistWithItemsHAL,
 } from '../../core/models/playlist.model';
 import { PlayerService } from '../../core/player/player.service';
-import { NavigationOriginService } from '../../core/navigation/navigation-origin.service';
 import {
   applyCoverTint,
   clearCoverTint,
@@ -65,7 +64,6 @@ export default class PlaylistDetailComponent {
   private readonly api = inject(PlaylistApi);
   private readonly snackbar = inject(MatSnackBar);
   private readonly player = inject(PlayerService);
-  private readonly navOrigin = inject(NavigationOriginService);
   private readonly coverColor = inject(CoverColorService);
   private readonly settings = inject(SettingsService);
 
@@ -183,8 +181,7 @@ export default class PlaylistDetailComponent {
   }
 
   protected onOpenItem(item: PlaylistItemHAL) {
-    this.navOrigin.set('playlist');
-    this.router.navigate(['/podcasts', item.podcast.id, 'items', item.id]);
+    this.router.navigate(['/playlists', this.idPlaylist(), 'items', item.id]);
   }
 
   protected onAction(item: PlaylistItemHAL, action: CoverCardAction) {

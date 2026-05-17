@@ -34,6 +34,14 @@ export const routes: Routes = [
     title: 'Playlists — Podcast Server',
   },
   {
+    // Item detail under a playlist — must come before the playlist-detail
+    // route. Same component as the podcast route; the URL conveys the
+    // "viewed from playlist" context (the podcastId is derived from the
+    // playlist payload before the item is fetched).
+    path: 'playlists/:idPlaylist/items/:id',
+    loadComponent: () => import('./features/item-detail/item-detail.component'),
+  },
+  {
     path: 'playlists/:idPlaylist',
     loadComponent: () =>
       import('./features/playlist-detail/playlist-detail.component'),

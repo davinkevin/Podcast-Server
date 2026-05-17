@@ -3,9 +3,11 @@ import {
   Component,
   computed,
   effect,
+  ElementRef,
   inject,
   input,
   signal,
+  viewChild,
 } from '@angular/core';
 import {
   NavigationOrigin,
@@ -22,6 +24,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 
 import { ItemApi, ItemRef } from '../../core/api/item.api';
+import { PlaylistApi } from '../../core/api/playlist.api';
 import { ItemHAL } from '../../core/models/item.model';
 import { PlayerService } from '../../core/player/player.service';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
@@ -57,23 +60,34 @@ import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialo
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export default class ItemDetailComponent {
-  // Bound from /podcasts/:idPodcast/items/:id via withComponentInputBinding().
-  readonly idPodcast = input.required<string>();
+  // One of `idPodcast` / `idPlaylist` is set depending on which route matched:
+  //   /podcasts/:idPodcast/items/:id   → idPodcast set, idPlaylist undefined
+  //   /playlists/:idPlaylist/items/:id → idPlaylist set, idPodcast undefined
+  // In the playlist case the podcastId is derived from the playlist payload
+  // (each PlaylistItemHAL carries its parent podcast).
+  readonly idPodcast = input<string | undefined>(undefined);
+  readonly idPlaylist = input<string | undefined>(undefined);
   readonly id = input.required<string>();
 
-  // Origin of this navigation (set by the list that linked here). Consumed
-  // once at construction so the view-transition-name on the hero cover is
-  // scoped to that list only — avoids cross-list morphs that aren't a
-  // natural navigation.
-  private readonly origin: NavigationOrigin | null =
+  // For the podcast/library origin, the source list seeded an in-memory
+  // marker right before navigating. Consumed once here to scope the hero
+  // cover's view-transition-name to that list only. The playlist origin is
+  // conveyed by the URL itself so we infer it without the service.
+  private readonly initialNavOrigin: NavigationOrigin | null =
     inject(NavigationOriginService).consume();
 
+  protected readonly origin = computed<NavigationOrigin | null>(() =>
+    this.idPlaylist() ? 'playlist' : this.initialNavOrigin,
+  );
+
   protected readonly heroTransitionName = computed<string | null>(() => {
-    if (!this.origin) return null;
-    return `${this.origin}-item-cover-${this.id()}`;
+    const o = this.origin();
+    if (!o) return null;
+    return `${o}-item-cover-${this.id()}`;
   });
 
   private readonly itemApi = inject(ItemApi);
+  private readonly playlistApi = inject(PlaylistApi);
   private readonly player = inject(PlayerService);
   private readonly stream = inject(DownloadStreamService);
   private readonly router = inject(Router);
@@ -83,23 +97,68 @@ export default class ItemDetailComponent {
   private readonly coverColor = inject(CoverColorService);
   private readonly settings = inject(SettingsService);
 
-  protected readonly ref = computed<ItemRef>(() => ({
-    podcastId: this.idPodcast(),
-    id: this.id(),
-  }));
+  // Playlist payload is fetched only when arrived via the /playlists route;
+  // it gives us the parent podcastId (each item carries its podcast) plus the
+  // playlist name & cover for the contextual UI bits (pre-title link, mini
+  // cover overlay, removal action).
+  protected readonly playlistQuery = this.playlistApi.getById(this.idPlaylist);
+
+  protected readonly fromPlaylist = computed(() => !!this.idPlaylist());
+
+  // The playlist item that points at this item id. Used for the cover URL
+  // fallback (so the hero can render before itemQuery resolves) and to
+  // resolve podcastId.
+  protected readonly playlistItem = computed(() => {
+    const pl = this.playlistQuery.data();
+    return pl?.items.find((i) => i.id === this.id()) ?? null;
+  });
+
+  // Effective podcastId — direct from the route in the podcast case, derived
+  // from the playlist payload in the playlist case. Undefined while the
+  // playlist query is in flight.
+  protected readonly podcastId = computed<string | undefined>(
+    () => this.idPodcast() ?? this.playlistItem()?.podcast.id,
+  );
+
+  // Empty-state guard for the rare case of a stale URL pointing to an item
+  // no longer in the playlist. True only once the playlist has resolved.
+  protected readonly itemMissingFromPlaylist = computed(() => {
+    if (!this.fromPlaylist()) return false;
+    if (!this.playlistQuery.isSuccess()) return false;
+    return !this.playlistItem();
+  });
+
+  protected readonly ref = computed<ItemRef | undefined>(() => {
+    const podcastId = this.podcastId();
+    if (!podcastId) return undefined;
+    return { podcastId, id: this.id() };
+  });
   protected readonly itemQuery = this.itemApi.getById(this.ref);
   private readonly resetMutation = this.itemApi.resetMutation();
   private readonly deleteMutation = this.itemApi.deleteMutation();
+  private readonly removeFromPlaylistMutation =
+    this.playlistApi.removeItemMutation();
 
-  // Cover URL derived from the route so the cover img can render before the
-  // item resource resolves — required for view-transition morphs from the
-  // list page. Once the item arrives, swap to its real URL (handles non-jpg
-  // covers gracefully).
+  // Cover URL — must be ready before itemQuery resolves to keep the
+  // view-transition morph smooth. Priority: the resolved item, then the
+  // playlist item (when we came from a playlist and have the playlist
+  // payload), then the route-derived URL (podcast case).
   protected readonly coverSrc = computed(() => {
     const item = this.itemQuery.data();
     if (item) return item.cover.url;
-    return `/api/v1/podcasts/${this.idPodcast()}/items/${this.id()}/cover.jpg`;
+    const fromPl = this.playlistItem();
+    if (fromPl) return fromPl.cover.url;
+    const podcastId = this.podcastId();
+    if (podcastId) return `/api/v1/podcasts/${podcastId}/items/${this.id()}/cover.jpg`;
+    return '';
   });
+
+  // Cover of the playlist itself, shown as a small overlay on the hero when
+  // the user arrived via /playlists/:idPlaylist/items/:id — signature
+  // visual cue that we're inside a playlist context.
+  protected readonly playlistCoverSrc = computed(() =>
+    this.idPlaylist() ? `/api/v1/playlists/${this.idPlaylist()}/cover.jpg` : null,
+  );
 
   // Palette from the item's cover, propagated via --page-tint / --page-tint-
   // bottom so the whole content area picks up the color like the podcast page.
@@ -208,11 +267,54 @@ export default class ItemDetailComponent {
     );
   }
 
+  protected onRemoveFromPlaylist(item: ItemHAL) {
+    const playlistId = this.idPlaylist();
+    if (!playlistId) return;
+    this.removeFromPlaylistMutation.mutate(
+      { playlistId, itemId: item.id, podcastId: item.podcastId },
+      {
+        onSuccess: () => {
+          this.snackbar.open('Removed from playlist', undefined, { duration: 2500 });
+          this.router.navigate(['/playlists', playlistId]);
+        },
+        onError: () =>
+          this.snackbar.open('Could not remove from playlist', 'Dismiss', { duration: 4000 }),
+      },
+    );
+  }
+
   protected onAddToPlaylist(item: ItemHAL) {
     this.dialog.open(AddToPlaylistDialogComponent, {
       data: { itemId: item.id, itemTitle: item.title, podcastId: item.podcastId },
       autoFocus: 'first-tabbable',
       panelClass: 'ps-fitting-dialog',
     });
+  }
+
+  // Reference to the hero <img>. We re-tag its view-transition-name right
+  // before the user navigates to the parent podcast so the cover morphs
+  // into this same item's row in the podcast-detail episode list (same
+  // artwork on both ends — would be incoherent to morph it into the
+  // podcast's own hero cover since the two images can differ).
+  protected readonly coverEl =
+    viewChild<ElementRef<HTMLImageElement>>('coverEl');
+
+  protected onPodcastLinkClick(event: MouseEvent) {
+    // Leave modified clicks (open in new tab, save link as, …) alone — they
+    // don't trigger the SPA navigation that would consume the snapshot.
+    if (
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    )
+      return;
+    const cover = this.coverEl()?.nativeElement;
+    // Match the name podcast-detail puts on the row for this item — when
+    // the destination renders, the two snapshots morph together. In the
+    // podcast-origin case the hero already carries this name (set via
+    // heroTransitionName), so this is a no-op there.
+    if (cover) cover.style.viewTransitionName = `podcast-item-cover-${this.id()}`;
   }
 }
