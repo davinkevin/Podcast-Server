@@ -12,6 +12,9 @@ import {
 import { Router } from '@angular/router';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { DatePipe } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
@@ -77,6 +80,9 @@ const DELETE_ITEM_ACTION: CoverCardAction = {
   standalone: true,
   imports: [
     DatePipe,
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
     MatIconModule,
     MatButtonModule,
     MatMenuModule,
@@ -100,6 +106,9 @@ export default class PodcastDetailComponent {
       return Number.isFinite(n) && n >= 0 ? n : 0;
     },
   });
+  // Search query — bound from `?q=` so the URL stays the source of truth
+  // (mirrors the Library pattern). Empty string when absent.
+  readonly q = input<string>('');
 
   private readonly router = inject(Router);
   private readonly api = inject(PodcastApi);
@@ -137,10 +146,15 @@ export default class PodcastDetailComponent {
 
   protected readonly itemsInput = computed<PodcastItemsInput>(() => ({
     podcastId: this.idPodcast(),
+    q: this.q(),
     page: this.page(),
     size: DEFAULT_PAGE_SIZE,
   }));
   protected readonly itemsQuery = this.api.items(this.itemsInput);
+
+  // Local draft mirrors the URL `q` on mount and is the source of truth
+  // while the user is typing. Submit pushes it back into the URL.
+  protected readonly searchDraft = signal('');
 
   // Palette extracted from the cover via node-vibrant. Pushed onto the global
   // --page-tint / --page-tint-bottom variables so the shell paints a faded
@@ -176,6 +190,15 @@ export default class PodcastDetailComponent {
   protected readonly heroOffscreen = signal(false);
 
   constructor() {
+    // Mirror the URL `?q=` into the search input — on first mount, and
+    // again whenever the URL changes (e.g. browser back from item-detail:
+    // ListRouteReuseStrategy doesn't retain podcast-detail, so the
+    // component remounts and the input field would otherwise be empty
+    // even though the URL still carries the query). The user typing
+    // changes `searchDraft` but not `q()`, so this effect doesn't fight
+    // the input — it only runs when the URL is the source of change.
+    effect(() => this.searchDraft.set(this.q()));
+
     effect(() => {
       const url = this.coverSrc();
       if (!url) return;
@@ -270,6 +293,24 @@ export default class PodcastDetailComponent {
       this.stream.downloading().some((d) => d.id === item.id) ||
       this.stream.queue().some((q) => q.id === item.id)
     );
+  }
+
+  protected onSubmitSearch() {
+    const q = this.searchDraft().trim();
+    // Reset to first page on new query — otherwise we'd land on a stale page
+    // index that may be out of range for the filtered result set.
+    this.router.navigate([], {
+      queryParams: { q: q || null, page: 0 },
+      queryParamsHandling: 'merge',
+    });
+  }
+
+  protected onClearSearch() {
+    this.searchDraft.set('');
+    this.router.navigate([], {
+      queryParams: { q: null, page: 0 },
+      queryParamsHandling: 'merge',
+    });
   }
 
   protected onPlay(item: ItemHAL) {

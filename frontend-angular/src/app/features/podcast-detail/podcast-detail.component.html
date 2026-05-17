@@ -14,6 +14,37 @@
      [title]="podcast?.title ?? ''"
      [shown]="heroOffscreen()"
    />
+
+   <!-- Top-of-page filter — same visual slot the list pages put their
+        search field in (library / podcasts / playlists). Right-aligned
+        so the cover/title hero below stays the page's primary anchor. -->
+   <header class="pod__page-header">
+     <form class="pod__search" (submit)="onSubmitSearch(); $event.preventDefault()">
+       <mat-form-field appearance="outline" subscriptSizing="dynamic">
+         <mat-icon matPrefix>search</mat-icon>
+         <input
+           matInput
+           type="search"
+           name="q"
+           placeholder="Filter episodes…"
+           [ngModel]="searchDraft()"
+           (ngModelChange)="searchDraft.set($event)"
+         />
+         @if (searchDraft()) {
+           <button
+             mat-icon-button
+             matSuffix
+             type="button"
+             aria-label="Clear search"
+             (click)="onClearSearch()"
+           >
+             <mat-icon>close</mat-icon>
+           </button>
+         }
+       </mat-form-field>
+     </form>
+   </header>
+
    <section class="pod__hero">
     <header class="pod__header">
       <!-- Cover is rendered immediately from the route id so the view

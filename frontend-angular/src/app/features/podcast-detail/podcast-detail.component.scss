@@ -48,6 +48,25 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
+// Top-of-page strip with the episode search field. Sits at the article's
+// top padding so it lands at the same vertical position as the title row
+// on /podcasts and /library (their page headers are the first child too).
+// Flex + center because the strip only has one child — a grid with `1fr |
+// center | 1fr` would shove that child into the first column instead.
+.pod__page-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pod__search {
+  width: min(28rem, 100%);
+}
+
+.pod__search mat-form-field {
+  width: 100%;
+}
+
 .pod__header {
   display: grid;
   grid-template-columns: minmax(0, 200px) minmax(0, 1fr);

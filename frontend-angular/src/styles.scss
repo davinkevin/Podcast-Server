@@ -88,6 +88,13 @@ body {
   animation-timing-function: cubic-bezier(0.32, 0.72, 0, 1);
 }
 
+// Hide WebKit/Blink's native search clear button. We render our own
+// `matSuffix` clear button on every `input[type="search"]` — without this
+// override Safari/Chrome stack a second native ⨯ next to the Material one.
+input[type='search']::-webkit-search-cancel-button {
+  display: none;
+}
+
 // Dialogs whose content fits without needing a scrollbar.
 // Apply via `panelClass: 'ps-fitting-dialog'` on `dialog.open(...)`.
 // Suppresses Material's default 65vh ceiling + the spurious 1px scrollbar that
