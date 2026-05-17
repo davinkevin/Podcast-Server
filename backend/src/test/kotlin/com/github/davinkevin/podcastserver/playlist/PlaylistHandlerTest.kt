@@ -44,6 +44,7 @@ class PlaylistHandlerTest (
         val item = PlaylistWithItems.Item(
             id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
             title = "a title",
+            url = "https://source.example.com/episodes/a-title.mp3",
             description = "a desc",
             mimeType = "audio/mp3",
             fileName = Path("file.mp3"),
@@ -137,6 +138,7 @@ class PlaylistHandlerTest (
                             "items":[{
                                 "id": "c42d2a59-46e6-4c1d-b0fb-2b47d389b370",
                                 "title": "a title",
+                                "url": "https://source.example.com/episodes/a-title.mp3",
                                 "proxyURL": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
                                 "description": "a desc",
                                 "mimeType": "audio/mp3",
@@ -192,6 +194,7 @@ class PlaylistHandlerTest (
                             "items":[{
                                 "id": "c42d2a59-46e6-4c1d-b0fb-2b47d389b370",
                                 "title": "a title",
+                                "url": "https://source.example.com/episodes/a-title.mp3",
                                 "proxyURL": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
                                 "description": "a desc",
                                 "mimeType": "audio/mp3",
@@ -314,6 +317,7 @@ class PlaylistHandlerTest (
                         PlaylistWithItems.Item(
                             id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
                             title = "a title",
+                            url = "https://source.example.com/episodes/a-title.mp3",
                             description = "a desc",
                             mimeType = "audio/mp3",
                             fileName = Path("file.mp3"),
@@ -369,7 +373,8 @@ class PlaylistHandlerTest (
                                          "title":"a podcast"
                                       },
                                       "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
-                                      "title":"a title"
+                                      "title":"a title",
+                                      "url":"https://source.example.com/episodes/a-title.mp3"
                                    }
                                 ]
                             }""")
@@ -386,6 +391,7 @@ class PlaylistHandlerTest (
                         PlaylistWithItems.Item(
                             id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
                             title = "a title",
+                            url = "https://source.example.com/episodes/a-title.mp3",
                             description = "a desc",
                             mimeType = "audio/mp3",
                             fileName = null,
@@ -441,7 +447,8 @@ class PlaylistHandlerTest (
                                          "title":"a podcast"
                                       },
                                       "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
-                                      "title":"a title"
+                                      "title":"a title",
+                                      "url":"https://source.example.com/episodes/a-title.mp3"
                                    }
                                 ]
                             }""")
@@ -458,6 +465,7 @@ class PlaylistHandlerTest (
                         PlaylistWithItems.Item(
                             id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
                             title = "a title",
+                            url = "https://source.example.com/episodes/a-title.mp3",
                             description = "a desc",
                             mimeType = "audio/mp3",
                             fileName = null,
@@ -516,7 +524,8 @@ class PlaylistHandlerTest (
                                          "title":"a podcast"
                                       },
                                       "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
-                                      "title":"a title"
+                                      "title":"a title",
+                                      "url":"https://source.example.com/episodes/a-title.mp3"
                                    }
                                 ]
                             }""")
@@ -533,6 +542,7 @@ class PlaylistHandlerTest (
                         PlaylistWithItems.Item(
                             id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
                             title = "a title",
+                            url = "https://source.example.com/episodes/a-title.mp3",
                             description = "a desc",
                             mimeType = "audio/mp3",
                             fileName = Path("file.mp3"),
@@ -553,6 +563,7 @@ class PlaylistHandlerTest (
                         PlaylistWithItems.Item(
                             id = UUID.fromString("4b48996c-686f-4339-b94e-f9595094f2ea"),
                             title = "2 a title",
+                            url = "https://source.example.com/episodes/2-a-title.mp3",
                             description = "a desc",
                             mimeType = "audio/mp3",
                             fileName = Path("file2.mp3"),
@@ -608,7 +619,8 @@ class PlaylistHandlerTest (
                                          "title":"a podcast"
                                       },
                                       "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
-                                      "title":"a title"
+                                      "title":"a title",
+                                      "url":"https://source.example.com/episodes/a-title.mp3"
                                    },
                                    {
                                       "cover":{
@@ -626,7 +638,8 @@ class PlaylistHandlerTest (
                                          "title":"2 a podcast"
                                       },
                                       "proxyURL":"/api/v1/podcasts/35d04720-1bc3-476b-b7b0-494a15adf45e/items/4b48996c-686f-4339-b94e-f9595094f2ea/2-a-title.mp3",
-                                      "title":"2 a title"
+                                      "title":"2 a title",
+                                      "url":"https://source.example.com/episodes/2-a-title.mp3"
                                    }
                                 ]
                             }""")
@@ -664,6 +677,7 @@ class PlaylistHandlerTest (
             val item = PlaylistWithItems.Item(
                 id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
                 title = "a title",
+                url = "https://source.example.com/episodes/a-title.mp3",
                 description = "a desc",
                 mimeType = "audio/mp3",
                 fileName = Path("file.mp3"),
@@ -723,7 +737,8 @@ class PlaylistHandlerTest (
                                      "title":"a podcast"
                                   },
                                   "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/a-title.mp3",
-                                  "title":"a title"
+                                  "title":"a title",
+                                  "url":"https://source.example.com/episodes/a-title.mp3"
                                }
                             ]
                         }""")

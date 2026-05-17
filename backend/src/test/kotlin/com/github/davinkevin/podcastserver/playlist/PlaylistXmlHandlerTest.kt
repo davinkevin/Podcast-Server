@@ -44,6 +44,7 @@ class PlaylistXmlHandlerTest (
             val item = PlaylistWithItems.Item(
                 id = UUID.fromString("c42d2a59-46e6-4c1d-b0fb-2b47d389b370"),
                 title = "a title",
+                url = "https://source.example.com/episodes/a-title.mp3",
                 description = "a desc",
                 mimeType = "audio/mp3",
                 fileName = Path("file.mp3"),

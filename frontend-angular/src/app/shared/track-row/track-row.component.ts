@@ -4,7 +4,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatRippleModule } from '@angular/material/core';
 
-import { CoverCardAction } from '../cover-card/cover-card.component';
+import {
+  CoverCardAction,
+  CoverCardActionGroup,
+  CoverCardMenuEntry,
+} from '../cover-card/cover-card.component';
 
 /**
  * Spotify / Apple Music style horizontal row for an item. Built as a
@@ -30,7 +34,7 @@ export class TrackRowComponent {
   readonly title = input.required<string>();
   readonly subtitle = input<string | undefined>(undefined);
   readonly coverUrl = input.required<string>();
-  readonly actions = input<readonly CoverCardAction[]>([]);
+  readonly actions = input<readonly CoverCardMenuEntry[]>([]);
   readonly playable = input<boolean>(true);
   readonly downloadable = input<boolean>(false);
   readonly viewTransitionName = input<string | undefined>(undefined);
@@ -57,4 +61,18 @@ export class TrackRowComponent {
   protected onOpen() {
     this.open.emit();
   }
+
+  // See CoverCardComponent for the rationale — discriminator helpers that
+  // give the template a clean `as` binding for the union variants.
+  protected asGroup(entry: CoverCardMenuEntry): CoverCardActionGroup | null {
+    return isGroup(entry) ? entry : null;
+  }
+
+  protected asAction(entry: CoverCardMenuEntry): CoverCardAction | null {
+    return isGroup(entry) ? null : entry;
+  }
+}
+
+function isGroup(entry: CoverCardMenuEntry): entry is CoverCardActionGroup {
+  return 'kind' in entry && entry.kind === 'group';
 }

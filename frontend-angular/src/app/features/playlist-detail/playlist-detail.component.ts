@@ -19,7 +19,10 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { PlaylistEditDialogComponent } from './playlist-edit-dialog.component';
 
-import { CoverCardAction } from '../../shared/cover-card/cover-card.component';
+import {
+  CoverCardAction,
+  CoverCardMenuEntry,
+} from '../../shared/cover-card/cover-card.component';
 import { TrackRowComponent } from '../../shared/track-row/track-row.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { DetailStickyHeaderComponent } from '../../shared/detail-sticky-header/detail-sticky-header.component';
@@ -35,6 +38,10 @@ import {
 } from '../../core/models/playlist.model';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import { PlayerService } from '../../core/player/player.service';
+import {
+  OPEN_IN_VLC_ACTION,
+  VlcService,
+} from '../../core/vlc/vlc.service';
 import {
   applyCoverTint,
   clearCoverTint,
@@ -77,6 +84,7 @@ export default class PlaylistDetailComponent {
   private readonly snackbar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly player = inject(PlayerService);
+  private readonly vlc = inject(VlcService);
   private readonly coverColor = inject(CoverColorService);
   private readonly settings = inject(SettingsService);
 
@@ -88,7 +96,39 @@ export default class PlaylistDetailComponent {
   // RSS URL is built from the path; the same URL is what podcast clients subscribe to.
   protected readonly rssUrl = computed(() => `${location.origin}/api/v1/playlists/${this.idPlaylist()}/rss`);
 
-  protected readonly cardActions = [REMOVE_ACTION] as const;
+  protected actionsFor(item: PlaylistItemHAL): readonly CoverCardMenuEntry[] {
+    const entries: CoverCardMenuEntry[] = [REMOVE_ACTION];
+    // "Open" submenu: source URL always available when the item has one,
+    // downloaded file + VLC only when the proxy URL is backed by a file
+    // on disk (otherwise both would land on a 404).
+    const openItems: CoverCardAction[] = [];
+    if (item.url) {
+      openItems.push({
+        id: 'open-original',
+        label: 'Open original URL',
+        icon: 'language',
+        url: item.url,
+      });
+    }
+    if (item.isDownloaded) {
+      openItems.push({
+        id: 'open-file',
+        label: 'Open downloaded file',
+        icon: 'download',
+        url: item.proxyURL,
+      });
+      openItems.push(OPEN_IN_VLC_ACTION);
+    }
+    if (openItems.length > 0) {
+      entries.push({
+        kind: 'group',
+        label: 'Open',
+        icon: 'open_in_new',
+        items: openItems,
+      });
+    }
+    return entries;
+  }
 
   // Palette extracted from the cover via node-vibrant. Pushed onto the global
   // --page-tint / --page-tint-bottom variables so the shell paints a faded
@@ -242,7 +282,14 @@ export default class PlaylistDetailComponent {
   }
 
   protected onAction(item: PlaylistItemHAL, action: CoverCardAction) {
-    if (action.id === REMOVE_ACTION.id) this.onRemove(item);
+    switch (action.id) {
+      case REMOVE_ACTION.id:
+        this.onRemove(item);
+        break;
+      case OPEN_IN_VLC_ACTION.id:
+        this.vlc.openInVlc(item.proxyURL);
+        break;
+    }
   }
 
   protected onRemove(item: PlaylistItemHAL) {

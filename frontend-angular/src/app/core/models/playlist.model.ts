@@ -10,6 +10,7 @@ export interface PlaylistsContainerHAL {
 export interface PlaylistItemHAL {
   readonly id: string;
   readonly title: string;
+  readonly url: string | null;
   readonly proxyURL: string;
   readonly description: string | null;
   readonly mimeType: string;

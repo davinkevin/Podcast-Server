@@ -160,6 +160,7 @@ class PlaylistRepositoryTest(
                         PlaylistWithItems. Item(
                             id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
                             title = "Geek INC 124",
+                            url = "http://fakeurl.com/geekinc.124.mp3",
                             fileName = Path("geekinc.124.mp3"),
                             description = "desc",
                             mimeType = "video/mp4",
@@ -194,6 +195,7 @@ class PlaylistRepositoryTest(
                     PlaylistWithItems.Item(
                         id = fromString("43fb990f-0b5e-413f-920c-6de217f9ecdd"),
                         title = "Appload 3",
+                        url = "http://fakeurl.com/appload.3.mp3",
                         fileName = Path("appload.3.mp3"),
                         description = "desc",
                         mimeType = "audio/mp3",
@@ -214,6 +216,7 @@ class PlaylistRepositoryTest(
                     PlaylistWithItems. Item(
                         id = fromString("0a774611-c857-44df-b7e0-5e5af31f7b56"),
                         title = "Geek INC 124",
+                        url = "http://fakeurl.com/geekinc.124.mp3",
                         fileName = Path("geekinc.124.mp3"),
                         description = "desc",
                         mimeType = "video/mp4",
@@ -336,6 +339,7 @@ class PlaylistRepositoryTest(
                 PlaylistWithItems. Item(
                     id = fromString("0a674611-c867-44df-b7e0-5e5af31f7b56"),
                     title = "Geek INC 126",
+                    url = "http://fakeurl.com/geekinc.126.mp3",
                     fileName = Path("geekinc.126.mp3"),
                     description = "desc",
                     mimeType = "video/mp4",

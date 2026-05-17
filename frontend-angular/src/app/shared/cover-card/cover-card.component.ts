@@ -15,6 +15,22 @@ export interface CoverCardAction {
   readonly url?: string;
 }
 
+/** Groups several actions under a nested Material submenu — the parent row
+ *  keeps the standard `[icon] [text]` layout (plus a chevron added by mat-menu
+ *  for free); the submenu opens on hover/click with each action rendered as
+ *  a normal menu item. Useful when several actions share an intent (e.g.
+ *  "open this item somewhere") and stacking them at the top level would feel
+ *  verbose. At most one group per menu — the templates use a fixed submenu
+ *  ref under the assumption. */
+export interface CoverCardActionGroup {
+  readonly kind: 'group';
+  readonly label: string;
+  readonly icon: string;
+  readonly items: readonly CoverCardAction[];
+}
+
+export type CoverCardMenuEntry = CoverCardAction | CoverCardActionGroup;
+
 @Component({
   selector: 'ps-cover-card',
   standalone: true,
@@ -30,7 +46,7 @@ export class CoverCardComponent {
   readonly title = input.required<string>();
   readonly subtitle = input<string | undefined>(undefined);
   readonly coverUrl = input.required<string>();
-  readonly actions = input<readonly CoverCardAction[]>([]);
+  readonly actions = input<readonly CoverCardMenuEntry[]>([]);
   readonly playable = input<boolean>(true);
   readonly downloadable = input<boolean>(false);
   /** When set, used as `view-transition-name` on the cover image so a
@@ -60,4 +76,21 @@ export class CoverCardComponent {
   protected onOpen() {
     this.open.emit();
   }
+
+  // Template-side discriminators. Angular's template type checker can narrow
+  // discriminated unions via `@if`, but only when the discriminator field
+  // exists on every variant — `CoverCardAction` doesn't carry `kind` at all,
+  // so we route through these helpers (with explicit type predicates) to
+  // get a clean `as` binding.
+  protected asGroup(entry: CoverCardMenuEntry): CoverCardActionGroup | null {
+    return isGroup(entry) ? entry : null;
+  }
+
+  protected asAction(entry: CoverCardMenuEntry): CoverCardAction | null {
+    return isGroup(entry) ? null : entry;
+  }
+}
+
+function isGroup(entry: CoverCardMenuEntry): entry is CoverCardActionGroup {
+  return 'kind' in entry && entry.kind === 'group';
 }

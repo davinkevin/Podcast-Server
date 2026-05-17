@@ -18,6 +18,7 @@ import { MatDialog } from '@angular/material/dialog';
 import {
   CoverCardAction,
   CoverCardComponent,
+  CoverCardMenuEntry,
 } from '../../shared/cover-card/cover-card.component';
 import { PagerComponent } from '../../shared/pager/pager.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
@@ -30,10 +31,15 @@ import { ItemHAL } from '../../core/models/item.model';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import { PlayerService } from '../../core/player/player.service';
 import { NavigationOriginService } from '../../core/navigation/navigation-origin.service';
+import {
+  OPEN_IN_VLC_ACTION,
+  VlcService,
+} from '../../core/vlc/vlc.service';
 import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialog.component';
 
 const DEFAULT_PAGE_SIZE = 24;
 const ADD_TO_PLAYLIST_ACTION: CoverCardAction = {
+  id: 'add-to-playlist',
   label: 'Add to playlist',
   icon: 'playlist_add',
 };
@@ -74,8 +80,41 @@ export default class LibraryComponent {
   private readonly player = inject(PlayerService);
   private readonly dialog = inject(MatDialog);
   private readonly navOrigin = inject(NavigationOriginService);
+  private readonly vlc = inject(VlcService);
 
-  protected readonly cardActions = [ADD_TO_PLAYLIST_ACTION] as const;
+  protected actionsFor(item: ItemHAL): readonly CoverCardMenuEntry[] {
+    const entries: CoverCardMenuEntry[] = [ADD_TO_PLAYLIST_ACTION];
+    // "Open" submenu — same shape as podcast-detail / playlist-detail.
+    // Source URL always available when the item has one, the downloaded
+    // variants only when the proxy URL is backed by a file on disk.
+    const openItems: CoverCardAction[] = [];
+    if (item.url) {
+      openItems.push({
+        id: 'open-original',
+        label: 'Open original URL',
+        icon: 'language',
+        url: item.url,
+      });
+    }
+    if (item.isDownloaded) {
+      openItems.push({
+        id: 'open-file',
+        label: 'Open downloaded file',
+        icon: 'download',
+        url: item.proxyURL,
+      });
+      openItems.push(OPEN_IN_VLC_ACTION);
+    }
+    if (openItems.length > 0) {
+      entries.push({
+        kind: 'group',
+        label: 'Open',
+        icon: 'open_in_new',
+        items: openItems,
+      });
+    }
+    return entries;
+  }
 
   protected readonly searchDraft = signal('');
 
@@ -150,12 +189,17 @@ export default class LibraryComponent {
   }
 
   protected onAction(item: ItemHAL, action: CoverCardAction) {
-    if (action.label === ADD_TO_PLAYLIST_ACTION.label) {
-      this.dialog.open(AddToPlaylistDialogComponent, {
-        data: { itemId: item.id, itemTitle: item.title, podcastId: item.podcastId },
-        autoFocus: 'first-tabbable',
-        panelClass: 'ps-fitting-dialog',
-      });
+    switch (action.id) {
+      case ADD_TO_PLAYLIST_ACTION.id:
+        this.dialog.open(AddToPlaylistDialogComponent, {
+          data: { itemId: item.id, itemTitle: item.title, podcastId: item.podcastId },
+          autoFocus: 'first-tabbable',
+          panelClass: 'ps-fitting-dialog',
+        });
+        break;
+      case OPEN_IN_VLC_ACTION.id:
+        this.vlc.openInVlc(item.proxyURL);
+        break;
     }
   }
 }

@@ -52,21 +52,59 @@
 
       <mat-menu #menu="matMenu">
         @for (entry of actions(); track entry.label) {
-          @if (entry.url) {
-            <a
-              mat-menu-item
-              [href]="entry.url"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <mat-icon>{{ entry.icon }}</mat-icon>
-              <span>{{ entry.label }}</span>
-            </a>
-          } @else {
-            <button mat-menu-item (click)="onAction(entry)">
-              <mat-icon>{{ entry.icon }}</mat-icon>
-              <span>{{ entry.label }}</span>
+          @if (asGroup(entry); as group) {
+            <button mat-menu-item [matMenuTriggerFor]="subMenu">
+              <mat-icon>{{ group.icon }}</mat-icon>
+              <span>{{ group.label }}</span>
             </button>
+          } @else {
+            @let a = asAction(entry);
+            @if (a) {
+              @if (a.url) {
+                <a
+                  mat-menu-item
+                  [href]="a.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <mat-icon>{{ a.icon }}</mat-icon>
+                  <span>{{ a.label }}</span>
+                </a>
+              } @else {
+                <button mat-menu-item (click)="onAction(a)">
+                  <mat-icon>{{ a.icon }}</mat-icon>
+                  <span>{{ a.label }}</span>
+                </button>
+              }
+            }
+          }
+        }
+      </mat-menu>
+
+      <!-- Nested submenu — only renders entries when one of the actions is
+           a group. At most one group per menu (see CoverCardActionGroup). -->
+      <mat-menu #subMenu="matMenu">
+        @for (entry of actions(); track entry.label) {
+          @let group = asGroup(entry);
+          @if (group) {
+            @for (item of group.items; track item.label) {
+              @if (item.url) {
+                <a
+                  mat-menu-item
+                  [href]="item.url"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                  <span>{{ item.label }}</span>
+                </a>
+              } @else {
+                <button mat-menu-item (click)="onAction(item)">
+                  <mat-icon>{{ item.icon }}</mat-icon>
+                  <span>{{ item.label }}</span>
+                </button>
+              }
+            }
           }
         }
       </mat-menu>

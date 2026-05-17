@@ -90,7 +90,7 @@
             [coverUrl]="itemCoverUrl(item)"
             [playable]="item.isDownloaded"
             [downloadable]="!item.isDownloaded && !isInProgress(item)"
-            [actions]="cardActions"
+            [actions]="actionsFor(item)"
             [viewTransitionName]="'playlist-item-cover-' + item.id"
             (play)="onPlay(item)"
             (download)="onDownload(item)"

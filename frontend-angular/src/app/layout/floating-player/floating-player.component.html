@@ -34,6 +34,15 @@
         <button
           mat-icon-button
           type="button"
+          aria-label="Open in VLC"
+          matTooltip="Open in VLC"
+          (click)="onOpenInVlc(item.proxyURL)"
+        >
+          <mat-icon>play_circle_outline</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          type="button"
           aria-label="Close player"
           (click)="player.close()"
         >

@@ -19,7 +19,10 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
-import { CoverCardAction } from '../../shared/cover-card/cover-card.component';
+import {
+  CoverCardAction,
+  CoverCardMenuEntry,
+} from '../../shared/cover-card/cover-card.component';
 import { TrackRowComponent } from '../../shared/track-row/track-row.component';
 import { PagerComponent } from '../../shared/pager/pager.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
@@ -42,6 +45,10 @@ import {
 } from '../../core/cover-color/cover-color.service';
 import { SettingsService } from '../../core/settings/settings.service';
 import { NavigationOriginService } from '../../core/navigation/navigation-origin.service';
+import {
+  OPEN_IN_VLC_ACTION,
+  VlcService,
+} from '../../core/vlc/vlc.service';
 import { queryKeys } from '../../core/api/query-keys';
 
 import { PodcastEditDialogComponent } from './podcast-edit-dialog.component';
@@ -105,6 +112,7 @@ export default class PodcastDetailComponent {
   private readonly settings = inject(SettingsService);
   private readonly queryClient = inject(QueryClient);
   private readonly navOrigin = inject(NavigationOriginService);
+  private readonly vlc = inject(VlcService);
 
   protected readonly id = computed(() => this.idPodcast());
   protected readonly podcastQuery = this.api.getById(this.id);
@@ -201,19 +209,37 @@ export default class PodcastDetailComponent {
   // Per-item action list built fresh for each row so Reset only appears when
   // there's a file on disk to reset, and "Open original" carries the item's
   // remote URL into the menu entry (rendered as an external link).
-  protected itemActions(item: ItemHAL): readonly CoverCardAction[] {
-    const actions: CoverCardAction[] = [
-      ADD_TO_PLAYLIST_ACTION,
+  protected itemActions(item: ItemHAL): readonly CoverCardMenuEntry[] {
+    const entries: CoverCardMenuEntry[] = [ADD_TO_PLAYLIST_ACTION];
+    // Fold every "open in X" verb into a single row of icon buttons so the
+    // menu stays scannable: Source (web) → Downloaded file → VLC. Only the
+    // first one is available when the item isn't yet downloaded.
+    const openItems: CoverCardAction[] = [
       {
         id: 'open-original',
-        label: 'Open original',
-        icon: 'open_in_new',
+        label: 'Open original URL',
+        icon: 'language',
         url: item.url,
       },
     ];
-    if (item.isDownloaded) actions.push(RESET_ITEM_ACTION);
-    actions.push(DELETE_ITEM_ACTION);
-    return actions;
+    if (item.isDownloaded) {
+      openItems.push({
+        id: 'open-file',
+        label: 'Open downloaded file',
+        icon: 'download',
+        url: item.proxyURL,
+      });
+      openItems.push(OPEN_IN_VLC_ACTION);
+    }
+    entries.push({
+      kind: 'group',
+      label: 'Open',
+      icon: 'open_in_new',
+      items: openItems,
+    });
+    if (item.isDownloaded) entries.push(RESET_ITEM_ACTION);
+    entries.push(DELETE_ITEM_ACTION);
+    return entries;
   }
 
   protected subtitleFor(item: ItemHAL): string {
@@ -267,6 +293,9 @@ export default class PodcastDetailComponent {
           autoFocus: 'first-tabbable',
           panelClass: 'ps-fitting-dialog',
         });
+        break;
+      case OPEN_IN_VLC_ACTION.id:
+        this.vlc.openInVlc(item.proxyURL);
         break;
       case RESET_ITEM_ACTION.id:
         this.onResetItem(item);

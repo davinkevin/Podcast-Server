@@ -24,6 +24,7 @@ data class PlaylistWithItems(
     data class Item(
         val id: UUID,
         override val title: String,
+        val url: String?,
         override val fileName: Path?,
 
         val description: String?,

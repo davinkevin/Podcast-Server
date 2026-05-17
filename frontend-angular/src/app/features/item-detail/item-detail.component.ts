@@ -35,6 +35,7 @@ import {
   CoverPalette,
 } from '../../core/cover-color/cover-color.service';
 import { SettingsService } from '../../core/settings/settings.service';
+import { VlcService } from '../../core/vlc/vlc.service';
 import {
   StatusBadgeComponent,
   StatusBadgeKind,
@@ -96,6 +97,7 @@ export default class ItemDetailComponent {
   private readonly dialog = inject(MatDialog);
   private readonly coverColor = inject(CoverColorService);
   private readonly settings = inject(SettingsService);
+  private readonly vlc = inject(VlcService);
 
   // Playlist payload is fetched only when arrived via the /playlists route;
   // it gives us the parent podcastId (each item carries its podcast) plus the
@@ -281,6 +283,10 @@ export default class ItemDetailComponent {
           this.snackbar.open('Could not remove from playlist', 'Dismiss', { duration: 4000 }),
       },
     );
+  }
+
+  protected onOpenInVlc(item: ItemHAL) {
+    this.vlc.openInVlc(item.proxyURL);
   }
 
   protected onAddToPlaylist(item: ItemHAL) {

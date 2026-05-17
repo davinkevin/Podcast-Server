@@ -57,6 +57,7 @@ class PlaylistRepository(
                 PlaylistWithItems.Item(
                     id = it[ITEM.ID],
                     title = it[ITEM.TITLE],
+                    url = it[ITEM.URL],
                     fileName = it[ITEM.FILE_NAME],
                     description = it[ITEM.DESCRIPTION],
                     mimeType = it[ITEM.MIME_TYPE],

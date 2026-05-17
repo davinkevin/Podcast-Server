@@ -139,6 +139,7 @@ private class PlaylistWithItemsHAL(val id: UUID, val name: String, val items: Co
     data class Item(
             val id: UUID,
             val title: String,
+            val url: String?,
 
             val proxyURL: URI,
             val description: String?,
@@ -169,6 +170,7 @@ private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
     return PlaylistWithItemsHAL.Item(
             id = id,
             title = title,
+            url = url,
             proxyURL = itemUrl,
 
             description = description,
