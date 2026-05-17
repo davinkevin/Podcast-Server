@@ -97,4 +97,72 @@ body {
   max-height: 90vh;
 }
 
+// M3 expressive overrides for mat-menu — lifts the default 4px corner /
+// flat surface to a more expressive shape: larger corner radius, a tonal
+// surface-container background, per-item rounded hover backgrounds tinted
+// with the system primary.
+//
+// Note: we deliberately do NOT use --page-accent here. The cover-color
+// service registers `--page-accent` with `@property { initial-value:
+// transparent }` so the cover hero shadows can fade out on untinted
+// routes via `color-mix(--page-accent 38%, transparent)`. That same
+// trick would make menu icons invisible on the library / podcasts list /
+// playlists list — the var() fallback never fires when the property is
+// registered. Sticking with --mat-sys-primary keeps menus consistent
+// across routes and dark/light aware.
+//
+// Lives at the global scope because mat-menu portals into a CDK overlay
+// outside the host component's view encapsulation.
+.mat-mdc-menu-panel.mat-mdc-menu-panel {
+  border-radius: 20px;
+  background: var(--mat-sys-surface-container);
+  box-shadow: var(--mat-sys-level3);
+  padding: 6px;
+  min-width: 14rem;
+}
+
+.mat-mdc-menu-panel .mat-mdc-menu-item {
+  min-height: 44px;
+  border-radius: 12px;
+  // Slight margin so the rounded hover rectangle stops short of the panel
+  // edge — gives each item a tablet-style chip feel rather than a flat row.
+  margin: 2px 0;
+  padding-inline: 12px;
+  transition:
+    background-color 160ms cubic-bezier(0.2, 0, 0, 1),
+    color 160ms cubic-bezier(0.2, 0, 0, 1);
+
+  // The item icon sits at .mat-mdc-menu-item-icon — Material gives it
+  // on-surface-variant by default. We restate it so the hover override
+  // below has a known starting color.
+  .mat-mdc-menu-item-icon,
+  .mat-icon {
+    color: var(--mat-sys-on-surface-variant);
+    transition: color 160ms cubic-bezier(0.2, 0, 0, 1);
+    margin-right: 12px;
+  }
+
+  .mat-mdc-menu-item-text {
+    font: var(--mat-sys-body-large);
+  }
+
+  &:not([disabled]):hover,
+  &:not([disabled]).cdk-program-focused,
+  &:not([disabled]).cdk-keyboard-focused,
+  &:not([disabled]).mat-mdc-menu-item-highlighted {
+    background-color: color-mix(in srgb, var(--mat-sys-primary) 14%, transparent);
+
+    .mat-mdc-menu-item-icon,
+    .mat-icon {
+      color: var(--mat-sys-primary);
+    }
+  }
+
+  // Submenu chevron — soften it so it doesn't compete with the icon at
+  // left. Lives at the .mat-mdc-menu-submenu-icon slot Material owns.
+  .mat-mdc-menu-submenu-icon {
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+
 
