@@ -20,8 +20,8 @@
   @let playlist = playlistQuery.data();
   @let plCover = playlistCoverSrc();
 
-  <article class="detail">
-    <div class="detail__cover-wrap">
+  <article class="detail" [class.detail--wide-cover]="coverIsWide()">
+    <div class="detail__cover-wrap" [style.aspect-ratio]="coverAspectRatio()">
       <!-- Cover rendered from the route id so the view-transition morph
            from the list page has a destination element ready before the
            item resource resolves. -->

@@ -14,6 +14,15 @@
   margin: 0 auto;
 }
 
+// Landscape covers (≥ 16/9) stack the artwork above everything else and
+// span the full page width — same shape as the mobile collapse below,
+// triggered by content shape instead of viewport width. Keeps the cover
+// readable at its natural aspect instead of squashing it into a 320px
+// portrait-oriented slot.
+.detail.detail--wide-cover {
+  grid-template-columns: 1fr;
+}
+
 @media (max-width: 720px) {
   .detail {
     grid-template-columns: 1fr;
@@ -25,6 +34,9 @@
   align-self: start;
   border-radius: 24px;
   overflow: hidden;
+  // Default 1/1 — overridden by [style.aspect-ratio] once the HAL gives
+  // us the real width/height. Keeps the view-transition source/destination
+  // geometry stable while the item resource is in flight.
   aspect-ratio: 1 / 1;
   // Standard elevation + colored glow picking up the cover's accent.
   box-shadow:

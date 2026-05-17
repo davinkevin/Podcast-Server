@@ -141,6 +141,25 @@ export default class ItemDetailComponent {
   private readonly removeFromPlaylistMutation =
     this.playlistApi.removeItemMutation();
 
+  // CSS `aspect-ratio` value piped onto the cover wrapper so it matches the
+  // artwork's natural shape (16/9 for YouTube, 1/1 for most RSS items, …).
+  // Null while the HAL hasn't resolved — SCSS keeps the 1/1 default in
+  // that window so the view-transition into this page has a stable target.
+  protected readonly coverAspectRatio = computed<string | null>(() => {
+    const item = this.itemQuery.data();
+    if (!item) return null;
+    return `${item.cover.width} / ${item.cover.height}`;
+  });
+
+  // Layout switch: wide covers (≥ 16/9) stack the artwork above the meta
+  // column at full page width; everything else keeps the side-by-side
+  // layout where the cover sits in a fixed-width left column.
+  protected readonly coverIsWide = computed(() => {
+    const item = this.itemQuery.data();
+    if (!item) return false;
+    return item.cover.width / item.cover.height >= 16 / 9;
+  });
+
   // Cover URL — must be ready before itemQuery resolves to keep the
   // view-transition morph smooth. Priority: the resolved item, then the
   // playlist item (when we came from a playlist and have the playlist
