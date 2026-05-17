@@ -65,6 +65,31 @@ export class PlaylistApi {
     }));
   }
 
+  // No dedicated "edit" endpoint exists — the backend's POST /playlists is an
+  // upsert keyed by name (ON CONFLICT ON CONSTRAINT PLAYLIST_NAME_KEY DO
+  // UPDATE SET cover_id = ...). We exploit that here: passing the playlist's
+  // current name + a new coverUrl swaps the cover on the existing row. Cannot
+  // rename a playlist this way.
+  updateCoverMutation() {
+    return injectMutation(() => ({
+      mutationFn: (args: { id: string; name: string; coverUrl: string }) =>
+        lastValueFrom(
+          this.http.post<PlaylistWithItemsHAL>('/api/v1/playlists', {
+            name: args.name,
+            coverUrl: args.coverUrl,
+          }),
+        ),
+      onSuccess: (_data, vars) => {
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.playlists.list(),
+        });
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.playlists.detail(vars.id),
+        });
+      },
+    }));
+  }
+
   deleteMutation() {
     return injectMutation(() => ({
       mutationFn: (id: string) =>

@@ -14,7 +14,10 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
+
+import { PlaylistEditDialogComponent } from './playlist-edit-dialog.component';
 
 import { CoverCardAction } from '../../shared/cover-card/cover-card.component';
 import { TrackRowComponent } from '../../shared/track-row/track-row.component';
@@ -63,6 +66,7 @@ export default class PlaylistDetailComponent {
   private readonly router = inject(Router);
   private readonly api = inject(PlaylistApi);
   private readonly snackbar = inject(MatSnackBar);
+  private readonly dialog = inject(MatDialog);
   private readonly player = inject(PlayerService);
   private readonly coverColor = inject(CoverColorService);
   private readonly settings = inject(SettingsService);
@@ -141,11 +145,20 @@ export default class PlaylistDetailComponent {
     return `/api/v1/playlists/${playlist.id}/cover.jpg`;
   }
 
+  // Bumped after a successful Settings save to bust the browser cache for
+  // the cover, whose URL stays the same even after the backend swaps the
+  // file on disk.
+  protected readonly coverVersion = signal(0);
+
   // Derived from the route so the cover renders immediately for view-
   // transition morphing, before the playlist resource resolves.
-  protected readonly coverSrc = computed(
-    () => `/api/v1/playlists/${this.idPlaylist()}/cover.jpg`,
-  );
+  protected readonly coverSrc = computed(() => {
+    const id = this.idPlaylist();
+    if (!id) return '';
+    const v = this.coverVersion();
+    const base = `/api/v1/playlists/${id}/cover.jpg`;
+    return v === 0 ? base : `${base}?v=${v}`;
+  });
 
   protected itemCoverUrl(item: PlaylistItemHAL): string {
     return item.cover.url;
@@ -217,6 +230,19 @@ export default class PlaylistDetailComponent {
       () =>
         this.snackbar.open('Could not copy the URL', 'Dismiss', { duration: 4000 }),
     );
+  }
+
+  protected onOpenSettings(playlist: PlaylistWithItemsHAL) {
+    this.dialog
+      .open(PlaylistEditDialogComponent, {
+        data: playlist,
+        autoFocus: 'first-tabbable',
+        panelClass: 'ps-fitting-dialog',
+      })
+      .afterClosed()
+      .subscribe((saved) => {
+        if (saved) this.coverVersion.update((n) => n + 1);
+      });
   }
 
   protected onDelete(playlist: PlaylistWithItemsHAL) {

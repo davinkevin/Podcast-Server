@@ -37,6 +37,10 @@
               <mat-icon>{{ copyHint() === 'copied' ? 'check' : 'rss_feed' }}</mat-icon>
               {{ copyHint() === 'copied' ? 'Copied!' : 'Copy RSS link' }}
             </button>
+            <button mat-stroked-button (click)="onOpenSettings(playlist)">
+              <mat-icon>settings</mat-icon>
+              Settings
+            </button>
             <button
               mat-icon-button
               aria-label="More actions"
