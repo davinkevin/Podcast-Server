@@ -34,6 +34,12 @@ export class TrackRowComponent {
   readonly title = input.required<string>();
   readonly subtitle = input<string | undefined>(undefined);
   readonly coverUrl = input.required<string>();
+  /** CSS `aspect-ratio` value, e.g. `'16 / 9'` or `'1 / 1'`. When set, the
+   *  thumb keeps the row's fixed height but its width follows the natural
+   *  ratio of the artwork (capped by SCSS so panoramic covers don't push
+   *  the title column off the start of the row). When omitted, the thumb
+   *  falls back to a square. */
+  readonly aspectRatio = input<string | null>(null);
   readonly actions = input<readonly CoverCardMenuEntry[]>([]);
   readonly playable = input<boolean>(true);
   readonly downloadable = input<boolean>(false);

@@ -49,12 +49,19 @@
     <header class="pod__header">
       <!-- Cover is rendered immediately from the route id so the view
            transition coming from the list page has a destination element
-           in the new DOM snapshot (before podcastResource resolves). -->
+           in the new DOM snapshot (before podcastResource resolves).
+           The natural aspect ratio of the artwork (e.g. 16/9 for YouTube
+           covers) overrides the default 1/1 once the podcast payload
+           lands — until then the cover stays square so the view-transition
+           target keeps the same geometry as the source card. -->
       <img
         class="pod__cover"
         [src]="coverSrc()"
         [alt]="podcast?.title ?? ''"
         [style.view-transition-name]="'pod-cover-' + idPodcast()"
+        [style.aspect-ratio]="
+          podcast ? podcast.cover.width + ' / ' + podcast.cover.height : null
+        "
       />
       @if (podcast) {
       <div class="pod__meta">
@@ -163,6 +170,7 @@
               [title]="item.title"
               [subtitle]="subtitleFor(item)"
               [coverUrl]="item.cover.url"
+              [aspectRatio]="item.cover.width + ' / ' + item.cover.height"
               [playable]="item.isDownloaded"
               [downloadable]="!item.isDownloaded && !isInProgress(item)"
               [actions]="itemActions(item)"

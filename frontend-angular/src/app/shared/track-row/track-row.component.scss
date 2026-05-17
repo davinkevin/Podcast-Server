@@ -5,7 +5,11 @@
 .row {
   position: relative;
   display: grid;
-  grid-template-columns: 56px minmax(0, 1fr) auto;
+  // First column sizes to the cover's intrinsic width — fixed-height thumb
+  // (see .row__cover) whose width follows its aspect ratio. Square covers
+  // give 56px, 16/9 ones give ~100px, with a hard cap on the image side
+  // so the title column doesn't get pushed too far right.
+  grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
   gap: 0.875rem;
   width: 100%;
@@ -31,8 +35,15 @@
 }
 
 .row__cover {
-  width: 56px;
+  // Fixed height keeps rows uniform; width follows the natural aspect-
+  // ratio (default 1/1 when no inline override). Min/max widths cap
+  // the extremes so a panoramic cover doesn't crowd the title, and a
+  // very tall portrait one stays clickable.
   height: 56px;
+  width: auto;
+  aspect-ratio: 1 / 1;
+  min-width: 32px;
+  max-width: 112px;
   object-fit: cover;
   border-radius: 8px;
   display: block;
