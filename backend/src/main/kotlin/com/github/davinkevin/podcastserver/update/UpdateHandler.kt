@@ -21,8 +21,9 @@ class UpdateHandler(
     fun update(r: ServerRequest): ServerResponse {
         val id = r.pathVariable("podcastId")
             .let(UUID::fromString)
+        val withDownload = r.paramOrNull("download")?.toBoolean() ?: false
 
-        update.update(id)
+        update.update(id, withDownload)
 
         return ServerResponse.ok().build()
     }

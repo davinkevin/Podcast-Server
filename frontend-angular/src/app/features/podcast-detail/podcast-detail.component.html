@@ -95,10 +95,36 @@
               Upload episode
             </button>
           } @else {
-            <button mat-flat-button color="primary" (click)="onUpdateNow(podcast)">
-              <mat-icon>refresh</mat-icon>
-              Update now
-            </button>
+            <!-- Split button: primary action "Update now" + an attached
+                 chevron that reveals "Update & download new" so the
+                 visible bar keeps a single text-button while still
+                 surfacing the variant. -->
+            <div class="pod__update-split">
+              <button
+                mat-flat-button
+                color="primary"
+                class="pod__update-split__main"
+                (click)="onUpdateNow(podcast)"
+              >
+                <mat-icon>refresh</mat-icon>
+                Update now
+              </button>
+              <button
+                mat-flat-button
+                color="primary"
+                class="pod__update-split__chevron"
+                aria-label="More update options"
+                [matMenuTriggerFor]="updateMenu"
+              >
+                <mat-icon>expand_more</mat-icon>
+              </button>
+              <mat-menu #updateMenu="matMenu">
+                <button mat-menu-item (click)="onUpdateAndDownload(podcast)">
+                  <mat-icon>download</mat-icon>
+                  <span>Update &amp; download new episodes</span>
+                </button>
+              </mat-menu>
+            </div>
           }
           <button mat-stroked-button (click)="onOpenSettings(podcast)">
             <mat-icon>settings</mat-icon>

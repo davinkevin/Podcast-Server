@@ -368,6 +368,37 @@ class UpdateServiceTest(
 
 
         @Test
+        fun `and launch download afterwards when download is true`() {
+            /* Given */
+            whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast)
+            val uri = URI(podcast.url!!)
+            val fakeUpdater = mock<FakeUpdater> {
+                on { signatureOf(any()) } doReturn "another-signature"
+                on { findItems(any()) } doReturn items
+                on { update(any()) }.thenCallRealMethod()
+                on { type() }.thenCallRealMethod()
+                on { registry }.thenReturn(SimpleMeterRegistry())
+            }
+            whenever(updaters.of(uri)).thenReturn(fakeUpdater)
+            doNothing().whenever(podcastRepository).updateSignature(eq(podcast.id), any())
+            whenever(itemRepository.create(any<List<ItemForCreation>>())).then { args ->
+                args.getArgument<List<ItemForCreation>>(0)
+                    .map { it.toItem(podcast) }
+            }
+            doNothing().whenever(fileService).downloadAndUpload(any<DownloadAndUploadRequest.ForItemCover>())
+            doNothing().whenever(podcastRepository).updateLastUpdate(eq(podcast.id))
+            doNothing().whenever(idm).launchDownload()
+
+            /* When */
+            service.update(podcast.id, download = true)
+
+            /* Then */
+            await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                verify(idm).launchDownload()
+            }
+        }
+
+        @Test
         fun `on a podcast with an updater returning no data after the update`() {
             /* Given */
             val p = podcast.copy(signature = "a specific signature")

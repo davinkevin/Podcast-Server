@@ -94,7 +94,7 @@ class UpdateHandlerTest(
         fun `with success`() {
             /* Given */
             val id = UUID.fromString("cd651e1f-1dbd-4f20-af61-951ec0473884")
-            doNothing().whenever(update).update(id)
+            doNothing().whenever(update).update(id, download = false)
             /* When */
             rest
                     .get()
@@ -103,7 +103,23 @@ class UpdateHandlerTest(
                     /* Then */
                     .expectStatus().isOk
 
-            verify(update).update(id)
+            verify(update).update(id, download = false)
+        }
+
+        @Test
+        fun `and download`() {
+            /* Given */
+            val id = UUID.fromString("cd651e1f-1dbd-4f20-af61-951ec0473884")
+            doNothing().whenever(update).update(id, download = true)
+            /* When */
+            rest
+                    .get()
+                    .uri("/api/v1/podcasts/$id/update?download=true")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isOk
+
+            verify(update).update(id, download = true)
         }
 
     }

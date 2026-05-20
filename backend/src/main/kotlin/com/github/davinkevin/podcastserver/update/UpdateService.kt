@@ -89,7 +89,7 @@ class UpdateService(
         log.info("End of the global update with {} found, done in {}s", value.size, duration.inWholeSeconds)
     }
 
-    fun update(podcastId: UUID) = updateExecutor.execute {
+    fun update(podcastId: UUID, download: Boolean = false) = updateExecutor.execute {
         liveUpdate.isUpdating(true)
 
         val podcast = podcastRepository.findById(podcastId)!!
@@ -109,6 +109,10 @@ class UpdateService(
         saveSignatureAndCreateItems(update.podcast, update.items, update.newSignature)
 
         liveUpdate.isUpdating(false)
+
+        if (download) {
+            updateExecutor.execute { idm.launchDownload() }
+        }
     }
 
     private fun saveSignatureAndCreateItems(

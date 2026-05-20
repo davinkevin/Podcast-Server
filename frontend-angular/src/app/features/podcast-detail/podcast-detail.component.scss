@@ -155,6 +155,30 @@
   margin-left: auto;
 }
 
+// Split button for the "Update now" primary action. The two child buttons
+// touch (gap: 1px) so they read as one cohesive control; the rounded
+// shape stays on the outer edges only, with the inner adjacent corners
+// squared. Material doesn't ship a split-button primitive — this is the
+// minimum CSS to fake the look without forking the button component.
+.pod__update-split {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 1px;
+}
+
+.pod__update-split .pod__update-split__main {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+.pod__update-split .pod__update-split__chevron {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  // Narrow box: just the chevron, no horizontal padding bloat.
+  min-width: 36px;
+  padding: 0;
+}
+
 .pod__list {
   display: flex;
   flex-direction: column;

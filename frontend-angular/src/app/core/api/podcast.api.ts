@@ -137,9 +137,17 @@ export class PodcastApi {
   }
 
   // Fire-and-forget HTTP, SSE drives the UI update. Kept as Observable since
-  // there's no related query to invalidate eagerly.
-  triggerUpdate(id: string) {
-    return this.http.get(`/api/v1/podcasts/${id}/update`, { responseType: 'text' });
+  // there's no related query to invalidate eagerly. `download: true` makes
+  // the backend chain a `launchDownload()` once the refresh has produced
+  // new items — equivalent to clicking "Update now" then immediately
+  // "Download" on each new episode.
+  triggerUpdate(id: string, options: { readonly download?: boolean } = {}) {
+    const params: Record<string, string> = {};
+    if (options.download) params['download'] = 'true';
+    return this.http.get(`/api/v1/podcasts/${id}/update`, {
+      params,
+      responseType: 'text',
+    });
   }
 
   updateAll(options: { readonly download?: boolean; readonly force?: boolean } = {}) {

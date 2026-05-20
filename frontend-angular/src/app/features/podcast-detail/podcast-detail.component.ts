@@ -393,6 +393,15 @@ export default class PodcastDetailComponent {
     });
   }
 
+  protected onUpdateAndDownload(podcast: PodcastHAL) {
+    this.api.triggerUpdate(podcast.id, { download: true }).subscribe({
+      next: () =>
+        this.snackbar.open('Update started — new episodes will be downloaded', undefined, { duration: 3000 }),
+      error: () =>
+        this.snackbar.open('Could not start update', 'Dismiss', { duration: 4000 }),
+    });
+  }
+
   protected onOpenSettings(podcast: PodcastHAL) {
     this.dialog
       .open(PodcastEditDialogComponent, {
