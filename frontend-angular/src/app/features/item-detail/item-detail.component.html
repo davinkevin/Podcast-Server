@@ -131,10 +131,25 @@
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #moreMenu="matMenu">
-          <button mat-menu-item [matMenuTriggerFor]="openMenu">
-            <mat-icon>open_in_new</mat-icon>
-            <span>Open</span>
-          </button>
+          @if (item.isDownloaded) {
+            <button mat-menu-item [matMenuTriggerFor]="openMenu">
+              <mat-icon>open_in_new</mat-icon>
+              <span>Open</span>
+            </button>
+          } @else {
+            <!-- Not downloaded: only "Open original URL" makes sense, so
+                 surface it at the top level instead of behind an "Open"
+                 submenu trigger that would only ever show one child. -->
+            <a
+              mat-menu-item
+              [href]="item.url"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <mat-icon>language</mat-icon>
+              <span>Open original URL</span>
+            </a>
+          }
           @if (inPlaylist) {
             <button mat-menu-item (click)="onAddToPlaylist(item)">
               <mat-icon>playlist_add</mat-icon>

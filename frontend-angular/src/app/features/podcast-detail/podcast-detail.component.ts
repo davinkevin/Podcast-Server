@@ -234,9 +234,11 @@ export default class PodcastDetailComponent {
   // remote URL into the menu entry (rendered as an external link).
   protected itemActions(item: ItemHAL): readonly CoverCardMenuEntry[] {
     const entries: CoverCardMenuEntry[] = [ADD_TO_PLAYLIST_ACTION];
-    // Fold every "open in X" verb into a single row of icon buttons so the
-    // menu stays scannable: Source (web) → Downloaded file → VLC. Only the
-    // first one is available when the item isn't yet downloaded.
+    // Fold every "open in X" verb together: Source (web) → Downloaded
+    // file → VLC. Only the first is available when the item isn't yet
+    // downloaded, in which case it goes at the top level rather than
+    // hiding behind an "Open" submenu trigger that would only show one
+    // child.
     const openItems: CoverCardAction[] = [
       {
         id: 'open-original',
@@ -254,12 +256,16 @@ export default class PodcastDetailComponent {
       });
       openItems.push(OPEN_IN_VLC_ACTION);
     }
-    entries.push({
-      kind: 'group',
-      label: 'Open',
-      icon: 'open_in_new',
-      items: openItems,
-    });
+    if (openItems.length === 1) {
+      entries.push(openItems[0]);
+    } else {
+      entries.push({
+        kind: 'group',
+        label: 'Open',
+        icon: 'open_in_new',
+        items: openItems,
+      });
+    }
     if (item.isDownloaded) entries.push(RESET_ITEM_ACTION);
     entries.push(DELETE_ITEM_ACTION);
     return entries;

@@ -98,9 +98,9 @@ export default class PlaylistDetailComponent {
 
   protected actionsFor(item: PlaylistItemHAL): readonly CoverCardMenuEntry[] {
     const entries: CoverCardMenuEntry[] = [REMOVE_ACTION];
-    // "Open" submenu: source URL always available when the item has one,
-    // downloaded file + VLC only when the proxy URL is backed by a file
-    // on disk (otherwise both would land on a 404).
+    // Source URL always available when the item has one, downloaded file +
+    // VLC only when the proxy URL is backed by a file on disk (otherwise
+    // both would land on a 404).
     const openItems: CoverCardAction[] = [];
     if (item.url) {
       openItems.push({
@@ -119,7 +119,12 @@ export default class PlaylistDetailComponent {
       });
       openItems.push(OPEN_IN_VLC_ACTION);
     }
-    if (openItems.length > 0) {
+    // Single option (typical when the item isn't downloaded yet — only
+    // "Open original URL" is available) goes directly at the top level;
+    // wrapping it in an "Open" submenu would just add an extra click.
+    if (openItems.length === 1) {
+      entries.push(openItems[0]);
+    } else if (openItems.length > 1) {
       entries.push({
         kind: 'group',
         label: 'Open',
