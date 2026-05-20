@@ -155,15 +155,16 @@
   margin-left: auto;
 }
 
-// Split button for the "Update now" primary action. The two child buttons
-// touch (gap: 1px) so they read as one cohesive control; the rounded
-// shape stays on the outer edges only, with the inner adjacent corners
-// squared. Material doesn't ship a split-button primitive — this is the
-// minimum CSS to fake the look without forking the button component.
+// Split button for the "Update now" primary action. Two child buttons
+// touching edge-to-edge (no gap) with rounded corners on the outer
+// edges only — so they read as one continuous pill. Material 3's split
+// button spec calls for a thin internal divider in the button's tint
+// rather than a hard break revealing the page background: we apply it
+// as an inset shadow on the chevron's left edge so it stays in the
+// primary's color family instead of bleeding the cover tint through.
 .pod__update-split {
   display: inline-flex;
   align-items: stretch;
-  gap: 1px;
 }
 
 .pod__update-split .pod__update-split__main {
@@ -171,12 +172,23 @@
   border-bottom-right-radius: 0;
 }
 
-.pod__update-split .pod__update-split__chevron {
+.pod__update-split .pod__update-split__chevron.pod__update-split__chevron {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
-  // Narrow box: just the chevron, no horizontal padding bloat.
-  min-width: 36px;
-  padding: 0;
+  // !important to overpower mat-flat-button's `min-width: 64px` on
+  // `.mdc-button` — without it the chevron stays in a wider-than-
+  // needed box.
+  min-width: 0 !important;
+  width: 40px !important;
+  padding: 0 !important;
+  // Reset only the inner-label horizontal gutter; let Material's
+  // existing flex centering keep doing its job for the icon position.
+  ::ng-deep .mdc-button__label {
+    padding-inline: 0 !important;
+  }
+  // Very thin darkening line on the leading edge — barely visible,
+  // just enough to suggest the two halves are distinct buttons.
+  box-shadow: inset 1px 0 0 0 rgba(0, 0, 0, 0.08);
 }
 
 .pod__list {

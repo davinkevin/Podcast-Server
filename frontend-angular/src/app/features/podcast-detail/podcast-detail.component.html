@@ -92,7 +92,7 @@
           @if (podcast.type === 'upload') {
             <button mat-flat-button color="primary" (click)="onOpenUpload(podcast)">
               <mat-icon>upload</mat-icon>
-              Upload episode
+              Upload
             </button>
           } @else {
             <!-- Split button: primary action "Update now" + an attached
@@ -121,7 +121,7 @@
               <mat-menu #updateMenu="matMenu">
                 <button mat-menu-item (click)="onUpdateAndDownload(podcast)">
                   <mat-icon>download</mat-icon>
-                  <span>Update &amp; download new episodes</span>
+                  <span>Update &amp; Download</span>
                 </button>
               </mat-menu>
             </div>
