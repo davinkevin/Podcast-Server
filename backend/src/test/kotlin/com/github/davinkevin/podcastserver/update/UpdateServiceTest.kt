@@ -131,8 +131,8 @@ class UpdateServiceTest(
             /* Then */
             await().atMost(5, TimeUnit.SECONDS).untilAsserted {
                 liveUpdate.inOrder {
-                    verify().isUpdating(true)
-                    verify().isUpdating(false)
+                    verify().isPodcastUpdating(podcast.id, true)
+                    verify().isPodcastUpdating(podcast.id, false)
                 }
                 verify(podcastRepository).findById(p.id)
                 verifyNoMoreInteractions(
@@ -169,8 +169,8 @@ class UpdateServiceTest(
                 verify(fakeUpdater, times(2)).type()
                 verify(fakeUpdater, times(2)).registry
                 liveUpdate.inOrder {
-                    verify().isUpdating(true)
-                    verify().isUpdating(false)
+                    verify().isPodcastUpdating(podcast.id, true)
+                    verify().isPodcastUpdating(podcast.id, false)
                 }
                 fakeUpdater.inOrder {
                     verify().update(any())
@@ -223,8 +223,8 @@ class UpdateServiceTest(
                 verify(fakeUpdater, times(2)).type()
                 verify(fakeUpdater, times(2)).registry
                 liveUpdate.inOrder {
-                    verify().isUpdating(true)
-                    verify().isUpdating(false)
+                    verify().isPodcastUpdating(podcast.id, true)
+                    verify().isPodcastUpdating(podcast.id, false)
                 }
                 fakeUpdater.inOrder {
                     verify().update(any())
@@ -283,8 +283,8 @@ class UpdateServiceTest(
                 verify(fakeUpdater, times(2)).registry
 
                 liveUpdate.inOrder {
-                    verify().isUpdating(true)
-                    verify().isUpdating(false)
+                    verify().isPodcastUpdating(podcast.id, true)
+                    verify().isPodcastUpdating(podcast.id, false)
                 }
                 fakeUpdater.inOrder {
                     verify().update(any())
@@ -338,8 +338,8 @@ class UpdateServiceTest(
                 verify(fakeUpdater, times(2)).registry
 
                 liveUpdate.inOrder {
-                    verify().isUpdating(true)
-                    verify().isUpdating(false)
+                    verify().isPodcastUpdating(podcast.id, true)
+                    verify().isPodcastUpdating(podcast.id, false)
                 }
                 fakeUpdater.inOrder {
                     verify().update(any())
@@ -422,8 +422,8 @@ class UpdateServiceTest(
                 verify(fakeUpdater, times(1)).registry
 
                 liveUpdate.inOrder {
-                    verify().isUpdating(true)
-                    verify().isUpdating(false)
+                    verify().isPodcastUpdating(podcast.id, true)
+                    verify().isPodcastUpdating(podcast.id, false)
                 }
                 fakeUpdater.inOrder {
                     verify().update(any())

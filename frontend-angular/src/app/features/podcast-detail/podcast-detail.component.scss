@@ -172,6 +172,30 @@
   border-bottom-right-radius: 0;
 }
 
+// Loading variant: the spinner + "Updating…" text need to be laid out as
+// an inline-flex row inside the button label so the glyph sits on the
+// text's middle baseline. Without this the bare `<mat-spinner>` floats
+// to the top-left of the button content and the label drops below it,
+// which looks broken. We project everything into a single span so
+// mat-flat-button sees one content node.
+.pod__update-split__main--loading ::ng-deep .mdc-button__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pod__update-split__loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  // The Material spinner has a default 4px stroke margin that pushes the
+  // overall box bigger than its diameter; trim it so the gap to the text
+  // reads consistently with the icon+label layout of the idle variant.
+  mat-spinner {
+    flex: 0 0 auto;
+  }
+}
+
 .pod__update-split .pod__update-split__chevron.pod__update-split__chevron {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;

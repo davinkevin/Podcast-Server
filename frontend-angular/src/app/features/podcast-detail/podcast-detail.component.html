@@ -98,22 +98,46 @@
             <!-- Split button: primary action "Update now" + an attached
                  chevron that reveals "Update & download new" so the
                  visible bar keeps a single text-button while still
-                 surfacing the variant. -->
+                 surfacing the variant. Both halves go disabled while an
+                 update is in flight (SSE `podcast-updating` event) so
+                 the user can't kick off a second run on the same row. -->
             <div class="pod__update-split">
-              <button
-                mat-flat-button
-                color="primary"
-                class="pod__update-split__main"
-                (click)="onUpdateNow(podcast)"
-              >
-                <mat-icon>refresh</mat-icon>
-                Update now
-              </button>
+              @if (isUpdating()) {
+                <!-- Loading variant: spinner replaces the refresh icon
+                     and the label flips to "Updating…". `disabled` so a
+                     second click can't queue another run. Static content
+                     inside each mat-flat-button (no @if nested in the
+                     button's projected slot) — Angular's diagnostic
+                     `controlFlowPreventingContentProjection` would
+                     otherwise flag the conditional. -->
+                <button
+                  mat-flat-button
+                  color="primary"
+                  class="pod__update-split__main pod__update-split__main--loading"
+                  disabled
+                >
+                  <span class="pod__update-split__loading">
+                    <mat-spinner diameter="18" />
+                    <span>Updating…</span>
+                  </span>
+                </button>
+              } @else {
+                <button
+                  mat-flat-button
+                  color="primary"
+                  class="pod__update-split__main"
+                  (click)="onUpdateNow(podcast)"
+                >
+                  <mat-icon>refresh</mat-icon>
+                  Update now
+                </button>
+              }
               <button
                 mat-flat-button
                 color="primary"
                 class="pod__update-split__chevron"
                 aria-label="More update options"
+                [disabled]="isUpdating()"
                 [matMenuTriggerFor]="updateMenu"
               >
                 <mat-icon>expand_more</mat-icon>

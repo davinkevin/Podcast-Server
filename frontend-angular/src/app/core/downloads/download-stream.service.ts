@@ -12,10 +12,15 @@ export class DownloadStreamService {
   private readonly downloadingMap = signal<ReadonlyMap<string, DownloadingItemHAL>>(new Map());
   private readonly queueState = signal<readonly DownloadingItemHAL[]>([]);
   private readonly updatingState = signal<boolean>(false);
+  // Set of podcast ids currently being refreshed. Pushed via the
+  // `podcast-updating` SSE event so the UI can spin the "Update now"
+  // button on the exact /podcasts/:id page that triggered the run.
+  private readonly updatingPodcastsState = signal<ReadonlySet<string>>(new Set());
 
   readonly downloading = computed(() => Array.from(this.downloadingMap().values()));
   readonly queue = this.queueState.asReadonly();
   readonly updating = this.updatingState.asReadonly();
+  readonly updatingPodcasts = this.updatingPodcastsState.asReadonly();
   readonly count = computed(() => this.downloading().length + this.queue().length);
 
   private eventSource?: EventSource;
@@ -69,6 +74,17 @@ export class DownloadStreamService {
     es.addEventListener('updating', (ev) => {
       const flag = parse<boolean>(ev);
       this.updatingState.set(flag === true);
+    });
+
+    es.addEventListener('podcast-updating', (ev) => {
+      const payload = parse<{ podcastId: string; updating: boolean }>(ev);
+      if (!payload) return;
+      this.updatingPodcastsState.update((current) => {
+        const next = new Set(current);
+        if (payload.updating) next.add(payload.podcastId);
+        else next.delete(payload.podcastId);
+        return next;
+      });
     });
 
     // EventSource auto-reconnects on transient errors; nothing to do here.

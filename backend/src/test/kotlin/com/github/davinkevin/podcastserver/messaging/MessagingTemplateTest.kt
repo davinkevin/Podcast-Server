@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.extension.assertthat.assertAll
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import org.awaitility.Awaitility.await
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.extension.ExtendWith
 import org.mockito.kotlin.*
@@ -35,6 +36,14 @@ class MessagingTemplateTest(
         @Bean
         @Primary
         fun event(): ApplicationEventPublisher = mock()
+    }
+
+    // Shared event mock across tests via the Spring context — reset
+    // between tests so `verify(times(N))` counts start at 0 per test
+    // method.
+    @BeforeEach
+    fun resetEventMock() {
+        reset(event)
     }
 
     private val item1 = DownloadingItem(
@@ -248,5 +257,48 @@ class MessagingTemplateTest(
                 assertThat(captor.thirdValue.value).isEqualTo(true)
             }
         }
+    }
+
+    @Test
+    fun `should emit per-podcast updating without touching the global flag`() {
+        /* Given */
+        doNothing().whenever(event).publishEvent(any<PodcastUpdatingMessage>())
+        val podcastId = UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66")
+
+        /* When */
+        messages.isPodcastUpdating(podcastId, true)
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            val podcast = argumentCaptor<PodcastUpdatingMessage>()
+            verify(event).publishEvent(podcast.capture())
+
+            assertAll {
+                assertThat(podcast.firstValue.topic).isEqualTo("podcast-updating")
+                assertThat(podcast.firstValue.value)
+                    .isEqualTo(PodcastUpdatingValue(podcastId, true))
+            }
+        }
+
+        /* When */
+        messages.isPodcastUpdating(podcastId, false)
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            val podcast = argumentCaptor<PodcastUpdatingMessage>()
+            verify(event, times(2)).publishEvent(podcast.capture())
+
+            assertAll {
+                assertThat(podcast.secondValue.value)
+                    .isEqualTo(PodcastUpdatingValue(podcastId, false))
+            }
+        }
+
+        // Per-podcast events are completely decoupled from the global
+        // `isUpdating` flag — they should never publish an UpdateMessage.
+        // This guards against accidental coupling reintroducing the race
+        // around concurrent single-podcast updates flipping the global
+        // false while another is still running.
+        verify(event, never()).publishEvent(any<UpdateMessage>())
     }
 }

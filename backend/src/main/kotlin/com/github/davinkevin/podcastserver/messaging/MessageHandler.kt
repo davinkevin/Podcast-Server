@@ -56,6 +56,7 @@ private fun <T> toSSE(v: Message<T>): ServerSentEvent<out Any> {
         is UpdateMessage -> v.value
         is WaitingQueueMessage -> v.value.map(::toDownloadingItemHAL)
         is DownloadingItemMessage -> toDownloadingItemHAL(v.value)
+        is PodcastUpdatingMessage -> v.value
     }
 
     return ServerSentEvent(event = v.topic, body = body)

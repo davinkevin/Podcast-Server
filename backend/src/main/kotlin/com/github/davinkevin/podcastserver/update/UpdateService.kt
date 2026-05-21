@@ -90,11 +90,14 @@ class UpdateService(
     }
 
     fun update(podcastId: UUID, download: Boolean = false) = updateExecutor.execute {
-        liveUpdate.isUpdating(true)
+        // `isPodcastUpdating` emits the per-podcast event AND the global
+        // `isUpdating` event in one go (see MessagingTemplate) — no need
+        // to call `isUpdating` separately.
+        liveUpdate.isPodcastUpdating(podcastId, true)
 
         val podcast = podcastRepository.findById(podcastId)!!
         if (podcast.url == null) {
-            liveUpdate.isUpdating(false)
+            liveUpdate.isPodcastUpdating(podcastId, false)
             return@execute
         }
 
@@ -102,13 +105,13 @@ class UpdateService(
 
         val update = updaters.of(request.url).update(request)
         if (update == null) {
-            liveUpdate.isUpdating(false)
+            liveUpdate.isPodcastUpdating(podcastId, false)
             return@execute
         }
 
         saveSignatureAndCreateItems(update.podcast, update.items, update.newSignature)
 
-        liveUpdate.isUpdating(false)
+        liveUpdate.isPodcastUpdating(podcastId, false)
 
         if (download) {
             updateExecutor.execute { idm.launchDownload() }

@@ -152,6 +152,14 @@ export default class PodcastDetailComponent {
   }));
   protected readonly itemsQuery = this.api.items(this.itemsInput);
 
+  // True while this exact podcast is being refreshed server-side — the
+  // backend emits `podcast-updating` SSE events around its update run
+  // and `DownloadStreamService` accumulates them. Used to swap the
+  // "Update now" button for a spinner + disabled state.
+  protected readonly isUpdating = computed(() =>
+    this.stream.updatingPodcasts().has(this.idPodcast()),
+  );
+
   // Local draft mirrors the URL `q` on mount and is the source of truth
   // while the user is typing. Submit pushes it back into the URL.
   protected readonly searchDraft = signal('');
