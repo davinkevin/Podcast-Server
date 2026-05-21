@@ -57,7 +57,17 @@
       }
 
       @if (queueItems.length > 0) {
-        <h3 class="popover__section-title">In queue</h3>
+        <header class="popover__section-head">
+          <h3 class="popover__section-title">In queue</h3>
+          <button
+            mat-button
+            class="popover__section-action"
+            (click)="onClearQueue()"
+          >
+            <mat-icon>delete_sweep</mat-icon>
+            Clear queue
+          </button>
+        </header>
         <ul
           class="popover__list popover__list--queue"
           cdkDropList

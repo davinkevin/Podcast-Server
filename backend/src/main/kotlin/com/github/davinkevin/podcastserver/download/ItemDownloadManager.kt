@@ -76,6 +76,11 @@ class ItemDownloadManager (
         manageInBackground()
     }
 
+    fun emptyQueue() {
+        repository.emptyQueue()
+        convertAndSendWaitingQueueInBackground()
+    }
+
     fun removeACurrentDownload(id: UUID) {
         downloaders.remove(id)
         repository.remove(id, false)

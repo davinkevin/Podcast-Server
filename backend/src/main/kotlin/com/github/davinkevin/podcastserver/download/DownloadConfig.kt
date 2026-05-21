@@ -38,6 +38,7 @@ class DownloadRouterConfig {
             "/queue".nest {
                 GET("", d::queue)
                 POST("", d::moveInQueue)
+                DELETE("", d::emptyQueue)
                 DELETE("/{id}", d::removeFromQueue)
             }
         }

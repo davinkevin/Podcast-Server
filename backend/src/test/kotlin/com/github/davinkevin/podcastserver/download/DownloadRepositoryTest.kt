@@ -1667,6 +1667,69 @@ class DownloadRepositoryTest(
 
     @Nested
     @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+    @DisplayName("should empty queue")
+    inner class ShouldEmptyQueue {
+
+        private val coverId = UUID.fromString("32ec6d44-b880-11ea-b3de-0242ac130004")
+        private val podcastId = UUID.fromString("32ec6d44-b880-11ea-b3de-0242ac130004")
+
+        private val waiting1 = UUID.fromString("11106eba-b89b-11ea-b3de-0242ac130004")
+        private val waiting2 = UUID.fromString("21106eba-b89b-11ea-b3de-0242ac130004")
+        private val downloading1 = UUID.fromString("31106eba-b89b-11ea-b3de-0242ac130004")
+        private val itemCoverId1 = UUID.fromString("11010c64-b89a-11ea-b3de-0242ac130004")
+        private val itemCoverId2 = UUID.fromString("21010c64-b89a-11ea-b3de-0242ac130004")
+        private val itemCoverId3 = UUID.fromString("31010c64-b89a-11ea-b3de-0242ac130004")
+
+        @BeforeEach
+        fun beforeEach() {
+            val now = OffsetDateTime.now(fixedDate)
+
+            query.batch(
+                truncate(DOWNLOADING_ITEM).cascade(),
+                truncate(ITEM).cascade(),
+                truncate(PODCAST).cascade(),
+                truncate(COVER).cascade(),
+
+                insertInto(COVER, COVER.ID, COVER.HEIGHT, COVER.WIDTH, COVER.URL)
+                    .values(coverId, 100, 100, "https://foo.bac.com/cover.jpg"),
+
+                insertInto(p, p.ID, p.DESCRIPTION, p.HAS_TO_BE_DELETED, p.LAST_UPDATE, p.SIGNATURE, p.TITLE, p.TYPE, p.URL, p.COVER_ID)
+                    .values(podcastId, "desc", true, now, "sign", "Podcast-Title", "Youtube", "https://www.youtube.com/channel/UCx83f-KzDd3o1QK2AdJIftg", coverId),
+
+                insertInto(c, c.ID, c.HEIGHT, c.WIDTH, c.URL)
+                    .values(itemCoverId1, 100, 100, "https://foo.bac.com/item/cover.jpg")
+                    .values(itemCoverId2, 100, 100, "https://foo.bac.com/item/cover.jpg")
+                    .values(itemCoverId3, 100, 100, "https://foo.bac.com/item/cover.jpg"),
+
+                insertInto(i, i.ID, i.CREATION_DATE, i.PUB_DATE, i.DOWNLOAD_DATE, i.DESCRIPTION, i.FILE_NAME, i.LENGTH, i.MIME_TYPE, i.NUMBER_OF_FAIL, i.STATUS, i.TITLE, i.URL, i.GUID, i.COVER_ID, i.PODCAST_ID)
+                    .values(waiting1, now, now, now, "desc item 1", Path(""), 123, "foo/bar", 0, ItemStatus.NOT_DOWNLOADED, "item_1", "https://foo.bar.com/item/1", "https://foo.bar.com/item/1", itemCoverId1, podcastId)
+                    .values(waiting2, now, now, now, "desc item 2", Path(""), 123, "foo/bar", 0, ItemStatus.NOT_DOWNLOADED, "item_2", "https://foo.bar.com/item/2", "https://foo.bar.com/item/2", itemCoverId2, podcastId)
+                    .values(downloading1, now, now, now, "desc item 3", Path(""), 123, "foo/bar", 0, ItemStatus.STARTED, "item_3", "https://foo.bar.com/item/3", "https://foo.bar.com/item/3", itemCoverId3, podcastId),
+
+                insertInto(DOWNLOADING_ITEM)
+                    .columns(DOWNLOADING_ITEM.ITEM_ID, DOWNLOADING_ITEM.STATE, DOWNLOADING_ITEM.POSITION)
+                    .values(downloading1, DownloadingState.DOWNLOADING, 1)
+                    .values(waiting1, DownloadingState.WAITING, 2)
+                    .values(waiting2, DownloadingState.WAITING, 3)
+            )
+                .execute()
+        }
+
+        @Test
+        fun `wipes only WAITING items and keeps DOWNLOADING ones`() {
+            /* Given */
+            /* When */
+            repo.emptyQueue()
+
+            /* Then */
+            val remaining = query.selectFrom(DOWNLOADING_ITEM).fetch()
+                .map { it[DOWNLOADING_ITEM.ITEM_ID] to it[DOWNLOADING_ITEM.STATE] }
+            assertThat(remaining).containsExactly(downloading1 to DownloadingState.DOWNLOADING)
+        }
+    }
+
+    @Nested
+    @TestInstance(TestInstance.Lifecycle.PER_CLASS)
     @DisplayName("should move into queue")
     inner class ShouldMoveIntoQueue {
 

@@ -419,6 +419,26 @@ class DownloadHandlerTest(
     }
 
     @Nested
+    @DisplayName("should empty the whole queue")
+    inner class ShouldEmptyQueue {
+
+        @Test
+        fun `with success`() {
+            /* Given */
+            /* When */
+            rest
+                    .delete()
+                    .uri("/api/v1/downloads/queue")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isNoContent
+                    .expectBody().isEmpty
+
+            verify(idm).emptyQueue()
+        }
+    }
+
+    @Nested
     @DisplayName("should remove from queue")
     inner class ShouldRemoveFromQueue {
 

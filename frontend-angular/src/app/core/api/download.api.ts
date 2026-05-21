@@ -59,4 +59,10 @@ export class DownloadApi {
       { responseType: 'text' },
     );
   }
+
+  // Wipe every WAITING item from the queue in one shot. Downloads currently in
+  // progress are left alone. Backend broadcasts the new (empty) queue via SSE.
+  emptyQueue() {
+    return this.http.delete('/api/v1/downloads/queue', { responseType: 'text' });
+  }
 }

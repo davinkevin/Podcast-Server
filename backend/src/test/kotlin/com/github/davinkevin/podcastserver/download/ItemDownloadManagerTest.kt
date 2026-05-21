@@ -660,6 +660,24 @@ class ItemDownloadManagerTest(
 
     }
 
+    @Nested
+    @DisplayName("should empty the whole queue")
+    inner class ShouldEmptyQueue {
+
+        @Test
+        @Timeout(5)
+        fun `with success`() {
+            /* Given */
+            doNothing().whenever(repository).emptyQueue()
+            whenever(repository.findAllWaiting()).thenReturn(emptyList())
+            /* When */
+            idm.emptyQueue()
+            /* Then */
+            verify(repository).emptyQueue()
+        }
+
+    }
+
     @TestConfiguration
     @Import(ItemDownloadManager::class)
     class LocalTestConfiguration {

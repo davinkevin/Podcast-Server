@@ -74,6 +74,11 @@ class DownloadHandler(private val downloadService: ItemDownloadManager) {
         return ServerResponse.noContent().build()
     }
 
+    fun emptyQueue(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {
+        downloadService.emptyQueue()
+        return ServerResponse.noContent().build()
+    }
+
     fun removeFromQueue(r: ServerRequest): ServerResponse {
         val id = UUID.fromString(r.pathVariable("id"))
         val stop = r.paramOrNull("stop")?.toBoolean() ?: false

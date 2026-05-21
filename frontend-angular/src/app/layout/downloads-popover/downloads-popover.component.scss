@@ -69,6 +69,25 @@
   margin: 0.75rem 0.25rem 0.5rem;
 }
 
+// Section header bar with title on the left + a bulk action button on the
+// right. Used by the queue section to host the "Clear queue" button.
+.popover__section-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding-right: 0.25rem;
+}
+
+.popover__section-action.mat-mdc-button {
+  // Pull the button up so it sits visually on the same baseline as the
+  // already-spaced section title (which has its own top margin).
+  margin-top: 0.5rem;
+  // Tighter than default to fit alongside the small section title.
+  font: var(--mat-sys-label-medium);
+  color: var(--mat-sys-error);
+}
+
 .popover__list {
   list-style: none;
   margin: 0;

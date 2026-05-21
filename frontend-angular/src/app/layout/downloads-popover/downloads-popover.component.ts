@@ -83,4 +83,15 @@ export class DownloadsPopoverComponent {
       error: () => this.queue.set(previous),
     });
   }
+
+  protected onClearQueue() {
+    if (this.queue().length === 0) return;
+    if (!confirm('Remove all queued items? Active downloads continue.')) return;
+    // Optimistic empty; SSE confirms with a fresh waiting=[] event.
+    const previous = this.queue();
+    this.queue.set([]);
+    this.api.emptyQueue().subscribe({
+      error: () => this.queue.set(previous),
+    });
+  }
 }

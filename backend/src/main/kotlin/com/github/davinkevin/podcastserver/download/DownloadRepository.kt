@@ -146,6 +146,13 @@ class DownloadRepository(
         if (hasToBeStopped) stopItem(id)
     }
 
+    fun emptyQueue() {
+        query
+            .deleteFrom(DOWNLOADING_ITEM)
+            .where(DOWNLOADING_ITEM.STATE.eq(DownloadingState.WAITING))
+            .execute()
+    }
+
     fun moveItemInQueue(id: UUID, position: Int) {
         val numberOfDownloadingItem = select(coalesce(max(DOWNLOADING_ITEM.POSITION), 0))
             .from(DOWNLOADING_ITEM)
