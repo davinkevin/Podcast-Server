@@ -78,6 +78,62 @@
   gap: 0.25rem;
 }
 
+// Drag handle on queued rows. Cursor flips to grabbing while a drag is
+// active (CDK toggles `.cdk-drag` on the row).
+.row__grip {
+  background: none;
+  border: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  color: var(--mat-sys-on-surface-variant);
+  cursor: grab;
+  flex: 0 0 auto;
+}
+.row__grip:hover {
+  background: var(--mat-sys-surface-container-highest);
+  color: var(--mat-sys-on-surface);
+}
+.row__grip:active,
+.cdk-drag-preview .row__grip {
+  cursor: grabbing;
+}
+
+// Floating row that follows the cursor during drag. CDK clones the LI
+// into a portal at the document root — re-apply the row styling so it
+// reads as a faithful preview of the source. `surface-container-highest`
+// + level2 elevation lifts it visually off the popover behind.
+.cdk-drag-preview {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem;
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container-highest);
+  color: var(--mat-sys-on-surface);
+  box-shadow: var(--mat-sys-level2);
+}
+
+// Dotted slot that takes the row's source position while dragging — fed
+// in via `*cdkDragPlaceholder` so we replace the row with a single empty
+// drop target rather than the default cloned-LI placeholder.
+.row__placeholder {
+  height: 56px;
+  border-radius: 12px;
+  background: var(--mat-sys-surface-container);
+  border: 1px dashed var(--mat-sys-outline-variant);
+}
+
+// Smooth out the reorder animation as siblings settle into their new
+// positions when an item is dropped.
+.cdk-drop-list-dragging .row:not(.cdk-drag-placeholder) {
+  transition: transform 200ms cubic-bezier(0, 0, 0.2, 1);
+}
+
 .row {
   display: flex;
   align-items: center;

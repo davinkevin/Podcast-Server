@@ -48,4 +48,15 @@ export class DownloadApi {
       responseType: 'text',
     });
   }
+
+  // Reorder an item in the download queue. `position` is the zero-based target
+  // index. Backend rebroadcasts the new queue via SSE so no client query to
+  // invalidate.
+  moveInQueue(id: string, position: number) {
+    return this.http.post(
+      '/api/v1/downloads/queue',
+      { id, position },
+      { responseType: 'text' },
+    );
+  }
 }

@@ -1,12 +1,12 @@
 @let downloading = stream.downloading();
-@let queue = stream.queue();
+@let queueItems = queue();
 
 <section class="popover" role="dialog" aria-label="Downloads">
   <header class="popover__header">
     <h2 class="popover__title">Downloads</h2>
-    @if (downloading.length > 0 || queue.length > 0) {
+    @if (downloading.length > 0 || queueItems.length > 0) {
       <span class="popover__count">
-        {{ downloading.length }} active · {{ queue.length }} queued
+        {{ downloading.length }} active · {{ queueItems.length }} queued
       </span>
     }
     <button
@@ -56,11 +56,26 @@
         </ul>
       }
 
-      @if (queue.length > 0) {
+      @if (queueItems.length > 0) {
         <h3 class="popover__section-title">In queue</h3>
-        <ul class="popover__list">
-          @for (item of queue; track item.id) {
-            <li class="row row--queued">
+        <ul
+          class="popover__list popover__list--queue"
+          cdkDropList
+          (cdkDropListDropped)="onQueueDrop($event)"
+        >
+          @for (item of queueItems; track item.id) {
+            <li class="row row--queued" cdkDrag [cdkDragData]="item">
+              <!-- Drag handle: only this grabs the drag, so the Remove
+                   button stays clickable without triggering a drag. -->
+              <button
+                type="button"
+                class="row__grip"
+                cdkDragHandle
+                aria-label="Reorder"
+                matTooltip="Drag to reorder"
+              >
+                <mat-icon>drag_indicator</mat-icon>
+              </button>
               <img class="row__cover" [src]="item.cover.url" [alt]="item.title" />
               <div class="row__meta">
                 <div class="row__title" [title]="item.title">{{ item.title }}</div>
@@ -76,6 +91,9 @@
               >
                 <mat-icon>close</mat-icon>
               </button>
+              <!-- Slot in the source position while dragging — keeps the
+                   list height stable and shows the drop target. -->
+              <div class="row__placeholder" *cdkDragPlaceholder></div>
             </li>
           }
         </ul>
