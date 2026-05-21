@@ -188,14 +188,18 @@ export default class PodcastDetailComponent {
     };
   });
 
-  // Compact hero state: true once the user has scrolled past the page
-  // header — i.e. when the sticky hero starts pinning to the top. Driven
-  // by an IntersectionObserver on a sentinel placed BEFORE the hero so
-  // the trigger fires immediately on scroll, not after scrolling the
-  // hero's full natural height.
+  // Compact hero state: true once the user has scrolled past the hero's
+  // full natural height. Driven by an IntersectionObserver on a sentinel
+  // placed AFTER the hero so the toggle fires only after the hero is
+  // fully off-screen. When true, the hero is switched to `position: fixed`
+  // at the top in compact form; `heroFullHeight` captures the pre-toggle
+  // height so the spacer in the template can fill the now-empty natural-
+  // flow slot and keep items below from jumping up.
   private readonly heroSentinel =
     viewChild<ElementRef<HTMLElement>>('heroSentinel');
+  private readonly heroEl = viewChild<ElementRef<HTMLElement>>('heroEl');
   protected readonly heroOffscreen = signal(false);
+  protected readonly heroFullHeight = signal(0);
 
   constructor() {
     // Mirror the URL `?q=` into the search input — on first mount, and
@@ -221,15 +225,25 @@ export default class PodcastDetailComponent {
     });
 
     // Watch the hero sentinel from the scrollable shell outlet's viewport.
-    // Sentinel sits just above the hero: while it's visible the user is at
-    // the top of the page → hero full. Once it exits the viewport (user
-    // started scrolling past the page header) → hero compacts in place.
+    // Sentinel sits just below the hero: while it's visible the hero is
+    // still on screen → in natural flow, full size. Once it exits the
+    // viewport the hero is fully off-screen and we switch it to compact
+    // (position: fixed at the top). The hero's natural-flow height is
+    // captured the instant before the switch so the placeholder div in
+    // the template can fill the gap and keep items from jumping up.
     effect((onCleanup) => {
       const el = this.heroSentinel()?.nativeElement;
       if (!el) return;
       const root = el.closest('.shell__outlet') as HTMLElement | null;
       const observer = new IntersectionObserver(
-        ([entry]) => this.heroOffscreen.set(!entry.isIntersecting),
+        ([entry]) => {
+          const offscreen = !entry.isIntersecting;
+          if (offscreen && !this.heroOffscreen()) {
+            const hero = this.heroEl()?.nativeElement;
+            if (hero) this.heroFullHeight.set(hero.offsetHeight);
+          }
+          this.heroOffscreen.set(offscreen);
+        },
         { root, threshold: 0 },
       );
       observer.observe(el);
