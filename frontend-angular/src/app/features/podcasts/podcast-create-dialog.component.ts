@@ -351,6 +351,14 @@ export class PodcastCreateDialogComponent {
     if (!body) return;
     this.createMutation.mutate(body, {
       onSuccess: (created) => {
+        // Kick off a refresh right after creation so the new podcast fills
+        // with episodes without an extra manual click. Driven from the
+        // client so the create endpoint stays free of side-effects.
+        // Skipped for upload-only podcasts — there's no remote feed to
+        // fetch.
+        if (created.type !== 'upload') {
+          this.podcastApi.triggerUpdate(created.id).subscribe();
+        }
         this.snackbar.open('Podcast created', undefined, { duration: 2500 });
         this.dialogRef.close(created);
       },
