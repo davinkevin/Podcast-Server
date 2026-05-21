@@ -12,6 +12,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatDialog } from '@angular/material/dialog';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 
 import { CoverCardComponent } from '../../shared/cover-card/cover-card.component';
@@ -19,6 +22,7 @@ import { EmptyStateComponent } from '../../shared/empty-state/empty-state.compon
 import { PodcastApi } from '../../core/api/podcast.api';
 import { PodcastHAL } from '../../core/models/podcast.model';
 import { queryKeys } from '../../core/api/query-keys';
+import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import { PodcastCreateDialogComponent } from './podcast-create-dialog.component';
 import { PodcastsListStateService } from './podcasts-list-state.service';
 
@@ -32,6 +36,8 @@ import { PodcastsListStateService } from './podcasts-list-state.service';
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
+    MatMenuModule,
+    MatTooltipModule,
     CoverCardComponent,
     EmptyStateComponent,
   ],
@@ -45,6 +51,12 @@ export default class PodcastsComponent {
   private readonly dialog = inject(MatDialog);
   private readonly queryClient = inject(QueryClient);
   private readonly state = inject(PodcastsListStateService);
+  private readonly stream = inject(DownloadStreamService);
+  private readonly snackbar = inject(MatSnackBar);
+
+  // Bulk-refresh button state: spin + disable while SSE reports a global
+  // update is in flight (driven by UpdateService.updateAll on the backend).
+  protected readonly isUpdatingAll = this.stream.updating;
 
   // TanStack Query provides stale-while-revalidate out of the box — on return
   // navigation the cached list renders instantly while a background refetch
@@ -82,6 +94,20 @@ export default class PodcastsComponent {
 
   protected onClearSearch() {
     this.search.set('');
+  }
+
+  protected onUpdateAll(withDownload: boolean) {
+    if (this.isUpdatingAll()) return;
+    this.api.updateAll({ download: withDownload }).subscribe({
+      next: () =>
+        this.snackbar.open(
+          withDownload ? 'Update & download started' : 'Update started',
+          undefined,
+          { duration: 2500 },
+        ),
+      error: () =>
+        this.snackbar.open('Could not start update', 'Dismiss', { duration: 4000 }),
+    });
   }
 
   protected onAdd() {

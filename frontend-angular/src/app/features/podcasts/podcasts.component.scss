@@ -17,11 +17,18 @@
 }
 
 // Empty state: no `.podcasts__search` rendered, so the grid auto-flow
-// would drop the Add button into the middle column (the search slot) and
-// it'd appear centred instead of flush-right. Collapse to a 2-column
-// layout so the button lands on the right edge.
+// would drop the actions cluster into the middle column (the search slot)
+// and they'd appear centred instead of flush-right. Collapse to a
+// 2-column layout so they land on the right edge.
 .podcasts__header:not(:has(.podcasts__search)) {
   grid-template-columns: 1fr auto;
+}
+
+.podcasts__actions {
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .podcasts__heading {
@@ -48,15 +55,74 @@
 }
 
 .podcasts__add {
-  justify-self: end;
+  // Layout is handled by .podcasts__actions (inline-flex); no extra
+  // self-positioning needed.
+}
+
+// Stroked split-button — same construction as `.pod__update-split` on
+// /podcasts/:id so the affordance reads the same in both places. Two
+// child buttons touching edge-to-edge with rounded corners on the
+// outside only — they read as one continuous pill.
+.podcasts__update-split {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.podcasts__update-split .podcasts__update-split__main {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  // Drop the right outline so the seam between the two halves doesn't
+  // read as a double-line (main's right + chevron's left). Combined
+  // with the chevron's `border-left: 0` below, the two buttons share
+  // their edge and the pill reads as one continuous outline.
+  border-right: 0;
+  // Tight padding on the seam edge — Material's default ~16px right
+  // padding leaves a visible gap between "Update all" and the chevron
+  // that reads as dead space. Keep the standard 16px on the left
+  // (around the leading icon) so the label still has breathing room
+  // against the outline.
+  padding-right: 6px !important;
+}
+
+// Loading variant lays the spinner + label inline so the spinner sits
+// on the text baseline, matching the per-podcast update button.
+.podcasts__update-split__main--loading ::ng-deep .mdc-button__label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.podcasts__update-split__loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  mat-spinner {
+    flex: 0 0 auto;
+  }
+}
+
+.podcasts__update-split .podcasts__update-split__chevron.podcasts__update-split__chevron {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  // !important to overpower mat-stroked-button's `min-width: 64px`.
+  min-width: 0 !important;
+  width: 40px !important;
+  padding: 0 !important;
+  // Drop the chevron button's left border so the seam between the two
+  // halves doesn't read as a double line — keeps the pill continuous.
+  border-left: 0;
+  ::ng-deep .mdc-button__label {
+    padding-inline: 0 !important;
+  }
 }
 
 @media (max-width: 800px) {
-  // Stack on narrow screens: heading on top, search full-width, add below.
+  // Stack on narrow screens: heading on top, search full-width, actions
+  // cluster below — left-aligned.
   .podcasts__header {
     grid-template-columns: 1fr;
   }
-  .podcasts__add {
+  .podcasts__actions {
     justify-self: start;
   }
 }

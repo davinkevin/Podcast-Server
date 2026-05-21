@@ -40,15 +40,67 @@
       </mat-form-field>
     }
 
-    <button
-      mat-flat-button
-      color="primary"
-      class="podcasts__add"
-      (click)="onAdd()"
-    >
-      <mat-icon>add</mat-icon>
-      Add podcast
-    </button>
+    <div class="podcasts__actions">
+      <!-- Split-button mirroring the per-podcast "Update now" affordance:
+           primary text-button refreshes every feed; the chevron reveals a
+           menu entry that also chains a download of any new episode the
+           refresh produces. Disabled (with spinner + "Updating…" label)
+           while the global SSE `updating` flag is true. -->
+      <div class="podcasts__update-split">
+        <!-- Two fully-formed buttons rather than a shared shell with @if
+             inside, because mat-button's icon projection slot only
+             accepts a single root node — splitting at the button level
+             dodges the Angular compiler's controlFlowPreventingContent-
+             Projection warning, as the per-podcast Update button does. -->
+        @if (isUpdatingAll()) {
+          <button
+            mat-stroked-button
+            class="podcasts__update-split__main podcasts__update-split__main--loading"
+            disabled
+            matTooltip="Refresh every feed"
+          >
+            <span class="podcasts__update-split__loading">
+              <mat-spinner diameter="18" />
+              <span>Updating…</span>
+            </span>
+          </button>
+        } @else {
+          <button
+            mat-stroked-button
+            class="podcasts__update-split__main"
+            (click)="onUpdateAll(false)"
+            matTooltip="Refresh every feed"
+          >
+            <mat-icon>refresh</mat-icon>
+            Update all
+          </button>
+        }
+        <button
+          mat-stroked-button
+          class="podcasts__update-split__chevron"
+          aria-label="More update options"
+          [disabled]="isUpdatingAll()"
+          [matMenuTriggerFor]="updateAllMenu"
+        >
+          <mat-icon>expand_more</mat-icon>
+        </button>
+        <mat-menu #updateAllMenu="matMenu">
+          <button mat-menu-item (click)="onUpdateAll(true)">
+            <mat-icon>cloud_download</mat-icon>
+            <span>Update all &amp; download</span>
+          </button>
+        </mat-menu>
+      </div>
+      <button
+        mat-flat-button
+        color="primary"
+        class="podcasts__add"
+        (click)="onAdd()"
+      >
+        <mat-icon>add</mat-icon>
+        Add podcast
+      </button>
+    </div>
   </header>
 
   @if (loading && !result) {
