@@ -87,7 +87,12 @@
       </div>
 
       <footer class="library__footer">
-        <ps-pager [page]="result.number" [first]="result.first" [last]="result.last" />
+        <ps-pager
+          [page]="result.number"
+          [first]="result.first"
+          [last]="result.last"
+          [totalPages]="result.totalPages"
+        />
       </footer>
     }
   }

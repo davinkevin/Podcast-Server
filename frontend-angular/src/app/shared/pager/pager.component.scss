@@ -1,8 +1,25 @@
+// Outer wrapper is transparent — each direction lives in its own pill
+// (`.pager__group`) so the page background shows through the seam and
+// the four buttons clearly read as "backward" + "forward" pairs.
 .pager {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.pager__group {
   display: inline-flex;
   align-items: center;
   gap: 0.25rem;
   padding: 0.25rem;
   border-radius: 999px;
   background: var(--mat-sys-surface-container);
+}
+
+// Hidden group: keeps its width in flow so the opposite group never
+// drifts toward the center when the user is on the first/last page.
+// `visibility: hidden` (vs `display: none`) preserves the box and
+// removes the buttons from focus + screen readers in one go.
+.pager__group--invisible {
+  visibility: hidden;
 }

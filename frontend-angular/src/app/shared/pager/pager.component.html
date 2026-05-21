@@ -1,6 +1,24 @@
 @if (!first() || !last()) {
   <nav class="pager" aria-label="Pagination">
-    @if (!first()) {
+    <!-- Both groups are always present in the DOM so the visible buttons
+         never shift when the user reaches the first or last page; the
+         non-applicable group flips to `visibility: hidden` instead,
+         preserving its layout slot (and dropping it out of the tab
+         order + accessibility tree automatically). -->
+    <div
+      class="pager__group"
+      [class.pager__group--invisible]="first()"
+      [attr.aria-hidden]="first() ? 'true' : null"
+    >
+      <a
+        mat-icon-button
+        aria-label="First page"
+        queryParamsHandling="merge"
+        [queryParams]="firstQuery"
+        [routerLink]="[]"
+      >
+        <mat-icon>first_page</mat-icon>
+      </a>
       <a
         mat-icon-button
         aria-label="Previous page"
@@ -10,9 +28,13 @@
       >
         <mat-icon>chevron_left</mat-icon>
       </a>
-    }
+    </div>
 
-    @if (!last()) {
+    <div
+      class="pager__group"
+      [class.pager__group--invisible]="last()"
+      [attr.aria-hidden]="last() ? 'true' : null"
+    >
       <a
         mat-icon-button
         aria-label="Next page"
@@ -22,6 +44,18 @@
       >
         <mat-icon>chevron_right</mat-icon>
       </a>
-    }
+      @let lq = lastQuery();
+      @if (lq) {
+        <a
+          mat-icon-button
+          aria-label="Last page"
+          queryParamsHandling="merge"
+          [queryParams]="lq"
+          [routerLink]="[]"
+        >
+          <mat-icon>last_page</mat-icon>
+        </a>
+      }
+    </div>
   </nav>
 }

@@ -23,13 +23,21 @@ export class PagerComponent {
   readonly page = input.required<number>();
   readonly first = input<boolean>(true);
   readonly last = input<boolean>(true);
+  // Optional: when supplied the pager renders « First and Last »
+  // shortcuts. Skipped when callers can't compute it cheaply.
+  readonly totalPages = input<number | undefined>(undefined);
 
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
+  protected readonly firstQuery = { page: 0 } as const;
   protected readonly prevQuery = computed(() => ({ page: Math.max(0, this.page() - 1) }));
   protected readonly nextQuery = computed(() => ({ page: this.page() + 1 }));
+  protected readonly lastQuery = computed(() => {
+    const total = this.totalPages();
+    return total !== undefined ? { page: total - 1 } : undefined;
+  });
 
   // ←/→ keyboard navigation. Bound at the document level so it fires
   // regardless of which element on the page has focus, with guards
@@ -42,7 +50,14 @@ export class PagerComponent {
   //     (`first/last` HAL flags)
   @HostListener('document:keydown', ['$event'])
   protected onDocumentKey(event: KeyboardEvent) {
-    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    if (
+      event.key !== 'ArrowLeft' &&
+      event.key !== 'ArrowRight' &&
+      event.key !== 'Home' &&
+      event.key !== 'End'
+    ) {
+      return;
+    }
     if (event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
 
     // ListRouteReuseStrategy detaches list pages (`library`/`podcasts`/
@@ -71,6 +86,15 @@ export class PagerComponent {
     } else if (event.key === 'ArrowRight' && !this.last()) {
       event.preventDefault();
       this.navigateTo(this.nextQuery());
+    } else if (event.key === 'Home' && !this.first()) {
+      event.preventDefault();
+      this.navigateTo(this.firstQuery);
+    } else if (event.key === 'End' && !this.last()) {
+      // Skip when totalPages wasn't supplied — we can't know the index.
+      const last = this.lastQuery();
+      if (!last) return;
+      event.preventDefault();
+      this.navigateTo(last);
     }
   }
 
