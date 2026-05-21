@@ -29,7 +29,6 @@ import {
 import { TrackRowComponent } from '../../shared/track-row/track-row.component';
 import { PagerComponent } from '../../shared/pager/pager.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
-import { DetailStickyHeaderComponent } from '../../shared/detail-sticky-header/detail-sticky-header.component';
 import {
   StatusBadgeComponent,
   StatusBadgeKind,
@@ -91,7 +90,6 @@ const DELETE_ITEM_ACTION: CoverCardAction = {
     PagerComponent,
     EmptyStateComponent,
     StatusBadgeComponent,
-    DetailStickyHeaderComponent,
   ],
   templateUrl: './podcast-detail.component.html',
   styleUrl: './podcast-detail.component.scss',
@@ -190,9 +188,11 @@ export default class PodcastDetailComponent {
     };
   });
 
-  // Sticky compact header visibility: true once the hero has scrolled out
-  // of view. Driven by an IntersectionObserver on the sentinel placed right
-  // after the hero in the template.
+  // Compact hero state: true once the user has scrolled past the page
+  // header — i.e. when the sticky hero starts pinning to the top. Driven
+  // by an IntersectionObserver on a sentinel placed BEFORE the hero so
+  // the trigger fires immediately on scroll, not after scrolling the
+  // hero's full natural height.
   private readonly heroSentinel =
     viewChild<ElementRef<HTMLElement>>('heroSentinel');
   protected readonly heroOffscreen = signal(false);
@@ -221,9 +221,9 @@ export default class PodcastDetailComponent {
     });
 
     // Watch the hero sentinel from the scrollable shell outlet's viewport.
-    // The sentinel sits at the bottom of the hero; when it intersects the
-    // viewport, the hero is visible → compact header hidden. When it
-    // scrolls out → compact header shown.
+    // Sentinel sits just above the hero: while it's visible the user is at
+    // the top of the page → hero full. Once it exits the viewport (user
+    // started scrolling past the page header) → hero compacts in place.
     effect((onCleanup) => {
       const el = this.heroSentinel()?.nativeElement;
       if (!el) return;
