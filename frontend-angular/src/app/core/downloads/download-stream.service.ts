@@ -73,18 +73,39 @@ export class DownloadStreamService {
 
     es.addEventListener('updating', (ev) => {
       const flag = parse<boolean>(ev);
-      this.updatingState.set(flag === true);
+      const wasUpdating = this.updatingState();
+      const isUpdating = flag === true;
+      this.updatingState.set(isUpdating);
+      // Bulk refresh just finished server-side — refetch every visible
+      // podcast & item list so new episodes pop in without manual
+      // navigation. Skip the leading false→false on first connect.
+      if (wasUpdating && !isUpdating) {
+        this.queryClient.invalidateQueries({ queryKey: queryKeys.podcasts.all });
+        this.queryClient.invalidateQueries({ queryKey: queryKeys.items.all });
+      }
     });
 
     es.addEventListener('podcast-updating', (ev) => {
       const payload = parse<{ podcastId: string; updating: boolean }>(ev);
       if (!payload) return;
+      const wasUpdating = this.updatingPodcastsState().has(payload.podcastId);
       this.updatingPodcastsState.update((current) => {
         const next = new Set(current);
         if (payload.updating) next.add(payload.podcastId);
         else next.delete(payload.podcastId);
         return next;
       });
+      // Per-podcast: on true → false transition refetch this podcast's
+      // metadata (lastUpdate) and its items list so newly fetched
+      // episodes appear on /podcasts/:id without a manual reload.
+      if (wasUpdating && !payload.updating) {
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.podcasts.detail(payload.podcastId),
+        });
+        this.queryClient.invalidateQueries({
+          queryKey: ['podcasts', payload.podcastId, 'items'],
+        });
+      }
     });
 
     // EventSource auto-reconnects on transient errors; nothing to do here.
