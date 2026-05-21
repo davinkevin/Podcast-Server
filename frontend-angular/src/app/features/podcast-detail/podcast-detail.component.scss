@@ -302,6 +302,11 @@
 .pod__update-split .pod__update-split__main {
   border-top-right-radius: 0;
   border-bottom-right-radius: 0;
+  // Tight padding on the seam edge — Material's default ~16px right
+  // padding leaves a visible gap between "Update now" and the chevron
+  // that reads as dead space. Keep the standard padding on the left
+  // (around the leading icon) for breathing room.
+  padding-right: 6px !important;
 }
 
 // Loading variant: the spinner + "Updating…" text need to be laid out as
@@ -342,9 +347,6 @@
   ::ng-deep .mdc-button__label {
     padding-inline: 0 !important;
   }
-  // Very thin darkening line on the leading edge — barely visible,
-  // just enough to suggest the two halves are distinct buttons.
-  box-shadow: inset 1px 0 0 0 rgba(0, 0, 0, 0.08);
 }
 
 .pod__list {
