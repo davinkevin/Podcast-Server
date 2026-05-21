@@ -16,6 +16,14 @@
   gap: 1rem;
 }
 
+// Empty state: no `.podcasts__search` rendered, so the grid auto-flow
+// would drop the Add button into the middle column (the search slot) and
+// it'd appear centred instead of flush-right. Collapse to a 2-column
+// layout so the button lands on the right edge.
+.podcasts__header:not(:has(.podcasts__search)) {
+  grid-template-columns: 1fr auto;
+}
+
 .podcasts__heading {
   display: flex;
   align-items: baseline;
