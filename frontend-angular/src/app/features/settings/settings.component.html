@@ -5,46 +5,6 @@
 
   <article class="card">
     <header class="card__head">
-      <mat-icon class="card__icon">refresh</mat-icon>
-      <div>
-        <h2 class="card__title">Podcasts updates</h2>
-        <p class="card__subtitle">
-          Refresh feeds across the whole library, optionally fetching the new episodes immediately.
-        </p>
-      </div>
-    </header>
-    <div class="card__actions">
-      <button
-        mat-flat-button
-        color="primary"
-        [disabled]="updating()"
-        (click)="onUpdateAll(false)"
-      >
-        @if (updating()) {
-          <mat-spinner diameter="18" />
-        } @else {
-          <mat-icon>refresh</mat-icon>
-        }
-        Update all
-      </button>
-      <button
-        mat-flat-button
-        color="primary"
-        [disabled]="updating()"
-        (click)="onUpdateAll(true)"
-      >
-        @if (updating()) {
-          <mat-spinner diameter="18" />
-        } @else {
-          <mat-icon>cloud_download</mat-icon>
-        }
-        Update all &amp; download
-      </button>
-    </div>
-  </article>
-
-  <article class="card">
-    <header class="card__head">
       <mat-icon class="card__icon">download</mat-icon>
       <div>
         <h2 class="card__title">Parallel downloads</h2>

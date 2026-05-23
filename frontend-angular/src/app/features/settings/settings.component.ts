@@ -16,7 +16,6 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
 import { DownloadApi } from '../../core/api/download.api';
-import { PodcastApi } from '../../core/api/podcast.api';
 import { ItemApi } from '../../core/api/item.api';
 import { CoverApi } from '../../core/api/cover.api';
 import {
@@ -45,7 +44,6 @@ const COVERS_DEFAULT_DAYS = 365;
 })
 export default class SettingsComponent {
   private readonly downloads = inject(DownloadApi);
-  private readonly podcasts = inject(PodcastApi);
   private readonly items = inject(ItemApi);
   private readonly covers = inject(CoverApi);
   private readonly settings = inject(SettingsService);
@@ -67,8 +65,6 @@ export default class SettingsComponent {
   protected readonly coversRetentionDays = signal<number>(COVERS_DEFAULT_DAYS);
   protected readonly cleaningItems = this.cleanItemsMutation.isPending;
   protected readonly cleaningCovers = this.cleanCoversMutation.isPending;
-
-  protected readonly updating = signal(false);
 
   protected readonly theme = this.settings.theme;
 
@@ -119,25 +115,6 @@ export default class SettingsComponent {
         this.snackbar.open('Old covers cleaned up', undefined, { duration: 2500 }),
       onError: () =>
         this.snackbar.open('Could not clean covers', 'Dismiss', { duration: 4000 }),
-    });
-  }
-
-  protected onUpdateAll(withDownload: boolean) {
-    if (this.updating()) return;
-    this.updating.set(true);
-    this.podcasts.updateAll({ download: withDownload }).subscribe({
-      next: () => {
-        this.updating.set(false);
-        this.snackbar.open(
-          withDownload ? 'Update & download started' : 'Update started',
-          undefined,
-          { duration: 2500 },
-        );
-      },
-      error: () => {
-        this.updating.set(false);
-        this.snackbar.open('Could not start update', 'Dismiss', { duration: 4000 });
-      },
     });
   }
 
