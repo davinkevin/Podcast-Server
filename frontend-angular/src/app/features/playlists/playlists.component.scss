@@ -16,6 +16,15 @@
   gap: 1rem;
 }
 
+// Empty state: no `.playlists__search` rendered, so the grid auto-flow
+// would drop the Create button into the middle column (the search slot)
+// and it'd appear centered instead of flush-right. Collapse to a
+// 2-column layout so the button lands on the right edge — matches the
+// fix on `/podcasts`.
+.playlists__header:not(:has(.playlists__search)) {
+  grid-template-columns: 1fr auto;
+}
+
 .playlists__heading {
   display: flex;
   align-items: baseline;
