@@ -29,6 +29,7 @@ import {
 import { TrackRowComponent } from '../../shared/track-row/track-row.component';
 import { PagerComponent } from '../../shared/pager/pager.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
+import { DetailStickyHeaderComponent } from '../../shared/detail-sticky-header/detail-sticky-header.component';
 import {
   StatusBadgeComponent,
   StatusBadgeKind,
@@ -89,6 +90,7 @@ const DELETE_ITEM_ACTION: CoverCardAction = {
     TrackRowComponent,
     PagerComponent,
     EmptyStateComponent,
+    DetailStickyHeaderComponent,
     StatusBadgeComponent,
   ],
   templateUrl: './podcast-detail.component.html',
@@ -188,18 +190,15 @@ export default class PodcastDetailComponent {
     };
   });
 
-  // Compact hero state: true once the user has scrolled past the hero's
-  // full natural height. Driven by an IntersectionObserver on a sentinel
-  // placed AFTER the hero so the toggle fires only after the hero is
-  // fully off-screen. When true, the hero is switched to `position: fixed`
-  // at the top in compact form; `heroFullHeight` captures the pre-toggle
-  // height so the spacer in the template can fill the now-empty natural-
-  // flow slot and keep items below from jumping up.
+  // Sticky-bar visibility: true once the user has scrolled past the hero's
+  // full natural height. Drives the `<ps-detail-sticky-header>`. Same
+  // pattern as `/playlists/:id`: full hero stays statically in flow (no
+  // class changes during scroll), a separate compact bar fades in on top.
+  // The two-element design avoids any layout work mid-scroll on iOS
+  // Safari which was freezing momentum scroll on iPad.
   private readonly heroSentinel =
     viewChild<ElementRef<HTMLElement>>('heroSentinel');
-  private readonly heroEl = viewChild<ElementRef<HTMLElement>>('heroEl');
   protected readonly heroOffscreen = signal(false);
-  protected readonly heroFullHeight = signal(0);
 
   constructor() {
     // Mirror the URL `?q=` into the search input — on first mount, and
@@ -225,25 +224,14 @@ export default class PodcastDetailComponent {
     });
 
     // Watch the hero sentinel from the scrollable shell outlet's viewport.
-    // Sentinel sits just below the hero: while it's visible the hero is
-    // still on screen → in natural flow, full size. Once it exits the
-    // viewport the hero is fully off-screen and we switch it to compact
-    // (position: fixed at the top). The hero's natural-flow height is
-    // captured the instant before the switch so the placeholder div in
-    // the template can fill the gap and keep items from jumping up.
+    // Once the sentinel exits view (i.e. the hero is fully scrolled out),
+    // toggle `heroOffscreen` to reveal the sticky compact header.
     effect((onCleanup) => {
       const el = this.heroSentinel()?.nativeElement;
       if (!el) return;
       const root = el.closest('.shell__outlet') as HTMLElement | null;
       const observer = new IntersectionObserver(
-        ([entry]) => {
-          const offscreen = !entry.isIntersecting;
-          if (offscreen && !this.heroOffscreen()) {
-            const hero = this.heroEl()?.nativeElement;
-            if (hero) this.heroFullHeight.set(hero.offsetHeight);
-          }
-          this.heroOffscreen.set(offscreen);
-        },
+        ([entry]) => this.heroOffscreen.set(!entry.isIntersecting),
         { root, threshold: 0 },
       );
       observer.observe(el);

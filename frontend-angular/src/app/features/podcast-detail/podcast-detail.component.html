@@ -9,6 +9,12 @@
   />
 } @else {
   <article class="pod">
+   <ps-detail-sticky-header
+     [coverUrl]="coverSrc()"
+     [title]="podcast?.title ?? ''"
+     [shown]="heroOffscreen()"
+   />
+
    <!-- Top-of-page filter — same visual slot the list pages put their
         search field in (library / podcasts / playlists). Right-aligned
         so the cover/title hero below stays the page's primary anchor. -->
@@ -39,7 +45,7 @@
      </form>
    </header>
 
-   <section #heroEl class="pod__hero" [class.pod__hero--compact]="heroOffscreen()">
+   <section class="pod__hero">
     <header class="pod__header">
       <!-- Cover is rendered immediately from the route id so the view
            transition coming from the list page has a destination element
@@ -172,24 +178,11 @@
     </header>
    </section>
 
-    <!-- Sentinel: placed AFTER the hero so it only exits the viewport once
-         the user has scrolled past the hero's full natural height. That's
-         the trigger for switching the hero from in-flow (scrolls with the
-         page) to `position: fixed` at the top in compact form. -->
+    <!-- Sentinel: 1 px slice placed right after the hero. An
+         IntersectionObserver watches it against the `.shell__outlet`
+         viewport so the sticky compact header above only fades in
+         once the hero has scrolled fully out of view. -->
     <div #heroSentinel aria-hidden="true" class="pod__sentinel"></div>
-
-    @if (heroOffscreen()) {
-      <!-- Placeholder that reserves the hero's natural-flow space while
-           it's `position: fixed` — otherwise removing the hero from flow
-           would let the items below jump up by ~heroFullHeight px the
-           instant compact mode flips on. The height is captured in the
-           IntersectionObserver callback just before the transition. -->
-      <div
-        class="pod__hero-spacer"
-        aria-hidden="true"
-        [style.height.px]="heroFullHeight()"
-      ></div>
-    }
 
     <header class="pod__section-header">
       <h2 class="pod__section-title">Episodes</h2>

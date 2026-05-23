@@ -15,83 +15,22 @@
 }
 
 .pod__sentinel {
-  // Zero-height slice placed AFTER the sticky hero. An IntersectionObserver
-  // watches it against the .shell__outlet viewport: the sentinel only exits
-  // the viewport once the user has scrolled past the hero's full natural
-  // height (the hero is pinned at top: 0 by then), so the compact transition
-  // happens off-screen and the user never sees the hero resize mid-scroll.
+  // Zero-height slice placed right after the hero. An IntersectionObserver
+  // watches it against the .shell__outlet viewport so the sticky compact
+  // header only fades in once the hero has scrolled fully out of view.
   width: 100%;
   height: 1px;
   margin-top: -1px;
 }
 
 .pod__hero {
-  // Default: in natural flow, scrolls with the page. NOT sticky — that's
-  // the whole point of this layout: the hero scrolls out naturally and
-  // only once it's fully off-screen does the `--compact` modifier kick in
-  // (driven by the IntersectionObserver on `.pod__sentinel` below the
-  // hero), switching the element to `position: fixed` at the top of the
-  // outlet in compact form. A `.pod__hero-spacer` renders at the same
-  // moment to keep the items list anchored — see template.
-
-  // Break out of .pod's centered 80rem column so the hero band spans the
-  // outlet edge to edge (Spotify / Apple Music look). Trick: symmetric
-  // negative margins extend the box by (outlet-width - .pod-width) / 2 on
-  // each side. The --sidenav-width term offsets the viewport correction
-  // so we land on the outlet's edges, not the window's.
-  margin-inline: calc(50% - 50vw + var(--sidenav-width, 0px) / 2);
-
+  // Statically placed in the article flow; scrolls out with the page.
+  // No class change happens on scroll — the sticky compact bar is a
+  // separate `<ps-detail-sticky-header>` element that fades in via
+  // opacity once `heroOffscreen()` is true. Avoiding any layout work
+  // mid-scroll is what keeps iOS Safari momentum smooth on iPad.
   background: transparent;
-  // Block-only padding: horizontal spacing is handled by the inner
-  // .pod__header so its content lines up with the items list below
-  // regardless of the hero's full-bleed background band.
-  padding-block: clamp(1.25rem, 3vw, 2rem);
-  padding-inline: 0;
-}
-
-.pod__hero--compact {
-  // Pin the compact bar to the top of the outlet area. `fixed` (not
-  // sticky) so the bar never participates in the page flow: no shift
-  // when toggling, and it spans edge-to-edge from the sidenav to the
-  // right viewport edge regardless of the page's max-width.
-  position: fixed;
-  top: 0;
-  left: var(--sidenav-width, 0);
-  right: 0;
-  z-index: 5;
-  // Override the negative-margin full-bleed trick — fixed positioning
-  // uses left/right directly, the trick would offset the bar wrongly.
-  margin-inline: 0;
-  padding-block: 0.5rem;
-  padding-inline: 0;
-  background: color-mix(
-    in srgb,
-    color-mix(in srgb, var(--page-tint) 20%, var(--mat-sys-surface)) 60%,
-    transparent
-  );
-  backdrop-filter: blur(20px) saturate(160%);
-  -webkit-backdrop-filter: blur(20px) saturate(160%);
-  // Slide-in animation when the compact bar pops in — replicates the
-  // feel of the previous separate sticky-header component.
-  animation: pod-hero-compact-in 200ms cubic-bezier(0.2, 0, 0, 1) both;
-}
-
-@keyframes pod-hero-compact-in {
-  from {
-    opacity: 0;
-    transform: translateY(-100%);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.pod__hero-spacer {
-  // Width-stretching, height bound inline from the component so the
-  // items list stays anchored when the hero leaves natural flow.
-  width: 100%;
-  flex: 0 0 auto;
+  padding: clamp(1.25rem, 3vw, 2rem);
 }
 
 .pod__section-header {
@@ -132,42 +71,20 @@
 }
 
 .pod__header {
-  // The hero spans the outlet edge to edge; .pod__header re-centers its
-  // content inside the same 80rem column the rest of the article uses,
-  // with matching horizontal padding so cover/title align with the items
-  // list below regardless of the hero's full-bleed background.
-  max-width: 80rem;
-  margin-inline: auto;
-  padding-inline: clamp(1rem, 4vw, 2rem);
-  width: 100%;
-
-  // Flex (not grid) so the meta can release its `flex-grow` factor on
-  // compact transition: the row collapses from "fill the whole 80rem"
-  // to "cover + title content width", and `justify-content: center`
-  // distributes the freed space equally on each side — sliding the
-  // cover + title group toward the page's middle as the user scrolls.
-  // `flex-grow` is a number, so the slide animates smoothly.
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: minmax(0, 200px) minmax(0, 1fr);
   gap: clamp(1rem, 4vw, 2rem);
-  transition: gap 200ms cubic-bezier(0.2, 0, 0, 1);
-}
-
-.pod__hero--compact .pod__header {
-  gap: 0.75rem;
+  align-items: stretch;
 }
 
 @media (max-width: 600px) {
   .pod__header {
-    flex-direction: column;
-    align-items: stretch;
+    grid-template-columns: 1fr;
   }
 }
 
 .pod__cover {
-  flex: 0 0 auto;
-  width: 200px;
+  width: 100%;
   aspect-ratio: 1 / 1;
   object-fit: cover;
   border-radius: 24px;
@@ -178,16 +95,7 @@
   box-shadow:
     var(--mat-sys-level3),
     0 24px 64px -16px color-mix(in srgb, var(--page-accent) 38%, transparent);
-  transition:
-    width 200ms cubic-bezier(0.2, 0, 0, 1),
-    border-radius 200ms cubic-bezier(0.2, 0, 0, 1),
-    box-shadow 400ms cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.pod__hero--compact .pod__cover {
-  width: 48px;
-  border-radius: 10px;
-  box-shadow: var(--mat-sys-level1);
+  transition: box-shadow 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .pod__meta {
@@ -196,14 +104,6 @@
   gap: 0.5rem;
   min-width: 0;
   justify-content: flex-end;
-  // Fills remaining row width in normal mode; releases to content width
-  // in compact (overridden below) so the page's centering kicks in.
-  flex: 1 1 auto;
-  transition: flex-grow 200ms cubic-bezier(0.2, 0, 0, 1);
-}
-
-.pod__hero--compact .pod__meta {
-  flex-grow: 0;
 }
 
 .pod__title {
@@ -211,36 +111,7 @@
   letter-spacing: -0.01em;
   margin: 0;
   color: var(--hero-title-color, var(--mat-sys-on-surface));
-  transition:
-    color 400ms cubic-bezier(0.4, 0, 0.2, 1),
-    font-size 200ms cubic-bezier(0.2, 0, 0, 1);
-}
-
-// Compact mode: title shrinks to a single line bar-style header. We
-// override font-size only (not the `font` shorthand) because shorthand
-// resets all sub-properties at once and can't be transitioned.
-.pod__hero--compact .pod__title {
-  font-size: 1.1rem;
-  font-weight: 500;
-  letter-spacing: 0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  min-width: 0;
-  // Cap the auto-sized meta column so a very long title doesn't push the
-  // centered cover+title group out of the 80rem container.
-  max-width: 40ch;
-}
-
-// Sub/tags/actions disappear in compact mode. `display: none` is abrupt
-// but acceptable — the eye is drawn to the shrinking cover and title;
-// the secondary metadata blinking out is a minor concession in exchange
-// for not having to transition max-height (laggy with variable content
-// height).
-.pod__hero--compact .pod__sub,
-.pod__hero--compact .pod__tags,
-.pod__hero--compact .pod__actions {
-  display: none;
+  transition: color 400ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .pod__sub {
