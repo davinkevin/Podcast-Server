@@ -89,14 +89,6 @@
   margin-top: 0.75rem;
 }
 
-// "Copy RSS" toggles label between "Copy RSS" (~7 chars) and "Copied!"
-// (~7 chars but rendered narrower with proportional fonts). Pin a min-
-// width so the button doesn't reflow when the label swaps after a click
-// — keeps the action bar stable and avoids the neighbouring buttons
-// shifting half a centimetre to the right while "Copied!" is showing.
-.pl__copy-rss {
-  min-width: 9rem;
-}
 
 .pl__more {
   margin-left: auto;

@@ -150,6 +150,44 @@
               </mat-menu>
             </div>
           }
+          @if (podcast.type !== 'upload') {
+            <!-- Split-button mirroring the Update split's pattern:
+                 primary anchor delegates the default `podcast://` feed
+                 to the OS handler; the chevron reveals a "Full RSS"
+                 entry that uses the same URL with `?limit=false` so
+                 podcatchers receive the full archive instead of the
+                 recent slice. Upload-only podcasts have no remote feed
+                 to subscribe to, so the whole split is suppressed. -->
+            <div class="pod__subscribe-split">
+              <a
+                mat-stroked-button
+                class="pod__subscribe-split__main"
+                [href]="subscribeUrl()"
+                rel="noopener"
+              >
+                <mat-icon>rss_feed</mat-icon>
+                Subscribe
+              </a>
+              <button
+                mat-stroked-button
+                class="pod__subscribe-split__chevron"
+                aria-label="More subscribe options"
+                [matMenuTriggerFor]="subscribeMenu"
+              >
+                <mat-icon>expand_more</mat-icon>
+              </button>
+              <mat-menu #subscribeMenu="matMenu">
+                <a
+                  mat-menu-item
+                  [href]="subscribeFullUrl()"
+                  rel="noopener"
+                >
+                  <mat-icon>all_inclusive</mat-icon>
+                  <span>Full RSS</span>
+                </a>
+              </mat-menu>
+            </div>
+          }
           <button mat-stroked-button (click)="onOpenSettings(podcast)">
             <mat-icon>settings</mat-icon>
             Settings
@@ -163,6 +201,14 @@
             <mat-icon>more_vert</mat-icon>
           </button>
           <mat-menu #menu="matMenu">
+            @if (podcast.type !== 'upload') {
+              <!-- Clipboard fallback for desktop browsers without a
+                   registered podcatcher, or for sharing the URL. -->
+              <button mat-menu-item (click)="onCopyRss()">
+                <mat-icon>{{ copyHint() === 'copied' ? 'check' : 'content_copy' }}</mat-icon>
+                <span>{{ copyHint() === 'copied' ? 'Copied!' : 'Copy RSS link' }}</span>
+              </button>
+            }
             <button mat-menu-item (click)="onDelete(podcast)">
               <mat-icon>delete</mat-icon>
               <span>Delete podcast</span>

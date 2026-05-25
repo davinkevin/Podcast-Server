@@ -43,10 +43,20 @@
               <mat-icon>play_arrow</mat-icon>
               Play
             </button>
-            <button mat-stroked-button class="pl__copy-rss" (click)="onCopyRss()">
-              <mat-icon>{{ copyHint() === 'copied' ? 'check' : 'rss_feed' }}</mat-icon>
-              {{ copyHint() === 'copied' ? 'Copied!' : 'Copy RSS' }}
-            </button>
+            <!-- Subscribe via the native `podcast://` URI scheme — opens
+                 the user's default podcatcher (Apple Podcasts, Overcast,
+                 Pocket Casts…) and triggers the subscribe flow directly.
+                 No clipboard hop. As a plain anchor (no target=_blank)
+                 the browser hands off the scheme to the OS handler. -->
+            <a
+              mat-stroked-button
+              class="pl__subscribe"
+              [href]="subscribeUrl()"
+              rel="noopener"
+            >
+              <mat-icon>rss_feed</mat-icon>
+              Subscribe
+            </a>
             <button mat-stroked-button (click)="onOpenSettings(playlist)">
               <mat-icon>settings</mat-icon>
               Settings
@@ -60,6 +70,13 @@
               <mat-icon>more_vert</mat-icon>
             </button>
             <mat-menu #menu="matMenu">
+              <!-- Fallback for desktop browsers without a registered
+                   podcatcher: drops the RSS URL on the clipboard so the
+                   user can paste it wherever. -->
+              <button mat-menu-item (click)="onCopyRss()">
+                <mat-icon>{{ copyHint() === 'copied' ? 'check' : 'content_copy' }}</mat-icon>
+                <span>{{ copyHint() === 'copied' ? 'Copied!' : 'Copy RSS link' }}</span>
+              </button>
               <button mat-menu-item (click)="onDelete(playlist)">
                 <mat-icon>delete</mat-icon>
                 <span>Delete playlist</span>

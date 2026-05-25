@@ -220,6 +220,37 @@
   }
 }
 
+// Subscribe split-button — same construction as the Update split above,
+// applied to mat-stroked-button instead of flat. The chevron reveals a
+// "Full RSS" entry that subscribes to the full archive (?limit=false)
+// instead of the default recent-window feed.
+.pod__subscribe-split {
+  display: inline-flex;
+  align-items: stretch;
+}
+
+.pod__subscribe-split .pod__subscribe-split__main {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  // Drop the right outline so the seam between the two halves doesn't
+  // read as a doubled line; combined with the chevron's `border-left: 0`
+  // below the pair shares one continuous outline.
+  border-right: 0;
+  padding-right: 6px !important;
+}
+
+.pod__subscribe-split .pod__subscribe-split__chevron.pod__subscribe-split__chevron {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 0;
+  min-width: 0 !important;
+  width: 40px !important;
+  padding: 0 !important;
+  ::ng-deep .mdc-button__label {
+    padding-inline: 0 !important;
+  }
+}
+
 .pod__list {
   display: flex;
   flex-direction: column;

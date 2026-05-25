@@ -181,6 +181,28 @@ export default class PodcastDetailComponent {
     this.stream.updatingPodcasts().has(this.idPodcast()),
   );
 
+  // RSS URL exposed by the backend. The same URL drives both the
+  // clipboard fallback and the `podcast://` subscribe handoff.
+  protected readonly rssUrl = computed(
+    () => `${location.origin}/api/v1/podcasts/${this.idPodcast()}/rss`,
+  );
+  // `podcast://` URI scheme — intercepted by the user's default
+  // podcatcher (Apple Podcasts, Overcast, Pocket Casts…) and triggers
+  // the subscribe flow directly. Same host + path as `rssUrl`, just
+  // a scheme swap.
+  protected readonly subscribeUrl = computed(() =>
+    this.rssUrl().replace(/^https?:/, 'podcast:'),
+  );
+  // Full-feed variant — the backend's RSS endpoint defaults to a capped
+  // recent window; appending `?limit=false` returns every episode the
+  // podcast has on file. Surfaced behind the split-button chevron so
+  // power users can subscribe to the complete archive instead of just
+  // the recent slice.
+  protected readonly subscribeFullUrl = computed(
+    () => `${this.subscribeUrl()}?limit=false`,
+  );
+  protected readonly copyHint = signal<'idle' | 'copied'>('idle');
+
   // Local draft mirrors the URL `q` on mount and is the source of truth
   // while the user is typing. Submit pushes it back into the URL.
   protected readonly searchDraft = signal('');
@@ -445,6 +467,19 @@ export default class PodcastDetailComponent {
         onError: () =>
           this.snackbar.open('Could not delete item', 'Dismiss', { duration: 4000 }),
       },
+    );
+  }
+
+  protected onCopyRss() {
+    const url = this.rssUrl();
+    navigator.clipboard.writeText(url).then(
+      () => {
+        this.copyHint.set('copied');
+        this.snackbar.open('RSS URL copied', undefined, { duration: 2500 });
+        setTimeout(() => this.copyHint.set('idle'), 2500);
+      },
+      () =>
+        this.snackbar.open('Could not copy the URL', 'Dismiss', { duration: 4000 }),
     );
   }
 

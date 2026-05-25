@@ -136,6 +136,13 @@ export default class PlaylistDetailComponent {
 
   // RSS URL is built from the path; the same URL is what podcast clients subscribe to.
   protected readonly rssUrl = computed(() => `${location.origin}/api/v1/playlists/${this.idPlaylist()}/rss`);
+  // `podcast://` URI scheme — intercepted by the user's default podcatcher
+  // on iOS / Android / macOS (Apple Podcasts, Overcast, Pocket Casts…)
+  // and triggers a subscribe flow directly. Built by swapping the http(s)
+  // scheme of `rssUrl` so the host + path stay identical.
+  protected readonly subscribeUrl = computed(() =>
+    this.rssUrl().replace(/^https?:/, 'podcast:'),
+  );
 
   protected actionsFor(item: PlaylistItemHAL): readonly CoverCardMenuEntry[] {
     // Same three-section layout as Library and PodcastDetail (Open + Add
