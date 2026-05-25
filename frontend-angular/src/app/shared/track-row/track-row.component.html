@@ -24,10 +24,19 @@
       <button
         mat-icon-button
         class="row__primary"
-        aria-label="Play"
+        [class.row__primary--playing]="playing()"
+        [attr.aria-label]="playing() ? 'Now playing' : 'Play'"
         (click)="onPlay($event)"
       >
-        <mat-icon>play_arrow</mat-icon>
+        @if (playing()) {
+          <span class="row__playing-bars" aria-hidden="true">
+            <span></span>
+            <span></span>
+            <span></span>
+          </span>
+        } @else {
+          <mat-icon>play_arrow</mat-icon>
+        }
       </button>
     } @else if (downloadable()) {
       <button
@@ -52,30 +61,34 @@
       </button>
 
       <mat-menu #menu="matMenu">
-        @for (entry of actions(); track entry.label) {
-          @if (asGroup(entry); as group) {
-            <button mat-menu-item [matMenuTriggerFor]="subMenu">
-              <mat-icon>{{ group.icon }}</mat-icon>
-              <span>{{ group.label }}</span>
-            </button>
+        @for (entry of actions(); track $index) {
+          @if (isDivider(entry)) {
+            <mat-divider />
           } @else {
-            @let a = asAction(entry);
-            @if (a) {
-              @if (a.url) {
-                <a
-                  mat-menu-item
-                  [href]="a.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <mat-icon>{{ a.icon }}</mat-icon>
-                  <span>{{ a.label }}</span>
-                </a>
-              } @else {
-                <button mat-menu-item (click)="onAction(a)">
-                  <mat-icon>{{ a.icon }}</mat-icon>
-                  <span>{{ a.label }}</span>
-                </button>
+            @if (asGroup(entry); as group) {
+              <button mat-menu-item [matMenuTriggerFor]="subMenu">
+                <mat-icon>{{ group.icon }}</mat-icon>
+                <span>{{ group.label }}</span>
+              </button>
+            } @else {
+              @let a = asAction(entry);
+              @if (a) {
+                @if (a.url) {
+                  <a
+                    mat-menu-item
+                    [href]="a.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <mat-icon>{{ a.icon }}</mat-icon>
+                    <span>{{ a.label }}</span>
+                  </a>
+                } @else {
+                  <button mat-menu-item (click)="onAction(a)">
+                    <mat-icon>{{ a.icon }}</mat-icon>
+                    <span>{{ a.label }}</span>
+                  </button>
+                }
               }
             }
           }
@@ -85,7 +98,7 @@
       <!-- Nested submenu — only renders entries when one of the actions is
            a group. At most one group per menu (see CoverCardActionGroup). -->
       <mat-menu #subMenu="matMenu">
-        @for (entry of actions(); track entry.label) {
+        @for (entry of actions(); track $index) {
           @let group = asGroup(entry);
           @if (group) {
             @for (item of group.items; track item.label) {

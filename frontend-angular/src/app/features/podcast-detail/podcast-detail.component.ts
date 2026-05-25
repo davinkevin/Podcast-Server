@@ -25,6 +25,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import {
   CoverCardAction,
   CoverCardMenuEntry,
+  joinSections,
 } from '../../shared/cover-card/cover-card.component';
 import { TrackRowComponent } from '../../shared/track-row/track-row.component';
 import { PagerComponent } from '../../shared/pager/pager.component';
@@ -59,6 +60,26 @@ import { PodcastUploadDialogComponent } from './podcast-upload-dialog.component'
 import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialog.component';
 
 const DEFAULT_PAGE_SIZE = 24;
+const PLAY_NEXT_ACTION: CoverCardAction = {
+  id: 'play-next',
+  label: 'Play next',
+  icon: 'queue_play_next',
+};
+const ADD_TO_QUEUE_ACTION: CoverCardAction = {
+  id: 'add-to-queue',
+  label: 'Add to queue',
+  icon: 'add_to_queue',
+};
+const REMOVE_FROM_QUEUE_ACTION: CoverCardAction = {
+  id: 'remove-from-queue',
+  label: 'Remove from queue',
+  icon: 'playlist_remove',
+};
+const STOP_PLAYING_ACTION: CoverCardAction = {
+  id: 'stop-playing',
+  label: 'Stop playing',
+  icon: 'stop_circle',
+};
 const ADD_TO_PLAYLIST_ACTION: CoverCardAction = {
   id: 'add-to-playlist',
   label: 'Add to playlist',
@@ -114,7 +135,7 @@ export default class PodcastDetailComponent {
   private readonly api = inject(PodcastApi);
   private readonly itemApi = inject(ItemApi);
   private readonly stream = inject(DownloadStreamService);
-  private readonly player = inject(PlayerService);
+  protected readonly player = inject(PlayerService);
   private readonly dialog = inject(MatDialog);
   private readonly snackbar = inject(MatSnackBar);
   private readonly coverColor = inject(CoverColorService);
@@ -243,12 +264,14 @@ export default class PodcastDetailComponent {
   // there's a file on disk to reset, and "Open original" carries the item's
   // remote URL into the menu entry (rendered as an external link).
   protected itemActions(item: ItemHAL): readonly CoverCardMenuEntry[] {
-    const entries: CoverCardMenuEntry[] = [ADD_TO_PLAYLIST_ACTION];
-    // Fold every "open in X" verb together: Source (web) → Downloaded
-    // file → VLC. Only the first is available when the item isn't yet
-    // downloaded, in which case it goes at the top level rather than
-    // hiding behind an "Open" submenu trigger that would only show one
-    // child.
+    // Three semantic sections joined with `MENU_DIVIDER` between non-
+    // empty ones (see joinSections). Order chosen for predictability
+    // across the whole app — Library, PodcastDetail and PlaylistDetail
+    // all follow it:
+    //   1. Open (single entry or submenu) + Add to playlist
+    //   2. Queue affordances, reactive on player signals
+    //   3. Reset (downloaded only) + Delete
+    const header: CoverCardMenuEntry[] = [];
     const openItems: CoverCardAction[] = [
       {
         id: 'open-original',
@@ -267,18 +290,34 @@ export default class PodcastDetailComponent {
       openItems.push(OPEN_IN_VLC_ACTION);
     }
     if (openItems.length === 1) {
-      entries.push(openItems[0]);
+      header.push(openItems[0]);
     } else {
-      entries.push({
+      header.push({
         kind: 'group',
         label: 'Open',
         icon: 'open_in_new',
         items: openItems,
       });
     }
-    if (item.isDownloaded) entries.push(RESET_ITEM_ACTION);
-    entries.push(DELETE_ITEM_ACTION);
-    return entries;
+    header.push(ADD_TO_PLAYLIST_ACTION);
+
+    const queue: CoverCardMenuEntry[] = [];
+    if (item.isDownloaded) {
+      const isCurrent = this.player.currentItem()?.id === item.id;
+      if (isCurrent) {
+        queue.push(STOP_PLAYING_ACTION);
+      } else if (this.player.isQueued(item.id)) {
+        queue.push(REMOVE_FROM_QUEUE_ACTION);
+      } else {
+        queue.push(PLAY_NEXT_ACTION, ADD_TO_QUEUE_ACTION);
+      }
+    }
+
+    const danger: CoverCardMenuEntry[] = [];
+    if (item.isDownloaded) danger.push(RESET_ITEM_ACTION);
+    danger.push(DELETE_ITEM_ACTION);
+
+    return joinSections(header, queue, danger);
   }
 
   protected subtitleFor(item: ItemHAL): string {
@@ -344,6 +383,21 @@ export default class PodcastDetailComponent {
 
   protected onItemAction(item: ItemHAL, action: CoverCardAction) {
     switch (action.id) {
+      case PLAY_NEXT_ACTION.id:
+        this.player.playNext(item);
+        this.snackbar.open('Will play next', undefined, { duration: 2000 });
+        break;
+      case ADD_TO_QUEUE_ACTION.id:
+        this.player.enqueue(item);
+        this.snackbar.open('Added to queue', undefined, { duration: 2000 });
+        break;
+      case REMOVE_FROM_QUEUE_ACTION.id:
+        this.player.dequeue(item.id);
+        this.snackbar.open('Removed from queue', undefined, { duration: 2000 });
+        break;
+      case STOP_PLAYING_ACTION.id:
+        this.player.close();
+        break;
       case ADD_TO_PLAYLIST_ACTION.id:
         this.dialog.open(AddToPlaylistDialogComponent, {
           data: { itemId: item.id, itemTitle: item.title },

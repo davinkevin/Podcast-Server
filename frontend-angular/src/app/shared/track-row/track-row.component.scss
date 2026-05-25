@@ -88,3 +88,47 @@
   align-items: center;
   gap: 0.25rem;
 }
+
+// Three-bar "music playing" animation that replaces the play_arrow icon
+// when this row represents the floating player's current item. Sized to
+// fit Material's 24px icon slot.
+.row__playing-bars {
+  display: inline-flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 2px;
+  height: 18px;
+  width: 18px;
+  color: var(--mat-sys-primary);
+
+  > span {
+    display: block;
+    width: 3px;
+    background: currentColor;
+    border-radius: 2px;
+    transform-origin: bottom;
+    animation: row-playing-bar 900ms ease-in-out infinite;
+  }
+  > span:nth-child(1) {
+    height: 10px;
+    animation-delay: 0ms;
+  }
+  > span:nth-child(2) {
+    height: 18px;
+    animation-delay: 150ms;
+  }
+  > span:nth-child(3) {
+    height: 8px;
+    animation-delay: 300ms;
+  }
+}
+
+@keyframes row-playing-bar {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}

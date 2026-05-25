@@ -68,6 +68,7 @@
             [coverUrl]="coverUrl(item)"
             [playable]="item.isDownloaded"
             [downloadable]="!item.isDownloaded && !isInProgress(item)"
+            [playing]="player.currentItem()?.id === item.id"
             [actions]="actionsFor(item)"
             [viewTransitionName]="'library-item-cover-' + item.id"
             (play)="onPlay(item)"

@@ -1,6 +1,7 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatRippleModule } from '@angular/material/core';
 
@@ -29,12 +30,51 @@ export interface CoverCardActionGroup {
   readonly items: readonly CoverCardAction[];
 }
 
-export type CoverCardMenuEntry = CoverCardAction | CoverCardActionGroup;
+/** Visual hairline rendered between two groups of menu entries. Carries
+ *  no behaviour — purely a structural marker for the templates. */
+export interface CoverCardDivider {
+  readonly kind: 'divider';
+}
+
+/** Shared singleton for the structural divider — every component that
+ *  builds an action list can splice this in without re-declaring a
+ *  literal object each time. */
+export const MENU_DIVIDER: CoverCardDivider = { kind: 'divider' };
+
+/**
+ * Concatenate menu sections into a single flat list, inserting
+ * `MENU_DIVIDER` between consecutive non-empty sections. Empty sections
+ * are skipped — they don't yield a divider on either side. The intent
+ * is to keep callers declarative ("here are my three semantic groups")
+ * without having to repeat the bookkeeping for dangling dividers.
+ */
+export function joinSections(
+  ...sections: readonly (readonly CoverCardMenuEntry[])[]
+): readonly CoverCardMenuEntry[] {
+  const out: CoverCardMenuEntry[] = [];
+  for (const section of sections) {
+    if (section.length === 0) continue;
+    if (out.length > 0) out.push(MENU_DIVIDER);
+    out.push(...section);
+  }
+  return out;
+}
+
+export type CoverCardMenuEntry =
+  | CoverCardAction
+  | CoverCardActionGroup
+  | CoverCardDivider;
 
 @Component({
   selector: 'ps-cover-card',
   standalone: true,
-  imports: [MatIconModule, MatButtonModule, MatMenuModule, MatRippleModule],
+  imports: [
+    MatIconModule,
+    MatButtonModule,
+    MatDividerModule,
+    MatMenuModule,
+    MatRippleModule,
+  ],
   templateUrl: './cover-card.component.html',
   styleUrl: './cover-card.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -49,6 +89,10 @@ export class CoverCardComponent {
   readonly actions = input<readonly CoverCardMenuEntry[]>([]);
   readonly playable = input<boolean>(true);
   readonly downloadable = input<boolean>(false);
+  /** Set when this card represents the floating player's current item.
+   *  Replaces the play icon on the FAB with an animated "music playing"
+   *  indicator so the user can spot the active card at a glance. */
+  readonly playing = input<boolean>(false);
   /** When set, used as `view-transition-name` on the cover image so a
    *  matching element on the destination route (Apple-Music-style cover
    *  morph). Must be unique across all cards on screen at any time. */
@@ -87,10 +131,18 @@ export class CoverCardComponent {
   }
 
   protected asAction(entry: CoverCardMenuEntry): CoverCardAction | null {
-    return isGroup(entry) ? null : entry;
+    return isGroup(entry) || isDivider(entry) ? null : entry;
+  }
+
+  protected isDivider(entry: CoverCardMenuEntry): boolean {
+    return isDivider(entry);
   }
 }
 
 function isGroup(entry: CoverCardMenuEntry): entry is CoverCardActionGroup {
   return 'kind' in entry && entry.kind === 'group';
+}
+
+function isDivider(entry: CoverCardMenuEntry): entry is CoverCardDivider {
+  return 'kind' in entry && entry.kind === 'divider';
 }

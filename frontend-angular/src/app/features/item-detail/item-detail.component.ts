@@ -18,6 +18,7 @@ import { Title } from '@angular/platform-browser';
 import { DatePipe } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -51,6 +52,7 @@ import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialo
     DatePipe,
     MatIconModule,
     MatButtonModule,
+    MatDividerModule,
     MatMenuModule,
     MatProgressSpinnerModule,
     StatusBadgeComponent,
@@ -89,7 +91,7 @@ export default class ItemDetailComponent {
 
   private readonly itemApi = inject(ItemApi);
   private readonly playlistApi = inject(PlaylistApi);
-  private readonly player = inject(PlayerService);
+  protected readonly player = inject(PlayerService);
   private readonly stream = inject(DownloadStreamService);
   private readonly router = inject(Router);
   private readonly title = inject(Title);
@@ -260,6 +262,25 @@ export default class ItemDetailComponent {
       }
     }
     this.player.open(item);
+  }
+
+  protected onPlayNext(item: ItemHAL) {
+    this.player.playNext(item);
+    this.snackbar.open('Will play next', undefined, { duration: 2000 });
+  }
+
+  protected onAddToQueue(item: ItemHAL) {
+    this.player.enqueue(item);
+    this.snackbar.open('Added to queue', undefined, { duration: 2000 });
+  }
+
+  protected onRemoveFromQueue(item: ItemHAL) {
+    this.player.dequeue(item.id);
+    this.snackbar.open('Removed from queue', undefined, { duration: 2000 });
+  }
+
+  protected onStopPlaying() {
+    this.player.close();
   }
 
   protected onDownload(item: ItemHAL) {

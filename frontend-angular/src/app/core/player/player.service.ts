@@ -96,6 +96,63 @@ export class PlayerService {
     this.current.set(item);
   }
 
+  /**
+   * Insert `item` right after the currently-playing entry so it plays
+   * immediately when the current one finishes. If the player is closed
+   * (nothing playing), just start the item — same effect with one less
+   * step for the user. No-op if the item is already in the queue (the
+   * UI exposes a "Remove from queue" action instead).
+   */
+  playNext(item: Playable) {
+    if (!this.isOpen()) {
+      this.open(item);
+      return;
+    }
+    if (this.isQueued(item.id)) return;
+    const q = [...this.queueState()];
+    q.splice(this.indexState() + 1, 0, item);
+    this.queueState.set(q);
+  }
+
+  /**
+   * Append `item` to the end of the queue. Falls back to `open` when
+   * nothing is playing so the user always gets immediate feedback.
+   * No-op if the item is already in the queue.
+   */
+  enqueue(item: Playable) {
+    if (!this.isOpen()) {
+      this.open(item);
+      return;
+    }
+    if (this.isQueued(item.id)) return;
+    this.queueState.update((q) => [...q, item]);
+  }
+
+  /**
+   * Remove an item from the queue. No-op when the item isn't queued or
+   * when it's the currently-playing one — for that case the user should
+   * call `close()` or skip with `next()`/`prev()`. If the removed item
+   * sits BEFORE `currentIndex`, the index is decremented so the current
+   * entry keeps playing rather than the queue snapping forward.
+   */
+  dequeue(id: string) {
+    const q = this.queueState();
+    const idx = q.findIndex((i) => i.id === id);
+    if (idx < 0) return;
+    const currentIdx = this.indexState();
+    if (idx === currentIdx) return;
+    this.queueState.set(q.slice(0, idx).concat(q.slice(idx + 1)));
+    if (idx < currentIdx) {
+      this.indexState.set(currentIdx - 1);
+    }
+  }
+
+  /** True when an item with this id is somewhere in the current queue
+   *  (including the currently-playing entry). */
+  isQueued(id: string): boolean {
+    return this.queueState().some((i) => i.id === id);
+  }
+
   close() {
     this.current.set(undefined);
     this.queueState.set([]);

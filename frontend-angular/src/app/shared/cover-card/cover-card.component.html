@@ -11,29 +11,42 @@
     <ng-content select="[coverBadge]" />
   </div>
 
-  <div class="cover__overlay">
-    @if (playable()) {
-      <button
-        mat-fab
-        color="primary"
-        class="cover__primary"
-        aria-label="Play"
-        (click)="onPlay($event)"
-      >
+  <!-- Play / Download FAB lives OUTSIDE the hover overlay so it stays
+       visible at rest. When this card is the player's current item, the
+       play icon is replaced by a three-bar "music playing" animation —
+       same FAB shape, just a different glyph. -->
+  @if (playable()) {
+    <button
+      mat-fab
+      color="primary"
+      class="cover__primary"
+      [class.cover__primary--playing]="playing()"
+      [attr.aria-label]="playing() ? 'Now playing' : 'Play'"
+      (click)="onPlay($event)"
+    >
+      @if (playing()) {
+        <span class="cover__playing-bars" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
+      } @else {
         <mat-icon>play_arrow</mat-icon>
-      </button>
-    } @else if (downloadable()) {
-      <button
-        mat-fab
-        color="primary"
-        class="cover__primary"
-        aria-label="Download"
-        (click)="onDownload($event)"
-      >
-        <mat-icon>download</mat-icon>
-      </button>
-    }
+      }
+    </button>
+  } @else if (downloadable()) {
+    <button
+      mat-fab
+      color="primary"
+      class="cover__primary"
+      aria-label="Download"
+      (click)="onDownload($event)"
+    >
+      <mat-icon>download</mat-icon>
+    </button>
+  }
 
+  <div class="cover__overlay">
     @if (actions().length > 0) {
       <button
         mat-icon-button
@@ -46,30 +59,34 @@
       </button>
 
       <mat-menu #menu="matMenu">
-        @for (entry of actions(); track entry.label) {
-          @if (asGroup(entry); as group) {
-            <button mat-menu-item [matMenuTriggerFor]="subMenu">
-              <mat-icon>{{ group.icon }}</mat-icon>
-              <span>{{ group.label }}</span>
-            </button>
+        @for (entry of actions(); track $index) {
+          @if (isDivider(entry)) {
+            <mat-divider />
           } @else {
-            @let a = asAction(entry);
-            @if (a) {
-              @if (a.url) {
-                <a
-                  mat-menu-item
-                  [href]="a.url"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <mat-icon>{{ a.icon }}</mat-icon>
-                  <span>{{ a.label }}</span>
-                </a>
-              } @else {
-                <button mat-menu-item (click)="onAction(a)">
-                  <mat-icon>{{ a.icon }}</mat-icon>
-                  <span>{{ a.label }}</span>
-                </button>
+            @if (asGroup(entry); as group) {
+              <button mat-menu-item [matMenuTriggerFor]="subMenu">
+                <mat-icon>{{ group.icon }}</mat-icon>
+                <span>{{ group.label }}</span>
+              </button>
+            } @else {
+              @let a = asAction(entry);
+              @if (a) {
+                @if (a.url) {
+                  <a
+                    mat-menu-item
+                    [href]="a.url"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    <mat-icon>{{ a.icon }}</mat-icon>
+                    <span>{{ a.label }}</span>
+                  </a>
+                } @else {
+                  <button mat-menu-item (click)="onAction(a)">
+                    <mat-icon>{{ a.icon }}</mat-icon>
+                    <span>{{ a.label }}</span>
+                  </button>
+                }
               }
             }
           }
@@ -79,7 +96,7 @@
       <!-- Nested submenu — only renders entries when one of the actions is
            a group. At most one group per menu (see CoverCardActionGroup). -->
       <mat-menu #subMenu="matMenu">
-        @for (entry of actions(); track entry.label) {
+        @for (entry of actions(); track $index) {
           @let group = asGroup(entry);
           @if (group) {
             @for (item of group.items; track item.label) {

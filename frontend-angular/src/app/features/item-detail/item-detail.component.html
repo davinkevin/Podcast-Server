@@ -131,15 +131,15 @@
           <mat-icon>more_vert</mat-icon>
         </button>
         <mat-menu #moreMenu="matMenu">
+          <!-- Section 1: Open + Add to playlist. Open is always the first
+               entry — single "Open original URL" link if the file isn't
+               downloaded, "Open" submenu otherwise. -->
           @if (item.isDownloaded) {
             <button mat-menu-item [matMenuTriggerFor]="openMenu">
               <mat-icon>open_in_new</mat-icon>
               <span>Open</span>
             </button>
           } @else {
-            <!-- Not downloaded: only "Open original URL" makes sense, so
-                 surface it at the top level instead of behind an "Open"
-                 submenu trigger that would only ever show one child. -->
             <a
               mat-menu-item
               [href]="item.url"
@@ -150,12 +150,47 @@
               <span>Open original URL</span>
             </a>
           }
-          @if (inPlaylist) {
-            <button mat-menu-item (click)="onAddToPlaylist(item)">
-              <mat-icon>playlist_add</mat-icon>
-              <span>Add to another playlist</span>
-            </button>
+          <button mat-menu-item (click)="onAddToPlaylist(item)">
+            <mat-icon>playlist_add</mat-icon>
+            <span>{{ inPlaylist ? 'Add to another playlist' : 'Add to playlist' }}</span>
+          </button>
+
+          <!-- Section 2: queue affordances, reactive on `player` signals.
+               Downloaded items always get at least one entry — Stop
+               playing when this item is current, Remove from queue when
+               already queued, Play next + Add to queue otherwise — so
+               the menu keeps two dividers and a consistent shape across
+               states. Non-downloaded items have nothing to queue, so
+               the whole section (and its leading divider) drops. -->
+          @let isCurrentItem = player.currentItem()?.id === item.id;
+          @if (item.isDownloaded) {
+            <mat-divider />
+            @if (isCurrentItem) {
+              <button mat-menu-item (click)="onStopPlaying()">
+                <mat-icon>stop_circle</mat-icon>
+                <span>Stop playing</span>
+              </button>
+            } @else if (player.isQueued(item.id)) {
+              <button mat-menu-item (click)="onRemoveFromQueue(item)">
+                <mat-icon>playlist_remove</mat-icon>
+                <span>Remove from queue</span>
+              </button>
+            } @else {
+              <button mat-menu-item (click)="onPlayNext(item)">
+                <mat-icon>queue_play_next</mat-icon>
+                <span>Play next</span>
+              </button>
+              <button mat-menu-item (click)="onAddToQueue(item)">
+                <mat-icon>add_to_queue</mat-icon>
+                <span>Add to queue</span>
+              </button>
+            }
           }
+
+          <!-- Section 3: destructive actions. Always trailed by a divider
+               so they read as a separate cluster regardless of what the
+               middle section looked like. -->
+          <mat-divider />
           @if (item.isDownloaded) {
             <button mat-menu-item (click)="onReset(item)">
               <mat-icon>restart_alt</mat-icon>

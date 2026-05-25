@@ -1,12 +1,14 @@
 import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatRippleModule } from '@angular/material/core';
 
 import {
   CoverCardAction,
   CoverCardActionGroup,
+  CoverCardDivider,
   CoverCardMenuEntry,
 } from '../cover-card/cover-card.component';
 
@@ -22,7 +24,13 @@ import {
 @Component({
   selector: 'ps-track-row',
   standalone: true,
-  imports: [MatIconModule, MatButtonModule, MatMenuModule, MatRippleModule],
+  imports: [
+    MatIconModule,
+    MatButtonModule,
+    MatDividerModule,
+    MatMenuModule,
+    MatRippleModule,
+  ],
   templateUrl: './track-row.component.html',
   styleUrl: './track-row.component.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -43,6 +51,10 @@ export class TrackRowComponent {
   readonly actions = input<readonly CoverCardMenuEntry[]>([]);
   readonly playable = input<boolean>(true);
   readonly downloadable = input<boolean>(false);
+  /** Set when this row represents the floating player's current item.
+   *  Replaces the play icon with the animated "music playing" bars so
+   *  the active row stands out in long lists. */
+  readonly playing = input<boolean>(false);
   readonly viewTransitionName = input<string | undefined>(undefined);
 
   readonly play = output<void>();
@@ -75,10 +87,18 @@ export class TrackRowComponent {
   }
 
   protected asAction(entry: CoverCardMenuEntry): CoverCardAction | null {
-    return isGroup(entry) ? null : entry;
+    return isGroup(entry) || isDivider(entry) ? null : entry;
+  }
+
+  protected isDivider(entry: CoverCardMenuEntry): boolean {
+    return isDivider(entry);
   }
 }
 
 function isGroup(entry: CoverCardMenuEntry): entry is CoverCardActionGroup {
   return 'kind' in entry && entry.kind === 'group';
+}
+
+function isDivider(entry: CoverCardMenuEntry): entry is CoverCardDivider {
+  return 'kind' in entry && entry.kind === 'divider';
 }

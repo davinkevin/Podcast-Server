@@ -14,11 +14,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 import {
   CoverCardAction,
   CoverCardComponent,
   CoverCardMenuEntry,
+  joinSections,
 } from '../../shared/cover-card/cover-card.component';
 import { PagerComponent } from '../../shared/pager/pager.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
@@ -38,10 +40,40 @@ import {
 import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialog.component';
 
 const DEFAULT_PAGE_SIZE = 24;
+const PLAY_NEXT_ACTION: CoverCardAction = {
+  id: 'play-next',
+  label: 'Play next',
+  icon: 'queue_play_next',
+};
+const ADD_TO_QUEUE_ACTION: CoverCardAction = {
+  id: 'add-to-queue',
+  label: 'Add to queue',
+  icon: 'add_to_queue',
+};
+const REMOVE_FROM_QUEUE_ACTION: CoverCardAction = {
+  id: 'remove-from-queue',
+  label: 'Remove from queue',
+  icon: 'playlist_remove',
+};
+const STOP_PLAYING_ACTION: CoverCardAction = {
+  id: 'stop-playing',
+  label: 'Stop playing',
+  icon: 'stop_circle',
+};
 const ADD_TO_PLAYLIST_ACTION: CoverCardAction = {
   id: 'add-to-playlist',
   label: 'Add to playlist',
   icon: 'playlist_add',
+};
+const RESET_ITEM_ACTION: CoverCardAction = {
+  id: 'reset-item',
+  label: 'Reset',
+  icon: 'restart_alt',
+};
+const DELETE_ITEM_ACTION: CoverCardAction = {
+  id: 'delete-item',
+  label: 'Delete',
+  icon: 'delete',
 };
 
 @Component({
@@ -77,15 +109,24 @@ export default class LibraryComponent {
   private readonly router = inject(Router);
   private readonly itemApi = inject(ItemApi);
   private readonly stream = inject(DownloadStreamService);
-  private readonly player = inject(PlayerService);
+  protected readonly player = inject(PlayerService);
   private readonly dialog = inject(MatDialog);
+  private readonly snackbar = inject(MatSnackBar);
+  private readonly resetItemMutation = this.itemApi.resetMutation();
+  private readonly deleteItemMutation = this.itemApi.deleteMutation();
   private readonly navOrigin = inject(NavigationOriginService);
   private readonly vlc = inject(VlcService);
 
   protected actionsFor(item: ItemHAL): readonly CoverCardMenuEntry[] {
-    const entries: CoverCardMenuEntry[] = [ADD_TO_PLAYLIST_ACTION];
-    // Source URL always available when the item has one, the downloaded
-    // variants only when the proxy URL is backed by a file on disk.
+    // Menu is laid out as three sections, joined by `MENU_DIVIDER` only
+    // between non-empty ones so we never end up with a dangling line:
+    //   1. Open (single entry or submenu) + Add to playlist
+    //   2. Queue: Play next / Add to queue / Remove from queue
+    //      (reactive on `player` signals; absent for the currently-
+    //      playing item or for items the player can't reach because
+    //      they're not yet downloaded)
+    //   3. Reset (downloaded only) + Delete
+    const header: CoverCardMenuEntry[] = [];
     const openItems: CoverCardAction[] = [];
     if (item.url) {
       openItems.push({
@@ -104,20 +145,35 @@ export default class LibraryComponent {
       });
       openItems.push(OPEN_IN_VLC_ACTION);
     }
-    // Single option (typical when the item isn't downloaded yet — only
-    // "Open original URL" is available) goes directly at the top level;
-    // wrapping it in an "Open" submenu would just add an extra click.
     if (openItems.length === 1) {
-      entries.push(openItems[0]);
+      header.push(openItems[0]);
     } else if (openItems.length > 1) {
-      entries.push({
+      header.push({
         kind: 'group',
         label: 'Open',
         icon: 'open_in_new',
         items: openItems,
       });
     }
-    return entries;
+    header.push(ADD_TO_PLAYLIST_ACTION);
+
+    const queue: CoverCardMenuEntry[] = [];
+    if (item.isDownloaded) {
+      const isCurrent = this.player.currentItem()?.id === item.id;
+      if (isCurrent) {
+        queue.push(STOP_PLAYING_ACTION);
+      } else if (this.player.isQueued(item.id)) {
+        queue.push(REMOVE_FROM_QUEUE_ACTION);
+      } else {
+        queue.push(PLAY_NEXT_ACTION, ADD_TO_QUEUE_ACTION);
+      }
+    }
+
+    const danger: CoverCardMenuEntry[] = [];
+    if (item.isDownloaded) danger.push(RESET_ITEM_ACTION);
+    danger.push(DELETE_ITEM_ACTION);
+
+    return joinSections(header, queue, danger);
   }
 
   protected readonly searchDraft = signal('');
@@ -194,6 +250,21 @@ export default class LibraryComponent {
 
   protected onAction(item: ItemHAL, action: CoverCardAction) {
     switch (action.id) {
+      case PLAY_NEXT_ACTION.id:
+        this.player.playNext(item);
+        this.snackbar.open('Will play next', undefined, { duration: 2000 });
+        break;
+      case ADD_TO_QUEUE_ACTION.id:
+        this.player.enqueue(item);
+        this.snackbar.open('Added to queue', undefined, { duration: 2000 });
+        break;
+      case REMOVE_FROM_QUEUE_ACTION.id:
+        this.player.dequeue(item.id);
+        this.snackbar.open('Removed from queue', undefined, { duration: 2000 });
+        break;
+      case STOP_PLAYING_ACTION.id:
+        this.player.close();
+        break;
       case ADD_TO_PLAYLIST_ACTION.id:
         this.dialog.open(AddToPlaylistDialogComponent, {
           data: { itemId: item.id, itemTitle: item.title, podcastId: item.podcastId },
@@ -204,6 +275,41 @@ export default class LibraryComponent {
       case OPEN_IN_VLC_ACTION.id:
         this.vlc.openInVlc(item.proxyURL);
         break;
+      case RESET_ITEM_ACTION.id:
+        this.onResetItem(item);
+        break;
+      case DELETE_ITEM_ACTION.id:
+        this.onDeleteItem(item);
+        break;
     }
+  }
+
+  private onResetItem(item: ItemHAL) {
+    this.resetItemMutation.mutate(
+      { podcastId: item.podcastId, itemId: item.id },
+      {
+        onSuccess: () => {
+          this.player.closeIf(item.id);
+          this.snackbar.open('Item reset', undefined, { duration: 2500 });
+        },
+        onError: () =>
+          this.snackbar.open('Could not reset item', 'Dismiss', { duration: 4000 }),
+      },
+    );
+  }
+
+  private onDeleteItem(item: ItemHAL) {
+    if (!confirm(`Delete "${item.title}"?`)) return;
+    this.deleteItemMutation.mutate(
+      { podcastId: item.podcastId, itemId: item.id },
+      {
+        onSuccess: () => {
+          this.player.closeIf(item.id);
+          this.snackbar.open('Item deleted', undefined, { duration: 2500 });
+        },
+        onError: () =>
+          this.snackbar.open('Could not delete item', 'Dismiss', { duration: 4000 }),
+      },
+    );
   }
 }
