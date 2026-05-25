@@ -98,6 +98,97 @@ export class PagerComponent {
     }
   }
 
+  // Horizontal swipe → page navigation (touch devices). Tracked at the
+  // document level so the user can swipe anywhere on the page, not only
+  // on the pager itself. Convention matches Instagram / Tinder: swipe
+  // left = next page, swipe right = previous. Same `first()`/`last()`
+  // guards as keyboard so we never wrap.
+  //
+  // Detection: a swipe is `|deltaX| > SWIPE_DISTANCE` AND `duration <
+  // SWIPE_MAX_DURATION` AND `|deltaX| > |deltaY| * SWIPE_HV_RATIO` so a
+  // mostly-vertical scroll never accidentally paginates.
+  private touchStart?: { readonly x: number; readonly y: number; readonly t: number };
+
+  @HostListener('document:touchstart', ['$event'])
+  protected onTouchStart(event: TouchEvent) {
+    // Reset on every event so multi-touch / pinch / cancelled drags
+    // don't leak into the next single-finger swipe.
+    this.touchStart = undefined;
+    if (event.touches.length !== 1) return;
+    if (!this.host.nativeElement.isConnected) return;
+    if (this.isOverlayOpen()) return;
+    if (this.isEditableTarget(event.target)) return;
+    if (this.startedInHorizontalScroller(event.target as HTMLElement | null)) return;
+    const t = event.touches[0];
+    this.touchStart = { x: t.clientX, y: t.clientY, t: event.timeStamp };
+  }
+
+  @HostListener('document:touchcancel')
+  protected onTouchCancel() {
+    this.touchStart = undefined;
+  }
+
+  @HostListener('document:touchend', ['$event'])
+  protected onTouchEnd(event: TouchEvent) {
+    const start = this.touchStart;
+    this.touchStart = undefined;
+    if (!start) return;
+    if (!this.host.nativeElement.isConnected) return;
+    if (event.changedTouches.length === 0) return;
+    const end = event.changedTouches[0];
+    const dx = end.clientX - start.x;
+    const dy = end.clientY - start.y;
+    const duration = event.timeStamp - start.t;
+
+    const SWIPE_DISTANCE = 80; // px — anything less reads as a tap or hesitant drag
+    const SWIPE_MAX_DURATION = 500; // ms — beyond that the gesture isn't a swipe any more
+    const SWIPE_HV_RATIO = 1.5; // horizontal must dominate vertical by this factor
+
+    if (Math.abs(dx) < SWIPE_DISTANCE) return;
+    if (duration > SWIPE_MAX_DURATION) return;
+    if (Math.abs(dx) < Math.abs(dy) * SWIPE_HV_RATIO) return;
+
+    if (dx < 0 && !this.last()) {
+      this.navigateTo(this.nextQuery());
+    } else if (dx > 0 && !this.first()) {
+      this.navigateTo(this.prevQuery());
+    }
+  }
+
+  private isEditableTarget(target: EventTarget | null): boolean {
+    const el = target as HTMLElement | null;
+    if (!el) return false;
+    return (
+      el.tagName === 'INPUT' ||
+      el.tagName === 'TEXTAREA' ||
+      el.tagName === 'SELECT' ||
+      el.isContentEditable
+    );
+  }
+
+  // Walks up from `target` looking for a horizontally-scrollable
+  // ancestor (chip rows, embedded carousels). When one is found the
+  // touch belongs to that element's scroll, not to pagination.
+  private startedInHorizontalScroller(target: HTMLElement | null): boolean {
+    let el = target;
+    while (el && el !== document.body) {
+      if (el.scrollWidth > el.clientWidth) {
+        const overflowX = getComputedStyle(el).overflowX;
+        if (overflowX === 'auto' || overflowX === 'scroll') return true;
+      }
+      el = el.parentElement;
+    }
+    return false;
+  }
+
+  // True when a CDK overlay is currently attached (mat-dialog,
+  // mat-menu, mat-bottom-sheet…). Swipes inside those should belong
+  // to the overlay's own logic — or simply not paginate the page
+  // sitting behind.
+  private isOverlayOpen(): boolean {
+    return document.querySelector('.cdk-overlay-container .cdk-overlay-pane') !== null;
+  }
+
   private navigateTo(query: { readonly page: number }) {
     this.router.navigate([], {
       relativeTo: this.route,
