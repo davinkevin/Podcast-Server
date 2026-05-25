@@ -247,6 +247,18 @@ export default class ItemDetailComponent {
   }
 
   protected onPlay(item: ItemHAL) {
+    // In playlist mode, queue every playable item from the playlist and
+    // start at the current one — the floating player then auto-advances
+    // through the rest via the native `ended` event. In podcast mode we
+    // open a single-item queue, same effective behaviour as before.
+    const playlist = this.playlistQuery.data();
+    if (playlist) {
+      const startIndex = playlist.items.findIndex((i) => i.id === item.id);
+      if (startIndex >= 0) {
+        this.player.playFromList(playlist.items, startIndex);
+        return;
+      }
+    }
     this.player.open(item);
   }
 

@@ -13,6 +13,7 @@ import { Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -63,6 +64,7 @@ const REMOVE_ACTION: CoverCardAction = {
     MatIconModule,
     MatButtonModule,
     MatMenuModule,
+    MatTooltipModule,
     MatProgressSpinnerModule,
     TrackRowComponent,
     EmptyStateComponent,
@@ -222,32 +224,30 @@ export default class PlaylistDetailComponent {
     // Template gates Play behind `item.isDownloaded`, but be defensive: an
     // SSE event could land between render and click flipping the state.
     if (!item.isDownloaded) return;
-    // PlayerService.open expects the full ItemHAL shape; the playlist HAL
-    // carries less, so we adapt it here. `status: 'FINISH'` mirrors what
-    // the backend would return for a downloaded item.
-    this.player.open({
-      id: item.id,
-      title: item.title,
-      url: item.proxyURL,
-      pubDate: null,
-      downloadDate: null,
-      creationDate: '',
-      description: item.description ?? '',
-      mimeType: item.mimeType,
-      length: null,
-      fileName: null,
-      status: 'FINISH',
-      podcast: { id: item.podcast.id, title: item.podcast.title, url: '' },
-      cover: {
-        id: item.cover.id,
-        width: item.cover.width,
-        height: item.cover.height,
-        url: item.cover.url,
-      },
-      isDownloaded: true,
-      podcastId: item.podcast.id,
-      proxyURL: item.proxyURL,
-    });
+    // Queue the whole playlist starting at the clicked item — the floating
+    // player then auto-advances through the rest via `(ended)`. The player
+    // service accepts the playlist's narrower `Playable` shape directly,
+    // no adapter required.
+    const items = this.playlistQuery.data()?.items ?? [item];
+    const start = items.findIndex((i) => i.id === item.id);
+    this.player.playFromList(items, start >= 0 ? start : 0);
+  }
+
+  // True when at least one item in the playlist is actually playable
+  // (i.e. downloaded). Drives the disabled state of the header `Play`
+  // button so the user can't kick off a queue with nothing to play.
+  protected readonly hasPlayableItems = computed(() =>
+    (this.playlistQuery.data()?.items ?? []).some((i) => i.isDownloaded),
+  );
+
+  protected onPlayAll() {
+    const items = this.playlistQuery.data()?.items ?? [];
+    // Start at the first downloaded item — `playFromList` itself would
+    // skip leading non-downloaded ones, but starting on a known-playable
+    // index makes the intent explicit and avoids a wasted no-op.
+    const start = items.findIndex((i) => i.isDownloaded);
+    if (start < 0) return;
+    this.player.playFromList(items, start);
   }
 
   protected onDownload(item: PlaylistItemHAL) {

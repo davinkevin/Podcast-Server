@@ -172,4 +172,94 @@ input[type='search']::-webkit-search-cancel-button {
   }
 }
 
+// Player queue popover — opened from the floating-player's `queue_music`
+// button. Wider than the default menu and scroll-capped so a long
+// playlist doesn't overflow off-screen. Each row is two lines (title +
+// podcast) flanked by either the item's cover thumbnail or a "now
+// playing" indicator on the active row.
+.mat-mdc-menu-panel.player-queue-menu {
+  width: min(360px, 92vw);
+  max-width: min(360px, 92vw);
+  max-height: 70vh;
+}
 
+.player-queue-menu .queue__row.mat-mdc-menu-item {
+  // Override the global menu-item height — the rows here are taller to
+  // fit a cover thumbnail + two text lines without truncation pressure.
+  min-height: 56px;
+  padding-inline: 8px;
+
+  .mat-mdc-menu-item-text {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+  }
+}
+
+.player-queue-menu .queue__leader {
+  flex: 0 0 auto;
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.player-queue-menu .queue__cover {
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  display: block;
+}
+
+.player-queue-menu .queue__leader-icon {
+  color: var(--mat-sys-primary);
+}
+
+.player-queue-menu .queue__meta {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  // Override mat-mdc-menu-item-text's default styles inherited by children.
+  text-align: start;
+}
+
+.player-queue-menu .queue__title {
+  font: var(--mat-sys-body-medium);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.player-queue-menu .queue__sub {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+// Active row: solid primary-container background so it stands out in the
+// scrollable list. The hover override from the global menu rule still
+// applies for keyboard/pointer interaction on top.
+.player-queue-menu .queue__row--active.mat-mdc-menu-item {
+  background-color: color-mix(in srgb, var(--mat-sys-primary) 18%, transparent);
+  .queue__title {
+    color: var(--mat-sys-primary);
+    font-weight: 600;
+  }
+}
+
+// Already-played rows: dim them so the eye is drawn to the upcoming
+// items below the now-playing position.
+.player-queue-menu .queue__row--past:not(.queue__row--active) {
+  opacity: 0.55;
+}

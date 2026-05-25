@@ -33,9 +33,19 @@
           </p>
 
           <div class="pl__actions" [style]="actionStyles()">
-            <button mat-flat-button color="primary" (click)="onCopyRss()">
+            <button
+              mat-flat-button
+              color="primary"
+              [disabled]="!hasPlayableItems()"
+              [matTooltip]="hasPlayableItems() ? '' : 'No downloaded episodes to play'"
+              (click)="onPlayAll()"
+            >
+              <mat-icon>play_arrow</mat-icon>
+              Play
+            </button>
+            <button mat-stroked-button class="pl__copy-rss" (click)="onCopyRss()">
               <mat-icon>{{ copyHint() === 'copied' ? 'check' : 'rss_feed' }}</mat-icon>
-              {{ copyHint() === 'copied' ? 'Copied!' : 'Copy RSS link' }}
+              {{ copyHint() === 'copied' ? 'Copied!' : 'Copy RSS' }}
             </button>
             <button mat-stroked-button (click)="onOpenSettings(playlist)">
               <mat-icon>settings</mat-icon>

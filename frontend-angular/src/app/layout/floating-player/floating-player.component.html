@@ -12,6 +12,7 @@
           [src]="item.proxyURL"
           controls
           autoplay
+          (ended)="player.next()"
         ></video>
       </div>
     }
@@ -27,10 +28,42 @@
       </div>
 
       @if (!player.isVideo()) {
-        <audio class="player__audio" [src]="item.proxyURL" controls autoplay></audio>
+        <audio
+          class="player__audio"
+          [src]="item.proxyURL"
+          controls
+          autoplay
+          (ended)="player.next()"
+        ></audio>
       }
 
       <div class="player__controls">
+        <!-- Queue navigation — always present so the player controls cluster
+             stays stable across solo / playlist playback. Prev and next are
+             disabled at queue edges (and on solo playback, where the queue
+             is a single-element list, both stay disabled). The queue
+             popover always shows at least the current item. -->
+        <button
+          mat-icon-button
+          type="button"
+          aria-label="Previous in queue"
+          matTooltip="Previous"
+          [disabled]="!player.hasPrev()"
+          (click)="player.prev()"
+        >
+          <mat-icon>skip_previous</mat-icon>
+        </button>
+        <button
+          mat-icon-button
+          type="button"
+          aria-label="Next in queue"
+          matTooltip="Next"
+          [disabled]="!player.hasNext()"
+          (click)="player.next()"
+        >
+          <mat-icon>skip_next</mat-icon>
+        </button>
+        <ps-player-queue-button />
         <button
           mat-icon-button
           type="button"
