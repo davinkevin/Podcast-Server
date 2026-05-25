@@ -165,6 +165,41 @@
         </p>
       </div>
     </header>
+
+    <!-- Deployed-build identity. Pulls Spring Actuator's `/actuator/info`
+         which exposes git branch + short commit id + build time (and
+         optionally the tag if the deployed commit is tagged). The short
+         commit id is a hyperlink to the matching GitLab commit so the
+         user can jump straight to the code that's actually running. -->
+    @let info = buildInfoQuery.data();
+    @if (info; as i) {
+      <dl class="card__about">
+        <div class="card__about-row">
+          <dt>Branch</dt>
+          <dd>{{ i.git.branch }}</dd>
+        </div>
+        @if (i.git.tags; as tags) {
+          <div class="card__about-row">
+            <dt>Tag</dt>
+            <dd>{{ tags }}</dd>
+          </div>
+        }
+        <div class="card__about-row">
+          <dt>Commit</dt>
+          <dd>
+            <a
+              [href]="'https://gitlab.com/davinkevin/Podcast-Server/-/commit/' + i.git.commit.id"
+              target="_blank"
+              rel="noopener noreferrer"
+              >{{ i.git.commit.id }}</a
+            >
+            <span class="card__about-time">·</span>
+            <span class="card__about-time">{{ i.git.commit.time | date: 'medium' }}</span>
+          </dd>
+        </div>
+      </dl>
+    }
+
     <div class="card__actions">
       <a
         mat-stroked-button

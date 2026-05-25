@@ -67,3 +67,60 @@
 .card__limit {
   width: 14rem;
 }
+
+// Build-info description list inside the About card — branch / tag /
+// commit rows aligned in a 2-column layout. The label column gets a
+// fixed minimum so values line up visually across rows; on narrow
+// screens the row flips to stacked.
+.card__about {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin: 0;
+  padding: 0.75rem 1rem;
+  border-radius: 16px;
+  background: var(--mat-sys-surface-container);
+  font: var(--mat-sys-body-medium);
+}
+
+.card__about-row {
+  display: grid;
+  grid-template-columns: minmax(5rem, max-content) 1fr;
+  align-items: baseline;
+  gap: 1rem;
+
+  dt {
+    color: var(--mat-sys-on-surface-variant);
+    font: var(--mat-sys-label-medium);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  dd {
+    margin: 0;
+    color: var(--mat-sys-on-surface);
+    font-family: var(--mat-sys-typeface-plain);
+    word-break: break-all;
+
+    a {
+      color: var(--mat-sys-primary);
+      text-decoration: none;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+.card__about-time {
+  color: var(--mat-sys-on-surface-variant);
+  margin-inline: 0.4rem;
+  font: var(--mat-sys-body-small);
+}
+
+@media (max-width: 480px) {
+  .card__about-row {
+    grid-template-columns: 1fr;
+    gap: 0.125rem;
+  }
+}

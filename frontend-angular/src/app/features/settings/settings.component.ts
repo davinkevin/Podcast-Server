@@ -6,6 +6,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
@@ -18,6 +19,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { DownloadApi } from '../../core/api/download.api';
 import { ItemApi } from '../../core/api/item.api';
 import { CoverApi } from '../../core/api/cover.api';
+import { BuildInfoApi } from '../../core/api/build-info.api';
 import {
   SettingsService,
   ThemePreference,
@@ -30,6 +32,7 @@ const COVERS_DEFAULT_DAYS = 365;
   selector: 'ps-settings',
   standalone: true,
   imports: [
+    DatePipe,
     FormsModule,
     MatIconModule,
     MatButtonModule,
@@ -46,9 +49,11 @@ export default class SettingsComponent {
   private readonly downloads = inject(DownloadApi);
   private readonly items = inject(ItemApi);
   private readonly covers = inject(CoverApi);
+  private readonly buildInfoApi = inject(BuildInfoApi);
   private readonly settings = inject(SettingsService);
   private readonly snackbar = inject(MatSnackBar);
   protected readonly limitQuery = this.downloads.limit();
+  protected readonly buildInfoQuery = this.buildInfoApi.info();
   private readonly updateLimitMutation = this.downloads.updateLimitMutation();
   private readonly cleanItemsMutation = this.items.cleanupMutation();
   private readonly cleanCoversMutation = this.covers.cleanupMutation();

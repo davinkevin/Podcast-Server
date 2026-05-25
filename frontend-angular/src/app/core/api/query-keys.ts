@@ -43,4 +43,5 @@ export const queryKeys = {
     all: ['tags'] as const,
     search: (name: string) => ['tags', 'search', name] as const,
   },
+  buildInfo: ['build-info'] as const,
 } as const;
