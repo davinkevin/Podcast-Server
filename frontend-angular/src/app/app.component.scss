@@ -30,7 +30,14 @@
 
 .shell__outlet {
   flex: 1;
-  overflow: auto;
+  // Vertical scroll inside the outlet (where the page-tint gradient
+  // belongs). Horizontal axis is hard-clamped so a stray overflow on
+  // any child (a long title, an off-by-one margin trick, a
+  // position: fixed element with a wide shadow…) doesn't turn the
+  // whole document into a horizontally-scrollable surface on iOS
+  // Safari, which is otherwise eager to rubber-band any overflow.
+  overflow-x: hidden;
+  overflow-y: auto;
   // Reserve room for the floating-player mini bar (80px) plus a small gap.
   padding-bottom: 96px;
   // Per-route tint: route components set --page-tint (vibrant top) and

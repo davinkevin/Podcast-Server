@@ -61,6 +61,12 @@ html,
 body {
   height: 100%;
   margin: 0;
+  // Belt + suspenders against horizontal overflow on iOS Safari:
+  // even if a layer below decides to overflow, the document itself
+  // never goes wider than the viewport, so the whole UI never
+  // becomes horizontally-scrollable. The shell outlet already
+  // clamps its own axis — this is the document-level fallback.
+  overflow-x: hidden;
 }
 
 body {
