@@ -37,6 +37,36 @@ dependencies {
     compileOnly("org.postgresql:postgresql")
 }
 
+abstract class GenerateFlywayExpectedVersion : DefaultTask() {
+
+    @get:InputFiles
+    @get:PathSensitive(PathSensitivity.RELATIVE)
+    abstract val migrations: ConfigurableFileCollection
+
+    @get:OutputFile
+    abstract val outputFile: RegularFileProperty
+
+    @TaskAction
+    fun generate() {
+        val versionRegex = Regex("""^V(\d+)__.*\.sql$""")
+        val highest = migrations.files
+            .mapNotNull { versionRegex.matchEntire(it.name)?.groupValues?.get(1)?.toInt() }
+            .maxOrNull()
+            ?: error("No Flyway migration found in src/main/migrations")
+
+        outputFile.get().asFile.writeText("flyway.expected.version=$highest\n")
+    }
+}
+
+val generateFlywayExpectedVersion = tasks.register<GenerateFlywayExpectedVersion>("generateFlywayExpectedVersion") {
+    migrations.from(layout.projectDirectory.dir("src/main/migrations").asFileTree.matching { include("V*.sql") })
+    outputFile.set(layout.buildDirectory.file("generated/resources/flyway-expected/flyway-expected.properties"))
+}
+
+sourceSets.main {
+    resources.srcDir(generateFlywayExpectedVersion.map { it.outputFile.get().asFile.parentFile })
+}
+
 jooq {
     version = dependencyManagement.importedProperties["jooq.version"]
     edition = OSS

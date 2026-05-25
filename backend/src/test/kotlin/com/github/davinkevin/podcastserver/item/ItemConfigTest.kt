@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.item
 
+import com.github.davinkevin.podcastserver.config.health.database.DatabaseReadyEvent
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.podcast.PodcastRepository
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
@@ -13,7 +14,6 @@ import org.mockito.kotlin.doNothing
 import org.mockito.kotlin.mock
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
-import org.springframework.boot.CommandLineRunner
 import org.springframework.boot.context.annotation.UserConfigurations
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.context.annotation.Bean
@@ -29,19 +29,17 @@ class ItemConfigTest {
         .withConfiguration(UserConfigurations.of(ItemDependencyMockConfig::class.java, ItemConfig::class.java))
 
     @Test
-    fun `should trigger a reset of all item with a downloading status (started or paused) `() {
+    fun `should trigger a reset of all item with a downloading status (started or paused) on DatabaseReadyEvent`() {
         /* Given */
         /* When */
         contextRunner
             /* Then */
             .withConfiguration(UserConfigurations.of(MockForResetAtStartupConfig::class.java))
             .run {
-                assertThat(it).hasSingleBean(CommandLineRunner::class.java)
+                assertThat(it).hasSingleBean(OnDatabaseReadyItemCleaner::class.java)
 
                 val repo = it.getBean(ItemRepository::class.java)
-                val clr = it.getBean(CommandLineRunner::class.java)
-                clr.run()
-
+                it.publishEvent(DatabaseReadyEvent(this))
 
                 verify(repo).resetItemWithDownloadingState()
             }

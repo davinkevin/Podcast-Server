@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.download
 
+import com.github.davinkevin.podcastserver.config.health.database.DatabaseReadyEvent
 import com.github.davinkevin.podcastserver.download.downloaders.DownloaderSelector
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
@@ -8,10 +9,12 @@ import org.jooq.DSLContext
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
+import org.mockito.kotlin.verify
 import org.springframework.beans.factory.getBean
 import org.springframework.boot.autoconfigure.AutoConfigurations
 import org.springframework.boot.test.context.runner.ApplicationContextRunner
 import org.springframework.context.annotation.Bean
+import org.springframework.context.annotation.Primary
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 
 /**
@@ -56,6 +59,23 @@ class DownloadConfigTest {
     }
 
     @Test
+    fun `should reset downloading items on DatabaseReadyEvent`() {
+        /* Given */
+        /* When */
+        contextRunner
+            .withConfiguration(AutoConfigurations.of(MockDownloadRepoConfig::class.java))
+            .run {
+                /* Then */
+                assertThat(it).hasSingleBean(OnDatabaseReadyDownloadCleaner::class.java)
+
+                val repo = it.getBean<DownloadRepository>()
+                it.publishEvent(DatabaseReadyEvent(this))
+
+                verify(repo).resetToWaitingStateAllDownloadingItems()
+            }
+    }
+
+    @Test
     fun `should generate a thread pool executor`() {
         /* Given */
 
@@ -77,4 +97,8 @@ private class LocalTestConfiguration {
         on { concurrentDownload } doReturn 123
     }
     @Bean fun downloaderSelector(): DownloaderSelector = mock()
+}
+
+private class MockDownloadRepoConfig {
+    @Bean @Primary fun mockDownloadRepository(): DownloadRepository = mock()
 }

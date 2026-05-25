@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.config
 
+import com.github.davinkevin.podcastserver.config.health.HealthConfig
 import com.github.davinkevin.podcastserver.cover.CoverConfig
 import com.github.davinkevin.podcastserver.download.DownloadConfig
 import com.github.davinkevin.podcastserver.find.FindConfig
@@ -32,7 +33,8 @@ import java.nio.file.Paths
         TagConfig::class,
         CoverConfig::class,
         PlaylistConfig::class,
-        DownloadConfig::class
+        DownloadConfig::class,
+        HealthConfig::class,
 )
 class BeanConfigScan {
     @Bean

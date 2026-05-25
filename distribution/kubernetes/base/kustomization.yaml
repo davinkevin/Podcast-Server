@@ -3,6 +3,7 @@ kind: Kustomization
 
 resources:
   - backend.yaml
+  - init-db.yaml
   - ui-v1.yaml
   - ui-v3.yaml
 

@@ -25,7 +25,7 @@ management:
    show-details: always
    group:
     liveness.include:  ["db", "ping"]
-    readiness.include: ["ping"]
+    readiness.include: ["ping", "flywayMigration"]
  endpoints:
   web:
    exposure:

@@ -38,29 +38,6 @@ spec:
         module: backend
         serving: "true"
     spec:
-      initContainers:
-        - name: init-db
-          image: podcastserver/init-db
-          env:
-            - name: DATABASE_NAME
-              valueFrom:
-                configMapKeyRef:
-                  name: database
-                  key: name
-            - name: DATABASE_SERVICE_NAME
-              value: database
-            - name: FLYWAY_URL
-              value: jdbc:postgresql://$(DATABASE_SERVICE_NAME):5432/$(DATABASE_NAME)
-            - name: FLYWAY_USER
-              valueFrom:
-                configMapKeyRef:
-                  name: database
-                  key: username
-            - name: FLYWAY_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: database
-                  key: password
       containers:
         - name: app
           image: podcastserver/backend
@@ -72,18 +49,6 @@ spec:
                   key: name
             - name: DATABASE_SERVICE_NAME
               value: database
-            - name: SPRING_R2DBC_URL
-              value: r2dbc:postgresql://$(DATABASE_SERVICE_NAME):5432/$(DATABASE_NAME)
-            - name: SPRING_R2DBC_USERNAME
-              valueFrom:
-                configMapKeyRef:
-                  name: database
-                  key: username
-            - name: SPRING_R2DBC_PASSWORD
-              valueFrom:
-                secretKeyRef:
-                  name: database
-                  key: password
             - name: SPRING_DATASOURCE_URL
               value: jdbc:postgresql://$(DATABASE_SERVICE_NAME):5432/$(DATABASE_NAME)
             - name: SPRING_DATASOURCE_USERNAME
@@ -150,16 +115,18 @@ spec:
             - name: http-port
               containerPort: 8080
               protocol: TCP
-#          livenessProbe:
-#            failureThreshold: 10
-#            timeoutSeconds: 6
-#            httpGet:
-#              path: /actuator/health/liveness
-#              port: 8080
-#          readinessProbe:
-#            httpGet:
-#              path: /actuator/health/readiness
-#              port: 8080
+          livenessProbe:
+            failureThreshold: 10
+            timeoutSeconds: 6
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8080
+          readinessProbe:
+            failureThreshold: 60
+            periodSeconds: 5
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8080
 ---
 apiVersion: batch/v1
 kind: CronJob
