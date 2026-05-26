@@ -1,6 +1,0 @@
-
-* xref:introduction.adoc[Introduction]
-
-* *Installation*
-
-** xref:installation/kubernetes.adoc[on kubernetes]
