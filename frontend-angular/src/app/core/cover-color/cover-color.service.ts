@@ -25,13 +25,21 @@ function toCoverSwatch(s: Swatch | null | undefined): CoverSwatch | null {
 
 // CSS variables driven by the cover palette. Used across the shell and the
 // detail pages — kept here so route components stay declarative.
+//
+// `--hero-title-color` / `--hero-body-color` were intentionally dropped:
+// Vibrant.titleTextColor is calibrated for text sitting on the *raw*
+// swatch (e.g. white on solid bright pink). Our hero has
+// `background: transparent` and the page tint is folded into the shell
+// at 38 % opacity (see app.component.scss), so the actual background
+// behind the title is pale-pink-over-surface, not the raw swatch — white
+// text becomes invisible in light theme. The SCSS fallbacks
+// `--mat-sys-on-surface` / `--mat-sys-on-surface-variant` give the right
+// contrast in both themes.
 const TINT_VARS = [
   '--page-tint',
   '--page-tint-bottom',
   '--page-accent',
   '--page-on-accent',
-  '--hero-title-color',
-  '--hero-body-color',
 ] as const;
 
 export function applyCoverTint(
@@ -55,8 +63,6 @@ export function applyCoverTint(
   set(root, '--page-tint-bottom', bottom?.hex);
   set(root, '--page-accent', accent?.hex);
   set(root, '--page-on-accent', accent?.titleText);
-  set(root, '--hero-title-color', top?.titleText);
-  set(root, '--hero-body-color', top?.bodyText);
 }
 
 export function clearCoverTint(): void {
