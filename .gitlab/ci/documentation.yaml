@@ -1,0 +1,34 @@
+include:
+  - local: .gitlab/ci/utils.yaml
+
+# Build the VitePress site on any documentation change.
+# Acts as a CI validation gate on feature branches and produces the
+# artifact the `pages` job consumes on the default branch.
+👷 documentation:
+  stage: 👷‍ build
+  needs: []
+  extends: [ .only-on-documentation-changes ]
+  image: node:22-alpine
+  script:
+    - cd documentation
+    - npm ci
+    - npm run docs:build
+  artifacts:
+    paths:
+      - documentation/.vitepress/dist/
+
+# Publish to GitLab Pages on the default branch only.
+# Serves the site at https://davinkevin.gitlab.io/Podcast-Server/
+pages:
+  stage: 🚀 deploy
+  needs: [ "👷 documentation" ]
+  image: alpine:latest
+  rules:
+    - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
+      changes:
+        - documentation/**/*
+  script:
+    - mv documentation/.vitepress/dist public
+  artifacts:
+    paths:
+      - public/

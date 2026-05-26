@@ -1,6 +1,7 @@
 include:
   - local: .gitlab/ci/container-analysis.yaml
   - local: .gitlab/ci/gradle-build-tool.yaml
+  - local: .gitlab/ci/documentation.yaml
 
 workflow:
   rules:
@@ -19,6 +20,7 @@ stages:
   - 🐳 packaging
   - 🧪 test
   - 🔎 Security Analysis
+  - 🚀 deploy
 
 ⬇ backend:
   stage: ⬇ download
@@ -224,17 +226,6 @@ stages:
         - .gradle_home/caches
         - frontend-angular/.gradle
         - frontend-angular/node_modules/
-
-👷 documentation:
-  stage: 👷‍ build
-  needs: []
-  extends: [ .only-on-documentation-changes ]
-  image: antora/antora
-  script:
-    - antora generate documentation/documentation.yml --to-dir documentation/dist
-  artifacts:
-    paths:
-      - documentation/dist/
 
 🐳 backend:
   stage: 🐳 packaging
