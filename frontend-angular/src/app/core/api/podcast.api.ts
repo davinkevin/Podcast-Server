@@ -38,6 +38,18 @@ export class PodcastApi {
     }));
   }
 
+  // Imperative warm-up of the list cache from outside a component (e.g. the
+  // command palette service). Returns immediately if the cache is fresh,
+  // otherwise kicks off the fetch and resolves when it lands. No subscription
+  // is created — readers using `list()` pick the cached data up reactively.
+  prefetchList() {
+    return this.queryClient.prefetchQuery({
+      queryKey: queryKeys.podcasts.list(),
+      queryFn: () =>
+        lastValueFrom(this.http.get<PodcastsContainerHAL>('/api/v1/podcasts')),
+    });
+  }
+
   getById(id: Signal<string | undefined>) {
     return injectQuery(() => {
       const v = id();

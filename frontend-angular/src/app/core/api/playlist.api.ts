@@ -28,6 +28,20 @@ export class PlaylistApi {
     }));
   }
 
+  // Imperative warm-up of the list cache from outside a component (e.g. the
+  // command palette service). Returns immediately if the cache is fresh,
+  // otherwise kicks off the fetch and resolves when it lands. No subscription
+  // is created — readers using `list()` pick the cached data up reactively.
+  prefetchList() {
+    return this.queryClient.prefetchQuery({
+      queryKey: queryKeys.playlists.list(),
+      queryFn: () =>
+        lastValueFrom(
+          this.http.get<PlaylistsContainerHAL>('/api/v1/playlists'),
+        ),
+    });
+  }
+
   getById(id: Signal<string | undefined>) {
     return injectQuery(() => {
       const v = id();
