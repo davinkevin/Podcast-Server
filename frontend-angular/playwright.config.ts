@@ -19,7 +19,7 @@ export default defineConfig({
   ],
   webServer: {
     command: `npx ng serve --port=${PORT} --proxy-config proxy.conf.json`,
-    url: `${BASE_URL}/v3/`,
+    url: `${BASE_URL}/`,
     reuseExistingServer: !process.env["CI"],
     timeout: 120_000,
   },

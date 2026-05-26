@@ -32,7 +32,7 @@
               "base": "dist",
               "browser": ""
             },
-            "baseHref": "/v3/",
+            "baseHref": "/",
             "index": "src/index.html",
             "browser": "src/main.ts",
             "polyfills": [],

@@ -4,15 +4,6 @@ metadata:
   name: frontend
 spec:
   rules:
-    - matches:
-        - path:
-            value: "/v3"
-      backendRefs:
-        - name: ui-v3
-          port: 8080
-    - matches:
-        - path:
-            value: "/"
-      backendRefs:
-        - name: ui-v1
+    - backendRefs:
+        - name: ui
           port: 8080
