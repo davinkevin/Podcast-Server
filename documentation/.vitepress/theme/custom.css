@@ -12,3 +12,45 @@
     0 1px 2px rgba(0, 0, 0, 0.4),
     0 8px 24px rgba(0, 0, 0, 0.4);
 }
+
+/* Sponsor row on the landing — uniform white "chip" behind each logo so
+   sponsor assets (which ship in inconsistent variants — light vs dark
+   bg, with vs without transparency) all read cleanly on both themes. */
+.sponsors {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 2rem;
+  margin: 2rem 0 1rem;
+}
+
+.sponsors a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 320px;
+  height: 150px;
+  padding: 1.25rem 2.5rem;
+  /* White tile so logos designed for light backgrounds stay legible on
+     both themes — flat, no elevation/shadow. */
+  background: #ffffff;
+  border-radius: 8px;
+}
+
+/* `!important` so neither `.vp-doc img` nor the more-specific
+   `.dark .vp-doc img` screenshot elevation leaks onto sponsor logos. */
+.sponsors a img {
+  max-height: 100px;
+  max-width: 100%;
+  width: auto;
+  border-radius: 0;
+  box-shadow: none !important;
+}
+
+/* YourKit's artwork has a lot of internal padding, so it reads small at
+   the shared height — bump it up to balance the row. */
+.sponsors a img.sponsor-yourkit {
+  max-height: 128px;
+}
+

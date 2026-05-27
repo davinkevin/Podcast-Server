@@ -40,6 +40,12 @@ features:
 
 ## See it in action
 
+### Spotlight
+
+The home you land on — a curated Spotlight of fresh episodes (day / week / month) and a personalised "New for you" shelf.
+
+![Spotlight landing page with a featured carousel and a "New for you" grid](/screenshots/spotlight.webp)
+
 ### Library
 
 Browse every downloaded episode in one place — covers, source, instant filter.
@@ -75,3 +81,19 @@ Group episodes across podcasts into custom listens.
 Press <kbd>⌘K</kbd> (or <kbd>Ctrl</kbd>+<kbd>K</kbd>) anywhere to jump to a page, open a podcast, trigger an update.
 
 ![Command palette open over an episode view](/screenshots/palette.webp)
+
+## Supported by
+
+Podcast-Server is built with open-source licenses generously provided by:
+
+<div class="sponsors">
+  <a href="https://www.jetbrains.com/" target="_blank" rel="noopener" aria-label="JetBrains">
+    <img src="/sponsors/jetbrains.svg" alt="JetBrains">
+  </a>
+  <a href="https://www.yourkit.com/" target="_blank" rel="noopener" aria-label="YourKit">
+    <img class="sponsor-yourkit" src="/sponsors/yourkit.png" alt="YourKit">
+  </a>
+  <a href="https://gradle.com/develocity/" target="_blank" rel="noopener" aria-label="Develocity">
+    <img src="/sponsors/develocity.svg" alt="Develocity">
+  </a>
+</div>
