@@ -152,17 +152,18 @@
           }
           @if (podcast.type !== 'upload') {
             <!-- Split-button mirroring the Update split's pattern:
-                 primary anchor delegates the default `podcast://` feed
-                 to the OS handler; the chevron reveals a "Full RSS"
-                 entry that uses the same URL with `?limit=false` so
-                 podcatchers receive the full archive instead of the
-                 recent slice. Upload-only podcasts have no remote feed
-                 to subscribe to, so the whole split is suppressed. -->
+                 primary anchor opens the standard `https://` RSS feed;
+                 the chevron reveals a "Full RSS" entry that uses the
+                 same URL with `?limit=false` so subscribers receive the
+                 full archive instead of the recent slice. Upload-only
+                 podcasts have no remote feed to subscribe to, so the
+                 whole split is suppressed. -->
             <div class="pod__subscribe-split">
               <a
                 mat-stroked-button
                 class="pod__subscribe-split__main"
                 [href]="subscribeUrl()"
+                target="_blank"
                 rel="noopener"
               >
                 <mat-icon>rss_feed</mat-icon>
@@ -180,6 +181,7 @@
                 <a
                   mat-menu-item
                   [href]="subscribeFullUrl()"
+                  target="_blank"
                   rel="noopener"
                 >
                   <mat-icon>all_inclusive</mat-icon>

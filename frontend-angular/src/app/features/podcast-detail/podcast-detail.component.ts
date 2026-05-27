@@ -182,17 +182,16 @@ export default class PodcastDetailComponent {
   );
 
   // RSS URL exposed by the backend. The same URL drives both the
-  // clipboard fallback and the `podcast://` subscribe handoff.
+  // clipboard fallback and the subscribe link. Derived from
+  // `location.origin`, so it carries the current scheme + host.
   protected readonly rssUrl = computed(
     () => `${location.origin}/api/v1/podcasts/${this.idPodcast()}/rss`,
   );
-  // `podcast://` URI scheme — intercepted by the user's default
-  // podcatcher (Apple Podcasts, Overcast, Pocket Casts…) and triggers
-  // the subscribe flow directly. Same host + path as `rssUrl`, just
-  // a scheme swap.
-  protected readonly subscribeUrl = computed(() =>
-    this.rssUrl().replace(/^https?:/, 'podcast:'),
-  );
+  // Standard `https://` (or `http://` in dev) feed URL the Subscribe
+  // button points at — same value as `rssUrl`, kept under a dedicated
+  // name so the template intent stays clear and the full-feed variant
+  // below can build on it.
+  protected readonly subscribeUrl = this.rssUrl;
   // Full-feed variant — the backend's RSS endpoint defaults to a capped
   // recent window; appending `?limit=false` returns every episode the
   // podcast has on file. Surfaced behind the split-button chevron so

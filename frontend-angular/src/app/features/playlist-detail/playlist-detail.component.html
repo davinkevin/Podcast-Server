@@ -43,15 +43,15 @@
               <mat-icon>play_arrow</mat-icon>
               Play
             </button>
-            <!-- Subscribe via the native `podcast://` URI scheme — opens
-                 the user's default podcatcher (Apple Podcasts, Overcast,
-                 Pocket Casts…) and triggers the subscribe flow directly.
-                 No clipboard hop. As a plain anchor (no target=_blank)
-                 the browser hands off the scheme to the OS handler. -->
+            <!-- Subscribe via the standard `https://` RSS feed URL —
+                 opens the feed in a new tab so the user can hand it to
+                 their podcatcher. The "Copy RSS link" action in the
+                 overflow menu copies the same URL. -->
             <a
               mat-stroked-button
               class="pl__subscribe"
               [href]="subscribeUrl()"
+              target="_blank"
               rel="noopener"
             >
               <mat-icon>rss_feed</mat-icon>
