@@ -96,4 +96,7 @@ Podcast-Server is built with open-source licenses generously provided by:
   <a href="https://gradle.com/develocity/" target="_blank" rel="noopener" aria-label="Develocity">
     <img src="/sponsors/develocity.svg" alt="Develocity">
   </a>
+  <a href="https://about.gitlab.com/" target="_blank" rel="noopener" aria-label="GitLab">
+    <img src="/sponsors/gitlab.svg" alt="GitLab">
+  </a>
 </div>
