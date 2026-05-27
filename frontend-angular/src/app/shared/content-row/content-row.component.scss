@@ -1,0 +1,105 @@
+:host {
+  display: block;
+}
+
+.row__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+  // Pull the controls in line with the track's inner padding.
+  padding: 0 4px;
+}
+
+.row__heading {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+}
+
+.row__artwork {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex: 0 0 auto;
+  box-shadow: var(--mat-sys-level1);
+}
+
+.row__titles {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+
+.row__title-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.row__title {
+  font: var(--mat-sys-title-medium);
+  margin: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row__badge {
+  flex: 0 0 auto;
+  font: var(--mat-sys-label-small);
+  color: var(--mat-sys-on-secondary-container);
+  background: var(--mat-sys-secondary-container);
+  border-radius: 999px;
+  padding: 2px 8px;
+  line-height: 1.4;
+}
+
+.row__subtitle {
+  font: var(--mat-sys-body-small);
+  color: var(--mat-sys-on-surface-variant);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.row__controls {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  flex: 0 0 auto;
+}
+
+.row__track {
+  display: flex;
+  gap: 1.25rem;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  // Breathing room so card hover lift / shadows aren't clipped.
+  padding: 4px;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+// Each projected card gets a fixed track width; cover-card is fluid by
+// default (it fills a grid cell), so constrain it here.
+.row__track ::ng-deep > ps-cover-card {
+  flex: 0 0 168px;
+  width: 168px;
+  scroll-snap-align: start;
+}
+
+@media (min-width: 1100px) {
+  .row__track ::ng-deep > ps-cover-card {
+    flex-basis: 188px;
+    width: 188px;
+  }
+}

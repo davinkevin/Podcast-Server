@@ -234,9 +234,16 @@ export class CommandPaletteComponent implements AfterViewInit {
     const items: CommandItem[] = [
       {
         section: 'Navigation',
+        label: 'Spotlight',
+        icon: 'auto_awesome',
+        keywords: ['home', 'landing', 'digest', 'fresh', 'new', 'discover', 'recent'],
+        run: () => this.go(['/']),
+      },
+      {
+        section: 'Navigation',
         label: 'Library',
         icon: 'library_music',
-        keywords: ['items', 'episodes', 'home'],
+        keywords: ['items', 'episodes', 'all'],
         run: () => this.go(['/library']),
       },
       {

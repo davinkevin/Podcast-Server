@@ -1,0 +1,46 @@
+<header class="row__header">
+  <div class="row__heading">
+    @if (artworkUrl(); as art) {
+      <img class="row__artwork" [src]="art" alt="" loading="lazy" />
+    }
+    <div class="row__titles">
+      <div class="row__title-line">
+        <h2 class="row__title" [title]="title()">{{ title() }}</h2>
+        @if (badge(); as b) {
+          <span class="row__badge">{{ b }}</span>
+        }
+      </div>
+      @if (subtitle(); as s) {
+        <span class="row__subtitle">{{ s }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="row__controls">
+    @if (seeAllLink(); as link) {
+      <a mat-button class="row__see-all" [routerLink]="link">See all</a>
+    }
+    <button
+      mat-icon-button
+      type="button"
+      aria-label="Scroll left"
+      [disabled]="!canScrollLeft()"
+      (click)="page(-1)"
+    >
+      <mat-icon>chevron_left</mat-icon>
+    </button>
+    <button
+      mat-icon-button
+      type="button"
+      aria-label="Scroll right"
+      [disabled]="!canScrollRight()"
+      (click)="page(1)"
+    >
+      <mat-icon>chevron_right</mat-icon>
+    </button>
+  </div>
+</header>
+
+<div #track class="row__track" (scroll)="onScroll()">
+  <ng-content />
+</div>

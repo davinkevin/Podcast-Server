@@ -230,7 +230,7 @@ data class ItemHAL(
     data class Podcast(val id: UUID, val title: String, val url: String?)
 }
 
-private fun Item.toHAL(): ItemHAL {
+internal fun Item.toHAL(): ItemHAL {
 
     val extension = cover.url.extension().ifBlank { "jpg" }
 

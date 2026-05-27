@@ -21,9 +21,13 @@ interface NavLink {
   readonly label: string;
   readonly icon: string;
   readonly path: string;
+  /** Match the route exactly for active styling — needed for the root `/`
+   *  link, which would otherwise stay highlighted on every child route. */
+  readonly exact?: boolean;
 }
 
 const TOP_LINKS: readonly NavLink[] = [
+  { label: 'Spotlight', icon: 'auto_awesome', path: '/', exact: true },
   { label: 'Library', icon: 'library_music', path: '/library' },
   { label: 'Podcasts', icon: 'podcasts', path: '/podcasts' },
   { label: 'Playlists', icon: 'playlist_play', path: '/playlists' },

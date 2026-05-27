@@ -38,6 +38,11 @@ export const queryKeys = {
     all: ['downloads'] as const,
     limit: () => ['downloads', 'limit'] as const,
   },
+  digest: {
+    all: ['digest'] as const,
+    within: (within: string, maxItemsPerPodcast: number) =>
+      ['digest', within, maxItemsPerPodcast] as const,
+  },
   types: ['podcast-types'] as const,
   tags: {
     all: ['tags'] as const,

@@ -97,11 +97,19 @@ export class CoverCardComponent {
    *  matching element on the destination route (Apple-Music-style cover
    *  morph). Must be unique across all cards on screen at any time. */
   readonly viewTransitionName = input<string | undefined>(undefined);
+  /** When set, a small artwork "chip" of the parent (e.g. the podcast a
+   *  loose episode belongs to) is stamped on the bottom-right of the cover.
+   *  Acts as a visual cue + a quick link — clicking it emits `openParent`
+   *  instead of `open`. */
+  readonly parentCoverUrl = input<string | undefined>(undefined);
+  /** Accessible label target for the parent chip, e.g. the podcast title. */
+  readonly parentTitle = input<string | undefined>(undefined);
 
   readonly play = output<void>();
   readonly download = output<void>();
   readonly action = output<CoverCardAction>();
   readonly open = output<void>();
+  readonly openParent = output<void>();
 
   protected onPlay(event: Event) {
     event.stopPropagation();
@@ -119,6 +127,11 @@ export class CoverCardComponent {
 
   protected onOpen() {
     this.open.emit();
+  }
+
+  protected onOpenParent(event: Event) {
+    event.stopPropagation();
+    this.openParent.emit();
   }
 
   // Template-side discriminators. Angular's template type checker can narrow

@@ -1,0 +1,154 @@
+@let loading = digestQuery.isPending();
+@let err = digestQuery.error();
+
+<section class="landing">
+  <header class="landing__hero">
+    <mat-button-toggle-group
+      class="landing__period"
+      aria-label="Time window"
+      [value]="period()"
+      (change)="period.set($event.value)"
+      hideSingleSelectionIndicator
+    >
+      @for (p of periods; track p.value) {
+        <mat-button-toggle [value]="p.value">{{ p.label }}</mat-button-toggle>
+      }
+    </mat-button-toggle-group>
+
+    <a mat-stroked-button routerLink="/library" class="landing__all-link">
+      <mat-icon>list</mat-icon>
+      Browse all episodes
+    </a>
+  </header>
+
+  @if (loading && isEmpty()) {
+    <div class="landing__state"><mat-spinner diameter="32" /></div>
+  } @else if (err && isEmpty()) {
+    <ps-empty-state
+      icon="error_outline"
+      title="Couldn't load your library"
+      subtitle="Try refreshing in a moment."
+    />
+  } @else if (isEmpty()) {
+    <ps-empty-state
+      icon="inbox"
+      title="Nothing here yet"
+      subtitle="Add a podcast to start downloading episodes."
+    />
+  } @else {
+    <!-- Spotlight: a few important, fresh drops in wide banner cards. -->
+    @if (spotlight().length > 0) {
+      <ps-content-row title="Spotlight" subtitle="Worth a listen right now">
+        @for (item of spotlight(); track item.id) {
+          <div class="spotlight-card">
+            <button
+              type="button"
+              class="spotlight-card__open"
+              [attr.aria-label]="'Open ' + item.title"
+              (click)="onOpen(item)"
+            >
+              <img class="spotlight-card__bg" [src]="coverUrl(item)" alt="" />
+              <span class="spotlight-card__scrim"></span>
+              <span class="spotlight-card__body">
+                @if (isNew(item)) {
+                  <span class="spotlight-card__pill">New</span>
+                }
+                <span class="spotlight-card__show">{{ item.podcast.title }}</span>
+                <span class="spotlight-card__title">{{ item.title }}</span>
+              </span>
+            </button>
+            <button
+              type="button"
+              class="spotlight-card__play"
+              [class.spotlight-card__play--disabled]="!item.isDownloaded"
+              [attr.aria-label]="item.isDownloaded ? 'Play' : 'Open'"
+              (click)="item.isDownloaded ? onPlay(item) : onOpen(item)"
+            >
+              <mat-icon>{{ item.isDownloaded ? 'play_arrow' : 'open_in_new' }}</mat-icon>
+            </button>
+          </div>
+        }
+      </ps-content-row>
+    }
+
+    <!-- Mixed feed: shows (2+ recent) collapse to an icon tile that expands
+         inline; one-off drops show the episode itself. -->
+    <section class="landing__section">
+      <header class="landing__section-head">
+        <h2 class="landing__section-title">New for you</h2>
+      </header>
+
+      <div #grid class="landing__mixed">
+        @for (entry of entries(); track entry.id; let i = $index) {
+          @if (entry.kind === 'show') {
+            <ps-cover-card
+              class="tile"
+              [class.tile--active]="expandedId() === entry.id"
+              [title]="entry.title"
+              [subtitle]="entry.itemCount + ' new episodes'"
+              [coverUrl]="entry.coverUrl"
+              [playable]="false"
+              (open)="toggleShow(entry)"
+            >
+              <span coverBadge class="landing__count-pill">
+                <mat-icon>layers</mat-icon>
+                {{ entry.itemCount }}
+              </span>
+            </ps-cover-card>
+          } @else {
+            <ps-cover-card
+              class="tile"
+              [title]="entry.item.title"
+              [subtitle]="entry.item.podcast.title"
+              [coverUrl]="coverUrl(entry.item)"
+              [parentCoverUrl]="entry.podcastCoverUrl"
+              [parentTitle]="entry.item.podcast.title"
+              [playable]="entry.item.isDownloaded"
+              [downloadable]="
+                !entry.item.isDownloaded && !isInProgress(entry.item)
+              "
+              [playing]="player.currentItem()?.id === entry.item.id"
+              (play)="onPlay(entry.item)"
+              (download)="onDownload(entry.item)"
+              (open)="onOpen(entry.item)"
+              (openParent)="onOpenPodcast(entry.item.podcastId)"
+            >
+              @if (isNew(entry.item)) {
+                <span coverBadge class="landing__new-pill">New</span>
+              }
+            </ps-cover-card>
+          }
+
+          <!-- Expansion line: opens below the row that holds the open show. -->
+          @if (i === expansionIndex() && expandedShow(); as show) {
+            <div
+              class="landing__expansion"
+              [class.landing__expansion--tinted]="expandedTint()"
+              [style.--tint]="expandedTint()"
+            >
+              <ps-content-row
+                [title]="show.title"
+                [subtitle]="show.itemCount + ' new episodes'"
+                [artworkUrl]="show.coverUrl"
+                [seeAllLink]="showLink(show.podcastId)"
+              >
+                @for (item of show.items; track item.id) {
+                  <ps-cover-card
+                    [title]="item.title"
+                    [coverUrl]="coverUrl(item)"
+                    [playable]="item.isDownloaded"
+                    [downloadable]="!item.isDownloaded && !isInProgress(item)"
+                    [playing]="player.currentItem()?.id === item.id"
+                    (play)="onPlay(item)"
+                    (download)="onDownload(item)"
+                    (open)="onOpen(item)"
+                  />
+                }
+              </ps-content-row>
+            </div>
+          }
+        }
+      </div>
+    </section>
+  }
+</section>

@@ -11,6 +11,19 @@
     <ng-content select="[coverBadge]" />
   </div>
 
+  @if (parentCoverUrl(); as parent) {
+    <button
+      type="button"
+      class="cover__parent"
+      [attr.aria-label]="
+        parentTitle() ? 'Go to ' + parentTitle() : 'Go to podcast'
+      "
+      (click)="onOpenParent($event)"
+    >
+      <img [src]="parent" [alt]="parentTitle() ?? ''" loading="lazy" />
+    </button>
+  }
+
   <!-- Play / Download FAB lives OUTSIDE the hover overlay so it stays
        visible at rest. When this card is the player's current item, the
        play icon is replaced by a three-bar "music playing" animation —

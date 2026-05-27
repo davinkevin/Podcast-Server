@@ -12,6 +12,7 @@
         [routerLink]="link.path"
         routerLinkActive
         #rla="routerLinkActive"
+        [routerLinkActiveOptions]="{ exact: !!link.exact }"
         [activated]="rla.isActive"
         class="sidenav__link"
         [matTooltip]="link.label"

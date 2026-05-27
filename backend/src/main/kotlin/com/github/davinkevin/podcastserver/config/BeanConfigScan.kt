@@ -2,6 +2,7 @@ package com.github.davinkevin.podcastserver.config
 
 import com.github.davinkevin.podcastserver.config.health.HealthConfig
 import com.github.davinkevin.podcastserver.cover.CoverConfig
+import com.github.davinkevin.podcastserver.digest.DigestConfig
 import com.github.davinkevin.podcastserver.download.DownloadConfig
 import com.github.davinkevin.podcastserver.find.FindConfig
 import com.github.davinkevin.podcastserver.item.ItemConfig
@@ -27,6 +28,7 @@ import java.nio.file.Paths
 @EnableConfigurationProperties(PodcastServerParameters::class, ExternalTools::class)
 @Import(
         ItemConfig::class,
+        DigestConfig::class,
         UpdateConfig::class,
         FindConfig::class,
         PodcastConfig::class,

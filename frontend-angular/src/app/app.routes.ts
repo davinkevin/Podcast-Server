@@ -4,7 +4,8 @@ export const routes: Routes = [
   {
     path: '',
     pathMatch: 'full',
-    redirectTo: 'library',
+    loadComponent: () => import('./features/landing/landing.component'),
+    title: 'Spotlight — Podcast Server',
   },
   {
     path: 'library',

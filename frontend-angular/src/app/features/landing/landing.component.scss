@@ -1,0 +1,355 @@
+.landing {
+  padding: 1.5rem clamp(1rem, 4vw, 2rem) 4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.25rem;
+}
+
+// 3-column grid: quiet label on the left, period toggle centered in the
+// viewport, "browse all" on the right. The empty 1fr columns absorb leftover
+// space symmetrically so the toggle stays centered regardless of side widths.
+.landing__hero {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 1rem;
+}
+
+// Explicit placement keeps the toggle viewport-centered (empty 1fr column on
+// the left) and the link on the right.
+.landing__period {
+  grid-column: 2;
+  justify-self: center;
+}
+
+.landing__all-link {
+  grid-column: 3;
+  justify-self: end;
+}
+
+@media (max-width: 800px) {
+  // Stack on narrow screens, everything centered.
+  .landing__hero {
+    grid-template-columns: 1fr;
+    justify-items: center;
+  }
+
+  .landing__period,
+  .landing__all-link {
+    grid-column: auto;
+    justify-self: center;
+  }
+}
+
+.landing__state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4rem 1rem;
+}
+
+.landing__section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.landing__section-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  padding: 0 4px;
+}
+
+.landing__section-title {
+  font: var(--mat-sys-title-large);
+  margin: 0;
+}
+
+/* ---- Mixed feed ------------------------------------------------------ */
+
+// `auto-fill` columns; the JS column count in the component mirrors these
+// exact values (168px min, 1.25rem gap) so the expansion panel lands at the
+// end of the right row.
+.landing__mixed {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(168px, 1fr));
+  gap: 1.25rem;
+  padding: 0 4px;
+  align-items: start;
+}
+
+.tile {
+  min-width: 0;
+}
+
+.tile--active ::ng-deep .cover {
+  outline: 2px solid var(--mat-sys-primary);
+  outline-offset: 2px;
+}
+
+// Full-width line that slots in below the expanded show's row. Opens by
+// growing in height (so the rows below slide down) while fading + sliding
+// up, then its episode cards stagger in.
+.landing__expansion {
+  grid-column: 1 / -1;
+  padding: 1rem 0.75rem 1.25rem;
+  margin: 0.25rem 0 0.5rem;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--mat-sys-surface-container);
+  box-shadow: inset 0 0 0 1px var(--mat-sys-outline-variant);
+  transform-origin: top center;
+  animation: expansion-open 340ms cubic-bezier(0.2, 0, 0, 1);
+  transition: background 280ms ease;
+}
+
+@keyframes expansion-open {
+  from {
+    max-height: 0;
+    opacity: 0;
+    transform: translateY(-10px);
+    margin-top: 0;
+    margin-bottom: 0;
+    padding-top: 0;
+    padding-bottom: 0;
+  }
+  to {
+    max-height: 560px;
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Episode cards drift up + fade as the panel opens, lightly staggered.
+.landing__expansion ::ng-deep ps-cover-card {
+  animation: expansion-card 380ms cubic-bezier(0.2, 0, 0, 1) backwards;
+}
+
+@for $i from 1 through 10 {
+  .landing__expansion ::ng-deep ps-cover-card:nth-child(#{$i}) {
+    animation-delay: #{60 + $i * 35}ms;
+  }
+}
+
+@keyframes expansion-card {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .landing__expansion,
+  .landing__expansion ::ng-deep ps-cover-card {
+    animation: none;
+  }
+}
+
+// Tinted with a wash of the podcast cover's vibrant color (set via --tint).
+.landing__expansion--tinted {
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--tint) 26%, var(--mat-sys-surface-container)) 0%,
+    color-mix(in srgb, var(--tint) 8%, var(--mat-sys-surface-container)) 55%,
+    var(--mat-sys-surface-container) 100%
+  );
+}
+
+@keyframes expansion-in {
+  from {
+    opacity: 0;
+    transform: translateY(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// "New" pill on a fresh drop (published in the last 24h).
+.landing__new-pill {
+  font: var(--mat-sys-label-small);
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--mat-sys-on-primary);
+  background: var(--mat-sys-primary);
+  border-radius: 999px;
+  padding: 3px 9px;
+  box-shadow: var(--mat-sys-level1);
+}
+
+// Backlog-count pill on a collapsed show tile.
+.landing__count-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  font: var(--mat-sys-label-medium);
+  font-weight: 600;
+  color: var(--mat-sys-on-surface);
+  background: color-mix(in srgb, var(--mat-sys-surface) 82%, transparent);
+  backdrop-filter: blur(6px);
+  border-radius: 999px;
+  padding: 3px 9px 3px 6px;
+  box-shadow: var(--mat-sys-level1);
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+/* ---- Spotlight banners ----------------------------------------------- */
+
+// Big, full-bleed featured cards: the cover fills the card, a scrim keeps
+// the overlaid text legible, and a large play button sits bottom-right.
+.spotlight-card {
+  position: relative;
+  flex: 0 0 clamp(300px, 60vw, 460px);
+  width: clamp(300px, 60vw, 460px);
+  height: 240px;
+  scroll-snap-align: start;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: var(--mat-sys-level1);
+  transition:
+    transform 180ms cubic-bezier(0.2, 0, 0, 1),
+    box-shadow 180ms cubic-bezier(0.2, 0, 0, 1);
+
+  &:has(.spotlight-card__open:hover),
+  &:has(.spotlight-card__open:focus-visible) {
+    transform: translateY(-3px);
+    box-shadow: var(--mat-sys-level3);
+
+    .spotlight-card__bg {
+      transform: scale(1.05);
+    }
+  }
+}
+
+.spotlight-card__open {
+  display: block;
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: left;
+
+  &:focus-visible {
+    outline: 2px solid var(--mat-sys-primary);
+    outline-offset: -3px;
+  }
+}
+
+.spotlight-card__bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 320ms cubic-bezier(0.2, 0, 0, 1);
+}
+
+.spotlight-card__scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.05) 0%,
+    rgba(0, 0, 0, 0.15) 42%,
+    rgba(0, 0, 0, 0.82) 100%
+  );
+}
+
+.spotlight-card__body {
+  position: absolute;
+  left: 1.1rem;
+  right: 1.1rem;
+  bottom: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  color: #fff;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.5);
+}
+
+.spotlight-card__pill {
+  align-self: flex-start;
+  font: var(--mat-sys-label-medium);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--mat-sys-on-primary);
+  background: var(--mat-sys-primary);
+  border-radius: 999px;
+  padding: 2px 10px;
+  margin-bottom: 4px;
+  text-shadow: none;
+}
+
+.spotlight-card__show {
+  font: var(--mat-sys-label-large);
+  font-weight: 600;
+  opacity: 0.92;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.spotlight-card__title {
+  font: var(--mat-sys-headline-small);
+  font-weight: 700;
+  line-height: 1.15;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.spotlight-card__play {
+  position: absolute;
+  right: 1rem;
+  bottom: 1rem;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  background: var(--mat-sys-primary);
+  color: var(--mat-sys-on-primary);
+  box-shadow: var(--mat-sys-level2);
+  transition: transform 160ms cubic-bezier(0.2, 0, 0, 1);
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+  }
+
+  &:hover {
+    transform: scale(1.08);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #fff;
+    outline-offset: 2px;
+  }
+
+  &--disabled {
+    background: color-mix(in srgb, #fff 24%, transparent);
+    color: #fff;
+    backdrop-filter: blur(4px);
+  }
+}
