@@ -7,7 +7,12 @@ include:
 👷 documentation:
   stage: 👷‍ build
   needs: []
-  extends: [ .only-on-documentation-changes ]
+  # Re-run on content changes AND on changes to this CI definition, so a
+  # build/config fix is validated even when no page changed.
+  rules:
+    - changes:
+        - documentation/**/*
+        - .gitlab/ci/documentation.yaml
   # Full (Debian) node image rather than -alpine/-slim: it ships with git,
   # which VitePress' `lastUpdated` shells out to during the build.
   image: node:22
@@ -29,6 +34,7 @@ pages:
     - if: '$CI_COMMIT_REF_NAME == $CI_DEFAULT_BRANCH'
       changes:
         - documentation/**/*
+        - .gitlab/ci/documentation.yaml
   script:
     - mv documentation/.vitepress/dist public
   artifacts:
