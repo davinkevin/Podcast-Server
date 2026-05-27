@@ -8,7 +8,9 @@ include:
   stage: 👷‍ build
   needs: []
   extends: [ .only-on-documentation-changes ]
-  image: node:22-alpine
+  # Full (Debian) node image rather than -alpine/-slim: it ships with git,
+  # which VitePress' `lastUpdated` shells out to during the build.
+  image: node:22
   script:
     - cd documentation
     - npm ci
