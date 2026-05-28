@@ -30,17 +30,19 @@ tasks.register("downloadDependencies") {
         is DeprecatableConfiguration -> resolutionAlternatives.isNotEmpty()
         else -> false
     }
+
+    val buildDeps = buildscript
+        .configurations
+        .onEach { it.incoming.artifactView { lenient(true) }.artifacts }
+        .sumOf { it.resolve().size }
+
+    val allDeps = configurations
+        .filter { it.isCanBeResolved && !it.isDeprecated() }
+        .onEach { it.incoming.artifactView { lenient(true) }.artifacts }
+        .sumOf { it.resolve().size }
+
+    val total = allDeps + buildDeps
     doLast {
-        val buildDeps = buildscript
-            .configurations
-            .onEach { it.incoming.artifactView { lenient(true) }.artifacts }
-            .sumOf { it.resolve().size }
-
-        val allDeps = configurations
-            .filter { it.isCanBeResolved && !it.isDeprecated() }
-            .onEach { it.incoming.artifactView { lenient(true) }.artifacts }
-            .sumOf { it.resolve().size }
-
-        println("Downloaded all dependencies: ${allDeps + buildDeps}")
+        println("Downloaded all dependencies: $total")
     }
 }

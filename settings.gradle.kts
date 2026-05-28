@@ -1,3 +1,6 @@
+import com.gradle.develocity.agent.gradle.scan.BuildScanPublishingConfiguration
+import org.gradle.api.specs.Specs
+
 rootProject.name = "Podcast-Server"
 
 plugins {
@@ -6,33 +9,38 @@ plugins {
     id("org.gradle.toolchains.foojay-resolver-convention") version "1.0.0"
 }
 
-val env: Map<String, String> = System.getenv()
-val isCI = env["CI"].toBoolean()
-val hasDV = env["DEVELOCITY_ENABLED"].toBoolean()
+val isCI = providers.environmentVariable("CI").map { it.toBoolean() }.getOrElse(false)
+val hasDV = providers.environmentVariable("DEVELOCITY_ENABLED").map { it.toBoolean() }.getOrElse(false)
+val shouldPublish = isCI || hasDV
+val publishSpec: Spec<BuildScanPublishingConfiguration.PublishingContext?> =
+    if (shouldPublish) Specs.satisfyAll() else Specs.satisfyNone()
 
 buildCache {
     local { isEnabled = !isCI }
     remote(develocity.buildCache) {
-        isEnabled = isCI || hasDV
+        isEnabled = shouldPublish
         isPush = isCI
     }
 }
 
 develocity {
-    server = env["DEVELOCITY_SERVER"] ?: "https://no.ge.local"
+    server = providers.environmentVariable("DEVELOCITY_SERVER").getOrElse("https://no.ge.local")
     buildScan {
-        publishing.onlyIf { hasDV || isCI }
+        publishing.onlyIf(publishSpec)
         capture {
             fileFingerprints = true
             buildLogging = true
             testLogging = true
         }
         uploadInBackground = !isCI
-        if(isCI) {
-            tag(env["CI_COMMIT_REF_NAME"])
-            value("Pipeline", env["CI_PIPELINE_ID"])
-            value("Job Image", env["CI_JOB_IMAGE"])
-            link("Source", "https://gitlab.com/davinkevin/Podcast-Server/tree/${env["CI_COMMIT_REF_NAME"]}")
+        if (isCI) {
+            val refName = providers.environmentVariable("CI_COMMIT_REF_NAME").getOrElse("")
+            val pipelineId = providers.environmentVariable("CI_PIPELINE_ID").getOrElse("")
+            val jobImage = providers.environmentVariable("CI_JOB_IMAGE").getOrElse("")
+            tag(refName)
+            value("Pipeline", pipelineId)
+            value("Job Image", jobImage)
+            link("Source", "https://gitlab.com/davinkevin/Podcast-Server/tree/$refName")
         }
     }
 }

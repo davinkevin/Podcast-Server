@@ -163,24 +163,32 @@ jib {
 	}
 }
 
+// Jib plugin (3.5.x) is not yet compatible with the Gradle configuration cache.
+// Track: https://github.com/GoogleContainerTools/jib/issues/3132
+listOf("jib", "jibDockerBuild", "jibBuildTar").forEach {
+	tasks.named(it) { notCompatibleWithConfigurationCache("Jib plugin is not yet configuration-cache compatible") }
+}
+
 tasks.register("downloadDependencies") {
 	fun Configuration.isDeprecated(): Boolean = when (this) {
 		is DeprecatableConfiguration -> resolutionAlternatives.isNotEmpty()
 		else -> false
 	}
+
+	val buildDeps = buildscript
+		.configurations
+		.onEach { it.incoming.artifactView { lenient(true) }.artifacts }
+		.sumOf { it.resolve().size }
+
+	val allDeps = configurations
+		.filter { it.isCanBeResolved && !it.isDeprecated() }
+		.onEach { it.incoming.artifactView { lenient(true) }.artifacts }
+		.map { runCatching { it.resolve() }.getOrElse { emptySet() } }
+		.sumOf { it.size }
+
+	val total = allDeps + buildDeps
 	doLast {
-		val buildDeps = buildscript
-			.configurations
-			.onEach { it.incoming.artifactView { lenient(true) }.artifacts }
-			.sumOf { it.resolve().size }
-
-		val allDeps = configurations
-			.filter { it.isCanBeResolved && !it.isDeprecated() }
-			.onEach { it.incoming.artifactView { lenient(true) }.artifacts }
-			.map { runCatching { it.resolve() }.getOrElse { emptySet() } }
-			.sumOf { it.size }
-
-		println("Downloaded all dependencies: ${allDeps + buildDeps}")
+		println("Downloaded all dependencies: $total")
 	}
 }
 
