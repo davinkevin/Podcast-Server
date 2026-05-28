@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.service.image
 
+import com.github.davinkevin.podcastserver.extension.slf4j.errorWithDebugStack
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
@@ -14,7 +15,7 @@ class ImageService (private val rcb: RestClient.Builder ) {
     private val log = LoggerFactory.getLogger(ImageService::class.java)
 
     fun fetchCoverInformation(url: URI): CoverInformation? {
-        log.debug("fetch $url")
+        log.debug("fetch {}", url)
 
         val content = rcb
             .clone()
@@ -24,7 +25,7 @@ class ImageService (private val rcb: RestClient.Builder ) {
             .runCatching {
                 retrieve().body<ByteArrayResource>()
             }
-            .onFailure { log.error("Error during download of {}", url, it) }
+            .onFailure { log.errorWithDebugStack("Error during download of {}", url, throwable = it) }
             .getOrNull()
             ?: return null
 

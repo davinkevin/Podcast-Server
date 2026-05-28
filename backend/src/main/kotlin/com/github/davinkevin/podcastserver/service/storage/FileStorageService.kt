@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.service.storage
 
+import com.github.davinkevin.podcastserver.extension.slf4j.errorWithDebugStack
 import org.slf4j.LoggerFactory
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.http.MediaType
@@ -130,11 +131,11 @@ class FileStorageService(
             val delete = it.toDeleteRequest()
 
             bucket.copyObject(copy).runCatching { join() }
-                .onFailure { t -> log.error("Error during copy of ${it.key()}", t) }
+                .onFailure { t -> log.errorWithDebugStack("Error during copy of ${it.key()}", throwable = t) }
                 .getOrNull() ?: return@forEach
 
             bucket.deleteObject(delete).runCatching { join() }
-                .onFailure { t -> log.error("Error during deletion of ${it.key()}", t) }
+                .onFailure { t -> log.errorWithDebugStack("Error during deletion of ${it.key()}", throwable = t) }
                 .getOrNull() ?: return@forEach
         }
     }
@@ -155,7 +156,7 @@ class FileStorageService(
         }
 
         return errors.first()
-            .also { log.error("operation failed after $retries attempts", it.exceptionOrNull()) }
+            .also { log.errorWithDebugStack("operation failed after $retries attempts", throwable = it.exceptionOrNull()) }
     }
 
     fun metadata(title: String, file: Path): FileMetaData? {

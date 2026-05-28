@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelper
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.slf4j.errorWithDebugStack
 import com.github.davinkevin.podcastserver.service.ProcessService
 import com.github.davinkevin.podcastserver.service.ffmpeg.FfmpegService
 import net.bramp.ffmpeg.builder.FFmpegBuilder
@@ -105,7 +106,7 @@ class FfmpegDownloader(
             process.destroy()
             state.stopDownload()
         } catch (e: Exception) {
-            log.error("Error during stop of process :", e)
+            log.errorWithDebugStack("Error during stop of process :", throwable = e)
             state.failDownload()
         }
     }

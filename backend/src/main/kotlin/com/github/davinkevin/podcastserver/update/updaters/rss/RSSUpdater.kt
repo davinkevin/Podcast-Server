@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters.rss
 
+import com.github.davinkevin.podcastserver.extension.slf4j.errorWithDebugStack
 import com.github.davinkevin.podcastserver.service.image.ImageService
 import com.github.davinkevin.podcastserver.update.fetchCoverUpdateInformation
 import com.github.davinkevin.podcastserver.update.updaters.ItemFromUpdate
@@ -103,7 +104,7 @@ class RSSUpdater(
         return Result.runCatching {
             ZonedDateTime.parse(date, DateTimeFormatter.RFC_1123_DATE_TIME)
         } .onFailure {
-            log.error("Problem during date parsing of \"{}\" caused by {}", item.getChildText("title"), it.message)
+            log.errorWithDebugStack("Problem during date parsing of \"{}\" caused by {}", item.getChildText("title"), it.message, throwable = it)
         }
             .getOrDefault(ZonedDateTime.now())
     }
@@ -124,7 +125,7 @@ class RSSUpdater(
                 .retrieve()
                 .body<ByteArrayResource>()
         }
-            .onFailure { log.error("Error during getting rss updates.", it) }
+            .onFailure { log.errorWithDebugStack("Error during getting rss updates.", throwable = it) }
             .getOrNull()
     }
 

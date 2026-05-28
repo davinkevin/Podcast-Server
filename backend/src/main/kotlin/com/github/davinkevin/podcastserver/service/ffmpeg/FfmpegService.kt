@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.service.ffmpeg
 
+import com.github.davinkevin.podcastserver.extension.slf4j.errorWithDebugStack
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.CustomRunProcessFunc
 import com.github.davinkevin.podcastserver.utils.custom.ffmpeg.ProcessListener
 import net.bramp.ffmpeg.FFmpegExecutor
@@ -58,7 +59,7 @@ class FfmpegService(
 
             ffmpegExecutor.createJob(builder).run()
         }
-                .onFailure { log.error("Error during Ffmpeg conversion", it) }
+                .onFailure { log.errorWithDebugStack("Error during Ffmpeg conversion", throwable = it) }
 
         FileSystemUtils.deleteRecursively(tmpFolder)
     }
@@ -138,7 +139,7 @@ class FfmpegService(
         return Result.runCatching { pl.process.get(2, TimeUnit.SECONDS) }
                 .getOrElse {
                     pl.process.cancel(true)
-                    log.error("error during download", it)
+                    log.errorWithDebugStack("error during download", throwable = it)
                     throw it
                 }
     }

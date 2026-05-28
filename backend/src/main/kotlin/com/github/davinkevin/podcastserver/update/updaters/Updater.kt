@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.update.updaters
 
+import com.github.davinkevin.podcastserver.extension.slf4j.errorWithDebugStack
 import io.micrometer.core.instrument.Counter
 import io.micrometer.core.instrument.MeterRegistry
 import io.micrometer.core.instrument.Timer
@@ -21,7 +22,7 @@ interface Updater {
         log.info("podcast {} starts update", podcast.url)
         val (value, duration) = measureTimedValue {
             val signature = runCatching { signatureOf(podcast.url) }
-                .onFailure { log.error("podcast {} ends with error", podcast.url, it) }
+                .onFailure { log.errorWithDebugStack("podcast {} ends with error", podcast.url, throwable = it) }
                 .getOrNull()
                 ?: return@measureTimedValue null
 
@@ -33,7 +34,7 @@ interface Updater {
             log.debug("podcast {} has new signature {}", podcast.url, signature)
 
             val items = runCatching { findItems(podcast).toSet() }
-                .onFailure { log.error("podcast {} ends with error", podcast.url, it) }
+                .onFailure { log.errorWithDebugStack("podcast {} ends with error", podcast.url, throwable = it) }
                 .getOrNull() ?: return@measureTimedValue null
 
             Counter.builder("update.numberOfItem")

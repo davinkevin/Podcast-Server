@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.download.downloaders
 import com.github.davinkevin.podcastserver.download.DownloadRepository
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.slf4j.errorWithDebugStack
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.service.storage.UploadRequest
@@ -45,7 +46,7 @@ class DownloaderHelper(
 
         val execution = runCatching { downloader.download() }
         if (execution.isFailure) {
-            log.error("Error during download", execution.exceptionOrNull())
+            log.errorWithDebugStack("Error during download", throwable = execution.exceptionOrNull())
             failDownload()
         }
     }
@@ -100,7 +101,7 @@ class DownloaderHelper(
             log.info("End of download for ${info.item.url}")
         }
         .onFailure {
-            log.error("Error during download of ${info.item.url}", it)
+            log.errorWithDebugStack("Error during download of ${info.item.url}", throwable = it)
             failDownload()
         }
 

@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.update
 import com.github.davinkevin.podcastserver.cover.CoverForCreation
 import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.slf4j.errorWithDebugStack
 import com.github.davinkevin.podcastserver.item.Item
 import com.github.davinkevin.podcastserver.item.ItemForCreation
 import com.github.davinkevin.podcastserver.item.ItemRepository
@@ -141,7 +142,7 @@ class UpdateService(
             .map { it.toCoverUploadRequest() }
             .forEach { item ->
                 runCatching { fileService.downloadAndUpload(item) }
-                    .onFailure { log.error("Error during download of cover ${item.coverUrl}") }
+                    .onFailure { log.errorWithDebugStack("Error during download of cover ${item.coverUrl}", throwable = it) }
             }
 
         podcastRepository.updateLastUpdate(podcast.id)
