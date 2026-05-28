@@ -15,6 +15,11 @@
     'frontend-angular/yarn.lock',
     'frontend-angularjs/package.json',
   ],
+  kubernetes: {
+    fileMatch: [
+      'distribution/kubernetes/.+\\.yaml$',
+    ],
+  },
   packageRules: [
     {
       matchPackageNames: [
