@@ -30,8 +30,9 @@ class ItemDownloadManager (
         get() = repository.findAllDownloading()
 
     var limitParallelDownload: Int
-        get() = downloadExecutor.corePoolSize
+        get() = parameters.concurrentDownload
         set(value) {
+            parameters.updateConcurrentDownload(value)
             downloadExecutor.corePoolSize = value
             manageInBackground()
         }

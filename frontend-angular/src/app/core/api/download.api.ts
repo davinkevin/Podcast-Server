@@ -34,6 +34,54 @@ export class DownloadApi {
     }));
   }
 
+  /** Max retry count per failed download. */
+  numberOfTry() {
+    return injectQuery(() => ({
+      queryKey: queryKeys.downloads.numberOfTry(),
+      queryFn: () =>
+        lastValueFrom(this.http.get<number>('/api/v1/downloads/number-of-try')),
+    }));
+  }
+
+  updateNumberOfTryMutation() {
+    return injectMutation(() => ({
+      mutationFn: (value: number) =>
+        lastValueFrom(
+          this.http.post<number>('/api/v1/downloads/number-of-try', value),
+        ),
+      onSuccess: () => {
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.downloads.numberOfTry(),
+        });
+      },
+    }));
+  }
+
+  /** Lookback window (days) for items pulled from podcast feeds. */
+  daysToDownload() {
+    return injectQuery(() => ({
+      queryKey: queryKeys.downloads.daysToDownload(),
+      queryFn: () =>
+        lastValueFrom(
+          this.http.get<number>('/api/v1/downloads/days-to-download'),
+        ),
+    }));
+  }
+
+  updateDaysToDownloadMutation() {
+    return injectMutation(() => ({
+      mutationFn: (value: number) =>
+        lastValueFrom(
+          this.http.post<number>('/api/v1/downloads/days-to-download', value),
+        ),
+      onSuccess: () => {
+        this.queryClient.invalidateQueries({
+          queryKey: queryKeys.downloads.daysToDownload(),
+        });
+      },
+    }));
+  }
+
   // SSE drives queue/downloading state; no client query to invalidate.
   stopAll() {
     return this.http.post('/api/v1/downloads/stop', null, { responseType: 'text' });

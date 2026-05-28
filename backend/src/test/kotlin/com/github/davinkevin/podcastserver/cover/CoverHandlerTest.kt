@@ -1,10 +1,13 @@
 package com.github.davinkevin.podcastserver.cover
 
 import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.verify
+import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTestClient
@@ -35,6 +38,12 @@ class CoverHandlerTest(
 ) {
 
     @MockitoBean private lateinit var cover: CoverService
+    @MockitoBean private lateinit var parameters: PodcastServerParameters
+
+    @BeforeEach
+    fun setUp() {
+        whenever(parameters.numberOfDayToSaveCover).thenReturn(365L)
+    }
 
     @Nested
     @DisplayName("should delete cover")

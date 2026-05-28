@@ -14,6 +14,11 @@ class CoverRoutingConfig {
     fun coverRouter(cover: CoverHandler) = router {
         "/api/v1/covers".nest {
             DELETE("", cover::deleteOldCovers)
+
+            "/days-to-save".nest {
+                GET("", cover::findDaysToSave)
+                POST("", cover::updateDaysToSave)
+            }
         }
     }
 }

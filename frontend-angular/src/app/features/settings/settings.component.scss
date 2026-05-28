@@ -68,6 +68,12 @@
   width: 14rem;
 }
 
+// CleanUp rows: tight input glued to a matPrefix action icon, so a
+// narrower field reads better than the default 14rem.
+.card__limit--compact {
+  width: 11rem;
+}
+
 // Build-info description list inside the About card — branch / tag /
 // commit rows aligned in a 2-column layout. The label column gets a
 // fixed minimum so values line up visually across rows; on narrow

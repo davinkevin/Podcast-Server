@@ -25,8 +25,9 @@ import java.nio.file.Paths
  * Created by kevin on 26/12/2013.
  */
 @Configuration
-@EnableConfigurationProperties(PodcastServerParameters::class, ExternalTools::class)
+@EnableConfigurationProperties(ExternalTools::class)
 @Import(
+        PodcastServerParameters::class,
         ItemConfig::class,
         DigestConfig::class,
         UpdateConfig::class,

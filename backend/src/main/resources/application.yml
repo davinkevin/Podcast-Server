@@ -31,13 +31,6 @@ management:
    exposure:
     include: ['health', 'info', 'env', 'configprops', 'prometheus', 'metrics']
 
-##############################
-#    Application Specific    #
-##############################
-
-podcastserver:
- max-update-parallels: 256
-
 logging:
  level:
   org:

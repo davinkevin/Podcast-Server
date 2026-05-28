@@ -44,6 +44,11 @@ class ItemDownloadManagerTest(
 
     private val date = OffsetDateTime.of(2012, 3, 4, 5, 6, 7, 0, ZoneOffset.UTC)
 
+    @BeforeEach
+    fun setUp() {
+        whenever(parameters.concurrentDownload).thenReturn(1)
+    }
+
     @AfterEach
     fun afterEach() {
         Mockito.reset(messaging, repository, downloadExecutor, downloaders)

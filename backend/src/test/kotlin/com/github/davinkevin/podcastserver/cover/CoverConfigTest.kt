@@ -1,5 +1,6 @@
 package com.github.davinkevin.podcastserver.cover
 
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import org.assertj.core.api.Assertions.assertThat
 import org.jooq.DSLContext
@@ -67,5 +68,5 @@ class CoverConfigTest {
 private class LocalTestConfiguration {
     @Bean fun query(): DSLContext = mock()
     @Bean fun file(): FileStorageService = mock()
-
+    @Bean fun parameters(): PodcastServerParameters = mock()
 }

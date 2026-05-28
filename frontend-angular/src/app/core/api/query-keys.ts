@@ -37,6 +37,12 @@ export const queryKeys = {
   downloads: {
     all: ['downloads'] as const,
     limit: () => ['downloads', 'limit'] as const,
+    numberOfTry: () => ['downloads', 'number-of-try'] as const,
+    daysToDownload: () => ['downloads', 'days-to-download'] as const,
+  },
+  covers: {
+    all: ['covers'] as const,
+    daysToSave: () => ['covers', 'days-to-save'] as const,
   },
   digest: {
     all: ['digest'] as const,

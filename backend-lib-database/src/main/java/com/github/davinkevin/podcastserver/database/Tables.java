@@ -4,6 +4,7 @@
 package com.github.davinkevin.podcastserver.database;
 
 
+import com.github.davinkevin.podcastserver.database.tables.ApplicationSettings;
 import com.github.davinkevin.podcastserver.database.tables.Cover;
 import com.github.davinkevin.podcastserver.database.tables.DownloadingItem;
 import com.github.davinkevin.podcastserver.database.tables.FlywaySchemaHistory;
@@ -20,6 +21,11 @@ import com.github.davinkevin.podcastserver.database.tables.Tag;
  */
 @SuppressWarnings({ "all", "unchecked", "rawtypes", "this-escape" })
 public class Tables {
+
+    /**
+     * The table <code>public.application_settings</code>.
+     */
+    public static final ApplicationSettings APPLICATION_SETTINGS = ApplicationSettings.APPLICATION_SETTINGS;
 
     /**
      * The table <code>public.cover</code>.

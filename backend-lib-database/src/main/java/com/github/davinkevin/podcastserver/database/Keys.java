@@ -4,6 +4,7 @@
 package com.github.davinkevin.podcastserver.database;
 
 
+import com.github.davinkevin.podcastserver.database.tables.ApplicationSettings;
 import com.github.davinkevin.podcastserver.database.tables.Cover;
 import com.github.davinkevin.podcastserver.database.tables.DownloadingItem;
 import com.github.davinkevin.podcastserver.database.tables.FlywaySchemaHistory;
@@ -13,6 +14,7 @@ import com.github.davinkevin.podcastserver.database.tables.PlaylistItems;
 import com.github.davinkevin.podcastserver.database.tables.Podcast;
 import com.github.davinkevin.podcastserver.database.tables.PodcastTags;
 import com.github.davinkevin.podcastserver.database.tables.Tag;
+import com.github.davinkevin.podcastserver.database.tables.records.ApplicationSettingsRecord;
 import com.github.davinkevin.podcastserver.database.tables.records.CoverRecord;
 import com.github.davinkevin.podcastserver.database.tables.records.DownloadingItemRecord;
 import com.github.davinkevin.podcastserver.database.tables.records.FlywaySchemaHistoryRecord;
@@ -41,6 +43,7 @@ public class Keys {
     // UNIQUE and PRIMARY KEY definitions
     // -------------------------------------------------------------------------
 
+    public static final UniqueKey<ApplicationSettingsRecord> APPLICATION_SETTINGS_PKEY = Internal.createUniqueKey(ApplicationSettings.APPLICATION_SETTINGS, DSL.name("application_settings_pkey"), new TableField[] { ApplicationSettings.APPLICATION_SETTINGS.ID }, true);
     public static final UniqueKey<CoverRecord> COVER_PKEY = Internal.createUniqueKey(Cover.COVER, DSL.name("cover_pkey"), new TableField[] { Cover.COVER.ID }, true);
     public static final UniqueKey<DownloadingItemRecord> DOWNLOADING_ITEM_PKEY = Internal.createUniqueKey(DownloadingItem.DOWNLOADING_ITEM, DSL.name("downloading_item_pkey"), new TableField[] { DownloadingItem.DOWNLOADING_ITEM.ITEM_ID }, true);
     public static final UniqueKey<DownloadingItemRecord> DOWNLOADING_ITEM_POSITION_KEY = Internal.createUniqueKey(DownloadingItem.DOWNLOADING_ITEM, DSL.name("downloading_item_position_key"), new TableField[] { DownloadingItem.DOWNLOADING_ITEM.POSITION }, true);

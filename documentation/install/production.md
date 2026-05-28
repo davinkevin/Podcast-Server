@@ -95,21 +95,6 @@ kubectl apply -k my-podcast-server/
 
 Image pulls and the `init-db` `initContainer` take a few minutes the first time. After that, the app answers on the `domain` you configured.
 
-## Tuning
-
-Append runtime tuning keys to the `podcast-server` `ConfigMap`:
-
-```yaml
-configMapGenerator:
-  - name: podcast-server
-    behavior: merge
-    literals:
-      - concurrent-download=3            # parallel item downloads
-      - max-update-parallels=3           # parallel feed updates
-      - number-of-day-to-download=30     # retention (days) for downloaded items
-      - number-of-day-to-save-cover=365  # retention (days) for covers
-```
-
 ## Going further
 
 Once `standalone` is running, real-world deployments usually layer in:

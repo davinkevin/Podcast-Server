@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.download
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.java.net.extension
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
 import org.springframework.web.servlet.function.body
@@ -14,7 +15,10 @@ import java.util.*
 /**
  * Created by kevin on 17/09/2019
  */
-class DownloadHandler(private val downloadService: ItemDownloadManager) {
+class DownloadHandler(
+    private val downloadService: ItemDownloadManager,
+    private val parameters: PodcastServerParameters,
+) {
 
     fun download(r: ServerRequest): ServerResponse {
         val id = UUID.fromString(r.pathVariable("id"))
@@ -41,6 +45,24 @@ class DownloadHandler(private val downloadService: ItemDownloadManager) {
         downloadService.limitParallelDownload = limit
 
         return ServerResponse.ok().body(limit)
+    }
+
+    fun findNumberOfTry(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse =
+        ServerResponse.ok().body(parameters.numberOfTry)
+
+    fun updateNumberOfTry(r: ServerRequest): ServerResponse {
+        val value = r.body<Int>()
+        parameters.updateNumberOfTry(value)
+        return ServerResponse.ok().body(value)
+    }
+
+    fun findDaysToDownload(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse =
+        ServerResponse.ok().body(parameters.numberOfDayToDownload)
+
+    fun updateDaysToDownload(r: ServerRequest): ServerResponse {
+        val value = r.body<Long>()
+        parameters.updateNumberOfDayToDownload(value)
+        return ServerResponse.ok().body(value)
     }
 
     fun stopAll(@Suppress("UNUSED_PARAMETER") r: ServerRequest): ServerResponse {

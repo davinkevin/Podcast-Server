@@ -4,6 +4,7 @@
 package com.github.davinkevin.podcastserver.database;
 
 
+import com.github.davinkevin.podcastserver.database.tables.ApplicationSettings;
 import com.github.davinkevin.podcastserver.database.tables.Cover;
 import com.github.davinkevin.podcastserver.database.tables.DownloadingItem;
 import com.github.davinkevin.podcastserver.database.tables.FlywaySchemaHistory;
@@ -34,6 +35,11 @@ public class Public extends SchemaImpl {
      * The reference instance of <code>public</code>
      */
     public static final Public PUBLIC = new Public();
+
+    /**
+     * The table <code>public.application_settings</code>.
+     */
+    public final ApplicationSettings APPLICATION_SETTINGS = ApplicationSettings.APPLICATION_SETTINGS;
 
     /**
      * The table <code>public.cover</code>.
@@ -96,6 +102,7 @@ public class Public extends SchemaImpl {
     @Override
     public final List<Table<?>> getTables() {
         return Arrays.asList(
+            ApplicationSettings.APPLICATION_SETTINGS,
             Cover.COVER,
             DownloadingItem.DOWNLOADING_ITEM,
             FlywaySchemaHistory.FLYWAY_SCHEMA_HISTORY,

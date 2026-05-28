@@ -1,7 +1,6 @@
 package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 
 import com.github.davinkevin.podcastserver.service.properties.ExternalTools
-import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDL
 import org.slf4j.LoggerFactory
 import org.springframework.boot.context.properties.EnableConfigurationProperties
@@ -15,7 +14,7 @@ import tools.jackson.module.kotlin.readValue
  * Created by kevin on 08/05/2020
  */
 @Configuration
-@EnableConfigurationProperties(ExternalTools::class, PodcastServerParameters::class, YTDlpParameters::class)
+@EnableConfigurationProperties(ExternalTools::class, YTDlpParameters::class)
 @Import(YoutubeDlDownloaderFactory::class)
 class YoutubeDlConfig {
 

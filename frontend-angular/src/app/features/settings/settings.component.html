@@ -7,41 +7,92 @@
     <header class="card__head">
       <mat-icon class="card__icon">download</mat-icon>
       <div>
-        <h2 class="card__title">Parallel downloads</h2>
+        <h2 class="card__title">Download behavior</h2>
         <p class="card__subtitle">
-          How many episodes the server downloads at the same time.
+          How aggressively the server downloads episodes and how long it keeps the resulting files.
         </p>
       </div>
     </header>
     @let limit = limitQuery.data();
-    @let limitLoading = limitQuery.isPending();
+    @let numberOfTry = numberOfTryQuery.data();
     <div class="card__row">
-      @if (limitLoading && limit === undefined) {
+      @if (limitQuery.isPending() && limit === undefined) {
         <mat-spinner diameter="20" />
       } @else {
         <mat-form-field appearance="outline" subscriptSizing="dynamic" class="card__limit">
-          <mat-label>Limit</mat-label>
+          <mat-label>Parallel downloads</mat-label>
           <input
             matInput
             type="number"
             min="1"
             [ngModel]="limitDraft()"
             (ngModelChange)="onLimitInput($event)"
-            [disabled]="savingLimit()"
+            [disabled]="savingDownload()"
           />
         </mat-form-field>
-        <button
-          mat-flat-button
-          color="primary"
-          [disabled]="!limitDirty() || savingLimit()"
-          (click)="onSaveLimit()"
-        >
-          @if (savingLimit()) {
-            <mat-spinner diameter="18" />
-          }
-          Save
-        </button>
       }
+      @if (numberOfTryQuery.isPending() && numberOfTry === undefined) {
+        <mat-spinner diameter="20" />
+      } @else {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="card__limit">
+          <mat-label>Retries per failed download</mat-label>
+          <input
+            matInput
+            type="number"
+            min="0"
+            [ngModel]="numberOfTryDraft()"
+            (ngModelChange)="onNumberOfTryInput($event)"
+            [disabled]="savingDownload()"
+          />
+        </mat-form-field>
+      }
+    </div>
+    @let daysToDownload = daysToDownloadQuery.data();
+    @let daysToSave = daysToSaveQuery.data();
+    <div class="card__row">
+      @if (daysToDownloadQuery.isPending() && daysToDownload === undefined) {
+        <mat-spinner diameter="20" />
+      } @else {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="card__limit">
+          <mat-label>Item retention (days)</mat-label>
+          <input
+            matInput
+            type="number"
+            min="0"
+            [ngModel]="daysToDownloadDraft()"
+            (ngModelChange)="onDaysToDownloadInput($event)"
+            [disabled]="savingDownload()"
+          />
+        </mat-form-field>
+      }
+      @if (daysToSaveQuery.isPending() && daysToSave === undefined) {
+        <mat-spinner diameter="20" />
+      } @else {
+        <mat-form-field appearance="outline" subscriptSizing="dynamic" class="card__limit">
+          <mat-label>Cover retention (days)</mat-label>
+          <input
+            matInput
+            type="number"
+            min="0"
+            [ngModel]="daysToSaveDraft()"
+            (ngModelChange)="onDaysToSaveInput($event)"
+            [disabled]="savingDownload()"
+          />
+        </mat-form-field>
+      }
+    </div>
+    <div class="card__actions">
+      <button
+        mat-flat-button
+        color="primary"
+        [disabled]="!downloadDirty() || savingDownload()"
+        (click)="onSaveDownload()"
+      >
+        @if (savingDownload()) {
+          <mat-spinner diameter="18" />
+        }
+        Save
+      </button>
     </div>
   </article>
 
@@ -49,15 +100,15 @@
     <header class="card__head">
       <mat-icon class="card__icon">delete_sweep</mat-icon>
       <div>
-        <h2 class="card__title">Storage cleanup</h2>
+        <h2 class="card__title">CleanUp</h2>
         <p class="card__subtitle">
-          Free disk space by removing downloaded files and unused covers older than the chosen window.
+          On-demand removal of downloaded files and unused covers older than the chosen window.
         </p>
       </div>
     </header>
     <div class="card__row">
-      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="card__limit">
-        <mat-label>Items older than (days)</mat-label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="card__limit card__limit--compact">
+        <mat-label>Older than (days)</mat-label>
         <input
           matInput
           type="number"
@@ -68,7 +119,8 @@
         />
       </mat-form-field>
       <button
-        mat-stroked-button
+        mat-flat-button
+        color="primary"
         [disabled]="cleaningItems()"
         (click)="onCleanItems()"
       >
@@ -81,8 +133,8 @@
       </button>
     </div>
     <div class="card__row">
-      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="card__limit">
-        <mat-label>Covers older than (days)</mat-label>
+      <mat-form-field appearance="outline" subscriptSizing="dynamic" class="card__limit card__limit--compact">
+        <mat-label>Older than (days)</mat-label>
         <input
           matInput
           type="number"
@@ -93,7 +145,8 @@
         />
       </mat-form-field>
       <button
-        mat-stroked-button
+        mat-flat-button
+        color="primary"
         [disabled]="cleaningCovers()"
         (click)="onCleanCovers()"
       >

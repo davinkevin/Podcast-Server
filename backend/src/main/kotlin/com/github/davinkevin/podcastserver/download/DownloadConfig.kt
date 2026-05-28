@@ -30,6 +30,16 @@ class DownloadRouterConfig {
                 POST("", d::updateLimit)
             }
 
+            "/number-of-try".nest {
+                GET("", d::findNumberOfTry)
+                POST("", d::updateNumberOfTry)
+            }
+
+            "/days-to-download".nest {
+                GET("", d::findDaysToDownload)
+                POST("", d::updateDaysToDownload)
+            }
+
             POST("/stop", d::stopAll)
 
             "/{id}".nest {

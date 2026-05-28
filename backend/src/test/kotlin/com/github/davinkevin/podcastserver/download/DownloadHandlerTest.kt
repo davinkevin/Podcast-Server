@@ -4,6 +4,7 @@ import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.json.assertThatJson
 import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
+import com.github.davinkevin.podcastserver.service.properties.PodcastServerParameters
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -34,6 +35,7 @@ class DownloadHandlerTest(
 ) {
 
     @MockitoBean private lateinit var idm: ItemDownloadManager
+    @MockitoBean private lateinit var parameters: PodcastServerParameters
 
     private val item1 = DownloadingItem(
             id = UUID.fromString("6c05149f-a3e1-4302-ab1f-83324c75ad70"),
