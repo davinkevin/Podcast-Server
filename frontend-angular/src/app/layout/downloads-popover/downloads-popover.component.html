@@ -31,7 +31,7 @@
         <ul class="popover__list">
           @for (item of downloading; track item.id) {
             <li class="row">
-              <img class="row__cover" [src]="item.cover.url" [alt]="item.title" />
+              <img class="row__cover" [src]="item.cover.proxyURL" [alt]="item.title" />
               <div class="row__meta">
                 <div class="row__title" [title]="item.title">{{ item.title }}</div>
                 <div class="row__sub" [title]="item.podcast.title">
@@ -86,7 +86,7 @@
               >
                 <mat-icon>drag_indicator</mat-icon>
               </button>
-              <img class="row__cover" [src]="item.cover.url" [alt]="item.title" />
+              <img class="row__cover" [src]="item.cover.proxyURL" [alt]="item.title" />
               <div class="row__meta">
                 <div class="row__title" [title]="item.title">{{ item.title }}</div>
                 <div class="row__sub" [title]="item.podcast.title">

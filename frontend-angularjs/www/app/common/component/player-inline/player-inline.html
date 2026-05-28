@@ -4,7 +4,7 @@
 
         <div class="pull-left current-cover">
             <a ng-href="{{::'/podcasts/' + pic.currentVideo.podcast.id + '/items/' + pic.currentVideo.id }}">
-                <img class="current-cover" ng-src="{{ pic.currentVideo.cover.url }}" alt=""/>
+                <img class="current-cover" ng-src="{{ pic.currentVideo.cover.proxyURL }}" alt=""/>
             </a>
         </div>
         <div class="pull-left player">
@@ -24,7 +24,7 @@
                             <li ng-repeat="item in pic.playlist track by item.id">
                                 <a ng-class="{ 'currently-playing' : pic.isCurrentlyPlaying(item) }">
                                     <div class="pull-left" ng-click="pic.play(item)">
-                                        <img class="playlist-cover" ng-src="{{ ::item.cover.url }}" alt=""/>
+                                        <img class="playlist-cover" ng-src="{{ ::item.cover.proxyURL }}" alt=""/>
                                     </div>
                                     <span class="playlist-title" ng-click="pic.play(item)">
                                         {{ ::item.title | characters:45 }}

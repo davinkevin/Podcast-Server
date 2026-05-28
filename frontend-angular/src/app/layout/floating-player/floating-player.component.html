@@ -19,7 +19,7 @@
 
     <div class="player__bar">
       @if (!player.isVideo()) {
-        <img class="player__thumb" [src]="item.cover.url" [alt]="item.title" />
+        <img class="player__thumb" [src]="item.cover.proxyURL" [alt]="item.title" />
       }
 
       <div class="player__meta">

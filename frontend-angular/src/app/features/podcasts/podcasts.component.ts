@@ -85,7 +85,7 @@ export default class PodcastsComponent {
   });
 
   protected coverUrl(p: PodcastHAL): string {
-    return p.cover.url;
+    return p.cover.proxyURL;
   }
 
   protected onOpen(p: PodcastHAL) {

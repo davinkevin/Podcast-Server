@@ -19,7 +19,7 @@
         </div>
 
         <a class="pull-left" ng-href="{{ '/podcasts/' + item.podcast.id + '/items/' + item.id }}">
-            <img ng-src="{{::item.cover.url}}" >
+            <img ng-src="{{::item.cover.proxyURL}}" >
         </a>
 
         <div class="media-body">
@@ -54,7 +54,7 @@
                 </div>
 
                 <a class="pull-left" ng-href="{{ '/podcasts/' + item.podcast.id + '/items/' + item.id }}">
-                    <img ng-src="{{::item.cover.url}}">
+                    <img ng-src="{{::item.cover.proxyURL}}">
                 </a>
 
                 <div class="media-body">

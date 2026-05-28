@@ -71,7 +71,7 @@ export default class DownloadCtrl {
             case 'FINISH' :
                 this.$notification('Téléchargement terminé', {
                     body: item.title,
-                    icon: item.cover.url,
+                    icon: item.cover.proxyURL,
                     delay: 5000
                 });
                 this.onStoppedFromWS(elemToUpdate);

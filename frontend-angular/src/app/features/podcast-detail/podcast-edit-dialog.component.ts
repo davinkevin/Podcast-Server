@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  computed,
   effect,
   inject,
   signal,
@@ -72,10 +73,9 @@ const FIND_DEBOUNCE_MS = 500;
               <span>{{ findErr }} — keeping the current cover.</span>
             </div>
           } @else {
-            @let cover = currentCover();
             @let detectedType = info?.type ?? podcast.type;
             <div class="preview">
-              <img class="preview__cover" [src]="cover.url" [alt]="podcast.title" />
+              <img class="preview__cover" [src]="coverPreviewUrl()" [alt]="podcast.title" />
               <div class="preview__meta">
                 <div class="preview__title">{{ info?.title ?? podcast.title }}</div>
                 <div class="preview__sub">{{ detectedType }}</div>
@@ -217,6 +217,13 @@ export class PodcastEditDialogComponent {
     width: this.podcast.cover.width,
     height: this.podcast.cover.height,
     url: this.podcast.cover.url,
+  });
+  // Display via the proxy URL while the cover still points at the saved
+  // source — once the user (or /find) supplies a different URL, that URL
+  // has no proxy yet, so render it directly.
+  protected readonly coverPreviewUrl = computed(() => {
+    const cover = this.currentCover();
+    return cover.url === this.podcast.cover.url ? this.podcast.cover.proxyURL : cover.url;
   });
   protected readonly tagsDraft = signal<readonly TagInput[]>(
     this.podcast.tags.map((t) => ({ id: t.id, name: t.name })),

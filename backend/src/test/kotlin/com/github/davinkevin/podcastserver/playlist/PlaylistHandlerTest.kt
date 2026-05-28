@@ -151,7 +151,8 @@ class PlaylistHandlerTest (
                                   "id": "0882344b-fcaf-4332-9ab8-47e78921f929",
                                   "width": 123,
                                   "height": 456,
-                                  "url": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png"
+                                  "url": "https://foo.com/bar/podcast/image.png",
+                                  "proxyURL": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png"
                                 }
                               }]
                         }""")
@@ -207,7 +208,8 @@ class PlaylistHandlerTest (
                                   "id": "0882344b-fcaf-4332-9ab8-47e78921f929",
                                   "width": 123,
                                   "height": 456,
-                                  "url": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.jpg"
+                                  "url": "https://foo.com/bar/podcast/image",
+                                  "proxyURL": "/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.jpg"
                                 }
                               }]
                         }""")
@@ -361,7 +363,8 @@ class PlaylistHandlerTest (
                                       "cover":{
                                          "height":456,
                                          "id":"0882344b-fcaf-4332-9ab8-47e78921f929",
-                                         "url":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png",
+                                         "url":"https://foo.com/bar/podcast/image.png",
+                                         "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png",
                                          "width":123
                                       },
                                       "description":"a desc",
@@ -435,7 +438,8 @@ class PlaylistHandlerTest (
                                       "cover":{
                                          "height":456,
                                          "id":"0882344b-fcaf-4332-9ab8-47e78921f929",
-                                         "url":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png",
+                                         "url":"https://foo.com/bar/podcast/image.png",
+                                         "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png",
                                          "width":123
                                       },
                                       "description":"a desc",
@@ -512,7 +516,8 @@ class PlaylistHandlerTest (
                                       "cover":{
                                          "height":456,
                                          "id":"0882344b-fcaf-4332-9ab8-47e78921f929",
-                                         "url":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png",
+                                         "url":"https://foo.com/bar/podcast/image.png",
+                                         "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png",
                                          "width":123
                                       },
                                       "description":"a desc",
@@ -607,7 +612,8 @@ class PlaylistHandlerTest (
                                       "cover":{
                                          "height":456,
                                          "id":"0882344b-fcaf-4332-9ab8-47e78921f929",
-                                         "url":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png",
+                                         "url":"https://foo.com/bar/podcast/image.png",
+                                         "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png",
                                          "width":123
                                       },
                                       "description":"a desc",
@@ -626,7 +632,8 @@ class PlaylistHandlerTest (
                                       "cover":{
                                          "height":456,
                                          "id":"f1b81640-ff21-423b-9cc4-8c256e412e14",
-                                         "url":"/api/v1/podcasts/35d04720-1bc3-476b-b7b0-494a15adf45e/items/4b48996c-686f-4339-b94e-f9595094f2ea/cover.png",
+                                         "url":"https://foo.com/bar/podcast/2/image.png",
+                                         "proxyURL":"/api/v1/podcasts/35d04720-1bc3-476b-b7b0-494a15adf45e/items/4b48996c-686f-4339-b94e-f9595094f2ea/cover.png",
                                          "width":123
                                       },
                                       "description":"a desc",
@@ -725,7 +732,8 @@ class PlaylistHandlerTest (
                                   "cover":{
                                      "height":456,
                                      "id":"0882344b-fcaf-4332-9ab8-47e78921f929",
-                                     "url":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png",
+                                     "url":"https://foo.com/bar/podcast/image.png",
+                                     "proxyURL":"/api/v1/podcasts/3ba6411c-8fb9-4e24-afb1-adbad9a023e0/items/c42d2a59-46e6-4c1d-b0fb-2b47d389b370/cover.png",
                                      "width":123
                                   },
                                   "description":"a desc",

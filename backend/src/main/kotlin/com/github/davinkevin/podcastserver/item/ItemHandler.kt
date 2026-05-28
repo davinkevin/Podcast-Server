@@ -226,7 +226,7 @@ data class ItemHAL(
     @JsonProperty("isDownloaded")
     private val isDownloaded = Status.FINISH == status
 
-    data class Cover(val id: UUID, val width: Int, val height: Int, val url: URI)
+    data class Cover(val id: UUID, val width: Int, val height: Int, val url: URI, val proxyURL: URI)
     data class Podcast(val id: UUID, val title: String, val url: String?)
 }
 
@@ -234,7 +234,7 @@ internal fun Item.toHAL(): ItemHAL {
 
     val extension = cover.url.extension().ifBlank { "jpg" }
 
-    val coverUrl = UriComponentsBuilder.fromPath("/")
+    val coverProxyURL = UriComponentsBuilder.fromPath("/")
         .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), "cover.$extension")
         .build(true)
         .toUri()
@@ -245,21 +245,9 @@ internal fun Item.toHAL(): ItemHAL {
         description = description, mimeType = mimeType, length = length, fileName = fileName, status = status,
 
         podcast = ItemHAL.Podcast(podcast.id, podcast.title, podcast.url),
-        cover = ItemHAL.Cover(cover.id, cover.width, cover.height, coverUrl)
+        cover = ItemHAL.Cover(cover.id, cover.width, cover.height, cover.url, coverProxyURL)
     )
 }
-
-data class PageItemHAL (
-    val content: Collection<ItemHAL>,
-    val empty: Boolean,
-    val first: Boolean,
-    val last: Boolean,
-    val number: Int,
-    val numberOfElements: Int,
-    val size: Int,
-    val totalElements: Int,
-    val totalPages: Int
-)
 
 private fun PageItem.toHAL() = PageItemHAL(
     content = content.map { it.toHAL() },
@@ -271,6 +259,18 @@ private fun PageItem.toHAL() = PageItemHAL(
     size = size,
     totalElements = totalElements,
     totalPages = totalPages
+)
+
+data class PageItemHAL (
+    val content: Collection<ItemHAL>,
+    val empty: Boolean,
+    val first: Boolean,
+    val last: Boolean,
+    val number: Int,
+    val numberOfElements: Int,
+    val size: Int,
+    val totalElements: Int,
+    val totalPages: Int
 )
 
 data class PlaylistsHAL(val content: Collection<PlaylistHAL>) {

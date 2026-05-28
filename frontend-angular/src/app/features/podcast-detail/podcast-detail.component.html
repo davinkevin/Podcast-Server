@@ -270,7 +270,7 @@
             <ps-track-row
               [title]="item.title"
               [subtitle]="subtitleFor(item)"
-              [coverUrl]="item.cover.url"
+              [coverUrl]="item.cover.proxyURL"
               [aspectRatio]="item.cover.width + ' / ' + item.cover.height"
               [playable]="item.isDownloaded"
               [downloadable]="!item.isDownloaded && !isInProgress(item)"

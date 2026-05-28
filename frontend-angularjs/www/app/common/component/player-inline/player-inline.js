@@ -96,7 +96,7 @@ export default class PlayerInlineComponent {
         if (this.currentVideo !== null && this.currentVideo !== undefined) {
             this.API.stop();
             this.config.sources = [{src : this.currentVideo.proxyURL, type : this.currentVideo.mimeType }];
-            this.config.plugins.poster = this.currentVideo.cover.url;
+            this.config.plugins.poster = this.currentVideo.cover.proxyURL;
             this.API.play();
         }
     }

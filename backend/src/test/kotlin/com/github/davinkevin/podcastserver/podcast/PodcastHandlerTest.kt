@@ -82,7 +82,8 @@ class PodcastHandlerTest(
                        "cover":{
                           "height":200,
                           "id":"1e275238-4cbe-4abb-bbca-95a0e4ebbeea",
-                          "url":"/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/cover.png",
+                          "url":"https://external.domain.tld/cover.png",
+                          "proxyURL":"/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/cover.png",
                           "width":200
                        },
                        "hasToBeDeleted":true,
@@ -174,7 +175,7 @@ class PodcastHandlerTest(
                         isEqualTo("""{
                               "content": [
                                 {
-                                  "cover": { "height": 200, "id": "1e275238-4cbe-4abb-bbca-95a0e4ebbeea", "url": "/api/v1/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/cover.png", "width": 200 },
+                                  "cover": { "height": 200, "id": "1e275238-4cbe-4abb-bbca-95a0e4ebbeea", "url": "https://external.domain.tld/1.png", "proxyURL": "/api/v1/podcasts/ad16b2eb-657e-4064-b470-5b99397ce729/cover.png", "width": 200 },
                                   "hasToBeDeleted": true,
                                   "id": "ad16b2eb-657e-4064-b470-5b99397ce729",
                                   "lastUpdate": "2019-03-31T11:21:32.000000045+01:00",
@@ -184,7 +185,7 @@ class PodcastHandlerTest(
                                   "url": "https://foo.bar.com/app/1.rss"
                                 },
                                 {
-                                  "cover": { "height": 200, "id": "1e275238-4cbe-4abb-bbca-95a0e4ebbeea", "url": "/api/v1/podcasts/bd16b2eb-657e-4064-b470-5b99397ce729/cover.jpg", "width": 200 },
+                                  "cover": { "height": 200, "id": "1e275238-4cbe-4abb-bbca-95a0e4ebbeea", "url": "https://external.domain.tld/2", "proxyURL": "/api/v1/podcasts/bd16b2eb-657e-4064-b470-5b99397ce729/cover.jpg", "width": 200 },
                                   "hasToBeDeleted": true,
                                   "id": "bd16b2eb-657e-4064-b470-5b99397ce729",
                                   "lastUpdate": "2019-03-31T11:21:32.000000045+01:00",
@@ -194,7 +195,7 @@ class PodcastHandlerTest(
                                   "url": "https://foo.bar.com/app/2.rss"
                                 },
                                 {
-                                  "cover": { "height": 200, "id": "1e275238-4cbe-4abb-bbca-95a0e4ebbeea", "url": "/api/v1/podcasts/cd16b2eb-657e-4064-b470-5b99397ce729/cover.png", "width": 200 },
+                                  "cover": { "height": 200, "id": "1e275238-4cbe-4abb-bbca-95a0e4ebbeea", "url": "https://external.domain.tld/3.png", "proxyURL": "/api/v1/podcasts/cd16b2eb-657e-4064-b470-5b99397ce729/cover.png", "width": 200 },
                                   "hasToBeDeleted": true,
                                   "id": "cd16b2eb-657e-4064-b470-5b99397ce729",
                                   "lastUpdate": "2019-03-31T11:21:32.000000045+01:00",
@@ -280,7 +281,8 @@ class PodcastHandlerTest(
                               "cover": {
                                 "height": 1200,
                                 "id": "d6d4033a-d499-4c09-8d3e-d74595ae0993",
-                                "url": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
+                                "url": "http://foo.bar.com/cover.png",
+                                "proxyURL": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
                                 "width": 600
                               },
                               "hasToBeDeleted": true,
@@ -347,7 +349,8 @@ class PodcastHandlerTest(
                               "cover": {
                                 "height": 1200,
                                 "id": "d6d4033a-d499-4c09-8d3e-d74595ae0993",
-                                "url": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
+                                "url": "http://foo.bar.com/cover.png",
+                                "proxyURL": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
                                 "width": 600
                               },
                               "hasToBeDeleted": true,
@@ -400,7 +403,8 @@ class PodcastHandlerTest(
                               "cover": {
                                 "height": 1200,
                                 "id": "d6d4033a-d499-4c09-8d3e-d74595ae0993",
-                                "url": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
+                                "url": "http://foo.bar.com/cover.png",
+                                "proxyURL": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
                                 "width": 600
                               },
                               "hasToBeDeleted": true,
@@ -474,7 +478,8 @@ class PodcastHandlerTest(
                               "cover": {
                                 "height": 1200,
                                 "id": "d6d4033a-d499-4c09-8d3e-d74595ae0993",
-                                "url": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
+                                "url": "http://foo.bar.com/cover.png",
+                                "proxyURL": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
                                 "width": 600
                               },
                               "hasToBeDeleted": true,
@@ -534,7 +539,8 @@ class PodcastHandlerTest(
                               "cover": {
                                 "height": 1200,
                                 "id": "d6d4033a-d499-4c09-8d3e-d74595ae0993",
-                                "url": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
+                                "url": "http://foo.bar.com/cover.png",
+                                "proxyURL": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
                                 "width": 600
                               },
                               "hasToBeDeleted": true,
@@ -590,7 +596,8 @@ class PodcastHandlerTest(
                               "cover": {
                                 "height": 1200,
                                 "id": "d6d4033a-d499-4c09-8d3e-d74595ae0993",
-                                "url": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
+                                "url": "http://foo.bar.com/cover.png",
+                                "proxyURL": "/api/v1/podcasts/dbb18cac-58bb-4d89-b9ec-afc9da00afc5/cover.png",
                                 "width": 600
                               },
                               "hasToBeDeleted": true,

@@ -277,7 +277,8 @@ class ItemHandlerTest(
                            "cover":{
                               "height":200,
                               "id":"f4efe8db-7abf-4998-b15c-9fa2e06096a1",
-                              "url":"/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png",
+                              "url":"https://external.domain.tld/foo/bar.png",
+                              "proxyURL":"/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png",
                               "width":200
                            },
                            "creationDate":"2019-02-05T13:14:15Z",
@@ -326,7 +327,8 @@ class ItemHandlerTest(
                            "cover":{
                               "height":200,
                               "id":"f4efe8db-7abf-4998-b15c-9fa2e06096a1",
-                              "url":"/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png",
+                              "url":"https://external.domain.tld/foo/bar.png",
+                              "proxyURL":"/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png",
                               "width":200
                            },
                            "creationDate":"2019-02-05T13:14:15Z",
@@ -402,7 +404,8 @@ class ItemHandlerTest(
                            "cover":{
                               "height":200,
                               "id":"f4efe8db-7abf-4998-b15c-9fa2e06096a1",
-                              "url":"/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png",
+                              "url":"https://external.domain.tld/foo/bar.png",
+                              "proxyURL":"/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png",
                               "width":200
                            },
                            "creationDate":"2019-02-05T13:14:15Z",
@@ -910,7 +913,8 @@ class ItemHandlerTest(
                                       "cover":{
                                          "height":100,
                                          "id":"337edcd5-97d3-4f78-9a5b-1c14c999883b",
-                                         "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/cover.png",
+                                         "url":"https://foo.bar.com/cover.png",
+                                         "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/cover.png",
                                          "width":100
                                       },
                                       "creationDate":"2019-03-04T05:06:07Z",
@@ -965,7 +969,8 @@ class ItemHandlerTest(
                                   "cover":{
                                      "height":100,
                                      "id":"337edcd5-97d3-4f78-9a5b-1c14c999883b",
-                                     "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/cover.png",
+                                     "url":"https://foo.bar.com/cover.png",
+                                     "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/cover.png",
                                      "width":100
                                   },
                                   "creationDate":"2019-03-04T05:06:07Z",
@@ -992,7 +997,8 @@ class ItemHandlerTest(
                                   "cover":{
                                      "height":100,
                                      "id":"319072db-4411-4975-884e-f1cacbfb1471",
-                                     "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/cb4cd9b9-957a-457e-a72a-519241c51aca/cover.png",
+                                     "url":"https://foo.bar.com/2/cover.png",
+                                     "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/cb4cd9b9-957a-457e-a72a-519241c51aca/cover.png",
                                      "width":100
                                   },
                                   "creationDate":"2019-03-04T05:06:07Z",
@@ -1047,7 +1053,8 @@ class ItemHandlerTest(
                                   "cover":{
                                      "height":100,
                                      "id":"337edcd5-97d3-4f78-9a5b-1c14c999883b",
-                                     "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/cover.png",
+                                     "url":"https://foo.bar.com/cover.png",
+                                     "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/cover.png",
                                      "width":100
                                   },
                                   "creationDate":"2019-03-04T05:06:07Z",
@@ -1070,7 +1077,8 @@ class ItemHandlerTest(
                                   "cover":{
                                      "height":100,
                                      "id":"319072db-4411-4975-884e-f1cacbfb1471",
-                                     "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/cb4cd9b9-957a-457e-a72a-519241c51aca/cover.png",
+                                     "url":"https://foo.bar.com/2/cover.png",
+                                     "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/cb4cd9b9-957a-457e-a72a-519241c51aca/cover.png",
                                      "width":100
                                   },
                                   "creationDate":"2019-03-04T05:06:07Z",
@@ -1093,7 +1101,8 @@ class ItemHandlerTest(
                                   "cover":{
                                      "height":100,
                                      "id":"388d596e-858a-4746-bbe7-a1c027fa2fc4",
-                                     "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/ffbeb6b9-0e1f-4fb1-ab95-0f92effcc621/cover.png",
+                                     "url":"https://foo.bar.com/3/cover.png",
+                                     "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/ffbeb6b9-0e1f-4fb1-ab95-0f92effcc621/cover.png",
                                      "width":100
                                   },
                                   "creationDate":"2019-03-04T05:06:07Z",
@@ -1186,7 +1195,8 @@ class ItemHandlerTest(
                               "cover": {
                                 "height": 200,
                                 "id": "f4efe8db-7abf-4998-b15c-9fa2e06096a1",
-                                "url": "/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png",
+                                "url": "https://external.domain.tld/foo/bar.png",
+                                "proxyURL": "/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png",
                                 "width": 200
                               },
                               "creationDate": "2019-06-24T05:29:54.000000034+02:00",
@@ -1246,7 +1256,8 @@ class ItemHandlerTest(
                               "cover": {
                                 "height": 200,
                                 "id": "f4efe8db-7abf-4998-b15c-9fa2e06096a1",
-                                "url": "/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png",
+                                "url": "https://external.domain.tld/foo/bar.png",
+                                "proxyURL": "/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png",
                                 "width": 200
                               },
                               "creationDate": "2019-06-24T05:29:54.000000034+02:00",
@@ -1306,7 +1317,8 @@ class ItemHandlerTest(
                               "cover": {
                                 "height": 200,
                                 "id": "f4efe8db-7abf-4998-b15c-9fa2e06096a1",
-                                "url": "/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png",
+                                "url": "https://external.domain.tld/foo/bar.png",
+                                "proxyURL": "/api/v1/podcasts/dd16b2eb-657e-4064-b470-5b99397ce729/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png",
                                 "width": 200
                               },
                               "creationDate": "2019-06-24T05:29:54.000000034+02:00",
@@ -1511,7 +1523,8 @@ class ItemHandlerTest(
                               "id":"337edcd5-97d3-4f78-9a5b-1c14c999883b",
                               "width":100,
                               "height":100,
-                              "url":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/cover.png"
+                              "url":"https://foo.bar.com/cover.png",
+                              "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/cover.png"
                            },
                            "podcastId":"ef62c5c3-e79f-4474-8228-40b76abcdb57",
                            "proxyURL":"/api/v1/podcasts/ef62c5c3-e79f-4474-8228-40b76abcdb57/items/6a287582-e181-48f9-a23d-c88d03879feb/item_1.mp3",

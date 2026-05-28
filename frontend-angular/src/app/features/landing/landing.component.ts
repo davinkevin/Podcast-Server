@@ -154,7 +154,7 @@ export default class LandingComponent {
           id: 's-' + p.id,
           podcastId: p.id,
           title: p.title,
-          coverUrl: p.cover.url,
+          coverUrl: p.cover.proxyURL,
           itemCount: p.itemCount,
           items: p.items,
         };
@@ -163,7 +163,7 @@ export default class LandingComponent {
         kind: 'episode',
         id: 'e-' + p.items[0].id,
         item: p.items[0],
-        podcastCoverUrl: p.cover.url,
+        podcastCoverUrl: p.cover.proxyURL,
       };
     });
   });
@@ -211,7 +211,7 @@ export default class LandingComponent {
   }
 
   protected coverUrl(item: ItemHAL): string {
-    return item.cover.url;
+    return item.cover.proxyURL;
   }
 
   protected onPlay(item: ItemHAL) {

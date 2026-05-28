@@ -147,7 +147,7 @@ private data class PodcastHAL(val id: UUID,
 
                               val cover: CoverHAL)
 
-private data class CoverHAL(val id: UUID, val width: Int, val height: Int, val url: URI)
+private data class CoverHAL(val id: UUID, val width: Int, val height: Int, val url: URI, val proxyURL: URI)
 private data class TagHAL(val id: UUID, val name: String)
 
 private fun Cover.extension(): String {
@@ -155,7 +155,7 @@ private fun Cover.extension(): String {
 }
 
 private fun Podcast.toHAL(): PodcastHAL {
-    val coverUrl = UriComponentsBuilder.fromPath("/")
+    val proxyURL = UriComponentsBuilder.fromPath("/")
         .pathSegment("api", "v1", "podcasts", this.id.toString(), "cover." + this.cover.extension())
         .build(true)
         .toUri()
@@ -168,7 +168,7 @@ private fun Podcast.toHAL(): PodcastHAL {
         lastUpdate,
         type,
         tags.map { TagHAL(it.id, it.name) },
-        CoverHAL(cover.id, cover.width, cover.height, coverUrl)
+        CoverHAL(cover.id, cover.width, cover.height, cover.url, proxyURL)
     )
 }
 

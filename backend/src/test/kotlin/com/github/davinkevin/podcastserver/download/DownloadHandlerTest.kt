@@ -122,7 +122,8 @@ class DownloadHandlerTest(
                                  },
                                  "cover":{
                                     "id":"cc05149f-a3e1-4302-ab1f-83324c75ad70",
-                                    "url":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/6c05149f-a3e1-4302-ab1f-83324c75ad70/cover.png"
+                                    "url":"https://foo.bar.com/item1/url.png",
+                                    "proxyURL":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/6c05149f-a3e1-4302-ab1f-83324c75ad70/cover.png"
                                  }
                               },
                               {
@@ -136,7 +137,8 @@ class DownloadHandlerTest(
                                  },
                                  "cover":{
                                     "id":"ccaba8f2-4f2f-49f0-a520-a48bc628d81f",
-                                    "url":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/7caba8f2-4f2f-49f0-a520-a48bc628d81f/cover.png"
+                                    "url":"https://foo.bar.com/item2/url.png",
+                                    "proxyURL":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/7caba8f2-4f2f-49f0-a520-a48bc628d81f/cover.png"
                                  }
                               }
                            ]
@@ -188,7 +190,8 @@ class DownloadHandlerTest(
                                  },
                                  "cover":{
                                     "id":"ccaba8f2-4f2f-49f0-a520-a48bc628d81f",
-                                    "url":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/7caba8f2-4f2f-49f0-a520-a48bc628d81f/cover.jpg"
+                                    "url":"https://foo.bar.com/item2/url",
+                                    "proxyURL":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/7caba8f2-4f2f-49f0-a520-a48bc628d81f/cover.jpg"
                                  }
                               }
                            ]
@@ -240,7 +243,8 @@ class DownloadHandlerTest(
                                  },
                                  "cover":{
                                     "id":"ccaba8f2-4f2f-49f0-a520-a48bc628d81f",
-                                    "url":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/7caba8f2-4f2f-49f0-a520-a48bc628d81f/cover.png"
+                                    "url":"https://foo.bar.com/item2/url.png?foo=bar",
+                                    "proxyURL":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/7caba8f2-4f2f-49f0-a520-a48bc628d81f/cover.png"
                                  }
                               }
                            ]
@@ -374,7 +378,8 @@ class DownloadHandlerTest(
                                  },
                                  "cover":{
                                     "id":"cc05149f-a3e1-4302-ab1f-83324c75ad70",
-                                    "url":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/6c05149f-a3e1-4302-ab1f-83324c75ad70/cover.png"
+                                    "url":"https://foo.bar.com/item1/url.png",
+                                    "proxyURL":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/6c05149f-a3e1-4302-ab1f-83324c75ad70/cover.png"
                                  }
                               },
                               {
@@ -388,7 +393,8 @@ class DownloadHandlerTest(
                                  },
                                  "cover":{
                                     "id":"ccaba8f2-4f2f-49f0-a520-a48bc628d81f",
-                                    "url":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/7caba8f2-4f2f-49f0-a520-a48bc628d81f/cover.png"
+                                    "url":"https://foo.bar.com/item2/url.png",
+                                    "proxyURL":"/api/v1/podcasts/acaba8f2-4f2f-49f0-a520-a48bc628d81f/items/7caba8f2-4f2f-49f0-a520-a48bc628d81f/cover.png"
                                  }
                               }
                            ]

@@ -209,7 +209,7 @@ export default class LibraryComponent {
   }
 
   protected coverUrl(item: ItemHAL): string {
-    return item.cover.url;
+    return item.cover.proxyURL;
   }
 
   protected statusFor(item: ItemHAL): { kind: StatusBadgeKind; progression: number | null } | null {

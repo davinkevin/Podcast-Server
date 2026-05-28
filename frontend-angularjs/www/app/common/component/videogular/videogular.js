@@ -66,7 +66,7 @@ class VideogularConfigBuilder {
             src : item.proxyURL,
             type : item.mimeType
         });
-        this.config.plugins.poster = item.cover.url;
+        this.config.plugins.poster = item.cover.proxyURL;
         return this;
     }
 

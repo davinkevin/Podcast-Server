@@ -44,13 +44,13 @@ data class DigestPodcastHAL(
     val itemCount: Int,
     val items: List<ItemHAL>,
 ) {
-    data class CoverHAL(val id: UUID, val width: Int, val height: Int, val url: URI)
+    data class CoverHAL(val id: UUID, val width: Int, val height: Int, val url: URI, val proxyURL: URI)
 }
 
 private fun List<DigestPodcast>.toHAL() = DigestHAL(content = map { it.toHAL() })
 
 private fun DigestPodcast.toHAL(): DigestPodcastHAL {
-    val coverUrl = UriComponentsBuilder.fromPath("/")
+    val coverProxyURL = UriComponentsBuilder.fromPath("/")
         .pathSegment("api", "v1", "podcasts", id.toString(), "cover." + cover.extension())
         .build(true)
         .toUri()
@@ -58,7 +58,7 @@ private fun DigestPodcast.toHAL(): DigestPodcastHAL {
     return DigestPodcastHAL(
         id = id,
         title = title,
-        cover = DigestPodcastHAL.CoverHAL(cover.id, cover.width, cover.height, coverUrl),
+        cover = DigestPodcastHAL.CoverHAL(cover.id, cover.width, cover.height, cover.url, coverProxyURL),
         itemCount = itemCount,
         items = items.map { it.toHAL() },
     )

@@ -278,7 +278,7 @@ export default class PlaylistDetailComponent {
   });
 
   protected itemCoverUrl(item: PlaylistItemHAL): string {
-    return item.cover.url;
+    return item.cover.proxyURL;
   }
 
   protected onPlay(item: PlaylistItemHAL) {

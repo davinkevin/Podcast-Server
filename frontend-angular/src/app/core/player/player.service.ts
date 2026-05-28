@@ -13,7 +13,7 @@ export type Playable = {
   readonly mimeType: string;
   readonly isDownloaded: boolean;
   readonly podcast: { readonly id: string; readonly title: string };
-  readonly cover: { readonly url: string };
+  readonly cover: { readonly url: string; readonly proxyURL: string };
 };
 
 @Injectable({ providedIn: 'root' })

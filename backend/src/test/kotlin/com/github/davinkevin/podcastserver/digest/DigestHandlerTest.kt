@@ -106,7 +106,8 @@ class DigestHandlerTest(
                                     "id": "11111111-2222-3333-4444-555555555555",
                                     "width": 400,
                                     "height": 400,
-                                    "url": "/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/cover.png"
+                                    "url": "https://external.domain.tld/podcast/bar.png",
+                                    "proxyURL": "/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/cover.png"
                                 },
                                 "items": [
                                     {
@@ -133,7 +134,8 @@ class DigestHandlerTest(
                                             "id": "f4efe8db-7abf-4998-b15c-9fa2e06096a1",
                                             "width": 200,
                                             "height": 200,
-                                            "url": "/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png"
+                                            "url": "https://external.domain.tld/foo/bar.png",
+                                            "proxyURL": "/api/v1/podcasts/8e2df56f-959b-4eb4-b5fa-0fd6027ae0f9/items/27184b1a-7642-4ffd-ac7e-14fb36f7f15c/cover.png"
                                         }
                                     }
                                 ]

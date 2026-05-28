@@ -53,7 +53,7 @@ import { PlayerService } from '../../core/player/player.service';
             @if (active) {
               <mat-icon class="queue__leader-icon">play_arrow</mat-icon>
             } @else {
-              <img class="queue__cover" [src]="item.cover.url" alt="" />
+              <img class="queue__cover" [src]="item.cover.proxyURL" alt="" />
             }
           </div>
           <div class="queue__meta">

@@ -168,9 +168,9 @@ export default class ItemDetailComponent {
   // payload), then the route-derived URL (podcast case).
   protected readonly coverSrc = computed(() => {
     const item = this.itemQuery.data();
-    if (item) return item.cover.url;
+    if (item) return item.cover.proxyURL;
     const fromPl = this.playlistItem();
-    if (fromPl) return fromPl.cover.url;
+    if (fromPl) return fromPl.cover.proxyURL;
     const podcastId = this.podcastId();
     if (podcastId) return `/api/v1/podcasts/${podcastId}/items/${this.id()}/cover.jpg`;
     return '';
@@ -216,7 +216,7 @@ export default class ItemDetailComponent {
     effect(() => {
       const item = this.itemQuery.data();
       if (!item) return;
-      this.coverColor.extract(item.cover.url).then((p) => this.palette.set(p));
+      this.coverColor.extract(item.cover.proxyURL).then((p) => this.palette.set(p));
     });
 
     effect((onCleanup) => {

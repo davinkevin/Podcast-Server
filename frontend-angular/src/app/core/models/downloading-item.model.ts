@@ -8,5 +8,5 @@ export interface DownloadingItemHAL {
   readonly progression: number;
   readonly isDownloaded: boolean;
   readonly podcast: { readonly id: string; readonly title: string };
-  readonly cover: { readonly id: string; readonly url: string };
+  readonly cover: { readonly id: string; readonly url: string; readonly proxyURL: string };
 }

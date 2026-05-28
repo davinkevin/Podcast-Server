@@ -34,7 +34,7 @@ export default class PodcastUploadComponent{
     $uploadFile(file) {
         return this.itemService.upload(this.podcast, file)
             .then(item => { this.$scope.$emit("podcastEdition:upload"); return item; })
-            .then(item => this.$notification('Upload done', { body: item.title, icon: item.cover.url, delay: 5000}));
+            .then(item => this.$notification('Upload done', { body: item.title, icon: item.cover.proxyURL, delay: 5000}));
     }
 }
 

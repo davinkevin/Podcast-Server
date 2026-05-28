@@ -26,6 +26,7 @@ export interface ItemCoverHAL {
   readonly width: number;
   readonly height: number;
   readonly url: string;
+  readonly proxyURL: string;
 }
 
 export interface ItemHAL {

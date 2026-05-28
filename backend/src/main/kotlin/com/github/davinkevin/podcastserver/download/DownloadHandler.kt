@@ -101,13 +101,13 @@ private data class DownloadingItemHAL(
         val cover: Cover
 ) {
     data class Podcast(val id: UUID, val title: String)
-    data class Cover(val id: UUID, val url: URI)
+    data class Cover(val id: UUID, val url: URI, val proxyURL: URI)
 }
 
 private fun toDownloadingItem(item: DownloadingItem): DownloadingItemHAL {
     val extension = item.cover.url.extension().ifBlank { "jpg" }
 
-    val coverUrl = UriComponentsBuilder.fromPath("/")
+    val coverProxyURL = UriComponentsBuilder.fromPath("/")
             .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$extension")
             .build(true)
             .toUri()
@@ -123,7 +123,8 @@ private fun toDownloadingItem(item: DownloadingItem): DownloadingItemHAL {
             ),
             cover = DownloadingItemHAL.Cover(
                     id = item.cover.id,
-                    url = coverUrl
+                    url = item.cover.url,
+                    proxyURL = coverProxyURL
             )
     )
 }

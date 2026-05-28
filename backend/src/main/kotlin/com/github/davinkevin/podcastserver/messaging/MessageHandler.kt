@@ -7,12 +7,15 @@ import com.google.common.annotations.VisibleForTesting
 import org.springframework.context.event.EventListener
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
+import org.springframework.web.util.UriComponentsBuilder
 import reactor.core.publisher.Flux
 import reactor.core.publisher.Sinks
 import java.net.URI
 import java.time.Duration.ZERO
 import java.time.Duration.ofSeconds
 import java.util.*
+import kotlin.io.path.Path
+import kotlin.io.path.extension
 
 class MessageHandler {
 
@@ -79,17 +82,26 @@ internal data class DownloadingItemHAL(
     val isDownloaded = Status.FINISH == status
 
     data class Podcast(val id: UUID, val title: String)
-    data class Cover(val id: UUID, val url: URI)
+    data class Cover(val id: UUID, val url: URI, val proxyURL: URI)
 }
 
-internal fun toDownloadingItemHAL(item: DownloadingItem) = DownloadingItemHAL(
-    id = item.id,
-    title = item.title,
-    status = item.status,
-    url = item.url,
-    progression = item.progression,
-    podcast = DownloadingItemHAL.Podcast(item.podcast.id, item.podcast.title),
-    cover = DownloadingItemHAL.Cover(item.cover.id, item.cover.url)
-)
+internal fun toDownloadingItemHAL(item: DownloadingItem): DownloadingItemHAL {
+    val extension = Path(item.cover.url.path).extension.ifBlank { "jpg" }
+
+    val coverProxyURL = UriComponentsBuilder.fromPath("/")
+        .pathSegment("api", "v1", "podcasts", item.podcast.id.toString(), "items", item.id.toString(), "cover.$extension")
+        .build(true)
+        .toUri()
+
+    return DownloadingItemHAL(
+        id = item.id,
+        title = item.title,
+        status = item.status,
+        url = item.url,
+        progression = item.progression,
+        podcast = DownloadingItemHAL.Podcast(item.podcast.id, item.podcast.title),
+        cover = DownloadingItemHAL.Cover(item.cover.id, item.cover.url, coverProxyURL)
+    )
+}
 
 internal data class ServerSentEvent<T>(val event: String, val body: T)

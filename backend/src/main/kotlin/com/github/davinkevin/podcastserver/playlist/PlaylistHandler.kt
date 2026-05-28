@@ -150,14 +150,14 @@ private class PlaylistWithItemsHAL(val id: UUID, val name: String, val items: Co
             val cover: Cover) {
 
         data class Podcast(val id: UUID, val title: String)
-        data class Cover (val id: UUID, val width: Int, val height: Int, val url: URI)
+        data class Cover (val id: UUID, val width: Int, val height: Int, val url: URI, val proxyURL: URI)
     }
 }
 
 private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
     val coverExtension = cover.url.extension().ifBlank { "jpg" }
 
-    val coverUrl = UriComponentsBuilder.fromPath("/")
+    val coverProxyURL = UriComponentsBuilder.fromPath("/")
             .pathSegment("api", "v1", "podcasts", podcast.id.toString(), "items", id.toString(), "cover.$coverExtension")
             .build(true)
             .toUri()
@@ -185,7 +185,8 @@ private fun PlaylistWithItems.Item.toHAL(): PlaylistWithItemsHAL.Item {
                     id = cover.id,
                     height = cover.height,
                     width = cover.width,
-                    url = coverUrl
+                    url = cover.url,
+                    proxyURL = coverProxyURL
             )
     )
 }
