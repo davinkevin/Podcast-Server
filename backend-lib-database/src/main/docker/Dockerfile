@@ -26,4 +26,4 @@ FROM gcr.io/distroless/java25-debian13:latest@sha256:583ba2e08558063002bd1b5874a
 COPY --from=flyway-base /flyway/ /database/
 WORKDIR /database/
 
-ENTRYPOINT [ "java", "-cp", "lib/*:lib/flyway/*:lib/aad/*:drivers/*", "org.flywaydb.commandline.Main", "migrate"]
+ENTRYPOINT [ "java", "-cp", "lib/*:lib/flyway/*:lib/aad/*:drivers/*", "org.flywaydb.commandline.Main", "migrate", "-locations=filesystem:/database/sql"]
