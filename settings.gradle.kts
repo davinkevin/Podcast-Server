@@ -33,14 +33,17 @@ develocity {
             testLogging = true
         }
         uploadInBackground = !isCI
-        if (isCI) {
-            val refName = providers.environmentVariable("CI_COMMIT_REF_NAME").getOrElse("")
-            val pipelineId = providers.environmentVariable("CI_PIPELINE_ID").getOrElse("")
-            val jobImage = providers.environmentVariable("CI_JOB_IMAGE").getOrElse("")
-            tag(refName)
-            value("Pipeline", pipelineId)
-            value("Job Image", jobImage)
-            link("Source", "https://gitlab.com/davinkevin/Podcast-Server/tree/$refName")
+        // Read CI_* env vars at execution time (inside background {}) so they
+        // don't enter the configuration cache fingerprint — CI_PIPELINE_ID
+        // changes on every pipeline and would otherwise invalidate the cache.
+        background {
+            if (System.getenv("CI").toBoolean()) {
+                val refName = System.getenv("CI_COMMIT_REF_NAME").orEmpty()
+                tag(refName)
+                value("Pipeline", System.getenv("CI_PIPELINE_ID").orEmpty())
+                value("Job Image", System.getenv("CI_JOB_IMAGE").orEmpty())
+                link("Source", "https://gitlab.com/davinkevin/Podcast-Server/tree/$refName")
+            }
         }
     }
 }
