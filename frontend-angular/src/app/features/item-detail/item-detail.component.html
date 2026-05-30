@@ -14,8 +14,8 @@
     subtitle="Try refreshing in a moment."
   />
 } @else {
-  @let badge = item ? statusFor(item) : null;
-  @let inProgress = item ? isInProgress(item) : false;
+  @let badge = statusBadge();
+  @let loading = showLoader();
   @let inPlaylist = fromPlaylist();
   @let playlist = playlistQuery.data();
   @let plCover = playlistCoverSrc();
@@ -32,7 +32,10 @@
         [alt]="item?.title ?? ''"
         [style.view-transition-name]="heroTransitionName()"
       />
-      @if (badge) {
+      <!-- Downloading progress is surfaced through the action FAB loader
+           (which shows the percentage), so the cover badge covers the
+           remaining queued / failed states only. -->
+      @if (badge && badge.kind !== 'downloading') {
         <ps-status-badge
           class="detail__badge"
           [kind]="badge.kind"
@@ -105,7 +108,18 @@
             <mat-icon>play_arrow</mat-icon>
             Play
           </button>
-        } @else if (!inProgress) {
+        } @else if (loading) {
+          <!-- While downloading/queued the FAB stays in place and turns into
+               a disabled spinner + status label (mirrors the podcast
+               "Updating…" button). The button never vanishes, so the user
+               doesn't see Download disappear then Play pop in (#260). -->
+          <button mat-fab extended color="primary" class="detail__action-loading" disabled>
+            <span class="detail__action-loading-inner" role="status" aria-live="polite">
+              <mat-spinner diameter="20" />
+              <span>{{ loaderLabel() }}</span>
+            </span>
+          </button>
+        } @else {
           <button mat-fab extended color="primary" (click)="onDownload(item)">
             <mat-icon>download</mat-icon>
             Download

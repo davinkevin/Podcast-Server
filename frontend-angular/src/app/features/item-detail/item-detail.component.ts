@@ -213,6 +213,24 @@ export default class ItemDetailComponent {
       if (item) this.title.setTitle(`${item.title} — Podcast Server`);
     });
 
+    // Bridge the FINISH→refetch gap: when a download leaves the stream but
+    // the detail hasn't yet resolved as downloaded, hold the loader. Cleared
+    // as soon as the item resolves downloaded (→ Play) or failed (→ retry).
+    effect(() => {
+      const inProgress = this.inProgress();
+      const item = this.itemQuery.data();
+      const downloaded = item?.isDownloaded ?? false;
+      const failed = item?.status === 'FAILED';
+
+      if (this.prevInProgress && !inProgress && !downloaded && !failed) {
+        this.settling.set(true);
+      }
+      if (downloaded || failed) {
+        this.settling.set(false);
+      }
+      this.prevInProgress = inProgress;
+    });
+
     effect(() => {
       const item = this.itemQuery.data();
       if (!item) return;
@@ -227,26 +245,57 @@ export default class ItemDetailComponent {
     });
   }
 
-  protected statusFor(item: ItemHAL): { kind: StatusBadgeKind; progression: number | null } | null {
-    const downloading = this.stream.downloading().find((d) => d.id === item.id);
-    if (downloading) {
-      return { kind: 'downloading', progression: downloading.progression };
-    }
-    if (this.stream.queue().some((q) => q.id === item.id)) {
-      return { kind: 'queued', progression: null };
-    }
-    if (item.status === 'FAILED') {
-      return { kind: 'failed', progression: null };
-    }
-    return null;
-  }
+  // --- Download / progress state -------------------------------------------
+  // This page always renders a single item, so the state below is keyed on
+  // the route id() rather than taking an item parameter.
 
-  protected isInProgress(item: ItemHAL): boolean {
-    return (
-      this.stream.downloading().some((d) => d.id === item.id) ||
-      this.stream.queue().some((q) => q.id === item.id)
-    );
-  }
+  private readonly downloadingEntry = computed(
+    () => this.stream.downloading().find((d) => d.id === this.id()) ?? null,
+  );
+  private readonly isQueued = computed(() =>
+    this.stream.queue().some((q) => q.id === this.id()),
+  );
+
+  // Active download or queued — driven by the SSE stream.
+  protected readonly inProgress = computed(
+    () => !!this.downloadingEntry() || this.isQueued(),
+  );
+
+  // Brief gap between a download leaving the stream (FINISH) and the item
+  // detail refetch flipping `isDownloaded` to true. Armed by the effect in
+  // the constructor; without it the FAB would flash back to "Download" for a
+  // frame before becoming "Play" — the exact flicker #260 calls out.
+  private prevInProgress = false;
+  private readonly settling = signal(false);
+
+  // Keep the loader up for the whole active phase plus the settling window.
+  protected readonly showLoader = computed(
+    () => this.inProgress() || (this.settling() && !this.itemQuery.data()?.isDownloaded),
+  );
+
+  // Badge shown over the cover for queued / failed states. The `downloading`
+  // kind is intentionally surfaced through the FAB loader (which carries the
+  // percentage) instead, so we don't duplicate the progress indicator.
+  protected readonly statusBadge = computed<{
+    kind: StatusBadgeKind;
+    progression: number | null;
+  } | null>(() => {
+    const downloading = this.downloadingEntry();
+    if (downloading) return { kind: 'downloading', progression: downloading.progression };
+    if (this.isQueued()) return { kind: 'queued', progression: null };
+    if (this.itemQuery.data()?.status === 'FAILED') return { kind: 'failed', progression: null };
+    return null;
+  });
+
+  // Text rendered inside the loading FAB.
+  protected readonly loaderLabel = computed(() => {
+    const badge = this.statusBadge();
+    if (badge?.kind === 'queued') return 'Queued…';
+    if (badge?.kind === 'downloading' && badge.progression !== null) {
+      return `Downloading… ${badge.progression}%`;
+    }
+    return 'Downloading…';
+  });
 
   protected onPlay(item: ItemHAL) {
     // In playlist mode, queue every playable item from the playlist and

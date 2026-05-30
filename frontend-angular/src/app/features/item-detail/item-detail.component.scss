@@ -200,6 +200,30 @@
   align-items: center;
 }
 
+// Loading variant of the primary FAB: Download swaps to a disabled spinner +
+// status label while the item downloads (mirrors the podcast "Updating…"
+// button). The extended FAB lays its label out in `.mdc-extended-fab__text`;
+// we make that an inline-flex row so the spinner sits on the text baseline
+// instead of stacking above it.
+.detail__action-loading ::ng-deep .mdc-extended-fab__text {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.detail__action-loading-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  // Tint the spinner with the button's own foreground so it reads against
+  // the FAB surface in both the accent and disabled states.
+  mat-spinner {
+    flex: 0 0 auto;
+    --mdc-circular-progress-active-indicator-color: currentColor;
+  }
+}
+
 // Pushes the overflow menu to the right edge of the actions row. `margin-left:
 // auto` works inside flex regardless of how many siblings precede it, and
 // behaves correctly when the row wraps on narrow screens (the button just
