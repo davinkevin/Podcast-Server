@@ -1,24 +1,17 @@
 package com.github.davinkevin.podcastserver.download.downloaders
 
 import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.YoutubeDlDownloaderFactory
+import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.YoutubeDlService
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
-import org.junit.jupiter.api.Test
-import org.junit.jupiter.api.extension.ExtendWith
 import org.junit.jupiter.params.ParameterizedTest
 import org.junit.jupiter.params.provider.MethodSource
-import org.mockito.junit.jupiter.MockitoSettings
-import org.mockito.kotlin.any
-import org.mockito.kotlin.whenever
-import org.mockito.quality.Strictness
+import org.mockito.kotlin.mock
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.test.context.bean.override.mockito.MockitoBean
 import org.springframework.context.ApplicationContext
-import org.springframework.test.context.junit.jupiter.SpringExtension
-import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.util.*
 import java.util.stream.Stream
@@ -26,22 +19,17 @@ import kotlin.io.path.Path
 import kotlin.reflect.KClass
 
 @NestedSpringTest
-@MockitoSettings(strictness = Strictness.LENIENT)
 class DownloaderSelectorTest(
     @Autowired val applicationContext: ApplicationContext
 ) {
 
-    @MockitoBean private lateinit var youtubeDLDownloader: YoutubeDlDownloaderFactory
+    private val youtubeDLDownloader = YoutubeDlDownloaderFactory(mock(), YoutubeDlService(mock(), emptyMap()))
 
     lateinit var selector: DownloaderSelector
 
     @BeforeEach
     fun beforeEach() {
-        val downloaders = setOf<DownloaderFactory>(youtubeDLDownloader)
-
-        downloaders.forEach { whenever(it.compatibility(any())).thenCallRealMethod()}
-
-        selector = DownloaderSelector(applicationContext, downloaders)
+        selector = DownloaderSelector(applicationContext, setOf(youtubeDLDownloader))
     }
 
     @MethodSource("urlToDownloader")

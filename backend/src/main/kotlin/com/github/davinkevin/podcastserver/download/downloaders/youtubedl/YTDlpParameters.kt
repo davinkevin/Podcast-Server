@@ -15,4 +15,21 @@ data class YTDlpParameters(
      * do). Blank disables the option.
      */
     val impersonate: String = "chrome",
-)
+    /**
+     * Hosts treated as video platform pages: downloaded with format
+     * selection and the configured extra parameters, never impersonated.
+     * Any other url is treated as a direct file download.
+     */
+    val videoPlatforms: List<String> = DEFAULT_VIDEO_PLATFORMS,
+) {
+    companion object {
+        val DEFAULT_VIDEO_PLATFORMS = listOf(
+            "youtube.com",
+            "www.6play.fr",
+            "www.tf1.fr",
+            "www.france.tv",
+            "replay.gulli.fr",
+            "dailymotion.com",
+        )
+    }
+}

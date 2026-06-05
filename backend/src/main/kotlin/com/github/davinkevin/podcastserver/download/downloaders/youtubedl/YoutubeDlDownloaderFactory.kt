@@ -17,7 +17,7 @@ class YoutubeDlDownloaderFactory(
     override fun compatibility(downloadingInformation: DownloadingInformation): Int {
         val url = downloadingInformation.url.toASCIIString().lowercase(Locale.getDefault())
         return when {
-            isFromVideoPlatform(url) -> 5
+            youtubeDL.isFromVideoPlatform(url) -> 5
             url.startsWith("http") -> Int.MAX_VALUE - 1
             else -> Int.MAX_VALUE
         }

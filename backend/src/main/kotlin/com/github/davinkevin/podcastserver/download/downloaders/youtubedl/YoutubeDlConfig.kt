@@ -26,6 +26,6 @@ class YoutubeDlConfig {
 
         log.debug("extra parameters: {}", extraParameters)
 
-        return YoutubeDlService(youtube, extraParameters, parameters.impersonate)
+        return YoutubeDlService(youtube, extraParameters, parameters.impersonate, parameters.videoPlatforms)
     }
 }

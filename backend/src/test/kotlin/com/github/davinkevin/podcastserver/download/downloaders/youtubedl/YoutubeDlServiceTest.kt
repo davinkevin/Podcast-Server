@@ -36,6 +36,39 @@ class YoutubeDlServiceTest(
     fun beforeEach() = Mockito.reset(youtubeDl)
 
     @Nested
+    @DisplayName("should identify video platforms")
+    inner class ShouldIdentifyVideoPlatforms {
+
+        @ParameterizedTest(name = "url {0}")
+        @ValueSource(strings = [
+            "https://youtube.com/file.mp3",
+            "https://www.6play.fr/file.mp3",
+            "https://www.tf1.fr/file.mp3",
+            "https://www.france.tv/file.mp3",
+            "https://replay.gulli.fr/file.mp3",
+            "https://dailymotion.com/file.mp3"
+        ])
+        fun `with default hosts`(url: String) {
+            assertThat(youtube.isFromVideoPlatform(url)).isTrue()
+        }
+
+        @Test
+        fun `and treat any other url as a direct file`() {
+            assertThat(youtube.isFromVideoPlatform("https://foo.bar.com/file.mp3")).isFalse()
+        }
+
+        @Test
+        fun `with hosts customized by configuration`() {
+            /* Given */
+            val ytdlp = YoutubeDlService(youtubeDl, emptyMap(), videoPlatforms = listOf("my.platform.tv"))
+
+            /* When & Then */
+            assertThat(ytdlp.isFromVideoPlatform("https://my.platform.tv/video/123")).isTrue()
+            assertThat(ytdlp.isFromVideoPlatform("https://youtube.com/file.mp3")).isFalse()
+        }
+    }
+
+    @Nested
     @DisplayName("should extract name")
     inner class ShouldExtractName {
 

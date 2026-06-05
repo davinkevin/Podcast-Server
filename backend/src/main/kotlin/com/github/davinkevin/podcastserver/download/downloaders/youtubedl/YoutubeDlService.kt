@@ -16,10 +16,13 @@ class YoutubeDlService(
     private val youtube: YoutubeDL,
     private val extraParameters: Map<String, String>,
     private val impersonate: String = "chrome",
+    private val videoPlatforms: List<String> = YTDlpParameters.DEFAULT_VIDEO_PLATFORMS,
 ) {
 
     private val DEFAULT_FORMAT = "bv+ba"
     private val log = LoggerFactory.getLogger(YoutubeDlService::class.java)
+
+    fun isFromVideoPlatform(url: String): Boolean = videoPlatforms.any { it in url }
 
     fun extractName(url: String): String {
         if (!isFromVideoPlatform(url)) {

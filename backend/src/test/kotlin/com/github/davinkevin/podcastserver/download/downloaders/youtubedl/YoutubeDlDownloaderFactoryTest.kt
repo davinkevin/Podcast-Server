@@ -73,17 +73,11 @@ class YoutubeDlDownloaderFactoryTest(
             )
         )
 
-        @ParameterizedTest(name = "url {0}")
-        @ValueSource(strings = [
-            "https://youtube.com/file.mp3",
-            "https://www.6play.fr/file.mp3",
-            "https://www.tf1.fr/file.mp3",
-            "https://www.france.tv/file.mp3",
-            "https://replay.gulli.fr/file.mp3",
-            "https://dailymotion.com/file.mp3"
-        ])
-        fun `should be compatible if is video platform from`(url: String) {
+        @Test
+        fun `should be compatible if the service identifies a video platform`() {
             /* Given */
+            val url = "https://youtube.com/file.mp3"
+            whenever(youtubeDL.isFromVideoPlatform(url)).thenReturn(true)
             val dItem = DownloadingInformation(
                 item = item,
                 url = URI.create(url),
