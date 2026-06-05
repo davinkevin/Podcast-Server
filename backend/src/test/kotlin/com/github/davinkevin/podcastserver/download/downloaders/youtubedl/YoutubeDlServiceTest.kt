@@ -78,6 +78,16 @@ class YoutubeDlServiceTest(
         }
 
         @Test
+        fun `should rename hls manifest to mp4 because it is remuxed during download`() {
+            /* Given */
+            val itemUrl = "https://live.video.provider.com/stream/master.m3u8?token=123"
+            /* When */
+            val result = youtube.extractName(itemUrl)
+            /* Then */
+            assertThat(result).isEqualTo("master.mp4")
+        }
+
+        @Test
         fun `with error`() {
             /* Given */
             /* When */
@@ -124,6 +134,44 @@ class YoutubeDlServiceTest(
                         it.option["retries"] == "10" &&
                         it.option["output"] == "foo.mp3" &&
                         it.option["impersonate"] == "chrome"
+            }
+            whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
+
+            /* When */
+            val download = youtube.download(url, destination, progressCallback)
+
+            /* Then */
+            assertThat(download).isSameAs(response)
+        }
+
+        @Test
+        fun `should download hls stream with impersonation and remux to mp4`() {
+            /* Given */
+            val hlsUrl = "https://live.video.provider.com/stream/master.m3u8"
+            val requestForDownload = argWhere<YoutubeDLRequest> {
+                        it.url == hlsUrl &&
+                        it.directory == "/tmp" &&
+                        it.option["retries"] == "10" &&
+                        it.option["output"] == "foo.mp3" &&
+                        it.option["impersonate"] == "chrome" &&
+                        it.option["remux-video"] == "mp4" &&
+                        !it.option.containsKey("format")
+            }
+            whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
+
+            /* When */
+            val download = youtube.download(hlsUrl, destination, progressCallback)
+
+            /* Then */
+            assertThat(download).isSameAs(response)
+        }
+
+        @Test
+        fun `should not remux direct files which are not hls streams`() {
+            /* Given */
+            val requestForDownload = argWhere<YoutubeDLRequest> {
+                it.url == url &&
+                  !it.option.containsKey("remux-video")
             }
             whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
 

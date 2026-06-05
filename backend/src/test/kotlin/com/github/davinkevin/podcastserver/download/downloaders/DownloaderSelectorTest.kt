@@ -1,7 +1,5 @@
 package com.github.davinkevin.podcastserver.download.downloaders
 
-import com.github.davinkevin.podcastserver.download.downloaders.ffmpeg.FfmpegDownloader
-import com.github.davinkevin.podcastserver.download.downloaders.ffmpeg.FfmpegDownloaderFactory
 import com.github.davinkevin.podcastserver.download.downloaders.youtubedl.YoutubeDlDownloaderFactory
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
@@ -33,14 +31,13 @@ class DownloaderSelectorTest(
     @Autowired val applicationContext: ApplicationContext
 ) {
 
-    @MockitoBean private lateinit var ffmpegDownloader: FfmpegDownloaderFactory
     @MockitoBean private lateinit var youtubeDLDownloader: YoutubeDlDownloaderFactory
 
     lateinit var selector: DownloaderSelector
 
     @BeforeEach
     fun beforeEach() {
-        val downloaders = setOf(ffmpegDownloader, youtubeDLDownloader)
+        val downloaders = setOf<DownloaderFactory>(youtubeDLDownloader)
 
         downloaders.forEach { whenever(it.compatibility(any())).thenCallRealMethod()}
 
@@ -69,7 +66,8 @@ class DownloaderSelectorTest(
         fun urlToDownloader(): Stream<DownloaderArgument> =
                 Stream.of(
                         DownloaderArgument(URI.create("http://foo.bar.com/a/path/with/file.mp3"), YoutubeDlDownloaderFactory::class),
-                        DownloaderArgument(URI.create("http://foo.bar.com/a/path/with/file.m3u8"), FfmpegDownloaderFactory::class),
+                        DownloaderArgument(URI.create("http://foo.bar.com/a/path/with/file.m3u8"), YoutubeDlDownloaderFactory::class),
+                        DownloaderArgument(URI.create("http://foo.bar.com/a/path/with/file.mp4"), YoutubeDlDownloaderFactory::class),
                         DownloaderArgument(URI.create("https://www.youtube.com/watch?v=RKh4T3m-Qlk&feature=youtube_gdata"), YoutubeDlDownloaderFactory::class)
                 )
     }

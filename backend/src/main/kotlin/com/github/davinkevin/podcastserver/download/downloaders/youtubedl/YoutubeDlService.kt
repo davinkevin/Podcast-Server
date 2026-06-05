@@ -25,6 +25,8 @@ class YoutubeDlService(
         if (!isFromVideoPlatform(url)) {
             return Path(url).fileName.toString()
                 .substringBefore("?")
+                // HLS manifests are remuxed to mp4 during download, name the result accordingly
+                .replace(Regex("\\.m3u8$"), ".mp4")
         }
 
         val request = YoutubeDLRequest(url).apply {
@@ -64,12 +66,20 @@ class YoutubeDlService(
             if(isFromVideoPlatform(url)) {
                 setOption("format", DEFAULT_FORMAT)
                 extraParameters.forEach { setOption(it.key, it.value) }
-            } else if (impersonate.isNotBlank()) {
-                // Direct enclosure downloads have to look like a browser:
-                // Cloudflare-fronted hosts (e.g. private Patreon feeds) reject
-                // yt-dlp's default TLS fingerprint with a 403 even though the
-                // URL itself is valid.
-                setOption("impersonate", impersonate)
+            } else {
+                if (impersonate.isNotBlank()) {
+                    // Direct enclosure downloads have to look like a browser:
+                    // Cloudflare-fronted hosts (e.g. private Patreon feeds) reject
+                    // yt-dlp's default TLS fingerprint with a 403 even though the
+                    // URL itself is valid.
+                    setOption("impersonate", impersonate)
+                }
+                if ("m3u8" in url.lowercase()) {
+                    // HLS streams come as MPEG-TS segments: remux them into the
+                    // mp4 container the rest of the system expects, like the
+                    // legacy ffmpeg download path used to do.
+                    setOption("remux-video", "mp4")
+                }
             }
         }
             .also { log.debug("download command: yt-dlp {}", it.buildOptions()) }
