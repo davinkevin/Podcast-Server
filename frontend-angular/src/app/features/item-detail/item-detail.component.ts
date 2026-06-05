@@ -30,12 +30,10 @@ import { ItemHAL } from '../../core/models/item.model';
 import { PlayerService } from '../../core/player/player.service';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import {
-  applyCoverTint,
-  clearCoverTint,
   CoverColorService,
   CoverPalette,
 } from '../../core/cover-color/cover-color.service';
-import { SettingsService } from '../../core/settings/settings.service';
+import { PageTintService } from '../../core/cover-color/page-tint.service';
 import { VlcService } from '../../core/vlc/vlc.service';
 import {
   StatusBadgeComponent,
@@ -98,7 +96,8 @@ export default class ItemDetailComponent {
   private readonly snackbar = inject(MatSnackBar);
   private readonly dialog = inject(MatDialog);
   private readonly coverColor = inject(CoverColorService);
-  private readonly settings = inject(SettingsService);
+  private readonly pageTint = inject(PageTintService);
+  private readonly hostElement = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly vlc = inject(VlcService);
 
   // Playlist payload is fetched only when arrived via the /playlists route;
@@ -237,11 +236,16 @@ export default class ItemDetailComponent {
       this.coverColor.extract(item.cover.proxyURL).then((p) => this.palette.set(p));
     });
 
-    effect((onCleanup) => {
+    // Claim the tint for the URL we are rendered at. PageTintService only
+    // applies it while that URL stays active and clears it on navigation,
+    // so no destroy-time cleanup is needed — and a back-navigation to a
+    // retained (detached, not destroyed) detail page can't be wiped by
+    // this component's teardown running out of order.
+    effect(() => {
       const p = this.palette();
-      const dark = this.settings.effectiveTheme() === 'dark';
-      applyCoverTint(p, dark);
-      onCleanup(() => clearCoverTint());
+      const url = this.pageTint.currentUrl();
+      if (!this.hostElement.nativeElement.isConnected) return;
+      this.pageTint.claim(url, p);
     });
   }
 

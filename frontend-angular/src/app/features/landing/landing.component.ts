@@ -19,6 +19,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { CoverCardComponent } from '../../shared/cover-card/cover-card.component';
 import { ContentRowComponent } from '../../shared/content-row/content-row.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
+import { CurrentUrlService } from '../../core/navigation/current-url.service';
 import { DigestApi, DigestInput } from '../../core/api/digest.api';
 import { ItemApi } from '../../core/api/item.api';
 import { ItemHAL } from '../../core/models/item.model';
@@ -85,6 +86,7 @@ export default class LandingComponent {
   private readonly itemApi = inject(ItemApi);
   private readonly coverColor = inject(CoverColorService);
   protected readonly player = inject(PlayerService);
+  private readonly currentUrl = inject(CurrentUrlService);
 
   protected readonly periods = PERIODS;
   protected readonly period = signal<Period>('PT24H');
@@ -103,6 +105,17 @@ export default class LandingComponent {
 
   constructor() {
     afterNextRender(() => this.measureColumns());
+
+    // ListRouteReuseStrategy retains this page (detached, not destroyed)
+    // so iOS back to spotlight re-attaches the existing grid without a
+    // remount flicker. Re-measure on every navigation back here: the
+    // viewport may have changed while the page was off-screen, and the
+    // resize HostListener is guarded against detached measurement.
+    effect(() => {
+      this.currentUrl.url();
+      if (!this.gridRef()?.nativeElement.isConnected) return;
+      this.measureColumns();
+    });
 
     // Collapse any open row when the period changes (its entry may be gone).
     effect(() => {
@@ -136,7 +149,9 @@ export default class LandingComponent {
 
   private measureColumns() {
     const el = this.gridRef()?.nativeElement;
-    if (!el) return;
+    // While detached by ListRouteReuseStrategy the grid is out of the DOM
+    // and measures 0 wide — skip, the re-attach effect re-measures.
+    if (!el || !el.isConnected) return;
     const w = el.clientWidth;
     const cols = Math.floor((w + GRID_GAP_PX) / (CELL_MIN_PX + GRID_GAP_PX));
     this.columns.set(Math.max(1, cols));

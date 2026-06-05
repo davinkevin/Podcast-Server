@@ -44,11 +44,11 @@ export const appConfig: ApplicationConfig = {
     ),
     provideHttpClient(withFetch()),
     provideAnimationsAsync(),
-    // Detach (instead of destroy) the list routes when navigating away to a
-    // detail page. On return the original DOM — including already-decoded
-    // covers — is re-attached, avoiding the iOS swipe-back cover flicker
-    // caused by the bfcache snapshot being swapped for a freshly rendered
-    // DOM tree.
+    // Detach (instead of destroy) the spotlight/list routes and the
+    // podcast/playlist detail routes when navigating away. On return the
+    // original DOM — including already-decoded covers — is re-attached,
+    // avoiding the iOS swipe-back flicker caused by the bfcache snapshot
+    // being swapped for a freshly rendered DOM tree.
     { provide: RouteReuseStrategy, useClass: ListRouteReuseStrategy },
     // TanStack Query — server state caching, stale-while-revalidate,
     // invalidation. Replaces the ad-hoc PageCache + httpResource pattern.

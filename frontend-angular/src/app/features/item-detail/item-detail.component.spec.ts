@@ -13,7 +13,7 @@ import { DownloadStreamService } from '../../core/downloads/download-stream.serv
 import { PlayerService } from '../../core/player/player.service';
 import { VlcService } from '../../core/vlc/vlc.service';
 import { CoverColorService } from '../../core/cover-color/cover-color.service';
-import { SettingsService } from '../../core/settings/settings.service';
+import { PageTintService } from '../../core/cover-color/page-tint.service';
 import { NavigationOriginService } from '../../core/navigation/navigation-origin.service';
 import { ItemHAL } from '../../core/models/item.model';
 import { DownloadingItemHAL } from '../../core/models/downloading-item.model';
@@ -97,7 +97,7 @@ describe('ItemDetailComponent download loader (#260)', () => {
         { provide: DownloadStreamService, useValue: { downloading, queue } },
         { provide: NavigationOriginService, useValue: { consume: () => null } },
         { provide: CoverColorService, useValue: { extract: () => Promise.resolve(null) } },
-        { provide: SettingsService, useValue: { effectiveTheme: () => 'light' } },
+        { provide: PageTintService, useValue: { currentUrl: () => '/', claim: () => {} } },
         { provide: PlayerService, useValue: {} },
         { provide: VlcService, useValue: {} },
         { provide: Title, useValue: { setTitle: () => {} } },

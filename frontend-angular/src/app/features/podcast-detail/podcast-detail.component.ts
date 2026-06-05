@@ -42,12 +42,10 @@ import { PodcastHAL } from '../../core/models/podcast.model';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import { PlayerService } from '../../core/player/player.service';
 import {
-  applyCoverTint,
-  clearCoverTint,
   CoverColorService,
   CoverPalette,
 } from '../../core/cover-color/cover-color.service';
-import { SettingsService } from '../../core/settings/settings.service';
+import { PageTintService } from '../../core/cover-color/page-tint.service';
 import { NavigationOriginService } from '../../core/navigation/navigation-origin.service';
 import {
   OPEN_IN_VLC_ACTION,
@@ -139,10 +137,11 @@ export default class PodcastDetailComponent {
   private readonly dialog = inject(MatDialog);
   private readonly snackbar = inject(MatSnackBar);
   private readonly coverColor = inject(CoverColorService);
-  private readonly settings = inject(SettingsService);
   private readonly queryClient = inject(QueryClient);
   private readonly navOrigin = inject(NavigationOriginService);
   private readonly vlc = inject(VlcService);
+  private readonly pageTint = inject(PageTintService);
+  private readonly hostElement = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly id = computed(() => this.idPodcast());
   protected readonly podcastQuery = this.api.getById(this.id);
@@ -244,12 +243,10 @@ export default class PodcastDetailComponent {
 
   constructor() {
     // Mirror the URL `?q=` into the search input — on first mount, and
-    // again whenever the URL changes (e.g. browser back from item-detail:
-    // ListRouteReuseStrategy doesn't retain podcast-detail, so the
-    // component remounts and the input field would otherwise be empty
-    // even though the URL still carries the query). The user typing
-    // changes `searchDraft` but not `q()`, so this effect doesn't fight
-    // the input — it only runs when the URL is the source of change.
+    // again whenever the URL changes (e.g. arriving with a `?q=` deep
+    // link). The user typing changes `searchDraft` but not `q()`, so this
+    // effect doesn't fight the input — it only runs when the URL is the
+    // source of change.
     effect(() => this.searchDraft.set(this.q()));
 
     effect(() => {
@@ -258,11 +255,16 @@ export default class PodcastDetailComponent {
       this.coverColor.extract(url).then((p) => this.palette.set(p));
     });
 
-    effect((onCleanup) => {
+    // Claim the tint for the URL we are rendered at. PageTintService only
+    // applies it while that URL stays active, so no destroy-time cleanup is
+    // needed — which matters now that ListRouteReuseStrategy detaches this
+    // page instead of destroying it. Reading `currentUrl` re-runs the
+    // effect on re-attach (browser back), re-claiming the tint.
+    effect(() => {
       const p = this.palette();
-      const dark = this.settings.effectiveTheme() === 'dark';
-      applyCoverTint(p, dark);
-      onCleanup(() => clearCoverTint());
+      const url = this.pageTint.currentUrl();
+      if (!this.hostElement.nativeElement.isConnected) return;
+      this.pageTint.claim(url, p);
     });
 
     // Watch the hero sentinel from the scrollable shell outlet's viewport.

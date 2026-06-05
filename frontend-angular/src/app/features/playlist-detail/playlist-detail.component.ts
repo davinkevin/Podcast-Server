@@ -45,12 +45,10 @@ import {
   VlcService,
 } from '../../core/vlc/vlc.service';
 import {
-  applyCoverTint,
-  clearCoverTint,
   CoverColorService,
   CoverPalette,
 } from '../../core/cover-color/cover-color.service';
-import { SettingsService } from '../../core/settings/settings.service';
+import { PageTintService } from '../../core/cover-color/page-tint.service';
 import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialog.component';
 
 const PLAY_NEXT_ACTION: CoverCardAction = {
@@ -125,7 +123,8 @@ export default class PlaylistDetailComponent {
   protected readonly player = inject(PlayerService);
   private readonly vlc = inject(VlcService);
   private readonly coverColor = inject(CoverColorService);
-  private readonly settings = inject(SettingsService);
+  private readonly pageTint = inject(PageTintService);
+  private readonly hostElement = inject<ElementRef<HTMLElement>>(ElementRef);
 
   protected readonly id = computed(() => this.idPlaylist());
   protected readonly playlistQuery = this.api.getById(this.id);
@@ -237,11 +236,16 @@ export default class PlaylistDetailComponent {
       this.coverColor.extract(url).then((p) => this.palette.set(p));
     });
 
-    effect((onCleanup) => {
+    // Claim the tint for the URL we are rendered at. PageTintService only
+    // applies it while that URL stays active, so no destroy-time cleanup is
+    // needed — which matters now that ListRouteReuseStrategy detaches this
+    // page instead of destroying it. Reading `currentUrl` re-runs the
+    // effect on re-attach (browser back), re-claiming the tint.
+    effect(() => {
       const p = this.palette();
-      const dark = this.settings.effectiveTheme() === 'dark';
-      applyCoverTint(p, dark);
-      onCleanup(() => clearCoverTint());
+      const url = this.pageTint.currentUrl();
+      if (!this.hostElement.nativeElement.isConnected) return;
+      this.pageTint.claim(url, p);
     });
 
     // Watch the hero sentinel from the scrollable shell outlet's viewport.
