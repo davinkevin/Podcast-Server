@@ -134,5 +134,5 @@ class ItemDownloadManager (
 
 private fun DownloadingItem.toInformation(): DownloadingInformation {
     val fileName = Path(url.path).fileName
-    return DownloadingInformation(this, listOf(url), fileName, null)
+    return DownloadingInformation(this, url, fileName)
 }

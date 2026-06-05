@@ -73,21 +73,6 @@ class YoutubeDlDownloaderFactoryTest(
             )
         )
 
-        @Test
-        fun `should be at lower level of compatibility if multiple urls`() {
-            /* Given */
-            val dItem = DownloadingInformation(
-                item = item,
-                urls = listOf("https://foo.bar.com/one.mp3", "https://foo.bar.com/two.mp3").map(URI::create),
-                filename = Path("one.mp3"),
-                userAgent = null
-            )
-            /* When */
-            val compatibility = factory.compatibility(dItem)
-            /* Then */
-            assertThat(compatibility).isEqualTo(Int.MAX_VALUE)
-        }
-
         @ParameterizedTest(name = "url {0}")
         @ValueSource(strings = [
             "https://youtube.com/file.mp3",
@@ -101,9 +86,8 @@ class YoutubeDlDownloaderFactoryTest(
             /* Given */
             val dItem = DownloadingInformation(
                 item = item,
-                urls = listOf(URI.create(url)),
+                url = URI.create(url),
                 filename = Path("one.mp3"),
-                userAgent = null
             )
 
             /* When */
@@ -118,9 +102,8 @@ class YoutubeDlDownloaderFactoryTest(
             /* Given */
             val dItem = DownloadingInformation(
                 item = item,
-                urls = listOf(URI.create("https://foo.bar.com/one.mp3")),
+                url = URI.create("https://foo.bar.com/one.mp3"),
                 filename = Path("one.mp3"),
-                userAgent = null
             )
             /* When */
             val compatibility = factory.compatibility(dItem)
@@ -133,9 +116,8 @@ class YoutubeDlDownloaderFactoryTest(
             /* Given */
             val dItem = DownloadingInformation(
                 item = item,
-                urls = listOf(URI.create("ftp://foo.bar.com/one.mp3")),
+                url = URI.create("ftp://foo.bar.com/one.mp3"),
                 filename = Path("one.mp3"),
-                userAgent = null
             )
             /* When */
             val compatibility = factory.compatibility(dItem)

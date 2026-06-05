@@ -86,9 +86,8 @@ class YoutubeDlDownloaderTest(
 
         private val dItem = DownloadingInformation(
                 item = item,
-                urls = listOf(),
+                url = item.url,
                 filename = Path("one.mp3"),
-                userAgent = null
         )
 
         @BeforeEach
@@ -107,7 +106,7 @@ class YoutubeDlDownloaderTest(
             /* Given */
             val url = URI.create("https://foo.bar.com/one.mp3")
             var finalFile: Path = Files.createTempFile("not-used-for-now", ".mp3")
-            helper.info = dItem.copy(urls = listOf(url))
+            helper.info = dItem.copy(url = url)
 
             whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
             whenever(youtube.download(eq(url.toASCIIString()), any(), any())).then {
@@ -139,7 +138,7 @@ class YoutubeDlDownloaderTest(
                 @Test
                 fun `with youtube-dl`() {
                     /* Given */
-                    helper.info = dItem.copy(urls = listOf(url))
+                    helper.info = dItem.copy(url = url)
 
                     whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
                     doThrow(RuntimeException("fake error"))
@@ -159,7 +158,7 @@ class YoutubeDlDownloaderTest(
 
                 @BeforeEach
                 fun beforeEach() {
-                    helper.info = dItem.copy(urls = listOf(url))
+                    helper.info = dItem.copy(url = url)
                     whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
                 }
 
@@ -187,7 +186,7 @@ class YoutubeDlDownloaderTest(
             fun beforeEach() {
                 Mockito.reset(helper.template, youtube)
                 val url = URI.create("https://foo.bar.com/one.mp3")
-                helper.info = dItem.copy(urls = listOf(url))
+                helper.info = dItem.copy(url = url)
 
                 whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
                 whenever(youtube.download(eq(url.toASCIIString()), any(), any())).then {

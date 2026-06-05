@@ -44,13 +44,6 @@ class DownloaderSelectorTest(
         selector = DownloaderSelector(applicationContext, downloaders)
     }
 
-    @Test
-    fun `should reject empty url`() {
-        /* When */
-        assertThat(selector.of(DownloadingInformation(dItem, listOf(), Path("file.mp4"), null))).isEqualTo(
-            DownloaderSelector.NoOpDownloaderFactory)
-    }
-
     @MethodSource("urlToDownloader")
     @DisplayName("should return")
     @ParameterizedTest(name = "{0}")
@@ -92,7 +85,7 @@ private val dItem: DownloadingItem = DownloadingItem (
 
 
 class DownloaderArgument(val url: URI, val clazz: KClass<*>) {
-    val item = DownloadingInformation(dItem, listOf(url), Path("file.mp4"), null)
+    val item = DownloadingInformation(dItem, url, Path("file.mp4"))
 
     override fun toString(): String {
         return "${clazz.simpleName} for $url"
