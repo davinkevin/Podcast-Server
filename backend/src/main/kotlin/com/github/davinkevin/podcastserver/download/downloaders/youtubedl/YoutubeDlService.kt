@@ -92,6 +92,24 @@ class YoutubeDlService(
             callback.onProgressUpdate(p)
         }
 
-        return youtube.execute(r, progress) { p -> onProcessStarted(p) }
+        return try {
+            youtube.execute(r, progress) { p -> onProcessStarted(p) }
+        } catch (e: Exception) {
+            // yt-dlp failures carry their cause in stderr (e.g. anti-bot 403):
+            // surface its meaningful lines instead of a generic failure
+            throw RuntimeException("Error during download of $url: ${errorSummaryOf(e)}", e)
+        }
+    }
+
+    private fun errorSummaryOf(e: Exception): String {
+        val lines = (e.message ?: "").lines()
+            .map(String::trim)
+            .filter(String::isNotEmpty)
+
+        if (lines.isEmpty()) return "unknown error"
+
+        return lines.filter { it.startsWith("ERROR") }
+            .ifEmpty { lines.takeLast(1) }
+            .joinToString(" | ")
     }
 }

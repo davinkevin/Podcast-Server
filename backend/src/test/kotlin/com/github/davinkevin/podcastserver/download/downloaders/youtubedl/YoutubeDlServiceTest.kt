@@ -3,6 +3,7 @@ package com.github.davinkevin.podcastserver.download.downloaders.youtubedl
 import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
 import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDL
+import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLException
 import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLRequest
 import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLResponse
 import org.assertj.core.api.Assertions.assertThat
@@ -259,6 +260,33 @@ class YoutubeDlServiceTest(
 
             /* Then */
             assertThat(download).isSameAs(response)
+        }
+
+        @Test
+        fun `should surface yt-dlp error lines when the download fails`() {
+            /* Given */
+            val stderr = """
+                WARNING: unable to fetch something
+                ERROR: HTTP Error 403: Forbidden
+            """.trimIndent()
+            whenever(youtubeDl.execute(any(), any(), anyOrNull())).thenThrow(YoutubeDLException(stderr))
+
+            /* When */
+            assertThatThrownBy { youtube.download(url, destination, progressCallback) }
+                    /* Then */
+                    .hasMessage("Error during download of $url: ERROR: HTTP Error 403: Forbidden")
+        }
+
+        @Test
+        fun `should surface the last line when yt-dlp reports no explicit error`() {
+            /* Given */
+            whenever(youtubeDl.execute(any(), any(), anyOrNull()))
+                .thenThrow(YoutubeDLException("first line\nsomething went wrong"))
+
+            /* When */
+            assertThatThrownBy { youtube.download(url, destination, progressCallback) }
+                    /* Then */
+                    .hasMessage("Error during download of $url: something went wrong")
         }
 
         @Test

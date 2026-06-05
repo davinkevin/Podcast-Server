@@ -46,7 +46,8 @@ class DownloaderHelper(
 
         val execution = runCatching { downloader.download() }
         if (execution.isFailure) {
-            log.errorWithDebugStack("Error during download", throwable = execution.exceptionOrNull())
+            val error = execution.exceptionOrNull()
+            log.errorWithDebugStack("Error during download: {}", error?.message, throwable = error)
             failDownload()
         }
     }
