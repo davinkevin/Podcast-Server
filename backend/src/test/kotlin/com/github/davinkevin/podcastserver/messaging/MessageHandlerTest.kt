@@ -4,7 +4,6 @@ import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
 import org.assertj.core.api.Assertions.assertThat
-import org.awaitility.Awaitility
 import org.junit.jupiter.api.Disabled
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
@@ -32,7 +31,6 @@ import tools.jackson.module.kotlin.readValue
 import java.net.URI
 import java.time.Duration
 import java.util.*
-import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 
 @NestedSpringTest
@@ -315,25 +313,25 @@ class MessageHandlerTest(
         @Suppress("ReactiveStreamsUnusedPublisher")
         fun sseBuilderToFlux(): Pair<SseBuilder, Flux<LocalSSEvent>> {
             val sse = mock<SseBuilder>()
-            val events = Flux.generate { sink ->
-                val currentEvent = LocalSSEvent()
-                reset(sse)
-                whenever(sse.event(anyString())).then {
-                    currentEvent.event = it.arguments[0] as String
-                    return@then sse
-                }
-                whenever(sse.send(any())).then {
-                    currentEvent.data = it.arguments[0]
-                    return@then sse
-                }
+            val events = Sinks.many().unicast().onBackpressureBuffer<LocalSSEvent>()
 
-                Awaitility.await().atMost(10, TimeUnit.SECONDS)
-                    .until { currentEvent.event != null && currentEvent.data != null }
-
-                sink.next(currentEvent)
+            // Stubbed once, before the handler subscribes: stubbing a mock while
+            // another thread invokes it is racy and was the source of flakiness.
+            // event() then send() are called sequentially by the same subscriber,
+            // so the pending event can be confined to a simple local variable.
+            var currentEvent = LocalSSEvent()
+            whenever(sse.event(anyString())).then {
+                currentEvent.event = it.arguments[0] as String
+                return@then sse
+            }
+            whenever(sse.send(any())).then {
+                currentEvent.data = it.arguments[0]
+                events.tryEmitNext(currentEvent)
+                currentEvent = LocalSSEvent()
+                return@then sse
             }
 
-            return sse to events
+            return sse to events.asFlux()
         }
 
         @Suppress("UNCHECKED_CAST")
