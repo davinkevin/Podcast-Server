@@ -1,4 +1,0 @@
-podcastserver:
- externaltools:
-  ffmpeg: /opt/homebrew/bin/ffmpeg
-  ffprobe: /opt/homebrew/bin/ffprobe

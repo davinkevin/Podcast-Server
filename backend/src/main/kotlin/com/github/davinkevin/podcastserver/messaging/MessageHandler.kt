@@ -3,7 +3,6 @@ package com.github.davinkevin.podcastserver.messaging
 import com.fasterxml.jackson.annotation.JsonProperty
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
-import com.google.common.annotations.VisibleForTesting
 import org.springframework.context.event.EventListener
 import org.springframework.web.servlet.function.ServerRequest
 import org.springframework.web.servlet.function.ServerResponse
@@ -46,7 +45,7 @@ class MessageHandler {
         }, ofMinutes(30))
     }
 
-    @VisibleForTesting
+    // internal for testing
     internal fun streamingMessages(): Flux<ServerSentEvent<out Any>> {
         val heartBeat = Flux.interval(ZERO, ofSeconds(1))
             .map(::toHeartBeat)
@@ -59,7 +58,6 @@ class MessageHandler {
     }
 
     @EventListener
-    @VisibleForTesting
     internal fun receive(m: Message<out Any>) {
         messages.tryEmitNext(m)
     }

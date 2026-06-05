@@ -16,8 +16,6 @@ import org.springframework.boot.test.context.SpringBootTest
  */
 @SpringBootTest(
     properties = [
-        "podcastserver.externaltools.ffmpeg=/bin/echo",
-        "podcastserver.externaltools.ffprobe=/bin/echo",
         "podcastserver.storage.url=http://localhost:9000/",
         "podcastserver.storage.bucket=bucket",
     ]
