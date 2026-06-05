@@ -109,9 +109,9 @@ class FileStorageService(
     }
 
     private fun download(url: URI): ByteArrayResource? = rcb.clone()
-        .baseUrl(url.toASCIIString())
         .build()
         .get()
+        .uri(url)
         .accept(MediaType.ALL, MediaType.APPLICATION_OCTET_STREAM)
         .retrieve()
         .body<ByteArrayResource>()

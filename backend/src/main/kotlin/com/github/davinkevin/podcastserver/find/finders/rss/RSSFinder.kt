@@ -26,9 +26,9 @@ class RSSFinder(
     override fun findPodcastInformation(url: String): FindPodcastInformation? {
         val content = rcb
             .clone()
-            .baseUrl(url)
             .build()
             .get()
+            .uri(URI(url))
             .retrieve()
             .body<String>()
             ?: return null

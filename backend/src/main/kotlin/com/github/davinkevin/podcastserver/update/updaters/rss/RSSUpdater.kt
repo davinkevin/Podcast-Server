@@ -119,9 +119,9 @@ class RSSUpdater(
     private fun fetchRss(url: URI): ByteArrayResource? {
         return runCatching {
             rcb.clone()
-                .baseUrl(url.toASCIIString())
                 .build()
                 .get()
+                .uri(url)
                 .retrieve()
                 .body<ByteArrayResource>()
         }

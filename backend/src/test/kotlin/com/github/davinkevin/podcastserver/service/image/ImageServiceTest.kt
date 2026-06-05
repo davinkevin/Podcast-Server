@@ -40,6 +40,26 @@ class ImageServiceTest(
     }
 
     @Test
+    fun `should serve cover information for url with percent-encoded characters`(backend: WireMockServer) {
+        /* Given */
+        val url = URI("http://localhost:5555/img/eyJkIjo3Mn0%3D/image.png?token-hash=abc%3D")
+        backend.stubFor(get("/img/eyJkIjo3Mn0%3D/image.png?token-hash=abc%3D")
+                .willReturn(aResponse().withBodyFile("img/image.png"))
+        )
+
+        /* When */
+        val cover = imageService.fetchCoverInformation(url)
+
+        /* Then */
+        assertThat(cover).isNotNull()
+        assertAll {
+            assertThat(cover?.width).isEqualTo(256)
+            assertThat(cover?.height).isEqualTo(300)
+            assertThat(cover?.url).isEqualTo(url)
+        }
+    }
+
+    @Test
     fun `should return empty if file not found`(backend: WireMockServer) {
         /* Given */
         val url = URI("http://localhost:5555/img/image.png")

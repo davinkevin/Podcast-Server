@@ -19,8 +19,9 @@ class ImageService (private val rcb: RestClient.Builder ) {
 
         val content = rcb
             .clone()
-            .baseUrl(url.toASCIIString()).build()
+            .build()
             .get()
+            .uri(url)
             .accept(MediaType.ALL, MediaType.APPLICATION_OCTET_STREAM)
             .runCatching {
                 retrieve().body<ByteArrayResource>()
