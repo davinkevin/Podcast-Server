@@ -165,7 +165,7 @@ jib {
 
 // Jib plugin (3.5.x) is not yet compatible with the Gradle configuration cache.
 // Track: https://github.com/GoogleContainerTools/jib/issues/3132
-listOf("jib", "jibDockerBuild", "jibBuildTar").forEach {
+listOf("jib", "jibDockerBuild", "jibBuildTar", "_jibSkaffoldFilesV2", "_jibSkaffoldInit", "_jibSkaffoldSyncMap", "_skaffoldFailIfJibOutOfDate").forEach {
 	tasks.named(it) { notCompatibleWithConfigurationCache("Jib plugin is not yet configuration-cache compatible") }
 }
 
