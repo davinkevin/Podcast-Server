@@ -14,7 +14,8 @@ import kotlin.io.path.Path
  */
 class YoutubeDlService(
     private val youtube: YoutubeDL,
-    private val extraParameters: Map<String, String>
+    private val extraParameters: Map<String, String>,
+    private val impersonate: String = "chrome",
 ) {
 
     private val DEFAULT_FORMAT = "bv+ba"
@@ -63,6 +64,12 @@ class YoutubeDlService(
             if(isFromVideoPlatform(url)) {
                 setOption("format", DEFAULT_FORMAT)
                 extraParameters.forEach { setOption(it.key, it.value) }
+            } else if (impersonate.isNotBlank()) {
+                // Direct enclosure downloads have to look like a browser:
+                // Cloudflare-fronted hosts (e.g. private Patreon feeds) reject
+                // yt-dlp's default TLS fingerprint with a 403 even though the
+                // URL itself is valid.
+                setOption("impersonate", impersonate)
             }
         }
             .also { log.debug("download command: yt-dlp {}", it.buildOptions()) }

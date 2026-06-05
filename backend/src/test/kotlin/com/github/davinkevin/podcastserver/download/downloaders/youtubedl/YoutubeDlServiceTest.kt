@@ -122,12 +122,30 @@ class YoutubeDlServiceTest(
                         it.url == url  &&
                         it.directory == "/tmp" &&
                         it.option["retries"] == "10" &&
-                        it.option["output"] == "foo.mp3"
+                        it.option["output"] == "foo.mp3" &&
+                        it.option["impersonate"] == "chrome"
             }
             whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
 
             /* When */
             val download = youtube.download(url, destination, progressCallback)
+
+            /* Then */
+            assertThat(download).isSameAs(response)
+        }
+
+        @Test
+        fun `should not impersonate if disabled by configuration`() {
+            /* Given */
+            val ytdlp = YoutubeDlService(youtubeDl, emptyMap(), impersonate = "")
+            val requestForDownload = argWhere<YoutubeDLRequest> {
+                it.url == url &&
+                  !it.option.containsKey("impersonate")
+            }
+            whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
+
+            /* When */
+            val download = ytdlp.download(url, destination, progressCallback)
 
             /* Then */
             assertThat(download).isSameAs(response)
@@ -150,7 +168,8 @@ class YoutubeDlServiceTest(
                         it.option["retries"] == "10" &&
                         it.option["output"] == "foo.mp3" &&
                         it.option["merge-output-format"] == "mp4" &&
-                        it.option["format"] == "bv+ba"
+                        it.option["format"] == "bv+ba" &&
+                        !it.option.containsKey("impersonate")
             }
             whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
 
