@@ -135,7 +135,7 @@ class YoutubeDlServiceTest(
                         it.option["output"] == "foo.mp3" &&
                         it.option["impersonate"] == "chrome"
             }
-            whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
+            whenever(youtubeDl.execute(requestForDownload, any(), anyOrNull())).thenReturn(response)
 
             /* When */
             val download = youtube.download(url, destination, progressCallback)
@@ -157,7 +157,7 @@ class YoutubeDlServiceTest(
                         it.option["remux-video"] == "mp4" &&
                         !it.option.containsKey("format")
             }
-            whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
+            whenever(youtubeDl.execute(requestForDownload, any(), anyOrNull())).thenReturn(response)
 
             /* When */
             val download = youtube.download(hlsUrl, destination, progressCallback)
@@ -173,7 +173,7 @@ class YoutubeDlServiceTest(
                 it.url == url &&
                   !it.option.containsKey("remux-video")
             }
-            whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
+            whenever(youtubeDl.execute(requestForDownload, any(), anyOrNull())).thenReturn(response)
 
             /* When */
             val download = youtube.download(url, destination, progressCallback)
@@ -190,7 +190,7 @@ class YoutubeDlServiceTest(
                 it.url == url &&
                   !it.option.containsKey("impersonate")
             }
-            whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
+            whenever(youtubeDl.execute(requestForDownload, any(), anyOrNull())).thenReturn(response)
 
             /* When */
             val download = ytdlp.download(url, destination, progressCallback)
@@ -219,7 +219,7 @@ class YoutubeDlServiceTest(
                         it.option["format"] == "bv+ba" &&
                         !it.option.containsKey("impersonate")
             }
-            whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
+            whenever(youtubeDl.execute(requestForDownload, any(), anyOrNull())).thenReturn(response)
 
             /* When */
             val download = youtube.download(videoPlatformUrl, destination, progressCallback)
@@ -229,15 +229,32 @@ class YoutubeDlServiceTest(
         }
 
         @Test
+        fun `should expose the started process to the caller`() {
+            /* Given */
+            val process = mock<Process>()
+            var startedProcess: Process? = null
+            whenever(youtubeDl.execute(any(), any(), anyOrNull())).then {
+                it.getArgument<java.util.function.Consumer<Process>>(2).accept(process)
+                response
+            }
+
+            /* When */
+            youtube.download(url, destination, progressCallback) { startedProcess = it }
+
+            /* Then */
+            assertThat(startedProcess).isSameAs(process)
+        }
+
+        @Test
         fun `should call callback to propagate progression`() {
             /* Given */
             val captor = argumentCaptor<DownloadProgressCallback>()
             var isCalled = false
             val changeValue = DownloadProgressCallback { _ -> isCalled = true}
 
-            whenever(youtubeDl.execute(any(), any())).thenReturn(response)
+            whenever(youtubeDl.execute(any(), any(), anyOrNull())).thenReturn(response)
             youtube.download(url, destination, changeValue)
-            verify(youtubeDl).execute(any(), captor.capture())
+            verify(youtubeDl).execute(any(), captor.capture(), anyOrNull())
 
             /* When */
             captor.firstValue.onProgressUpdate(1f)
@@ -259,7 +276,7 @@ class YoutubeDlServiceTest(
                   it.option["format"] == "bv+ba"
                   it.option["foo"] == "bar"
             }
-            whenever(youtubeDl.execute(requestForDownload, any())).thenReturn(response)
+            whenever(youtubeDl.execute(requestForDownload, any(), anyOrNull())).thenReturn(response)
 
             /* When */
             val download = ytdlp.download(

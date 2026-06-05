@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -84,6 +85,18 @@ public class YoutubeDL {
      * @throws YoutubeDLException
      */
     public YoutubeDLResponse execute(YoutubeDLRequest request, DownloadProgressCallback callback) throws YoutubeDLException {
+        return execute(request, callback, null);
+    }
+
+    /**
+     * Execute youtube-dl request
+     * @param request request object
+     * @param callback callback
+     * @param onProcessStarted notified with the underlying process once started, allowing the caller to kill it
+     * @return response object
+     * @throws YoutubeDLException
+     */
+    public YoutubeDLResponse execute(YoutubeDLRequest request, DownloadProgressCallback callback, Consumer<Process> onProcessStarted) throws YoutubeDLException {
         String directory = request.getDirectory();
         Map<String, String> options = request.getOption();
 
@@ -107,6 +120,10 @@ public class YoutubeDL {
             process = processBuilder.start();
         } catch (IOException e) {
             throw new YoutubeDLException(e);
+        }
+
+        if (onProcessStarted != null) {
+            onProcessStarted.accept(process);
         }
 
         InputStream outStream = process.getInputStream();

@@ -4,6 +4,8 @@ import com.github.davinkevin.podcastserver.download.downloaders.Downloader
 import com.github.davinkevin.podcastserver.download.downloaders.DownloaderHelper
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInformation
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
+import com.github.davinkevin.podcastserver.entity.Status
+import com.github.davinkevin.podcastserver.extension.slf4j.errorWithDebugStack
 import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
 import org.slf4j.LoggerFactory
 import java.nio.file.Files
@@ -17,6 +19,8 @@ class YoutubeDlDownloader(
 ): Downloader {
 
     private val log = LoggerFactory.getLogger(YoutubeDlDownloader::class.java)
+
+    private var process: Process? = null
 
     override val downloadingInformation: DownloadingInformation
         get() = state.info
@@ -36,7 +40,13 @@ class YoutubeDlDownloader(
             }
         }
 
-        youtubeDL.download(url, state.target, callback)
+        runCatching { youtubeDL.download(url, state.target, callback) { process = it } }
+            .getOrElse {
+                // a stop request kills the yt-dlp process, which surfaces here
+                // as a failed execution: keep the STOPPED state in that case
+                if (state.info.item.status == Status.STOPPED) return state.info.item
+                throw it
+            }
 
         finishDownload()
 
@@ -54,6 +64,16 @@ class YoutubeDlDownloader(
     }
 
     override fun startDownload() = state.startDownload(this)
-    override fun stopDownload() = state.stopDownload()
+
+    override fun stopDownload() {
+        try {
+            state.stopDownload()
+            process?.destroy()
+        } catch (e: Exception) {
+            log.errorWithDebugStack("Error during stop of yt-dlp process :", throwable = e)
+            state.failDownload()
+        }
+    }
+
     override fun failDownload() = state.failDownload()
 }

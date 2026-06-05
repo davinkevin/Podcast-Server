@@ -11,6 +11,7 @@ import com.github.davinkevin.podcastserver.service.storage.FileMetaData
 import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
 import com.gitlab.davinkevin.podcastserver.youtubedl.YoutubeDLResponse
+import org.assertj.core.api.Assertions.assertThat
 import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
@@ -109,7 +110,7 @@ class YoutubeDlDownloaderTest(
             helper.info = dItem.copy(url = url)
 
             whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
-            whenever(youtube.download(eq(url.toASCIIString()), any(), any())).then {
+            whenever(youtube.download(eq(url.toASCIIString()), any(), any(), any())).then {
                 val fileToCreate = it.getArgument<Path>(1)
                 finalFile = Files.createFile(fileToCreate)
                 mock<YoutubeDLResponse>()
@@ -123,6 +124,52 @@ class YoutubeDlDownloaderTest(
                 verify(helper.file).upload(argThat<UploadRequest.ForItemFromPath> { podcastTitle == dItem.item.podcast.title && content == finalFile })
                 verify(helper.file).metadata(dItem.item.podcast.title, finalFile)
             }
+        }
+
+        @Test
+        fun `and kill the yt-dlp process on stop`() {
+            /* Given */
+            Mockito.reset(helper.file)
+            val url = URI.create("https://foo.bar.com/one.mp3")
+            helper.info = dItem.copy(url = url)
+            val process = mock<Process>()
+
+            whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
+            // the download surfaces the process then is interrupted by the stop request,
+            // mirroring a kill in flight without scheduling a successful finish
+            whenever(youtube.download(eq(url.toASCIIString()), any(), any(), any())).then {
+                it.getArgument<(Process) -> Unit>(3)(process)
+                helper.info = helper.info.status(Status.STOPPED)
+                throw RuntimeException("yt-dlp process killed")
+            }
+            downloader.download()
+
+            /* When */
+            downloader.stopDownload()
+
+            /* Then */
+            verify(process).destroy()
+        }
+
+        @Test
+        fun `and keep the stopped status when the process is killed by a stop request`() {
+            /* Given */
+            Mockito.reset(helper.file)
+            val url = URI.create("https://foo.bar.com/one.mp3")
+            helper.info = dItem.copy(url = url)
+
+            whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
+            whenever(youtube.download(eq(url.toASCIIString()), any(), any(), any())).then {
+                helper.info = helper.info.status(Status.STOPPED)
+                throw RuntimeException("yt-dlp process killed")
+            }
+
+            /* When */
+            val item = downloader.download()
+
+            /* Then */
+            assertThat(item.status).isEqualTo(Status.STOPPED)
+            verify(helper.file, never()).upload(any())
         }
 
         @Nested
@@ -142,7 +189,7 @@ class YoutubeDlDownloaderTest(
 
                     whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
                     doThrow(RuntimeException("fake error"))
-                            .whenever(youtube).download(eq(url.toASCIIString()), any(), any())
+                            .whenever(youtube).download(eq(url.toASCIIString()), any(), any(), any())
 
                     /* When */
                     assertThatThrownBy { downloader.download() }
@@ -165,7 +212,7 @@ class YoutubeDlDownloaderTest(
                 @Test
                 fun `should throw error if file not created by youtube-dl`() {
                     /* Given */
-                    whenever(youtube.download(eq(url.toASCIIString()), any(), any())).thenReturn(mock())
+                    whenever(youtube.download(eq(url.toASCIIString()), any(), any(), any())).thenReturn(mock())
                     /* When */
                     assertThatThrownBy { downloader.download() }
                             /* Then */
@@ -189,12 +236,12 @@ class YoutubeDlDownloaderTest(
                 helper.info = dItem.copy(url = url)
 
                 whenever(youtube.extractName(url.toASCIIString())).thenReturn("one.mp3")
-                whenever(youtube.download(eq(url.toASCIIString()), any(), any())).then {
+                whenever(youtube.download(eq(url.toASCIIString()), any(), any(), any())).then {
                     Files.createFile(it.getArgument(1))
                     mock<YoutubeDLResponse>()
                 }
                 downloader.download()
-                verify(youtube).download(any(), any(), captor.capture())
+                verify(youtube).download(any(), any(), captor.capture(), any())
             }
 
             @Test

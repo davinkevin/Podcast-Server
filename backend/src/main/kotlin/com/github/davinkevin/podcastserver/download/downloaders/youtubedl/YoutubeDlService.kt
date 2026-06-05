@@ -53,7 +53,7 @@ class YoutubeDlService(
         }
     }
 
-    fun download(url: String, destination: Path, callback: DownloadProgressCallback): YoutubeDLResponse {
+    fun download(url: String, destination: Path, callback: DownloadProgressCallback, onProcessStarted: (Process) -> Unit = {}): YoutubeDLResponse {
         Files.deleteIfExists(destination)
         val name = destination.fileName.toString()
         val downloadLocation = destination.parent.toAbsolutePath().toString()
@@ -84,9 +84,11 @@ class YoutubeDlService(
         }
             .also { log.debug("download command: yt-dlp {}", it.buildOptions()) }
 
-        return youtube.execute(r) { progress ->
-            log.debug("progress: {}", progress)
-            callback.onProgressUpdate(progress)
+        val progress = DownloadProgressCallback { p ->
+            log.debug("progress: {}", p)
+            callback.onProgressUpdate(p)
         }
+
+        return youtube.execute(r, progress) { p -> onProcessStarted(p) }
     }
 }
