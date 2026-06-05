@@ -12,6 +12,7 @@ import reactor.core.publisher.Flux
 import reactor.core.publisher.Sinks
 import java.net.URI
 import java.time.Duration.ZERO
+import java.time.Duration.ofMinutes
 import java.time.Duration.ofSeconds
 import java.util.*
 import kotlin.io.path.Path
@@ -23,8 +24,13 @@ class MessageHandler {
 
     fun sseMessages(@Suppress("UNUSED_PARAMETER") s: ServerRequest): ServerResponse {
         var stopped = false
-        return ServerResponse.sse { sse ->
-            streamingMessages()
+        // Without an explicit timeout, every connection ends with a logged
+        // AsyncRequestTimeoutException after the container default delay. A long finite
+        // timeout with a clean completion recycles each connection silently — a hard
+        // upper bound on zombie ones — and the browser EventSource reconnects
+        // transparently, the replayed messages covering the gap.
+        return ServerResponse.sse({ sse ->
+            val subscription = streamingMessages()
                 .takeUntil { stopped }
                 .subscribe {
                     sse.apply {
@@ -32,7 +38,12 @@ class MessageHandler {
                         stopped = runCatching { send(it.body) }.isFailure
                     }
                 }
-        }
+
+            sse.onTimeout {
+                subscription.dispose()
+                sse.complete()
+            }
+        }, ofMinutes(30))
     }
 
     @VisibleForTesting

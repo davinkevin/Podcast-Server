@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.Mockito.*
+import org.mockito.kotlin.argumentCaptor
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
@@ -282,6 +283,34 @@ class MessageHandlerTest(
     @Suppress("UNCHECKED_CAST", "UNUSED_PARAMETER")
     @DisplayName("Using implementation details")
     inner class UsingHandlerImplementationDetails {
+
+        @Test
+        fun `should define a long timeout to avoid spurious async timeout exceptions`() {
+            /* Given */
+            /* When */
+            val response = MessageHandler().sseMessages(mock())
+
+            /* Then */
+            val timeout = ReflectionTestUtils.getField(response, "timeout") as Duration
+            assertThat(timeout).isEqualTo(Duration.ofMinutes(30))
+        }
+
+        @Test
+        fun `should complete response on timeout to recycle connection silently`() {
+            /* Given */
+            val sse = mock<SseBuilder>()
+            val onTimeout = argumentCaptor<Runnable>()
+            val response = MessageHandler().sseMessages(mock())
+            val consumer = ReflectionTestUtils.getField(response, "sseConsumer") as Consumer<SseBuilder>
+            consumer.accept(sse)
+            verify(sse).onTimeout(onTimeout.capture())
+
+            /* When */
+            onTimeout.firstValue.run()
+
+            /* Then */
+            verify(sse).complete()
+        }
 
         @Suppress("ReactiveStreamsUnusedPublisher")
         fun sseBuilderToFlux(): Pair<SseBuilder, Flux<LocalSSEvent>> {
