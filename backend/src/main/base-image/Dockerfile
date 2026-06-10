@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.24.0
 
 # renovate: datasource=github-releases depName=yt-dlp/yt-dlp versioning=regex:^(?<major>\d{4})\.(?<minor>\d{2})\.(?<patch>\d{2})$
-ARG YT_DLP_VERSION=2026.03.17
+ARG YT_DLP_VERSION=2026.06.09
 
 FROM denoland/deno:bin-2.6.3@sha256:9ac6b95faa289ad20ba55e51c9a09fcd96fa8b65365f460ec2880b6c9e2a4e86 AS deno
 FROM debian:trixie-20260518 AS downloader
