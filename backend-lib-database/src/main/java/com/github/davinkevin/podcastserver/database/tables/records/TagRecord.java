@@ -76,6 +76,6 @@ public class TagRecord extends UpdatableRecordImpl<TagRecord> {
 
         setId(id);
         setName(name);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

@@ -92,6 +92,6 @@ public class DownloadingItemRecord extends UpdatableRecordImpl<DownloadingItemRe
         setItemId(itemId);
         setPosition(position);
         setState(state);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

@@ -141,6 +141,6 @@ public class ApplicationSettingsRecord extends UpdatableRecordImpl<ApplicationSe
         setNumberOfTry(numberOfTry);
         setNumberOfDayToDownload(numberOfDayToDownload);
         setNumberOfDayToSaveCover(numberOfDayToSaveCover);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

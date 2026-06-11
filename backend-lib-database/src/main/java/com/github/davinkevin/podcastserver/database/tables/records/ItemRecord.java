@@ -274,6 +274,6 @@ public class ItemRecord extends UpdatableRecordImpl<ItemRecord> {
         setPodcastId(podcastId);
         setGuid(guid);
         setStatus(status);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

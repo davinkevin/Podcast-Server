@@ -76,6 +76,6 @@ public class PlaylistItemsRecord extends UpdatableRecordImpl<PlaylistItemsRecord
 
         setPlaylistsId(playlistsId);
         setItemsId(itemsId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

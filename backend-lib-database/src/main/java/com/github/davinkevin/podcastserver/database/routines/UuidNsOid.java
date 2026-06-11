@@ -10,6 +10,7 @@ import java.util.UUID;
 
 import org.jooq.Parameter;
 import org.jooq.impl.AbstractRoutine;
+import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 
@@ -25,13 +26,13 @@ public class UuidNsOid extends AbstractRoutine<UUID> {
     /**
      * The parameter <code>public.uuid_ns_oid.RETURN_VALUE</code>.
      */
-    public static final Parameter<UUID> RETURN_VALUE = Internal.createParameter("RETURN_VALUE", SQLDataType.UUID, false, false);
+    public static final Parameter<UUID> RETURN_VALUE = Internal.createParameter("RETURN_VALUE", SQLDataType.UUID, false);
 
     /**
      * Create a new routine call instance
      */
     public UuidNsOid() {
-        super("uuid_ns_oid", Public.PUBLIC, SQLDataType.UUID);
+        super("uuid_ns_oid", Public.PUBLIC, DSL.comment(""), SQLDataType.UUID);
 
         setReturnParameter(RETURN_VALUE);
     }

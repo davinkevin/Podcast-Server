@@ -11,6 +11,7 @@ import java.util.UUID;
 import org.jooq.Field;
 import org.jooq.Parameter;
 import org.jooq.impl.AbstractRoutine;
+import org.jooq.impl.DSL;
 import org.jooq.impl.Internal;
 import org.jooq.impl.SQLDataType;
 
@@ -26,23 +27,23 @@ public class UuidGenerateV3 extends AbstractRoutine<UUID> {
     /**
      * The parameter <code>public.uuid_generate_v3.RETURN_VALUE</code>.
      */
-    public static final Parameter<UUID> RETURN_VALUE = Internal.createParameter("RETURN_VALUE", SQLDataType.UUID, false, false);
+    public static final Parameter<UUID> RETURN_VALUE = Internal.createParameter("RETURN_VALUE", SQLDataType.UUID, false);
 
     /**
      * The parameter <code>public.uuid_generate_v3.namespace</code>.
      */
-    public static final Parameter<UUID> NAMESPACE = Internal.createParameter("namespace", SQLDataType.UUID, false, false);
+    public static final Parameter<UUID> NAMESPACE = Internal.createParameter("namespace", SQLDataType.UUID, false);
 
     /**
      * The parameter <code>public.uuid_generate_v3.name</code>.
      */
-    public static final Parameter<String> NAME = Internal.createParameter("name", SQLDataType.CLOB, false, false);
+    public static final Parameter<String> NAME = Internal.createParameter("name", SQLDataType.CLOB, false);
 
     /**
      * Create a new routine call instance
      */
     public UuidGenerateV3() {
-        super("uuid_generate_v3", Public.PUBLIC, SQLDataType.UUID);
+        super("uuid_generate_v3", Public.PUBLIC, DSL.comment(""), SQLDataType.UUID);
 
         setReturnParameter(RETURN_VALUE);
         addInParameter(NAMESPACE);

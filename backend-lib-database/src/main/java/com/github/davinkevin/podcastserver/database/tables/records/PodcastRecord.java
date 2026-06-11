@@ -182,6 +182,6 @@ public class PodcastRecord extends UpdatableRecordImpl<PodcastRecord> {
         setType(type);
         setUrl(url);
         setCoverId(coverId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

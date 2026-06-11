@@ -106,6 +106,6 @@ public class CoverRecord extends UpdatableRecordImpl<CoverRecord> {
         setHeight(height);
         setUrl(url);
         setWidth(width);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

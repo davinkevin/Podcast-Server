@@ -91,6 +91,6 @@ public class PlaylistRecord extends UpdatableRecordImpl<PlaylistRecord> {
         setId(id);
         setName(name);
         setCoverId(coverId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }

@@ -76,6 +76,6 @@ public class PodcastTagsRecord extends UpdatableRecordImpl<PodcastTagsRecord> {
 
         setPodcastsId(podcastsId);
         setTagsId(tagsId);
-        resetChangedOnNotNull();
+        resetTouchedOnNotNull();
     }
 }
