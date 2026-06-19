@@ -9,7 +9,7 @@ include:
     TRIVY_USERNAME: ${DOCKER_IO_USER}
     TRIVY_PASSWORD: ${DOCKER_IO_PASSWORD}
   image:
-    name: aquasec/trivy:0.71.1@sha256:53570e6911c2361ebe7995228088cf83a6b9b73e7f3cdca44bd8f8f425e80fa7
+    name: aquasec/trivy:0.71.2@sha256:f5d0e600ecda7449e2a9b272805aef698631d3bb3f3a739a750de2c6819acdc9
     entrypoint: [""]
   artifacts:
     reports:
@@ -26,7 +26,7 @@ include:
   variables:
     TRIVY_NO_PROGRESS: "true"
   image:
-    name: aquasec/trivy:0.71.1@sha256:53570e6911c2361ebe7995228088cf83a6b9b73e7f3cdca44bd8f8f425e80fa7
+    name: aquasec/trivy:0.71.2@sha256:f5d0e600ecda7449e2a9b272805aef698631d3bb3f3a739a750de2c6819acdc9
     entrypoint: [""]
   script:
     - trivy --cache-dir .trivy/ image --download-db-only
