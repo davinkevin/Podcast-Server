@@ -91,9 +91,6 @@ class UpdateService(
     }
 
     fun update(podcastId: UUID, download: Boolean = false) = updateExecutor.execute {
-        // `isPodcastUpdating` emits the per-podcast event AND the global
-        // `isUpdating` event in one go (see MessagingTemplate) — no need
-        // to call `isUpdating` separately.
         liveUpdate.isPodcastUpdating(podcastId, true)
 
         val podcast = podcastRepository.findById(podcastId)!!

@@ -3,6 +3,8 @@ package com.github.davinkevin.podcastserver.messaging
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import org.springframework.context.ApplicationEventPublisher
 import java.util.UUID
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
 /**
  * Created by kevin on 2018-11-25
@@ -23,21 +25,33 @@ import java.util.UUID
 class MessagingTemplate(
     private val event: ApplicationEventPublisher
 ) {
+    // All events are published through a single-threaded executor so their
+    // relative order is preserved: a podcast's `updating:true` always reaches
+    // subscribers before its `updating:false`. A thread-per-event design (the
+    // previous `Thread.ofVirtual().start { ... }`) raced these two apart, and
+    // when `false` overtook `true` the UI left the "Update now" spinner stuck
+    // on for good. Publishing off the caller thread keeps emission
+    // non-blocking; the single worker also serializes access to the downstream
+    // `Sinks.Many`, which is not safe for concurrent emission. The worker is a
+    // virtual (daemon) thread, so it never holds up JVM shutdown.
+    private val publisher: ExecutorService =
+        Executors.newSingleThreadExecutor(Thread.ofVirtual().factory())
+
     fun sendWaitingQueue(value: List<DownloadingItem>) {
         val v = WaitingQueueMessage(value)
-        Thread.ofVirtual().start { event.publishEvent(v) }
+        publisher.execute { event.publishEvent(v) }
     }
     fun sendItem(value: DownloadingItem) {
         val v = DownloadingItemMessage(value)
-        Thread.ofVirtual().start { event.publishEvent(v) }
+        publisher.execute { event.publishEvent(v) }
     }
     fun isUpdating(value: Boolean) {
         val v = UpdateMessage(value)
-        Thread.ofVirtual().start { event.publishEvent(v) }
+        publisher.execute { event.publishEvent(v) }
     }
     fun isPodcastUpdating(podcastId: UUID, updating: Boolean) {
         val v = PodcastUpdatingMessage(PodcastUpdatingValue(podcastId, updating))
-        Thread.ofVirtual().start { event.publishEvent(v) }
+        publisher.execute { event.publishEvent(v) }
     }
 }
 

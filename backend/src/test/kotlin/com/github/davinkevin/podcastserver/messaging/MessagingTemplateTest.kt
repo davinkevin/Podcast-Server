@@ -19,6 +19,7 @@ import org.springframework.test.context.junit.jupiter.SpringExtension
 import org.springframework.test.context.junit.jupiter.SpringExtensionConfig
 import java.net.URI
 import java.util.*
+import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
 
 /**
@@ -300,5 +301,35 @@ class MessagingTemplateTest(
         // around concurrent single-podcast updates flipping the global
         // false while another is still running.
         verify(event, never()).publishEvent(any<UpdateMessage>())
+    }
+
+    @Test
+    fun `should preserve order between successive per-podcast updating events`() {
+        /* Given */
+        // Records the `updating` flag of each event in the order the publisher
+        // actually receives it. Handling `true` slowly means that if the two
+        // emissions are NOT serialized, the later `false` overtakes it — the
+        // exact reordering that leaves the "Update now" spinner stuck on.
+        val received = CopyOnWriteArrayList<Boolean>()
+        doAnswer { invocation ->
+            val message = invocation.getArgument<PodcastUpdatingMessage>(0)
+            if (message.value.updating) Thread.sleep(300)
+            received.add(message.value.updating)
+            null
+        }.whenever(event).publishEvent(any<PodcastUpdatingMessage>())
+        val podcastId = UUID.fromString("dc024a30-bd02-11e5-a837-0800200c9a66")
+
+        /* When */
+        // Fired back-to-back, mirroring UpdateService.update: `true` at the
+        // start of the run, `false` at the end.
+        messages.isPodcastUpdating(podcastId, true)
+        messages.isPodcastUpdating(podcastId, false)
+
+        /* Then */
+        await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+            assertAll {
+                assertThat(received).containsExactly(true, false)
+            }
+        }
     }
 }
