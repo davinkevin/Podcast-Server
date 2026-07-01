@@ -23,8 +23,8 @@ class UpdateHandler(
             .let(UUID::fromString)
         val withDownload = r.paramOrNull("download")?.toBoolean() ?: false
 
-        update.update(id, withDownload)
+        val found = update.update(id, withDownload)
 
-        return ServerResponse.ok().build()
+        return if (found) ServerResponse.ok().build() else ServerResponse.notFound().build()
     }
 }

@@ -90,30 +90,38 @@ class UpdateService(
         log.info("End of the global update with {} found, done in {}s", value.size, duration.inWholeSeconds)
     }
 
-    fun update(podcastId: UUID, download: Boolean = false) = updateExecutor.execute {
-        liveUpdate.isPodcastUpdating(podcastId, true)
+    fun update(podcastId: UUID, download: Boolean = false): Boolean {
+        // Resolve the podcast up front, on the caller thread, so a missing id
+        // is reported synchronously (the handler turns `false` into a 404).
+        // There is nothing to update for an unknown podcast, and bailing here
+        // means we never emit the `updating` spinner event for it either.
+        val podcast = podcastRepository.findById(podcastId) ?: return false
 
-        val podcast = podcastRepository.findById(podcastId)!!
-        if (podcast.url == null) {
+        updateExecutor.execute {
+            liveUpdate.isPodcastUpdating(podcastId, true)
+
+            // `false` is emitted in `finally`-fashion after the Result completes,
+            // so the "Update now" spinner is always released — including when a
+            // step below throws (DB write, item creation, …). Otherwise a
+            // mid-run failure would leave it stuck on for good.
+            runCatching {
+                if (podcast.url == null) return@runCatching
+
+                val request = PodcastToUpdate(podcast.id, URI(podcast.url), UUID.randomUUID().toString())
+
+                val update = updaters.of(request.url).update(request) ?: return@runCatching
+
+                saveSignatureAndCreateItems(update.podcast, update.items, update.newSignature)
+
+                if (download) {
+                    updateExecutor.execute { idm.launchDownload() }
+                }
+            }.onFailure { log.errorWithDebugStack("Error during update of podcast $podcastId", throwable = it) }
+
             liveUpdate.isPodcastUpdating(podcastId, false)
-            return@execute
         }
 
-        val request = PodcastToUpdate(podcast.id, URI(podcast.url), UUID.randomUUID().toString())
-
-        val update = updaters.of(request.url).update(request)
-        if (update == null) {
-            liveUpdate.isPodcastUpdating(podcastId, false)
-            return@execute
-        }
-
-        saveSignatureAndCreateItems(update.podcast, update.items, update.newSignature)
-
-        liveUpdate.isPodcastUpdating(podcastId, false)
-
-        if (download) {
-            updateExecutor.execute { idm.launchDownload() }
-        }
+        return true
     }
 
     private fun saveSignatureAndCreateItems(

@@ -17,6 +17,7 @@ import com.github.davinkevin.podcastserver.update.updaters.Type
 import com.github.davinkevin.podcastserver.update.updaters.Updater
 import com.github.davinkevin.podcastserver.update.updaters.UpdaterSelector
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry
+import org.assertj.core.api.Assertions.assertThat
 import org.awaitility.Awaitility.await
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.DisplayName
@@ -116,6 +117,61 @@ class UpdateServiceTest(
                 cover = ItemFromUpdate.Cover(100, 100, URI("http://localhost:1234/item/2.png"))
             )
         )
+
+        @Test
+        fun `and return false without emitting any event when the podcast does not exist`() {
+            /* Given */
+            val unknownId = UUID.fromString("9f05f4f8-0f0e-4a1e-8f2a-2b3c4d5e6f70")
+            whenever(podcastRepository.findById(unknownId)).thenReturn(null)
+
+            /* When */
+            val found = service.update(unknownId)
+
+            /* Then */
+            assertThat(found).isFalse()
+            verify(podcastRepository).findById(unknownId)
+            // Nothing to update: the spinner event is never emitted, and no
+            // other collaborator is touched.
+            verifyNoMoreInteractions(
+                podcastRepository,
+                itemRepository,
+                updaters,
+                liveUpdate,
+                fileService,
+                idm
+            )
+        }
+
+        @Test
+        fun `and still release the spinner when a step throws mid-run`() {
+            /* Given */
+            whenever(podcastRepository.findById(podcast.id)).thenReturn(podcast)
+            val uri = URI(podcast.url!!)
+            val fakeUpdater = mock<FakeUpdater> {
+                on { signatureOf(any()) } doReturn "another-signature"
+                on { findItems(any()) } doReturn items
+                on { update(any()) }.thenCallRealMethod()
+                on { type() }.thenCallRealMethod()
+                on { registry } doReturn SimpleMeterRegistry()
+            }
+            whenever(updaters.of(uri)).thenReturn(fakeUpdater)
+            // A DB write blows up in the middle of the run.
+            whenever(podcastRepository.updateSignature(eq(podcast.id), any()))
+                .thenThrow(RuntimeException("boom"))
+
+            /* When */
+            service.update(podcast.id)
+
+            /* Then */
+            await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                // `false` is still emitted despite the crash, so the UI spinner
+                // never gets stuck on.
+                liveUpdate.inOrder {
+                    verify().isPodcastUpdating(podcast.id, true)
+                    verify().isPodcastUpdating(podcast.id, false)
+                }
+            }
+        }
 
         @Test
         fun `and do nothing because the podcast has no url`() {

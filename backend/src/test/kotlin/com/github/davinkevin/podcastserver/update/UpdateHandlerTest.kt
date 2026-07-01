@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
 import org.mockito.kotlin.doNothing
+import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.verify
 import org.mockito.kotlin.whenever
 import org.springframework.beans.factory.annotation.Autowired
@@ -94,7 +95,7 @@ class UpdateHandlerTest(
         fun `with success`() {
             /* Given */
             val id = UUID.fromString("cd651e1f-1dbd-4f20-af61-951ec0473884")
-            doNothing().whenever(update).update(id, download = false)
+            doReturn(true).whenever(update).update(id, download = false)
             /* When */
             rest
                     .get()
@@ -110,7 +111,7 @@ class UpdateHandlerTest(
         fun `and download`() {
             /* Given */
             val id = UUID.fromString("cd651e1f-1dbd-4f20-af61-951ec0473884")
-            doNothing().whenever(update).update(id, download = true)
+            doReturn(true).whenever(update).update(id, download = true)
             /* When */
             rest
                     .get()
@@ -120,6 +121,22 @@ class UpdateHandlerTest(
                     .expectStatus().isOk
 
             verify(update).update(id, download = true)
+        }
+
+        @Test
+        fun `and return 404 when the podcast does not exist`() {
+            /* Given */
+            val id = UUID.fromString("f0e1d2c3-b4a5-6978-8a9b-0c1d2e3f4a5b")
+            doReturn(false).whenever(update).update(id, download = false)
+            /* When */
+            rest
+                    .get()
+                    .uri("/api/v1/podcasts/$id/update")
+                    .exchange()
+                    /* Then */
+                    .expectStatus().isNotFound
+
+            verify(update).update(id, download = false)
         }
 
     }
