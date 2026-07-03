@@ -9,10 +9,8 @@
     '@davinkevin',
   ],
   ignorePaths: [
-    // In frontend modules, only build.gradle.kts and docker/Dockerfile are tracked
-    // by Renovate. JavaScript dependencies (package.json, yarn.lock) are managed manually.
-    'frontend-angular/package.json',
-    'frontend-angular/yarn.lock',
+    // frontend-angularjs is legacy: only build.gradle.kts and docker/Dockerfile are
+    // tracked by Renovate, its JavaScript dependencies are managed manually.
     'frontend-angularjs/package.json',
   ],
   kubernetes: {
@@ -52,6 +50,35 @@
       groupSlug: 'all-kotlin',
       matchPackageNames: [
         '/^org.jetbrains.kotlin.*/',
+      ],
+    },
+    {
+      // Keep the Angular ecosystem in lockstep: framework, CLI, build, ESLint
+      // integration and the Analog test tooling all move together.
+      groupName: 'all-angular',
+      groupSlug: 'all-angular',
+      matchFileNames: [
+        'frontend-angular/package.json',
+      ],
+      matchPackageNames: [
+        '/^@angular\\//',
+        '/^@angular-eslint\\//',
+        'angular-eslint',
+        '/^@analogjs\\//',
+      ],
+    },
+    {
+      // TypeScript and zone.js are version-locked by Angular's peer dependency
+      // ranges. Renovate has no peer-dependency solver, so keep it inside the
+      // existing tilde ranges (patch-level only). Crossing to a new minor happens
+      // manually via `ng update` when moving Angular major.
+      rangeStrategy: 'in-range-only',
+      matchFileNames: [
+        'frontend-angular/package.json',
+      ],
+      matchPackageNames: [
+        'typescript',
+        'zone.js',
       ],
     },
   ],
