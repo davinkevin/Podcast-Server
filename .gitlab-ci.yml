@@ -69,20 +69,17 @@ stages:
 ⬇ ui-v3:
   stage: ⬇ download
   extends: [ .only-on-frontend-changes ]
-  needs: [⬇ build-tool]
-  image: gradle:jdk21
+  needs: []
+  image: node:24.16.0
   script:
-    - ./gradlew $GRADLE_OPTS :frontend-angular:downloadDependencies
+    - cd frontend-angular
+    - npm ci
   cache:
-    - !reference [ .using-build-tool ]
     - key:
         files:
           - frontend-angular/package-lock.json
         prefix: "ui-v3"
       paths:
-        - .gradle
-        - .gradle_home/caches
-        - frontend-angular/.gradle
         - frontend-angular/node_modules/
 
 🧪 backend:
@@ -146,21 +143,24 @@ stages:
 🧪 ui-v3:
   stage: 🧪 test
   extends: [ .only-on-frontend-changes ]
-  image: gradle:jdk21
+  image: node:24.16.0
   needs: [⬇ ui-v3]
+  variables:
+    # Publish a Build Scan for the native npm test run through the Develocity
+    # npm agent (installed as a devDependency). DEVELOCITY_ACCESS_KEY is provided
+    # as a project CI/CD variable (same one the Gradle build scans use).
+    NODE_OPTIONS: "-r @gradle-tech/develocity-agent/preload"
+    DEVELOCITY_URL: $DEVELOCITY_SERVER
   script:
-    - ./gradlew $GRADLE_OPTS :frontend-angular:npm_run_test
+    - cd frontend-angular
+    - npm run test
   cache:
-    - !reference [ .using-build-tool ]
     - key:
         files:
           - frontend-angular/package-lock.json
         prefix: "ui-v3"
       policy: pull
       paths:
-        - .gradle
-        - .gradle_home/caches
-        - frontend-angular/.gradle
         - frontend-angular/node_modules/
 
 👷 backend-base-image:
@@ -207,24 +207,26 @@ stages:
 👷 ui-v3:
   stage: 👷‍ build
   extends: [ .only-on-frontend-changes ]
-  image: gradle:jdk21
+  image: node:24.16.0
   needs: [⬇ ui-v3]
+  variables:
+    # Publish a Build Scan for the native npm build through the Develocity npm
+    # agent. DEVELOCITY_ACCESS_KEY is provided as a project CI/CD variable.
+    NODE_OPTIONS: "-r @gradle-tech/develocity-agent/preload"
+    DEVELOCITY_URL: $DEVELOCITY_SERVER
   script:
-    - ./gradlew $GRADLE_OPTS :frontend-angular:build
+    - cd frontend-angular
+    - npm run build
   artifacts:
     paths:
       - frontend-angular/dist/
   cache:
-    - !reference [ .using-build-tool ]
     - key:
         files:
           - frontend-angular/package-lock.json
         prefix: "ui-v3"
       policy: pull
       paths:
-        - .gradle
-        - .gradle_home/caches
-        - frontend-angular/.gradle
         - frontend-angular/node_modules/
 
 🐳 backend:
