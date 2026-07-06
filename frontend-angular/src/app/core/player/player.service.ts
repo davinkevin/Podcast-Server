@@ -6,7 +6,7 @@ import { computed, Injectable, signal } from '@angular/core';
  * and `PlaylistItemHAL` (loaded from playlist routes) so the queue can
  * mix and match without coercion.
  */
-export type Playable = {
+export interface Playable {
   readonly id: string;
   readonly title: string;
   readonly proxyURL: string;
@@ -14,7 +14,7 @@ export type Playable = {
   readonly isDownloaded: boolean;
   readonly podcast: { readonly id: string; readonly title: string };
   readonly cover: { readonly url: string; readonly proxyURL: string };
-};
+}
 
 @Injectable({ providedIn: 'root' })
 export class PlayerService {

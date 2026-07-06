@@ -105,7 +105,7 @@ export class CoverCardComponent {
   /** Accessible label target for the parent chip, e.g. the podcast title. */
   readonly parentTitle = input<string | undefined>(undefined);
 
-  readonly play = output<void>();
+  readonly playClicked = output<void>();
   readonly download = output<void>();
   readonly action = output<CoverCardAction>();
   readonly open = output<void>();
@@ -113,7 +113,7 @@ export class CoverCardComponent {
 
   protected onPlay(event: Event) {
     event.stopPropagation();
-    this.play.emit();
+    this.playClicked.emit();
   }
 
   protected onDownload(event: Event) {

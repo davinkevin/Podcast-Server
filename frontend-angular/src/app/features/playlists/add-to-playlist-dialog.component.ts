@@ -98,7 +98,7 @@ type Mode = 'pick' | 'create';
           <input
             matInput
             required
-            autofocus
+            cdkFocusInitial
             [ngModel]="newName()"
             (ngModelChange)="newName.set($event)"
             (keydown.enter)="onCreateAndAdd()"

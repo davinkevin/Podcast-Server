@@ -4,7 +4,7 @@ import { Title } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import ItemDetailComponent from './item-detail.component';
 import { ItemApi } from '../../core/api/item.api';
@@ -66,7 +66,7 @@ describe('ItemDetailComponent download loader (#260)', () => {
   let item: WritableSignal<ItemHAL | undefined>;
   let downloading: WritableSignal<readonly DownloadingItemHAL[]>;
   let queue: WritableSignal<readonly DownloadingItemHAL[]>;
-  let component: any;
+  let component: ItemDetailComponent;
 
   beforeEach(() => {
     item = signal<ItemHAL | undefined>(makeItem());
@@ -74,7 +74,7 @@ describe('ItemDetailComponent download loader (#260)', () => {
     queue = signal<readonly DownloadingItemHAL[]>([]);
 
     const itemQuery = { data: item, error: signal(undefined), isSuccess: signal(true) };
-    const noopMutation = { mutate: () => {} };
+    const noopMutation = { mutate: vi.fn() };
 
     TestBed.configureTestingModule({
       providers: [
@@ -84,7 +84,7 @@ describe('ItemDetailComponent download loader (#260)', () => {
             getById: () => itemQuery,
             resetMutation: () => noopMutation,
             deleteMutation: () => noopMutation,
-            triggerDownload: () => ({ subscribe: () => {} }),
+            triggerDownload: () => ({ subscribe: vi.fn() }),
           },
         },
         {
@@ -97,13 +97,13 @@ describe('ItemDetailComponent download loader (#260)', () => {
         { provide: DownloadStreamService, useValue: { downloading, queue } },
         { provide: NavigationOriginService, useValue: { consume: () => null } },
         { provide: CoverColorService, useValue: { extract: () => Promise.resolve(null) } },
-        { provide: PageTintService, useValue: { currentUrl: () => '/', claim: () => {} } },
+        { provide: PageTintService, useValue: { currentUrl: () => '/', claim: vi.fn() } },
         { provide: PlayerService, useValue: {} },
         { provide: VlcService, useValue: {} },
-        { provide: Title, useValue: { setTitle: () => {} } },
-        { provide: Router, useValue: { navigate: () => {} } },
-        { provide: MatSnackBar, useValue: { open: () => {} } },
-        { provide: MatDialog, useValue: { open: () => {} } },
+        { provide: Title, useValue: { setTitle: vi.fn() } },
+        { provide: Router, useValue: { navigate: vi.fn() } },
+        { provide: MatSnackBar, useValue: { open: vi.fn() } },
+        { provide: MatDialog, useValue: { open: vi.fn() } },
       ],
     });
 
@@ -117,40 +117,40 @@ describe('ItemDetailComponent download loader (#260)', () => {
   });
 
   it('shows no loader and no badge when the item is not downloaded and idle', () => {
-    expect(component.inProgress()).toBe(false);
-    expect(component.showLoader()).toBe(false);
-    expect(component.statusBadge()).toBeNull();
+    expect(component['inProgress']()).toBe(false);
+    expect(component['showLoader']()).toBe(false);
+    expect(component['statusBadge']()).toBeNull();
   });
 
   it('turns the FAB into a loader with the percentage while downloading', () => {
     downloading.set([makeDownloading(42)]);
 
-    expect(component.inProgress()).toBe(true);
-    expect(component.showLoader()).toBe(true);
-    expect(component.loaderLabel()).toBe('Downloading… 42%');
-    expect(component.statusBadge()).toEqual({ kind: 'downloading', progression: 42 });
+    expect(component['inProgress']()).toBe(true);
+    expect(component['showLoader']()).toBe(true);
+    expect(component['loaderLabel']()).toBe('Downloading… 42%');
+    expect(component['statusBadge']()).toEqual({ kind: 'downloading', progression: 42 });
   });
 
   it('shows a "Queued…" loader while waiting in the download queue', () => {
     queue.set([makeDownloading(0)]);
 
-    expect(component.showLoader()).toBe(true);
-    expect(component.loaderLabel()).toBe('Queued…');
-    expect(component.statusBadge()).toEqual({ kind: 'queued', progression: null });
+    expect(component['showLoader']()).toBe(true);
+    expect(component['loaderLabel']()).toBe('Queued…');
+    expect(component['statusBadge']()).toEqual({ kind: 'queued', progression: null });
   });
 
   it('drops the loader once the item is downloaded', () => {
     item.set(makeItem({ isDownloaded: true, status: 'FINISH' }));
 
-    expect(component.inProgress()).toBe(false);
-    expect(component.showLoader()).toBe(false);
-    expect(component.statusBadge()).toBeNull();
+    expect(component['inProgress']()).toBe(false);
+    expect(component['showLoader']()).toBe(false);
+    expect(component['statusBadge']()).toBeNull();
   });
 
   it('surfaces a failed badge but no loader so the Download button can retry', () => {
     item.set(makeItem({ status: 'FAILED' }));
 
-    expect(component.showLoader()).toBe(false);
-    expect(component.statusBadge()).toEqual({ kind: 'failed', progression: null });
+    expect(component['showLoader']()).toBe(false);
+    expect(component['statusBadge']()).toEqual({ kind: 'failed', progression: null });
   });
 });

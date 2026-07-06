@@ -108,7 +108,7 @@
                 !entry.item.isDownloaded && !isInProgress(entry.item)
               "
               [playing]="player.currentItem()?.id === entry.item.id"
-              (play)="onPlay(entry.item)"
+              (playClicked)="onPlay(entry.item)"
               (download)="onDownload(entry.item)"
               (open)="onOpen(entry.item)"
               (openParent)="onOpenPodcast(entry.item.podcastId)"
@@ -139,7 +139,7 @@
                     [playable]="item.isDownloaded"
                     [downloadable]="!item.isDownloaded && !isInProgress(item)"
                     [playing]="player.currentItem()?.id === item.id"
-                    (play)="onPlay(item)"
+                    (playClicked)="onPlay(item)"
                     (download)="onDownload(item)"
                     (open)="onOpen(item)"
                   />

@@ -39,7 +39,7 @@ export class DownloadsPopoverComponent {
   protected readonly stream = inject(DownloadStreamService);
   private readonly api = inject(DownloadApi);
 
-  readonly close = output<void>();
+  readonly closed = output<void>();
 
   // Local writable mirror of the SSE queue. Lets us apply optimistic reorders
   // on drop and snap back on error without waiting for the SSE round trip.

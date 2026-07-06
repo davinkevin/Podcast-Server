@@ -293,7 +293,7 @@
               [playing]="player.currentItem()?.id === item.id"
               [actions]="itemActions(item)"
               [viewTransitionName]="'podcast-item-cover-' + item.id"
-              (play)="onPlay(item)"
+              (playClicked)="onPlay(item)"
               (download)="onDownload(item)"
               (open)="onOpenItem(item)"
               (action)="onItemAction(item, $event)"

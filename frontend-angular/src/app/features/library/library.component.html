@@ -71,7 +71,7 @@
             [playing]="player.currentItem()?.id === item.id"
             [actions]="actionsFor(item)"
             [viewTransitionName]="'library-item-cover-' + item.id"
-            (play)="onPlay(item)"
+            (playClicked)="onPlay(item)"
             (download)="onDownload(item)"
             (open)="onOpen(item)"
             (action)="onAction(item, $event)"

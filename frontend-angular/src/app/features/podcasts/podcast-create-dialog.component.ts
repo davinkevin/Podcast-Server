@@ -47,7 +47,7 @@ type Mode = 'url' | 'manual';
           <input
             matInput
             type="url"
-            autofocus
+            cdkFocusInitial
             placeholder="Paste a feed URL…"
             [ngModel]="urlInput()"
             (ngModelChange)="urlInput.set($event)"

@@ -57,14 +57,14 @@ export class TrackRowComponent {
   readonly playing = input<boolean>(false);
   readonly viewTransitionName = input<string | undefined>(undefined);
 
-  readonly play = output<void>();
+  readonly playClicked = output<void>();
   readonly download = output<void>();
   readonly action = output<CoverCardAction>();
   readonly open = output<void>();
 
   protected onPlay(event: Event) {
     event.stopPropagation();
-    this.play.emit();
+    this.playClicked.emit();
   }
 
   protected onDownload(event: Event) {

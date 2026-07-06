@@ -121,7 +121,7 @@
             [playing]="player.currentItem()?.id === item.id"
             [actions]="actionsFor(item)"
             [viewTransitionName]="'playlist-item-cover-' + item.id"
-            (play)="onPlay(item)"
+            (playClicked)="onPlay(item)"
             (download)="onDownload(item)"
             (open)="onOpenItem(item)"
             (action)="onAction(item, $event)"

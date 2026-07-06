@@ -64,7 +64,7 @@
       (backdropClick)="closeDownloads()"
       (detach)="closeDownloads()"
     >
-      <ps-downloads-popover (close)="closeDownloads()" />
+      <ps-downloads-popover (closed)="closeDownloads()" />
     </ng-template>
 
     @for (link of bottomLinks; track link.path) {

@@ -31,7 +31,7 @@ import { PlaylistWithItemsHAL } from '../../core/models/playlist.model';
         <input
           matInput
           required
-          autofocus
+          cdkFocusInitial
           [ngModel]="name()"
           (ngModelChange)="name.set($event)"
           (keydown.enter)="onCreate()"
