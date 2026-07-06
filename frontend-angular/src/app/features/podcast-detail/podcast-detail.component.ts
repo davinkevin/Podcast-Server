@@ -211,7 +211,7 @@ export default class PodcastDetailComponent {
   private readonly palette = signal<CoverPalette | null>(null);
 
   // Per-button accent override. Material 19 uses per-component MDC tokens
-  // (--mdc-filled-button-container-color, --mdc-fab-container-color, ...)
+  // (--mat-button-filled-container-color, --mat-fab-container-color, ...)
   // — overriding --mat-sys-primary on a parent isn't enough since those
   // tokens are resolved at theme-compile time. We set the relevant tokens
   // inline so flat-button and fab variants pick up the cover accent. Null
@@ -222,9 +222,9 @@ export default class PodcastDetailComponent {
     const onPrimary = p?.vibrant?.titleText ?? p?.darkVibrant?.titleText;
     if (!primary || !onPrimary) return null;
     return {
-      '--mdc-filled-button-container-color': primary,
-      '--mdc-filled-button-label-text-color': onPrimary,
-      '--mdc-fab-container-color': primary,
+      '--mat-button-filled-container-color': primary,
+      '--mat-button-filled-label-text-color': onPrimary,
+      '--mat-fab-container-color': primary,
       '--mat-fab-foreground-color': onPrimary,
       '--mat-sys-primary': primary,
       '--mat-sys-on-primary': onPrimary,

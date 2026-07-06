@@ -9,6 +9,7 @@ const SSE_URL = '/api/v1/sse';
 @Injectable({ providedIn: 'root' })
 export class DownloadStreamService {
   private readonly queryClient = inject(QueryClient);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly downloadingMap = signal<ReadonlyMap<string, DownloadingItemHAL>>(new Map());
   private readonly queueState = signal<readonly DownloadingItemHAL[]>([]);
   private readonly updatingState = signal<boolean>(false);
@@ -25,12 +26,12 @@ export class DownloadStreamService {
 
   private eventSource?: EventSource;
 
-  constructor(destroyRef: DestroyRef) {
+  constructor() {
     if (typeof window === 'undefined' || typeof EventSource === 'undefined') {
       return;
     }
     this.connect();
-    destroyRef.onDestroy(() => this.eventSource?.close());
+    this.destroyRef.onDestroy(() => this.eventSource?.close());
   }
 
   private connect() {

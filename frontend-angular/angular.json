@@ -11,11 +11,31 @@
       "prefix": "ps",
       "style": "scss",
       "changeDetection": "OnPush",
-      "standalone": true
+      "standalone": true,
+      "type": "component"
     },
     "@schematics/angular:directive": {
       "prefix": "ps",
-      "standalone": true
+      "standalone": true,
+      "type": "directive"
+    },
+    "@schematics/angular:service": {
+      "type": "service"
+    },
+    "@schematics/angular:guard": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:interceptor": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:module": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:pipe": {
+      "typeSeparator": "."
+    },
+    "@schematics/angular:resolver": {
+      "typeSeparator": "."
     }
   },
   "projects": {

@@ -212,9 +212,9 @@ export default class PlaylistDetailComponent {
     const onPrimary = p?.vibrant?.titleText ?? p?.darkVibrant?.titleText;
     if (!primary || !onPrimary) return null;
     return {
-      '--mdc-filled-button-container-color': primary,
-      '--mdc-filled-button-label-text-color': onPrimary,
-      '--mdc-fab-container-color': primary,
+      '--mat-button-filled-container-color': primary,
+      '--mat-button-filled-label-text-color': onPrimary,
+      '--mat-fab-container-color': primary,
       '--mat-fab-foreground-color': onPrimary,
       '--mat-sys-primary': primary,
       '--mat-sys-on-primary': onPrimary,

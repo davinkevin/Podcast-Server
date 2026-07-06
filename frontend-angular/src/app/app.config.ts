@@ -1,7 +1,7 @@
 import {
   ApplicationConfig,
   inject,
-  provideExperimentalZonelessChangeDetection,
+  provideZonelessChangeDetection,
 } from '@angular/core';
 import { provideHttpClient, withFetch } from '@angular/common/http';
 import {
@@ -22,7 +22,7 @@ import { ListRouteReuseStrategy } from './core/navigation/list-route-reuse.strat
 
 export const appConfig: ApplicationConfig = {
   providers: [
-    provideExperimentalZonelessChangeDetection(),
+    provideZonelessChangeDetection(),
     provideRouter(
       routes,
       withComponentInputBinding(),
