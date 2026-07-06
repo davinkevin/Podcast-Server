@@ -37,7 +37,7 @@ export const appConfig: ApplicationConfig = {
       // keep their morph.
       withViewTransitions({
         onViewTransitionCreated: ({ transition }) => {
-          const trigger = inject(Router).getCurrentNavigation()?.trigger;
+          const trigger = inject(Router).currentNavigation()?.trigger;
           if (trigger === 'popstate') transition.skipTransition();
         },
       }),

@@ -7,7 +7,7 @@ import {
   ElementRef,
   inject,
   signal,
-  ViewChild,
+  viewChild,
 } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -205,8 +205,9 @@ export class CommandPaletteComponent implements AfterViewInit {
   private readonly settings = inject(SettingsService);
   private readonly snackbar = inject(MatSnackBar);
 
-  @ViewChild('searchInput') private searchInput?: ElementRef<HTMLInputElement>;
-  @ViewChild('list') private listEl?: ElementRef<HTMLUListElement>;
+  private readonly searchInput =
+    viewChild<ElementRef<HTMLInputElement>>('searchInput');
+  private readonly listEl = viewChild<ElementRef<HTMLUListElement>>('list');
 
   protected readonly query = signal('');
   // The raw "intent" index; the displayed active row is clamped via the
@@ -413,7 +414,7 @@ export class CommandPaletteComponent implements AfterViewInit {
     // Keep the active row in view as the user navigates with the keyboard.
     effect(() => {
       const idx = this.activeIndex();
-      const list = this.listEl?.nativeElement;
+      const list = this.listEl()?.nativeElement;
       if (!list) return;
       const rows = list.querySelectorAll<HTMLElement>('.palette__item');
       rows[idx]?.scrollIntoView({ block: 'nearest' });
@@ -423,7 +424,7 @@ export class CommandPaletteComponent implements AfterViewInit {
   ngAfterViewInit(): void {
     // Autofocus the search input. Using afterViewInit (not the input's
     // autofocus attribute) so MatDialog's own focus trap doesn't steal it.
-    queueMicrotask(() => this.searchInput?.nativeElement.focus());
+    queueMicrotask(() => this.searchInput()?.nativeElement.focus());
   }
 
   protected onQueryChange(v: string) {
