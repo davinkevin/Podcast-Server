@@ -11,7 +11,6 @@ import {
   withComponentInputBinding,
   withViewTransitions,
 } from '@angular/router';
-import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import {
   provideTanStackQuery,
   QueryClient,
@@ -43,7 +42,6 @@ export const appConfig: ApplicationConfig = {
       }),
     ),
     provideHttpClient(withFetch()),
-    provideAnimationsAsync(),
     // Detach (instead of destroy) the spotlight/list routes and the
     // podcast/playlist detail routes when navigating away. On return the
     // original DOM — including already-decoded covers — is re-attached,
