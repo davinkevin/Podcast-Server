@@ -11,7 +11,7 @@ description = "frontend-v3"
 
 node {
   download.set(true)
-  version.set("20.19.4")
+  version.set("24.16.0")
 }
 
 tasks.register("downloadDependencies") {
