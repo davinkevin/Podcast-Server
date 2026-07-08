@@ -38,7 +38,7 @@
     "@types/node": "^24.0.0",
     "@vitest/coverage-v8": "^4.1.10",
     "angular-eslint": "^22.0.0",
-    "eslint": "^9.28.0",
+    "eslint": "^10.0.0",
     "jsdom": "^29.0.0",
     "prettier": "^3.4.0",
     "typescript": "~6.0.3",
