@@ -4,7 +4,10 @@
     'config:recommended',
     'customManagers:dockerfileVersions',
   ],
-  rebaseWhen: 'never',
+  // Let Renovate rebase and regenerate lock files itself when a branch becomes
+  // conflicted (e.g. a lock file conflict after another MR merges), instead of
+  // requiring a manual rebase.
+  rebaseWhen: 'conflicted',
   assignees: [
     '@davinkevin',
   ],
