@@ -28,6 +28,7 @@ include:
 # Serves the site at https://davinkevin.gitlab.io/Podcast-Server/
 pages:
   stage: 🚀 deploy
+  interruptible: false
   needs: [ "👷 documentation" ]
   image: alpine:latest
   rules:
