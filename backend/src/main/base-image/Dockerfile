@@ -3,10 +3,14 @@
 # renovate: datasource=github-releases depName=yt-dlp/yt-dlp versioning=regex:^(?<major>\d{4})\.(?<minor>\d{2})\.(?<patch>\d{2})$
 ARG YT_DLP_VERSION=2026.07.04
 
+# renovate: datasource=github-tags depName=FFmpeg/FFmpeg extractVersion=^n(?<version>\d+\.\d+)
+ARG FFMPEG_VERSION=7.1
+
 FROM denoland/deno:bin-2.6.3@sha256:9ac6b95faa289ad20ba55e51c9a09fcd96fa8b65365f460ec2880b6c9e2a4e86 AS deno
 FROM debian:trixie-20260623 AS downloader
 
 ARG YT_DLP_VERSION
+ARG FFMPEG_VERSION
 
 WORKDIR /opt
 
@@ -17,19 +21,14 @@ RUN echo "install build dependencies" && \
   ARCH="$(dpkg --print-architecture)" && \
   echo "resolve arch-specific asset names (dpkg arch=${ARCH})" && \
   case "${ARCH}" in \
-    amd64) FFMPEG_ARCH=amd64; YT_DLP_ASSET=yt-dlp_linux ;; \
-    arm64) FFMPEG_ARCH=arm64; YT_DLP_ASSET=yt-dlp_linux_aarch64 ;; \
+    amd64) FFMPEG_ARCH=linux64; YT_DLP_ASSET=yt-dlp_linux ;; \
+    arm64) FFMPEG_ARCH=linuxarm64; YT_DLP_ASSET=yt-dlp_linux_aarch64 ;; \
     *) echo "Unsupported architecture: '${ARCH}'" >&2; exit 1 ;; \
   esac && \
-  echo "install ffmpeg static (${FFMPEG_ARCH})" && \
+  echo "install ffmpeg ${FFMPEG_VERSION} static from BtbN (${FFMPEG_ARCH})" && \
   mkdir /opt/ffmpeg && \
-  curl -qsSL "https://johnvansickle.com/ffmpeg/releases/ffmpeg-release-${FFMPEG_ARCH}-static.tar.xz" \
-    | tar xJv -C /opt/ffmpeg --strip-components 1 && \
-  rm -rf \
-    /opt/ffmpeg/model \
-    /opt/ffmpeg/manpages \
-    /opt/ffmpeg/qt-faststart \
-    /opt/ffmpeg/readme.txt && \
+  curl -qsSL "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/ffmpeg-n${FFMPEG_VERSION}-latest-${FFMPEG_ARCH}-gpl-${FFMPEG_VERSION}.tar.xz" \
+    | tar xJv -C /opt/ffmpeg --wildcards --strip-components 2 '*/bin/ffmpeg' '*/bin/ffprobe' && \
   echo "install yt-dlp standalone (${YT_DLP_ASSET}; PyInstaller, embeds Python and EJS scripts)" && \
   mkdir /opt/yt-dlp && \
   curl -qsSL -o /opt/yt-dlp/yt-dlp \
