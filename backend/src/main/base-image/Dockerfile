@@ -3,8 +3,8 @@
 # renovate: datasource=github-releases depName=yt-dlp/yt-dlp versioning=regex:^(?<major>\d{4})\.(?<minor>\d{2})\.(?<patch>\d{2})$
 ARG YT_DLP_VERSION=2026.07.04
 
-# renovate: datasource=github-tags depName=FFmpeg/FFmpeg extractVersion=^n(?<version>\d+\.\d+)
-ARG FFMPEG_VERSION=7.1
+# renovate: datasource=custom.btbn-ffmpeg depName=BtbN/FFmpeg-Builds versioning=loose
+ARG FFMPEG_VERSION=8.1
 
 FROM denoland/deno:bin-2.6.3@sha256:9ac6b95faa289ad20ba55e51c9a09fcd96fa8b65365f460ec2880b6c9e2a4e86 AS deno
 FROM debian:trixie-20260623 AS downloader

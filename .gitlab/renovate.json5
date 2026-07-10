@@ -21,6 +21,21 @@
       'distribution/kubernetes/.+\\.yaml$',
     ],
   },
+  // The base image downloads ffmpeg from BtbN/FFmpeg-Builds, whose rolling
+  // `latest` release only ships a subset of FFmpeg release lines (currently
+  // n7.1 and n8.1). Tracking FFmpeg/FFmpeg git tags proposed versions BtbN
+  // never builds (e.g. n7.2), producing MRs whose image build 404s on download.
+  // This custom datasource derives the available versions from the actual BtbN
+  // asset names, so Renovate only ever proposes buildable versions.
+  customDatasources: {
+    'btbn-ffmpeg': {
+      defaultRegistryUrlTemplate: 'https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/tags/latest',
+      format: 'json',
+      transformTemplates: [
+        '{ "releases": $distinct($map(assets[$contains(name, "ffmpeg-n") and $contains(name, "linux64")].name, function($n) { $substringBefore($substringAfter($n, "ffmpeg-n"), "-latest") })).{ "version": $ } }',
+      ],
+    },
+  },
   packageRules: [
     {
       matchPackageNames: [
