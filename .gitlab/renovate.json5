@@ -4,30 +4,19 @@
     'config:recommended',
     'customManagers:dockerfileVersions',
   ],
-  // Let Renovate rebase and regenerate lock files itself when a branch becomes
-  // conflicted (e.g. a lock file conflict after another MR merges), instead of
-  // requiring a manual rebase.
   rebaseWhen: 'conflicted',
   configMigration: true,
   assignees: [
     '@davinkevin',
   ],
   ignorePaths: [
-    // frontend-angularjs is legacy: only build.gradle.kts and docker/Dockerfile are
-    // tracked by Renovate, its JavaScript dependencies are managed manually.
     'frontend-angularjs/package.json',
   ],
   kubernetes: {
-    fileMatch: [
-      'distribution/kubernetes/.+\\.yaml$',
+    managerFilePatterns: [
+      '/distribution/kubernetes/.+\\.yaml$/',
     ],
   },
-  // The base image downloads ffmpeg from BtbN/FFmpeg-Builds, whose rolling
-  // `latest` release only ships a subset of FFmpeg release lines (currently
-  // n7.1 and n8.1). Tracking FFmpeg/FFmpeg git tags proposed versions BtbN
-  // never builds (e.g. n7.2), producing MRs whose image build 404s on download.
-  // This custom datasource derives the available versions from the actual BtbN
-  // asset names, so Renovate only ever proposes buildable versions.
   customDatasources: {
     'btbn-ffmpeg': {
       defaultRegistryUrlTemplate: 'https://api.github.com/repos/BtbN/FFmpeg-Builds/releases/tags/latest',
@@ -72,8 +61,6 @@
       ],
     },
     {
-      // Keep the Angular ecosystem in lockstep: framework, CLI, build, ESLint
-      // integration and the Analog test tooling all move together.
       groupName: 'all-angular',
       groupSlug: 'all-angular',
       matchFileNames: [
@@ -87,10 +74,6 @@
       ],
     },
     {
-      // TypeScript and zone.js are version-locked by Angular's peer dependency
-      // ranges. Renovate has no peer-dependency solver, so keep it inside the
-      // existing tilde ranges (patch-level only). Crossing to a new minor happens
-      // manually via `ng update` when moving Angular major.
       rangeStrategy: 'in-range-only',
       matchFileNames: [
         'frontend-angular/package.json',
