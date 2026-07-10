@@ -8,6 +8,7 @@
   // conflicted (e.g. a lock file conflict after another MR merges), instead of
   // requiring a manual rebase.
   rebaseWhen: 'conflicted',
+  configMigration: true,
   assignees: [
     '@davinkevin',
   ],
