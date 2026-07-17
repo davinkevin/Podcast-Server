@@ -7,7 +7,7 @@ ARG YT_DLP_VERSION=2026.07.04
 ARG FFMPEG_VERSION=8.1
 
 FROM denoland/deno:bin-2.6.3@sha256:9ac6b95faa289ad20ba55e51c9a09fcd96fa8b65365f460ec2880b6c9e2a4e86 AS deno
-FROM debian:trixie-20260623 AS downloader
+FROM debian:stable-20260713 AS downloader
 
 ARG YT_DLP_VERSION
 ARG FFMPEG_VERSION

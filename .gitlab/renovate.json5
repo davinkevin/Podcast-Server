@@ -28,6 +28,22 @@
   },
   packageRules: [
     {
+      // Debian publishes both a bare numeric tag (`13`) and codename/alias
+      // snapshots (`stable-YYYYMMDD`, `trixie-YYYYMMDD`). Default docker
+      // versioning ranks the bare `13` above the dated tags and proposes a
+      // scheme jump that drops date pinning. Constrain candidates to the
+      // `<alias>-YYYYMMDD` scheme so Renovate only bumps the date; `stable-*`
+      // then follows the current stable release across codename transitions
+      // (trixie -> forky -> ...) automatically.
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        'debian',
+      ],
+      versioning: 'regex:^(?<compatibility>\\w+)-(?<major>\\d{4})(?<minor>\\d{2})(?<patch>\\d{2})$',
+    },
+    {
       matchPackageNames: [
         'software.amazon.awssdk:bom',
       ],
