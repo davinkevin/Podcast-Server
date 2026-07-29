@@ -65,7 +65,7 @@ dependencies {
 
 	implementation(project(":backend-lib-youtubedl"))
 
-	implementation(platform("software.amazon.awssdk:bom:2.49.5"))
+	implementation(platform("software.amazon.awssdk:bom:2.49.6"))
 	implementation("software.amazon.awssdk:s3")
 	implementation("software.amazon.awssdk:netty-nio-client")
 
