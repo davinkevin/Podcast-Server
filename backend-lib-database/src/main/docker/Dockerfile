@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.25.0
+# syntax=docker/dockerfile:1.26.0
 
 FROM flyway/flyway:13.1.0 AS flyway-base
 

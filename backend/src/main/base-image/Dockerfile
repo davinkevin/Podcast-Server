@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1.25.0
+# syntax=docker/dockerfile:1.26.0
 
 # renovate: datasource=github-releases depName=yt-dlp/yt-dlp versioning=regex:^(?<major>\d{4})\.(?<minor>\d{2})\.(?<patch>\d{2})$
 ARG YT_DLP_VERSION=2026.07.04
