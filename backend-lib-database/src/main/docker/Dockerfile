@@ -1,6 +1,6 @@
 # syntax=docker/dockerfile:1.26.0
 
-FROM flyway/flyway:13.1.0 AS flyway-base
+FROM flyway/flyway:13.2.0 AS flyway-base
 
 RUN echo "Remove useless drivers and plugins, keep only postgresql and jackson" && \
     find /flyway/drivers -iname "*.jar" \
