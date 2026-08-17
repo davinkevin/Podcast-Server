@@ -4,7 +4,7 @@
 ARG YT_DLP_VERSION=2026.07.04
 
 # renovate: datasource=custom.btbn-ffmpeg depName=BtbN/FFmpeg-Builds versioning=loose
-ARG FFMPEG_VERSION=8.1
+ARG FFMPEG_VERSION=9.0
 
 FROM denoland/deno:bin-2.6.3@sha256:9ac6b95faa289ad20ba55e51c9a09fcd96fa8b65365f460ec2880b6c9e2a4e86 AS deno
 FROM debian:stable-20260803 AS downloader
