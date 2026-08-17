@@ -56,11 +56,14 @@
       automerge: true,
     },
     {
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        'pgsty/silo',
+      ],
       versioning: 'regex:^RELEASE\\.(?<major>\\d{4})-(?<minor>\\d{2})-(?<patch>\\d{2})T\\d{2}-\\d{2}-\\d{2}Z$',
       automerge: true,
-      matchPackageNames: [
-        '/^minio/',
-      ],
     },
     {
       groupName: 'all-flyway',

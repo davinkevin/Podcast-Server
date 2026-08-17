@@ -45,19 +45,19 @@ tasks:
         --name db-for-local-dev
         postgres:18.4-alpine
 
-  minio:start:
+  storage:start:
     vars:
-      TEMP_MINIO_DATA_FOLDER:
+      TEMP_STORAGE_DATA_FOLDER:
         sh: mktemp -d
-      MINIO_VERSION:
+      SILO_VERSION:
         sh: cat storage/Dockerfile | sd 'FROM.*:' ''
-    cmd: docker run 
-          -p 9000:9000 
-          -p 9001:9001 
-          -v {{.TEMP_MINIO_DATA_FOLDER}}:/data 
-          -e "MINIO_ROOT_USER=podcast-server-user" 
-          -e "MINIO_ROOT_PASSWORD=nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa" 
-          pgsty/minio:{{.MINIO_VERSION}} server /data --console-address ":9001"
+    cmd: docker run
+          -p 9000:9000
+          -p 9001:9001
+          -v {{.TEMP_STORAGE_DATA_FOLDER}}:/data
+          -e "MINIO_ROOT_USER=podcast-server-user"
+          -e "MINIO_ROOT_PASSWORD=nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa"
+          pgsty/silo:{{.SILO_VERSION}} server /data --console-address ":9001"
 
   release:
     env:
