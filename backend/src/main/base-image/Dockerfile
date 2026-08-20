@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1.26.0
 
 # renovate: datasource=github-releases depName=yt-dlp/yt-dlp versioning=regex:^(?<major>\d{4})\.(?<minor>\d{2})\.(?<patch>\d{2})$
-ARG YT_DLP_VERSION=2026.07.04
+ARG YT_DLP_VERSION=2026.08.19
 
 # renovate: datasource=custom.btbn-ffmpeg depName=BtbN/FFmpeg-Builds versioning=loose
 ARG FFMPEG_VERSION=9.0
