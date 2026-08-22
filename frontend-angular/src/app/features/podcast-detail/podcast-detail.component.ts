@@ -10,6 +10,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { Router } from '@angular/router';
+import { CdkConnectedOverlay, OverlayModule } from '@angular/cdk/overlay';
 import { QueryClient } from '@tanstack/angular-query-experimental';
 import { DatePipe } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -18,6 +19,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatMenuModule } from '@angular/material/menu';
+import { MatBadgeModule } from '@angular/material/badge';
+import { MatChipsModule } from '@angular/material/chips';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatDialog } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
@@ -30,6 +33,16 @@ import {
 import { TrackRowComponent } from '../../shared/track-row/track-row.component';
 import { PagerComponent } from '../../shared/pager/pager.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
+import {
+  ItemFilters,
+  ItemFiltersPanelComponent,
+} from '../../shared/item-filters/item-filters-panel.component';
+import {
+  STATUS_FILTER_OPTIONS,
+  StatusFilter,
+  isStatusFilter,
+  statusesFor,
+} from '../../shared/item-filters/item-filters.model';
 import { DetailStickyHeaderComponent } from '../../shared/detail-sticky-header/detail-sticky-header.component';
 import {
   StatusBadgeComponent,
@@ -41,16 +54,11 @@ import { ItemHAL } from '../../core/models/item.model';
 import { PodcastHAL } from '../../core/models/podcast.model';
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import { PlayerService } from '../../core/player/player.service';
-import {
-  CoverColorService,
-  CoverPalette,
-} from '../../core/cover-color/cover-color.service';
+import { CoverColorService, CoverPalette } from '../../core/cover-color/cover-color.service';
 import { PageTintService } from '../../core/cover-color/page-tint.service';
+import { CurrentUrlService } from '../../core/navigation/current-url.service';
 import { NavigationOriginService } from '../../core/navigation/navigation-origin.service';
-import {
-  OPEN_IN_VLC_ACTION,
-  VlcService,
-} from '../../core/vlc/vlc.service';
+import { OPEN_IN_VLC_ACTION, VlcService } from '../../core/vlc/vlc.service';
 import { queryKeys } from '../../core/api/query-keys';
 
 import { PodcastEditDialogComponent } from './podcast-edit-dialog.component';
@@ -111,6 +119,10 @@ const DELETE_ITEM_ACTION: CoverCardAction = {
     EmptyStateComponent,
     DetailStickyHeaderComponent,
     StatusBadgeComponent,
+    OverlayModule,
+    MatBadgeModule,
+    MatChipsModule,
+    ItemFiltersPanelComponent,
   ],
   templateUrl: './podcast-detail.component.html',
   styleUrl: './podcast-detail.component.scss',
@@ -128,8 +140,26 @@ export default class PodcastDetailComponent {
   // Search query — bound from `?q=` so the URL stays the source of truth
   // (mirrors the Library pattern). Empty string when absent.
   readonly q = input<string>('');
+  /**
+   * Bound from `?status=`, carrying the app's three-way vocabulary rather than
+   * the API's status list, exactly as the library does. The transform accepts
+   * `undefined` because `withComponentInputBinding` sets every input on each
+   * navigation, passing it for a parameter the URL does not have.
+   *
+   * There is no `?tags=` here: tags belong to the podcast, not the item, so
+   * inside one podcast they would match everything or nothing.
+   */
+  readonly status = input<StatusFilter, string | undefined>('all', {
+    transform: (v) => (isStatusFilter(v) ? v : 'all'),
+  });
+
+  private readonly filtersTrigger = viewChild('filtersTrigger', {
+    read: ElementRef<HTMLElement>,
+  });
+  private readonly filtersOverlay = viewChild(CdkConnectedOverlay);
 
   private readonly router = inject(Router);
+  private readonly currentUrl = inject(CurrentUrlService);
   private readonly api = inject(PodcastApi);
   private readonly itemApi = inject(ItemApi);
   private readonly stream = inject(DownloadStreamService);
@@ -169,6 +199,9 @@ export default class PodcastDetailComponent {
     q: this.q(),
     page: this.page(),
     size: DEFAULT_PAGE_SIZE,
+    // `all` expands to an empty list, which the API layer omits, so an
+    // unfiltered request is byte-for-byte what it was before.
+    status: statusesFor(this.status()),
   }));
   protected readonly itemsQuery = this.api.items(this.itemsInput);
 
@@ -196,9 +229,7 @@ export default class PodcastDetailComponent {
   // podcast has on file. Surfaced behind the split-button chevron so
   // power users can subscribe to the complete archive instead of just
   // the recent slice.
-  protected readonly subscribeFullUrl = computed(
-    () => `${this.subscribeUrl()}?limit=false`,
-  );
+  protected readonly subscribeFullUrl = computed(() => `${this.subscribeUrl()}?limit=false`);
   protected readonly copyHint = signal<'idle' | 'copied'>('idle');
 
   // Local draft mirrors the URL `q` on mount and is the source of truth
@@ -237,8 +268,7 @@ export default class PodcastDetailComponent {
   // class changes during scroll), a separate compact bar fades in on top.
   // The two-element design avoids any layout work mid-scroll on iOS
   // Safari which was freezing momentum scroll on iPad.
-  private readonly heroSentinel =
-    viewChild<ElementRef<HTMLElement>>('heroSentinel');
+  private readonly heroSentinel = viewChild<ElementRef<HTMLElement>>('heroSentinel');
   protected readonly heroOffscreen = signal(false);
 
   constructor() {
@@ -248,6 +278,22 @@ export default class PodcastDetailComponent {
     // effect doesn't fight the input — it only runs when the URL is the
     // source of change.
     effect(() => this.searchDraft.set(this.q()));
+
+    // This route is detached rather than destroyed, so the panel has to be
+    // closed from the URL — otherwise it would still be over the next page.
+    effect(() => {
+      const path = this.currentUrl.url().split('?')[0];
+      if (!path.startsWith('/podcasts/')) this.panelOpen.set(false);
+    });
+
+    // The CDK places an anchored overlay once and then only follows scrolling,
+    // not the page reflowing underneath it.
+    effect(() => {
+      this.status();
+      this.itemsQuery.data();
+      if (!this.panelOpen()) return;
+      this.filtersOverlay()?.overlayRef?.updatePosition();
+    });
 
     effect(() => {
       const url = this.coverSrc();
@@ -391,6 +437,44 @@ export default class PodcastDetailComponent {
     });
   }
 
+  protected readonly panelOpen = signal(false);
+  protected readonly hasActiveFilters = computed(() => this.status() !== 'all');
+  protected readonly activeFilterCount = computed(() => (this.hasActiveFilters() ? 1 : 0));
+  protected readonly statusFilterLabel = computed(
+    () => STATUS_FILTER_OPTIONS.find((o) => o.value === this.status())?.label ?? '',
+  );
+
+  protected onTogglePanel() {
+    this.panelOpen.update((open) => !open);
+  }
+
+  /** Focus returns to the chevron only once the overlay has actually gone. */
+  protected onClosePanel() {
+    this.panelOpen.set(false);
+  }
+
+  protected onPanelDetached() {
+    this.panelOpen.set(false);
+    const trigger = this.filtersTrigger()?.nativeElement;
+    if (trigger?.isConnected) trigger.focus();
+  }
+
+  /** Filters apply as they are set, so the panel stays open. */
+  protected onFiltersChanged(filters: ItemFilters) {
+    this.navigateToStatus(filters.status);
+  }
+
+  protected onRemoveStatusFilter() {
+    this.navigateToStatus('all');
+  }
+
+  private navigateToStatus(status: StatusFilter) {
+    this.router.navigate([], {
+      queryParams: { status: status === 'all' ? null : status, page: 0 },
+      queryParamsHandling: 'merge',
+    });
+  }
+
   protected onPlay(item: ItemHAL) {
     this.player.open(item);
   }
@@ -450,8 +534,7 @@ export default class PodcastDetailComponent {
           this.player.closeIf(item.id);
           this.snackbar.open('Item reset', undefined, { duration: 2500 });
         },
-        onError: () =>
-          this.snackbar.open('Could not reset item', 'Dismiss', { duration: 4000 }),
+        onError: () => this.snackbar.open('Could not reset item', 'Dismiss', { duration: 4000 }),
       },
     );
   }
@@ -465,8 +548,7 @@ export default class PodcastDetailComponent {
           this.player.closeIf(item.id);
           this.snackbar.open('Item deleted', undefined, { duration: 2500 });
         },
-        onError: () =>
-          this.snackbar.open('Could not delete item', 'Dismiss', { duration: 4000 }),
+        onError: () => this.snackbar.open('Could not delete item', 'Dismiss', { duration: 4000 }),
       },
     );
   }
@@ -479,26 +561,24 @@ export default class PodcastDetailComponent {
         this.snackbar.open('RSS URL copied', undefined, { duration: 2500 });
         setTimeout(() => this.copyHint.set('idle'), 2500);
       },
-      () =>
-        this.snackbar.open('Could not copy the URL', 'Dismiss', { duration: 4000 }),
+      () => this.snackbar.open('Could not copy the URL', 'Dismiss', { duration: 4000 }),
     );
   }
 
   protected onUpdateNow(podcast: PodcastHAL) {
     this.api.triggerUpdate(podcast.id).subscribe({
-      next: () =>
-        this.snackbar.open('Update started', undefined, { duration: 2500 }),
-      error: () =>
-        this.snackbar.open('Could not start update', 'Dismiss', { duration: 4000 }),
+      next: () => this.snackbar.open('Update started', undefined, { duration: 2500 }),
+      error: () => this.snackbar.open('Could not start update', 'Dismiss', { duration: 4000 }),
     });
   }
 
   protected onUpdateAndDownload(podcast: PodcastHAL) {
     this.api.triggerUpdate(podcast.id, { download: true }).subscribe({
       next: () =>
-        this.snackbar.open('Update started — new episodes will be downloaded', undefined, { duration: 3000 }),
-      error: () =>
-        this.snackbar.open('Could not start update', 'Dismiss', { duration: 4000 }),
+        this.snackbar.open('Update started — new episodes will be downloaded', undefined, {
+          duration: 3000,
+        }),
+      error: () => this.snackbar.open('Could not start update', 'Dismiss', { duration: 4000 }),
     });
   }
 

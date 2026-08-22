@@ -1,19 +1,24 @@
-export type ItemStatus =
-  | 'NOT_DOWNLOADED'
-  | 'STARTED'
-  | 'PAUSED'
-  | 'STOPPED'
-  | 'FAILED'
-  | 'FINISH';
-
-export const ITEM_STATUSES: readonly ItemStatus[] = [
+/**
+ * Every status the backend's `Status` enum can send or accept, in its order.
+ * This array is the single source of truth: `ItemStatus` is derived from it, so
+ * the two can never drift — and code that needs "every status except X" can
+ * filter it instead of re-listing values by hand.
+ *
+ * `PAUSED` is legacy: no backend path writes it any more, only a startup
+ * cleanup reads it back. It stays here because a filter derived from this list
+ * then keeps matching rows written by older versions at no cost.
+ */
+export const ITEM_STATUSES = [
   'NOT_DOWNLOADED',
   'STARTED',
   'PAUSED',
+  'DELETED',
   'STOPPED',
   'FAILED',
   'FINISH',
-];
+] as const;
+
+export type ItemStatus = (typeof ITEM_STATUSES)[number];
 
 export interface ItemPodcastRefHAL {
   readonly id: string;

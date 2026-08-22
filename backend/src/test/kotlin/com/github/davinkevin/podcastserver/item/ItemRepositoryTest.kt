@@ -1313,6 +1313,94 @@ class ItemRepositoryTest(
         }
 
         @Nested
+        @DisplayName("with the buckets the UI offers: downloaded and not downloaded")
+        inner class WithDownloadedAndNotDownloadedBuckets {
+
+            /**
+             * The v3 filter panel offers a single choice between three — All,
+             * Downloaded, Not downloaded — and derives the third from the enum
+             * as "every status except FINISH" rather than listing it. Deriving
+             * it here too means a status added to [Status] joins this list
+             * automatically, and has to land in exactly one bucket or fail.
+             */
+            private val notDownloaded = Status.entries.filterNot { it == Status.FINISH }
+
+            @BeforeEach
+            fun beforeEach() {
+                query.batch(
+                    insertInto(ITEM)
+                        .columns(ITEM.ID, ITEM.TITLE, ITEM.URL, ITEM.GUID, ITEM.FILE_NAME, ITEM.PODCAST_ID, ITEM.STATUS, ITEM.PUB_DATE, ITEM.DOWNLOAD_DATE, ITEM.CREATION_DATE, ITEM.NUMBER_OF_FAIL, ITEM.COVER_ID, ITEM.DESCRIPTION, ITEM.MIME_TYPE)
+                        // A download that failed: never on disk.
+                        .values(fromString("11111111-1111-1111-1111-111111111111"), "Bucket probe failed", "http://fakeurl.com/probe.failed.mp3", "http://fakeurl.com/probe.failed.mp3", null, fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), ItemStatus.FAILED, fixedDate, null, fixedDate, 3, fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "desc", "audio/mp3")
+                        // Downloaded once, then purged by retention: FILE_NAME is
+                        // nulled, so it is absent from disk and belongs with the
+                        // not-downloaded ones — as it did in v1.
+                        .values(fromString("22222222-2222-2222-2222-222222222222"), "Bucket probe deleted", "http://fakeurl.com/probe.deleted.mp3", "http://fakeurl.com/probe.deleted.mp3", null, fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), ItemStatus.DELETED, fixedDate, fixedDate, fixedDate, 0, fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "desc", "audio/mp3")
+                        // Stands in for a row written by an older version: no code
+                        // path produces PAUSED any more, only a startup cleanup
+                        // reads it. Deriving the list is what keeps it matched.
+                        .values(fromString("33333333-3333-3333-3333-333333333333"), "Bucket probe paused", "http://fakeurl.com/probe.paused.mp3", "http://fakeurl.com/probe.paused.mp3", null, fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), ItemStatus.PAUSED, fixedDate, null, fixedDate, 0, fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "desc", "audio/mp3")
+                        .values(fromString("44444444-4444-4444-4444-444444444444"), "Bucket probe finished", "http://fakeurl.com/probe.finished.mp3", "http://fakeurl.com/probe.finished.mp3", Path("probe.finished.mp3"), fromString("4dc2ccef-42ab-4733-8945-e3f2849b8083"), ItemStatus.FINISH, fixedDate, fixedDate, fixedDate, 0, fromString("8eac2413-3732-4c40-9c80-03e166dba3f0"), "desc", "audio/mp3")
+                )
+                    .execute()
+            }
+
+            private fun titlesFor(statuses: List<Status>): List<String> = repository
+                .search("Bucket probe", listOf(), statuses, ItemPageRequest(0, 12, ItemSort("desc", "pubDate")), null)
+                .content
+                .map(Item::title)
+
+            @Test
+            fun `not downloaded returns the failed, purged and legacy rows but not the downloaded one`() {
+                /* Given */
+                /* When */
+                val titles = titlesFor(notDownloaded)
+                /* Then */
+                assertThat(titles).containsExactlyInAnyOrder(
+                    "Bucket probe failed",
+                    "Bucket probe deleted",
+                    "Bucket probe paused",
+                )
+            }
+
+            @Test
+            fun `downloaded returns only the downloaded one`() {
+                /* Given */
+                /* When */
+                val titles = titlesFor(listOf(Status.FINISH))
+                /* Then */
+                assertThat(titles).containsExactly("Bucket probe finished")
+            }
+
+            @Test
+            fun `no status at all returns every row, whatever its status`() {
+                /* Given */
+                /* When */
+                val titles = titlesFor(listOf())
+                /* Then */
+                assertThat(titles).containsExactlyInAnyOrder(
+                    "Bucket probe failed",
+                    "Bucket probe deleted",
+                    "Bucket probe paused",
+                    "Bucket probe finished",
+                )
+            }
+
+            @Test
+            fun `every status belongs to exactly one of the two buckets`() {
+                /* Given */
+                val downloaded = listOf(Status.FINISH)
+                /* When */
+                /* Then */
+                assertAll {
+                    assertThat(downloaded + notDownloaded)
+                        .containsExactlyInAnyOrderElementsOf(Status.entries)
+                    assertThat(downloaded.intersect(notDownloaded.toSet())).isEmpty()
+                }
+            }
+        }
+
+        @Nested
         @DisplayName("with podcast id")
         inner class WithPodcastId {
 

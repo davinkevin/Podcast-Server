@@ -12,10 +12,16 @@ import { MatIconModule } from '@angular/material/icon';
       @if (subtitle(); as s) {
         <p class="empty__subtitle">{{ s }}</p>
       }
+      <!-- Optional footer, for pages that can offer a way out of the empty
+           state (e.g. clearing the active filters). Callers that project
+           nothing render exactly as before. -->
+      <div class="empty__actions"><ng-content /></div>
     </div>
   `,
   styles: `
-    :host { display: block; }
+    :host {
+      display: block;
+    }
     .empty {
       display: flex;
       flex-direction: column;
@@ -26,9 +32,30 @@ import { MatIconModule } from '@angular/material/icon';
       color: var(--mat-sys-on-surface-variant);
       text-align: center;
     }
-    .empty__icon { font-size: 64px; width: 64px; height: 64px; opacity: 0.6; }
-    .empty__title { font: var(--mat-sys-headline-small); margin: 0; color: var(--mat-sys-on-surface); }
-    .empty__subtitle { font: var(--mat-sys-body-medium); margin: 0; max-width: 36ch; }
+    .empty__icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      opacity: 0.6;
+    }
+    .empty__title {
+      font: var(--mat-sys-headline-small);
+      margin: 0;
+      color: var(--mat-sys-on-surface);
+    }
+    .empty__subtitle {
+      font: var(--mat-sys-body-medium);
+      margin: 0;
+      max-width: 36ch;
+    }
+    /* Collapses to nothing when no content is projected, so the existing
+       callers keep their current spacing. */
+    .empty__actions:empty {
+      display: none;
+    }
+    .empty__actions {
+      margin-top: 0.5rem;
+    }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

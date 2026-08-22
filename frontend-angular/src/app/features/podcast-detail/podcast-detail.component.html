@@ -9,238 +9,299 @@
   />
 } @else {
   <article class="pod">
-   <ps-detail-sticky-header
-     [coverUrl]="coverSrc()"
-     [title]="podcast?.title ?? ''"
-     [shown]="heroOffscreen()"
-   />
+    <ps-detail-sticky-header
+      [coverUrl]="coverSrc()"
+      [title]="podcast?.title ?? ''"
+      [shown]="heroOffscreen()"
+    />
 
-   <!-- Top-of-page filter — same visual slot the list pages put their
+    <!-- Top-of-page filter — same visual slot the list pages put their
         search field in (library / podcasts / playlists). Right-aligned
         so the cover/title hero below stays the page's primary anchor. -->
-   <header class="pod__page-header">
-     <form class="pod__search" (submit)="onSubmitSearch(); $event.preventDefault()">
-       <mat-form-field appearance="outline" subscriptSizing="dynamic">
-         <mat-icon matPrefix>search</mat-icon>
-         <input
-           matInput
-           type="search"
-           name="q"
-           placeholder="Filter episodes…"
-           [ngModel]="searchDraft()"
-           (ngModelChange)="searchDraft.set($event)"
-         />
-         @if (searchDraft()) {
-           <button
-             mat-icon-button
-             matSuffix
-             type="button"
-             aria-label="Clear search"
-             (click)="onClearSearch()"
-           >
-             <mat-icon>close</mat-icon>
-           </button>
-         }
-       </mat-form-field>
-     </form>
-   </header>
+    <header class="pod__page-header">
+      <div class="pod__search-col">
+        <form class="pod__search" (submit)="onSubmitSearch(); $event.preventDefault()">
+          <!-- Anchored to the whole field, not the chevron, so the panel reads as
+              an extension of the field. -->
+          <mat-form-field
+            appearance="outline"
+            subscriptSizing="dynamic"
+            cdkOverlayOrigin
+            #searchOrigin="cdkOverlayOrigin"
+            [class.pod__search-field--panel-open]="panelOpen()"
+          >
+            <mat-icon matPrefix>search</mat-icon>
+            <input
+              matInput
+              type="search"
+              name="q"
+              placeholder="Filter episodes…"
+              autocomplete="off"
+              autocorrect="off"
+              autocapitalize="none"
+              spellcheck="false"
+              [ngModel]="searchDraft()"
+              (ngModelChange)="searchDraft.set($event)"
+            />
+            @if (searchDraft()) {
+              <button
+                mat-icon-button
+                matSuffix
+                type="button"
+                aria-label="Clear search"
+                (click)="onClearSearch()"
+              >
+                <mat-icon>close</mat-icon>
+              </button>
+            }
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              #filtersTrigger
+              aria-haspopup="dialog"
+              aria-label="More filters"
+              [attr.aria-expanded]="panelOpen()"
+              (click)="onTogglePanel()"
+            >
+              <mat-icon
+                [matBadge]="activeFilterCount()"
+                [matBadgeHidden]="!hasActiveFilters() || panelOpen()"
+                matBadgeColor="accent"
+                matBadgeSize="small"
+                matBadgeOverlap="true"
+                >{{ panelOpen() ? 'expand_less' : 'expand_more' }}</mat-icon
+              >
+            </button>
+          </mat-form-field>
+        </form>
 
-   <section class="pod__hero">
-    <header class="pod__header">
-      <!-- Cover is rendered immediately from the route id so the view
+        <!-- No tags group here: tags belong to the podcast, not the item, so
+            inside one podcast they would match everything or nothing. -->
+        <ng-template
+          cdkConnectedOverlay
+          [cdkConnectedOverlayOrigin]="searchOrigin"
+          [cdkConnectedOverlayOpen]="panelOpen()"
+          [cdkConnectedOverlayMatchWidth]="true"
+          [cdkConnectedOverlayHasBackdrop]="false"
+          cdkConnectedOverlayUsePopover="global"
+          (overlayOutsideClick)="onClosePanel()"
+          (overlayKeydown)="$event.key === 'Escape' && onClosePanel()"
+          (detach)="onPanelDetached()"
+        >
+          <ps-item-filters-panel
+            [withTags]="false"
+            groupTitle="This podcast"
+            [status]="status()"
+            (changed)="onFiltersChanged($event)"
+          />
+        </ng-template>
+
+        <!-- Space reserved whether or not it holds anything: filters apply as
+             they are set, and without this the page jumped behind the open
+             panel on every toggle. -->
+        <div class="pod__active-filters">
+          @if (hasActiveFilters()) {
+            <mat-chip-set aria-label="Active filters">
+              <mat-chip-row (removed)="onRemoveStatusFilter()">
+                {{ statusFilterLabel() }}
+                <button
+                  matChipRemove
+                  [attr.aria-label]="'Remove status filter ' + statusFilterLabel()"
+                >
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip-row>
+            </mat-chip-set>
+          }
+        </div>
+      </div>
+    </header>
+
+    <section class="pod__hero">
+      <header class="pod__header">
+        <!-- Cover is rendered immediately from the route id so the view
            transition coming from the list page has a destination element
            in the new DOM snapshot (before podcastResource resolves).
            The natural aspect ratio of the artwork (e.g. 16/9 for YouTube
            covers) overrides the default 1/1 once the podcast payload
            lands — until then the cover stays square so the view-transition
            target keeps the same geometry as the source card. -->
-      <img
-        class="pod__cover"
-        [src]="coverSrc()"
-        [alt]="podcast?.title ?? ''"
-        [style.view-transition-name]="'pod-cover-' + idPodcast()"
-        [style.aspect-ratio]="
-          podcast ? podcast.cover.width + ' / ' + podcast.cover.height : null
-        "
-      />
-      @if (podcast) {
-      <div class="pod__meta">
-        <h1 class="pod__title">{{ podcast.title }}</h1>
-        <p class="pod__sub">
-          <span class="pod__sub-type">{{ podcast.type }}</span>
-          <span class="pod__sub-sep">·</span>
-          @if (podcast.lastUpdate; as d) {
-            Last update {{ d | date: 'medium' }}
-          } @else {
-            Never updated
-          }
-          @let total = itemsQuery.data()?.totalElements;
-          @if (total !== undefined) {
-            <span class="pod__sub-sep">·</span>
-            {{ total }} episode{{ total === 1 ? '' : 's' }}
-          }
-        </p>
-        @if (podcast.tags.length > 0) {
-          <ul class="pod__tags">
-            @for (tag of podcast.tags; track tag.id) {
-              <li class="pod__tag">{{ tag.name }}</li>
+        <img
+          class="pod__cover"
+          [src]="coverSrc()"
+          [alt]="podcast?.title ?? ''"
+          [style.view-transition-name]="'pod-cover-' + idPodcast()"
+          [style.aspect-ratio]="podcast ? podcast.cover.width + ' / ' + podcast.cover.height : null"
+        />
+        @if (podcast) {
+          <div class="pod__meta">
+            <h1 class="pod__title">{{ podcast.title }}</h1>
+            <p class="pod__sub">
+              <span class="pod__sub-type">{{ podcast.type }}</span>
+              <span class="pod__sub-sep">·</span>
+              @if (podcast.lastUpdate; as d) {
+                Last update {{ d | date: 'medium' }}
+              } @else {
+                Never updated
+              }
+              @let total = itemsQuery.data()?.totalElements;
+              @if (total !== undefined) {
+                <span class="pod__sub-sep">·</span>
+                {{ total }} episode{{ total === 1 ? '' : 's' }}
+              }
+            </p>
+            @if (podcast.tags.length > 0) {
+              <ul class="pod__tags">
+                @for (tag of podcast.tags; track tag.id) {
+                  <li class="pod__tag">{{ tag.name }}</li>
+                }
+              </ul>
             }
-          </ul>
-        }
 
-        <div class="pod__actions" [style]="actionStyles()">
-          @if (podcast.type === 'upload') {
-            <button mat-flat-button color="primary" (click)="onOpenUpload(podcast)">
-              <mat-icon>upload</mat-icon>
-              Upload
-            </button>
-          } @else {
-            <!-- Split button: primary action "Update now" + an attached
+            <div class="pod__actions" [style]="actionStyles()">
+              @if (podcast.type === 'upload') {
+                <button mat-flat-button color="primary" (click)="onOpenUpload(podcast)">
+                  <mat-icon>upload</mat-icon>
+                  Upload
+                </button>
+              } @else {
+                <!-- Split button: primary action "Update now" + an attached
                  chevron that reveals "Update & download new" so the
                  visible bar keeps a single text-button while still
                  surfacing the variant. Both halves go disabled while an
                  update is in flight (SSE `podcast-updating` event) so
                  the user can't kick off a second run on the same row. -->
-            <div class="pod__update-split">
-              @if (isUpdating()) {
-                <!-- Loading variant: spinner replaces the refresh icon
+                <div class="pod__update-split">
+                  @if (isUpdating()) {
+                    <!-- Loading variant: spinner replaces the refresh icon
                      and the label flips to "Updating…". `disabled` so a
                      second click can't queue another run. Static content
                      inside each mat-flat-button (no @if nested in the
                      button's projected slot) — Angular's diagnostic
                      `controlFlowPreventingContentProjection` would
                      otherwise flag the conditional. -->
-                <button
-                  mat-flat-button
-                  color="primary"
-                  class="pod__update-split__main pod__update-split__main--loading"
-                  disabled
-                >
-                  <span class="pod__update-split__loading">
-                    <mat-spinner diameter="18" />
-                    <span>Updating…</span>
-                  </span>
-                </button>
-              } @else {
-                <button
-                  mat-flat-button
-                  color="primary"
-                  class="pod__update-split__main"
-                  (click)="onUpdateNow(podcast)"
-                >
-                  <mat-icon>refresh</mat-icon>
-                  Update
-                </button>
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      class="pod__update-split__main pod__update-split__main--loading"
+                      disabled
+                    >
+                      <span class="pod__update-split__loading">
+                        <mat-spinner diameter="18" />
+                        <span>Updating…</span>
+                      </span>
+                    </button>
+                  } @else {
+                    <button
+                      mat-flat-button
+                      color="primary"
+                      class="pod__update-split__main"
+                      (click)="onUpdateNow(podcast)"
+                    >
+                      <mat-icon>refresh</mat-icon>
+                      Update
+                    </button>
+                  }
+                  <button
+                    mat-flat-button
+                    color="primary"
+                    class="pod__update-split__chevron"
+                    aria-label="More update options"
+                    [disabled]="isUpdating()"
+                    [matMenuTriggerFor]="updateMenu"
+                  >
+                    <mat-icon>expand_more</mat-icon>
+                  </button>
+                  <mat-menu #updateMenu="matMenu">
+                    <button mat-menu-item (click)="onUpdateAndDownload(podcast)">
+                      <mat-icon>download</mat-icon>
+                      <span>Update &amp; Download</span>
+                    </button>
+                  </mat-menu>
+                </div>
               }
-              <button
-                mat-flat-button
-                color="primary"
-                class="pod__update-split__chevron"
-                aria-label="More update options"
-                [disabled]="isUpdating()"
-                [matMenuTriggerFor]="updateMenu"
-              >
-                <mat-icon>expand_more</mat-icon>
-              </button>
-              <mat-menu #updateMenu="matMenu">
-                <button mat-menu-item (click)="onUpdateAndDownload(podcast)">
-                  <mat-icon>download</mat-icon>
-                  <span>Update &amp; Download</span>
-                </button>
-              </mat-menu>
-            </div>
-          }
-          @if (podcast.type !== 'upload') {
-            <!-- Split-button mirroring the Update split's pattern:
+              @if (podcast.type !== 'upload') {
+                <!-- Split-button mirroring the Update split's pattern:
                  primary anchor opens the standard `https://` RSS feed;
                  the chevron reveals a "Full RSS" entry that uses the
                  same URL with `?limit=false` so subscribers receive the
                  full archive instead of the recent slice. Upload-only
                  podcasts have no remote feed to subscribe to, so the
                  whole split is suppressed. -->
-            <div class="pod__subscribe-split">
-              <a
-                mat-stroked-button
-                class="pod__subscribe-split__main"
-                [href]="subscribeUrl()"
-                target="_blank"
-                rel="noopener"
-              >
-                <mat-icon>rss_feed</mat-icon>
-                Subscribe
-              </a>
-              <button
-                mat-stroked-button
-                class="pod__subscribe-split__chevron"
-                aria-label="More subscribe options"
-                [matMenuTriggerFor]="subscribeMenu"
-              >
-                <mat-icon>expand_more</mat-icon>
+                <div class="pod__subscribe-split">
+                  <a
+                    mat-stroked-button
+                    class="pod__subscribe-split__main"
+                    [href]="subscribeUrl()"
+                    target="_blank"
+                    rel="noopener"
+                  >
+                    <mat-icon>rss_feed</mat-icon>
+                    Subscribe
+                  </a>
+                  <button
+                    mat-stroked-button
+                    class="pod__subscribe-split__chevron"
+                    aria-label="More subscribe options"
+                    [matMenuTriggerFor]="subscribeMenu"
+                  >
+                    <mat-icon>expand_more</mat-icon>
+                  </button>
+                  <mat-menu #subscribeMenu="matMenu">
+                    <a mat-menu-item [href]="subscribeFullUrl()" target="_blank" rel="noopener">
+                      <mat-icon>all_inclusive</mat-icon>
+                      <span>Full RSS</span>
+                    </a>
+                  </mat-menu>
+                </div>
+              }
+              <button mat-stroked-button (click)="onOpenSettings(podcast)">
+                <mat-icon>settings</mat-icon>
+                Settings
               </button>
-              <mat-menu #subscribeMenu="matMenu">
-                <a
-                  mat-menu-item
-                  [href]="subscribeFullUrl()"
-                  target="_blank"
-                  rel="noopener"
-                >
-                  <mat-icon>all_inclusive</mat-icon>
-                  <span>Full RSS</span>
-                </a>
-              </mat-menu>
-            </div>
-          }
-          <button mat-stroked-button (click)="onOpenSettings(podcast)">
-            <mat-icon>settings</mat-icon>
-            Settings
-          </button>
-          <button
-            mat-icon-button
-            aria-label="More actions"
-            [matMenuTriggerFor]="menu"
-            class="pod__more"
-          >
-            <mat-icon>more_vert</mat-icon>
-          </button>
-          <mat-menu #menu="matMenu">
-            <!-- Opens the podcast's original source feed (RSS, YouTube…) —
+              <button
+                mat-icon-button
+                aria-label="More actions"
+                [matMenuTriggerFor]="menu"
+                class="pod__more"
+              >
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <mat-menu #menu="matMenu">
+                <!-- Opens the podcast's original source feed (RSS, YouTube…) —
                  distinct from "Copy RSS link" below, which shares the feed
                  regenerated by Podcast-Server. Hidden for upload-type
                  podcasts, which have no source URL. First entry for
                  discoverability, mirroring the item detail "Open" action. -->
-            @if (podcast.url) {
-              <a
-                mat-menu-item
-                [href]="podcast.url"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <mat-icon>language</mat-icon>
-                <span>Open original URL</span>
-              </a>
-            }
-            @if (podcast.type !== 'upload') {
-              <!-- Clipboard fallback for desktop browsers without a
+                @if (podcast.url) {
+                  <a mat-menu-item [href]="podcast.url" target="_blank" rel="noopener noreferrer">
+                    <mat-icon>language</mat-icon>
+                    <span>Open original URL</span>
+                  </a>
+                }
+                @if (podcast.type !== 'upload') {
+                  <!-- Clipboard fallback for desktop browsers without a
                    registered podcatcher, or for sharing the URL. -->
-              <button mat-menu-item (click)="onCopyRss()">
-                <mat-icon>{{ copyHint() === 'copied' ? 'check' : 'content_copy' }}</mat-icon>
-                <span>{{ copyHint() === 'copied' ? 'Copied!' : 'Copy RSS link' }}</span>
-              </button>
-            }
-            <button mat-menu-item (click)="onDelete(podcast)">
-              <mat-icon>delete</mat-icon>
-              <span>Delete podcast</span>
-            </button>
-          </mat-menu>
-        </div>
-      </div>
-      } @else {
-        <div class="pod__meta pod__meta--loading">
-          <mat-spinner diameter="24" />
-        </div>
-      }
-    </header>
-   </section>
+                  <button mat-menu-item (click)="onCopyRss()">
+                    <mat-icon>{{ copyHint() === 'copied' ? 'check' : 'content_copy' }}</mat-icon>
+                    <span>{{ copyHint() === 'copied' ? 'Copied!' : 'Copy RSS link' }}</span>
+                  </button>
+                }
+                <button mat-menu-item (click)="onDelete(podcast)">
+                  <mat-icon>delete</mat-icon>
+                  <span>Delete podcast</span>
+                </button>
+              </mat-menu>
+            </div>
+          </div>
+        } @else {
+          <div class="pod__meta pod__meta--loading">
+            <mat-spinner diameter="24" />
+          </div>
+        }
+      </header>
+    </section>
 
     <!-- Sentinel: 1 px slice placed right after the hero. An
          IntersectionObserver watches it against the `.shell__outlet`
@@ -274,11 +335,29 @@
       />
     } @else if (result) {
       @if (result.empty) {
-        <ps-empty-state
-          icon="inbox"
-          title="No episodes yet"
-          subtitle="Trigger an update or upload an episode to fill this podcast."
-        />
+        <!-- With a filter active, telling someone to trigger an update would be
+             wrong: the podcast may be full, just not of what they asked for. -->
+        @if (hasActiveFilters()) {
+          <ps-empty-state
+            icon="filter_alt_off"
+            title="No episodes match this filter"
+            [subtitle]="
+              q()
+                ? 'Nothing matches your search and the active filter.'
+                : 'Nothing matches the active filter.'
+            "
+          >
+            <button type="button" mat-stroked-button (click)="onRemoveStatusFilter()">
+              Clear filter
+            </button>
+          </ps-empty-state>
+        } @else {
+          <ps-empty-state
+            icon="inbox"
+            title="No episodes yet"
+            subtitle="Trigger an update or upload an episode to fill this podcast."
+          />
+        }
       } @else {
         <div class="pod__list">
           @for (item of result.content; track item.id) {
@@ -299,11 +378,7 @@
               (action)="onItemAction(item, $event)"
             >
               @if (badge) {
-                <ps-status-badge
-                  coverBadge
-                  [kind]="badge.kind"
-                  [progression]="badge.progression"
-                />
+                <ps-status-badge coverBadge [kind]="badge.kind" [progression]="badge.progression" />
               }
             </ps-track-row>
           }

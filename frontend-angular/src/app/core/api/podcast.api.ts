@@ -1,10 +1,6 @@
 import { inject, Injectable, Signal } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import {
-  injectMutation,
-  injectQuery,
-  QueryClient,
-} from '@tanstack/angular-query-experimental';
+import { injectMutation, injectQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import { lastValueFrom } from 'rxjs';
 
 import {
@@ -14,12 +10,13 @@ import {
   PodcastUpdateHAL,
 } from '../models/podcast.model';
 import { PageHAL } from '../models/page.model';
-import { ItemHAL } from '../models/item.model';
+import { ItemHAL, ItemStatus } from '../models/item.model';
 import { queryKeys } from './query-keys';
 
 export interface PodcastItemsInput {
   readonly podcastId: string;
   readonly q?: string;
+  readonly status?: readonly ItemStatus[];
   readonly page?: number;
   readonly size?: number;
   readonly sort?: string;
@@ -33,8 +30,7 @@ export class PodcastApi {
   list() {
     return injectQuery(() => ({
       queryKey: queryKeys.podcasts.list(),
-      queryFn: () =>
-        lastValueFrom(this.http.get<PodcastsContainerHAL>('/api/v1/podcasts')),
+      queryFn: () => lastValueFrom(this.http.get<PodcastsContainerHAL>('/api/v1/podcasts')),
     }));
   }
 
@@ -45,8 +41,7 @@ export class PodcastApi {
   prefetchList() {
     return this.queryClient.prefetchQuery({
       queryKey: queryKeys.podcasts.list(),
-      queryFn: () =>
-        lastValueFrom(this.http.get<PodcastsContainerHAL>('/api/v1/podcasts')),
+      queryFn: () => lastValueFrom(this.http.get<PodcastsContainerHAL>('/api/v1/podcasts')),
     });
   }
 
@@ -55,8 +50,7 @@ export class PodcastApi {
       const v = id();
       return {
         queryKey: v ? queryKeys.podcasts.detail(v) : ['podcasts', 'detail', 'noop'],
-        queryFn: () =>
-          lastValueFrom(this.http.get<PodcastHAL>(`/api/v1/podcasts/${v}`)),
+        queryFn: () => lastValueFrom(this.http.get<PodcastHAL>(`/api/v1/podcasts/${v}`)),
         enabled: !!v,
       };
     });
@@ -66,20 +60,20 @@ export class PodcastApi {
     return injectQuery(() => {
       const f = input();
       return {
-        queryKey: f
-          ? queryKeys.podcasts.items(f)
-          : ['podcasts', 'items', 'noop'],
+        queryKey: f ? queryKeys.podcasts.items(f) : ['podcasts', 'items', 'noop'],
         queryFn: () => {
-          const params = new HttpParams()
+          let params = new HttpParams()
             .set('q', f!.q ?? '')
             .set('page', f!.page ?? 0)
             .set('size', f!.size ?? 24)
             .set('sort', f!.sort ?? 'pubDate,DESC');
+          // Comma-joined only when non-empty, so an unfiltered request sends no
+          // `status` at all — the same contract as `ItemApi.search`.
+          if (f!.status && f!.status.length > 0) {
+            params = params.set('status', f!.status.join(','));
+          }
           return lastValueFrom(
-            this.http.get<PageHAL<ItemHAL>>(
-              `/api/v1/podcasts/${f!.podcastId}/items`,
-              { params },
-            ),
+            this.http.get<PageHAL<ItemHAL>>(`/api/v1/podcasts/${f!.podcastId}/items`, { params }),
           );
         },
         enabled: !!f,
@@ -102,9 +96,7 @@ export class PodcastApi {
   updateMutation() {
     return injectMutation(() => ({
       mutationFn: (args: { id: string; body: PodcastUpdateHAL }) =>
-        lastValueFrom(
-          this.http.put<PodcastHAL>(`/api/v1/podcasts/${args.id}`, args.body),
-        ),
+        lastValueFrom(this.http.put<PodcastHAL>(`/api/v1/podcasts/${args.id}`, args.body)),
       onSuccess: (_data, vars) => {
         this.queryClient.invalidateQueries({
           queryKey: queryKeys.podcasts.detail(vars.id),
@@ -119,9 +111,7 @@ export class PodcastApi {
   deleteMutation() {
     return injectMutation(() => ({
       mutationFn: (id: string) =>
-        lastValueFrom(
-          this.http.delete(`/api/v1/podcasts/${id}`, { responseType: 'text' }),
-        ),
+        lastValueFrom(this.http.delete(`/api/v1/podcasts/${id}`, { responseType: 'text' })),
       onSuccess: () => {
         this.queryClient.invalidateQueries({ queryKey: queryKeys.podcasts.all });
       },
@@ -134,10 +124,7 @@ export class PodcastApi {
         const form = new FormData();
         form.append('file', args.file, args.file.name);
         return lastValueFrom(
-          this.http.post<ItemHAL>(
-            `/api/v1/podcasts/${args.podcastId}/items/upload`,
-            form,
-          ),
+          this.http.post<ItemHAL>(`/api/v1/podcasts/${args.podcastId}/items/upload`, form),
         );
       },
       onSuccess: (_data, vars) => {

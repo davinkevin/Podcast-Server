@@ -62,12 +62,72 @@
   align-items: center;
 }
 
-.pod__search {
+// The field and its active-filter row share one column, so the chip sits under
+// the field rather than taking a slot of its own beside it.
+.pod__search-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
   width: min(28rem, 100%);
+}
+
+.pod__search {
+  width: 100%;
 }
 
 .pod__search mat-form-field {
   width: 100%;
+}
+
+.pod__active-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  // Always occupies its row, empty or not, so the header's height is constant
+  // and nothing below it moves when a filter is set or cleared. A chip row is
+  // 40px; reserving it costs that much whitespace on an unfiltered page and
+  // buys a page that never jumps.
+  min-height: 40px;
+}
+
+// While the filters panel is open the field and the panel are one module: flat
+// bottom corners to meet the panel's square top edge, no border between them,
+// and the panel's fill so there is no step in tone across the join either. The
+// radius and the border live on MDC's outline pieces, inside mat-form-field's
+// own template, hence ::ng-deep — as elsewhere in the app for MDC internals.
+.pod__search-field--panel-open {
+  // Hold the outline at the panel's own colour and weight. Material would
+  // otherwise draw it in `primary` and at 2px as soon as the field is focused,
+  // and half of a shape that is meant to read as one would be a different
+  // colour and thickness from the other. Set through the tokens Material reads,
+  // rather than fighting its state-layer selectors.
+  --mat-form-field-outlined-focus-outline-color: var(--mat-sys-outline);
+  --mat-form-field-outlined-focus-outline-width: 1px;
+  --mat-form-field-outlined-hover-outline-color: var(--mat-sys-outline);
+
+  ::ng-deep .mdc-notched-outline__leading {
+    border-bottom-left-radius: 0;
+  }
+
+  ::ng-deep .mdc-notched-outline__trailing {
+    border-bottom-right-radius: 0;
+  }
+
+  // Still !important: there is no per-side token, so the rules above set
+  // `border-color` for all four sides and would outrank a plain
+  // `border-bottom-color` here.
+  ::ng-deep .mdc-notched-outline__leading,
+  ::ng-deep .mdc-notched-outline__notch,
+  ::ng-deep .mdc-notched-outline__trailing {
+    border-bottom-color: transparent !important;
+  }
+
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    background: var(--mat-sys-surface-container);
+    border-top-left-radius: var(--mat-sys-corner-extra-small);
+    border-top-right-radius: var(--mat-sys-corner-extra-small);
+  }
 }
 
 .pod__header {

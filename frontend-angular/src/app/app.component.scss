@@ -38,6 +38,14 @@
   // Safari, which is otherwise eager to rubber-band any overflow.
   overflow-x: hidden;
   overflow-y: auto;
+  // Reserve the scrollbar's width whether or not it is showing. This is the
+  // element that actually scrolls — `html` never does — so this is where the
+  // page's width changes when content crosses the scrolling threshold, taking
+  // everything centred inside it a few pixels sideways. That jump has always
+  // been there; filters applying live cross the threshold constantly, and next
+  // to a panel anchored to the search field the drift reads as the panel coming
+  // unstuck from its field.
+  scrollbar-gutter: stable;
   // Reserve room for the floating-player mini bar (80px) plus a small gap.
   padding-bottom: 96px;
   // Per-route tint: route components set --page-tint (vibrant top) and

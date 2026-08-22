@@ -11,30 +11,140 @@
       }
     </div>
 
-    <form class="library__search" (submit)="onSubmitSearch(); $event.preventDefault()">
-      <mat-form-field appearance="outline" subscriptSizing="dynamic">
-        <mat-icon matPrefix>search</mat-icon>
-        <input
-          matInput
-          type="search"
-          name="q"
-          placeholder="Filter episodes…"
-          [ngModel]="searchDraft()"
-          (ngModelChange)="searchDraft.set($event)"
-        />
-        @if (searchDraft()) {
+    <div class="library__search-col">
+      <form class="library__search" (submit)="onSubmitSearch(); $event.preventDefault()">
+        <!-- The overlay is anchored to the whole field, not to the chevron, so
+             the panel reads as an extension of the field rather than a box
+             hanging off a button. -->
+        <mat-form-field
+          appearance="outline"
+          subscriptSizing="dynamic"
+          cdkOverlayOrigin
+          #searchOrigin="cdkOverlayOrigin"
+          [class.library__search-field--panel-open]="panelOpen()"
+        >
+          <mat-icon matPrefix>search</mat-icon>
+          <!-- A named input inside a form, so without this the browser saves
+               every submitted query and offers them back as a dropdown over the
+               filters panel. It is a filter box, not prose, so the keyboard's
+               correction and capitalisation are unwanted too.
+
+               Enter submits through the form's own implicit submission, which
+               works because this is the only text input the form contains — see
+               the overlay's note below on why the panel is not rendered inside
+               it. An e2e test holds that behaviour, whatever provides it. -->
+          <input
+            matInput
+            type="search"
+            name="q"
+            placeholder="Filter episodes…"
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="none"
+            spellcheck="false"
+            [ngModel]="searchDraft()"
+            (ngModelChange)="searchDraft.set($event)"
+          />
+          @if (searchDraft()) {
+            <button
+              mat-icon-button
+              matSuffix
+              type="button"
+              aria-label="Clear search"
+              (click)="onClearSearch()"
+            >
+              <mat-icon>close</mat-icon>
+            </button>
+          }
           <button
             mat-icon-button
             matSuffix
             type="button"
-            aria-label="Clear search"
-            (click)="onClearSearch()"
+            #filtersTrigger
+            aria-haspopup="dialog"
+            aria-label="More filters"
+            [attr.aria-expanded]="panelOpen()"
+            (click)="onTogglePanel()"
           >
-            <mat-icon>close</mat-icon>
+            <mat-icon
+              [matBadge]="activeFilterCount()"
+              [matBadgeHidden]="!hasActiveFilters() || panelOpen()"
+              matBadgeColor="accent"
+              matBadgeSize="small"
+              matBadgeOverlap="true"
+              >{{ panelOpen() ? 'expand_less' : 'expand_more' }}</mat-icon
+            >
           </button>
+        </mat-form-field>
+
+        <!-- No backdrop: the page behind stays live, this is not a modal. The
+             overlay lives outside the layout flow, so opening it cannot move
+             the episode grid.
+
+             usePopover is global, not inline: rendering the panel next to its
+             trigger put its controls inside this form, and the only thing that
+             ever came of it was breakage — Enter stopped submitting the search,
+             because a form with no submit button gives up implicit submission
+             once it holds more than one text input. The panel's controls are
+             never submitted, so there is nothing to gain from keeping them in
+             the form. Its buttons stay type="button" regardless, which costs
+             nothing and keeps the panel safe to host anywhere.
+
+             The panel is not disposed on navigation, because applying a filter
+             is itself a navigation and that would close it on every click. The
+             component closes it when the URL leaves /library instead. -->
+        <ng-template
+          cdkConnectedOverlay
+          [cdkConnectedOverlayOrigin]="searchOrigin"
+          [cdkConnectedOverlayOpen]="panelOpen()"
+          [cdkConnectedOverlayMatchWidth]="true"
+          [cdkConnectedOverlayHasBackdrop]="false"
+          cdkConnectedOverlayUsePopover="global"
+          (overlayOutsideClick)="onClosePanel()"
+          (overlayKeydown)="$event.key === 'Escape' && onClosePanel()"
+          (detach)="onPanelDetached()"
+        >
+          <ps-item-filters-panel
+            [tags]="tagFilters()"
+            [status]="status()"
+            (changed)="onFiltersChanged($event)"
+          />
+        </ng-template>
+      </form>
+
+      <!-- The row's space is reserved whether or not it holds anything, so the
+           header's height never changes: filters apply as they are set, and
+           without this the whole page jumped 48px behind the open panel on
+           every toggle. Empty by default, so the default page shows nothing
+           extra — an active filter would otherwise be invisible with the panel
+           closed, and it survives reloads and gets shared. -->
+      <div class="library__active-filters">
+        @if (hasActiveFilters()) {
+          <mat-chip-set aria-label="Active filters">
+            @for (tag of tags(); track tag) {
+              <mat-chip-row (removed)="onRemoveTagFilter(tag)">
+                {{ tag }}
+                <button matChipRemove [attr.aria-label]="'Remove tag ' + tag">
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip-row>
+            }
+            @if (status() !== 'all') {
+              <mat-chip-row (removed)="onRemoveStatusFilter()">
+                {{ statusFilterLabel() }}
+                <button
+                  matChipRemove
+                  [attr.aria-label]="'Remove status filter ' + statusFilterLabel()"
+                >
+                  <mat-icon>cancel</mat-icon>
+                </button>
+              </mat-chip-row>
+            }
+          </mat-chip-set>
+          <button type="button" mat-button (click)="onClearFilters()">Clear all</button>
         }
-      </mat-form-field>
-    </form>
+      </div>
+    </div>
   </header>
 
   @if (loading && !result) {
@@ -49,15 +159,32 @@
     />
   } @else if (result) {
     @if (result.empty) {
-      <ps-empty-state
-        icon="inbox"
-        title="No episodes yet"
-        [subtitle]="
-          q()
-            ? 'No match for your search. Try a different query.'
-            : 'Add a podcast to start downloading episodes.'
-        "
-      />
+      <!-- With a filter active, "Add a podcast to start downloading episodes"
+           would be told to someone who already has a thousand of them. Name
+           the filters as the reason and offer a way out. -->
+      @if (hasActiveFilters()) {
+        <ps-empty-state
+          icon="filter_alt_off"
+          title="No episodes match these filters"
+          [subtitle]="
+            q()
+              ? 'Nothing matches your search and the active filters.'
+              : 'Nothing matches the active filters.'
+          "
+        >
+          <button type="button" mat-stroked-button (click)="onClearFilters()">Clear filters</button>
+        </ps-empty-state>
+      } @else {
+        <ps-empty-state
+          icon="inbox"
+          title="No episodes yet"
+          [subtitle]="
+            q()
+              ? 'No match for your search. Try a different query.'
+              : 'Add a podcast to start downloading episodes.'
+          "
+        />
+      }
     } @else {
       <div class="library__grid">
         @for (item of result.content; track item.id) {
@@ -77,11 +204,7 @@
             (action)="onAction(item, $event)"
           >
             @if (badge) {
-              <ps-status-badge
-                coverBadge
-                [kind]="badge.kind"
-                [progression]="badge.progression"
-              />
+              <ps-status-badge coverBadge [kind]="badge.kind" [progression]="badge.progression" />
             }
           </ps-cover-card>
         }

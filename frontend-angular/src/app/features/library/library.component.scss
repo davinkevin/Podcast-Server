@@ -35,12 +35,76 @@
   color: var(--mat-sys-on-surface-variant);
 }
 
+// The field and the active-filter row share the centre column as one unit, so
+// the chips sit under the field instead of taking a grid cell of their own and
+// pushing the field off-centre.
+.library__search-col {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  width: 100%;
+}
+
 .library__search {
   width: 100%;
 }
 
 .library__search mat-form-field {
   width: 100%;
+}
+
+// While the filters panel is open the field and the panel are one module, not a
+// field with something bolted under it. That takes three things: flattening the
+// field's bottom corners to meet the panel's square top edge, erasing the border
+// between them, and giving the field the panel's fill so there is no step in
+// tone across the join either. The radius and the border live on MDC's three
+// outline pieces, inside mat-form-field's own template, hence ::ng-deep — as
+// elsewhere in the app for MDC internals.
+.library__search-field--panel-open {
+  // Hold the outline at the panel's own colour and weight. Material would
+  // otherwise draw it in `primary` and at 2px as soon as the field is focused,
+  // and half of a shape that is meant to read as one would be a different
+  // colour and thickness from the other. Set through the tokens Material reads,
+  // rather than fighting its state-layer selectors.
+  --mat-form-field-outlined-focus-outline-color: var(--mat-sys-outline);
+  --mat-form-field-outlined-focus-outline-width: 1px;
+  --mat-form-field-outlined-hover-outline-color: var(--mat-sys-outline);
+
+  ::ng-deep .mdc-notched-outline__leading {
+    border-bottom-left-radius: 0;
+  }
+
+  ::ng-deep .mdc-notched-outline__trailing {
+    border-bottom-right-radius: 0;
+  }
+
+  // !important to overpower Material's own outline colour, which it sets through
+  // a deliberately repeated selector so its hover and focus state layers always
+  // win. Hovering the field would otherwise redraw the very line this is
+  // erasing — and after clicking the chevron the pointer is sitting on it.
+  ::ng-deep .mdc-notched-outline__leading,
+  ::ng-deep .mdc-notched-outline__notch,
+  ::ng-deep .mdc-notched-outline__trailing {
+    border-bottom-color: transparent !important;
+  }
+
+  ::ng-deep .mat-mdc-text-field-wrapper {
+    background: var(--mat-sys-surface-container);
+    border-top-left-radius: var(--mat-sys-corner-extra-small);
+    border-top-right-radius: var(--mat-sys-corner-extra-small);
+  }
+}
+
+.library__active-filters {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  // Always occupies its row, empty or not, so the header's height is constant
+  // and nothing below it moves when a filter is set or cleared. A chip row is
+  // 40px; reserving it costs that much whitespace on an unfiltered page and
+  // buys a page that never jumps.
+  min-height: 40px;
 }
 
 @media (max-width: 800px) {
