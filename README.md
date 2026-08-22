@@ -1,11 +1,7 @@
 Podcast-Server
 ==============
 
-**Back-end** : [![Codacy Badge](https://app.codacy.com/project/badge/Grade/1cf045bbebc94d8fb99c19a53f794ad6)](https://www.codacy.com/manual/davin-kevin/Podcast-Server?utm_source=gitlab.com&amp;utm_medium=referral&amp;utm_content=davinkevin/Podcast-Server&amp;utm_campaign=Badge_Grade) [![codecov](https://codecov.io/gl/davinkevin/Podcast-Server/branch/master/graph/badge.svg)](https://codecov.io/gl/davinkevin/Podcast-Server)
-
-**Front-end** : [![Code Climate](https://codeclimate.com/github/davinkevin/Podcast-Server/badges/gpa.svg)](https://codeclimate.com/github/davinkevin/Podcast-Server)
-
-**Docker images** : [![Backend](https://badgen.net/badge/docker/backend/blue?icon=docker)](https://hub.docker.com/r/podcastserver/backend) [![UI](https://badgen.net/badge/docker/ui/blue?icon=docker)](https://hub.docker.com/r/podcastserver/ui) [![File-System](https://badgen.net/badge/docker/file-system/blue?icon=docker)](https://hub.docker.com/r/podcastserver/file-system) [![Init-db](https://badgen.net/badge/docker/init-db/blue?icon=docker)](https://hub.docker.com/r/podcastserver/init-db)
+**Docker images** : [![Backend](https://badgen.net/badge/docker/backend/blue?icon=docker)](https://hub.docker.com/r/podcastserver/backend) [![UI](https://badgen.net/badge/docker/ui/blue?icon=docker)](https://hub.docker.com/r/podcastserver/ui) [![Storage](https://badgen.net/badge/docker/storage/blue?icon=docker)](https://hub.docker.com/r/podcastserver/storage) [![Init-db](https://badgen.net/badge/docker/init-db/blue?icon=docker)](https://hub.docker.com/r/podcastserver/init-db)
 
 Application designed to be your Podcast local proxy in your LAN network. This projects is able to transform many source 
 into an RSS feed which can be consumed from the web UI or from your favorite podcast app.
