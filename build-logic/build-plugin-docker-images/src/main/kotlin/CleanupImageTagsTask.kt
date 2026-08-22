@@ -39,7 +39,7 @@ abstract class CleanupImageTagsTask : DefaultTask() {
 
     @TaskAction
     fun reconcile() {
-        val http = Http()
+        val http = JdkHttp()
         val isDryRun = dryRun.get()
 
         val refs = GitLabRefs(http, apiUrl.get(), projectId.get()).fetch()
@@ -53,7 +53,7 @@ abstract class CleanupImageTagsTask : DefaultTask() {
             isDryRun -> null
             else -> RegistryCredentials(registryUser.get(), registryPassword.get())
         }
-        val target = registryClient(registry.get(), http, namespace.get(), credentials)
+        val target = registryClient(registry.get(), http, namespace.get(), credentials, logger::lifecycle)
 
         var deleted = 0
         val failures = mutableListOf<String>()
@@ -64,10 +64,14 @@ abstract class CleanupImageTagsTask : DefaultTask() {
             logger.lifecycle("${namespace.get()}/$image: ${tags.size} tags, ${orphans.size} orphaned")
 
             orphans.forEach { tag ->
+                if (isDryRun) {
+                    logger.lifecycle("  would delete $tag")
+                    return@forEach
+                }
+                val status = target.deleteTag(image, tag)
                 when {
-                    isDryRun -> logger.lifecycle("  would delete $tag")
-                    target.deleteTag(image, tag) -> deleted++
-                    else -> failures += "$image:$tag"
+                    status.isSuccess || status.isGone -> deleted++
+                    else -> failures += "$image:$tag (HTTP ${status.code})"
                 }
             }
         }
@@ -75,7 +79,11 @@ abstract class CleanupImageTagsTask : DefaultTask() {
         when {
             isDryRun -> logger.lifecycle("Dry run, nothing deleted")
             failures.isEmpty() -> logger.lifecycle("Deleted $deleted tags")
-            else -> error("Deleted $deleted tags, ${failures.size} failed: ${failures.joinToString()}")
+            else -> error(
+                "Deleted $deleted tags, ${failures.size} failed. " +
+                    "The run is idempotent, so the next one retries them. " +
+                    "Failures: ${failures.joinToString()}"
+            )
         }
     }
 }
