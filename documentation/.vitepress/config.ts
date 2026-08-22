@@ -4,12 +4,12 @@ export default defineConfig({
   title: 'Podcast Server',
   description: 'Self-host every podcast in your home network',
 
-  base: '/Podcast-Server/',
+  base: '/',
 
   lastUpdated: true,
 
   head: [
-    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/Podcast-Server/favicon.svg' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: '/favicon.svg' }],
   ],
 
   themeConfig: {
