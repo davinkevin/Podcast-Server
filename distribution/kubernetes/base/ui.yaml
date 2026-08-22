@@ -37,16 +37,6 @@ spec:
         - image: podcastserver/ui:latest
           imagePullPolicy: IfNotPresent
           name: ui
-          # SERVER_ROOT / SERVER_FALLBACK_PAGE default to V3 in the image
-          # (see ui/src/docker/Dockerfile). To fall back to V1 in an
-          # incident, patch this Deployment with:
-          #   env:
-          #     - name: SERVER_ROOT
-          #       value: /podcast-server/v1
-          #     - name: SERVER_FALLBACK_PAGE
-          #       value: /podcast-server/v1/index.html
-          # No image rebuild required — both V1 and V3 bundles ship in the
-          # same image side by side under /podcast-server/{v1,v3}/.
           readinessProbe:
             httpGet:
               path: /

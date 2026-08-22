@@ -2,9 +2,9 @@ import { ITEM_STATUSES, ItemStatus } from '../../core/models/item.model';
 
 /**
  * What the status control offers: a single choice between three, never the raw
- * backend enum. This mirrors the v1 UI, whose `<select>` offered exactly
- * All / Downloaded / Not downloaded — see
- * `frontend-angularjs/www/app/search/search.js:166-176`.
+ * backend enum. Downloading, failing or paused items are states of an item the
+ * user has not got yet, so exposing them as separate filters would split one
+ * intent across several options — hence All / Downloaded / Not downloaded.
  */
 export type StatusFilter = 'all' | 'downloaded' | 'not-downloaded';
 

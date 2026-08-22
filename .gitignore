@@ -11,23 +11,9 @@ target
 build
 yarn-error.log
 
-# Front End in AngularJS :
-frontend-angularjs/www/fonts/
-frontend-angularjs/www/jspm_packages
-frontend-angularjs/node
-frontend-angularjs/**/*.css
-
 # Front End in Angular :
 frontend-angular/dist
 frontend-angular/coverage
-
-# Front End v3 (Angular 19) :
-frontend-v3/dist
-frontend-v3/coverage
-frontend-v3/.angular
-frontend-v3/playwright-report
-frontend-v3/test-results
-frontend-v3/out-tsc
 
 # Back End
 Backend/lib/

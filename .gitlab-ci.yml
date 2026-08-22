@@ -53,32 +53,6 @@ stages:
         - .gradle_home/caches
         - backend/build
 
-⬇ ui-v1:
-  stage: ⬇ download
-  extends: [ .only-on-frontend-changes ]
-  needs: [⬇ build-tool]
-  image: gradle:jdk21
-  variables:
-    NODE_TLS_REJECT_UNAUTHORIZED: "0"
-  before_script:
-    - apt update && apt install bzip2
-  script:
-    - ./gradlew $GRADLE_OPTS :frontend-angularjs:downloadDependencies
-  cache:
-    - !reference [ .using-build-tool ]
-    - key:
-        files:
-          - frontend-angularjs/npm-shrinkwrap.json
-          - frontend-angularjs/www/config.js
-        prefix: "ui-v1"
-      paths:
-        - .gradle
-        - .gradle_home/caches
-        - frontend-angularjs/.gradle
-        - frontend-angularjs/node_modules/
-        - frontend-angularjs/www/jspm_packages/
-        - frontend-angularjs/target/
-
 ⬇ ui-v3:
   stage: ⬇ download
   extends: [ .only-on-frontend-changes ]
@@ -192,34 +166,6 @@ stages:
     - kaniko_auth_docker_hub
   script:
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend/src/main/base-image/Dockerfile --destination podcastserver/backend-base-image:${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}
-
-👷 ui-v1:
-  stage: 👷‍ build
-  extends: [ .only-on-frontend-changes ]
-  image: gradle:jdk21
-  variables:
-    NODE_TLS_REJECT_UNAUTHORIZED: "0"
-  needs: [⬇ ui-v1]
-  script:
-    - ./gradlew $GRADLE_OPTS :frontend-angularjs:build
-  artifacts:
-    paths:
-      - frontend-angularjs/target/dist/
-  cache:
-    - !reference [ .using-build-tool ]
-    - key:
-        files:
-          - frontend-angularjs/npm-shrinkwrap.json
-          - frontend-angularjs/www/config.js
-        prefix: "ui-v1"
-      policy: pull
-      paths:
-        - .gradle
-        - .gradle_home/caches
-        - frontend-angularjs/.gradle
-        - frontend-angularjs/node_modules/
-        - frontend-angularjs/www/jspm_packages/
-        - frontend-angularjs/target/
 
 👷 ui-v3:
   stage: 👷‍ build
@@ -335,7 +281,7 @@ stages:
 🐳 ui:
   stage: 🐳 packaging
   extends: [ .only-on-frontend-changes ]
-  needs: [👷 ui-v1, 👷 ui-v3]
+  needs: [👷 ui-v3]
   image:
     name: gcr.io/kaniko-project/executor:debug
     entrypoint: [""]

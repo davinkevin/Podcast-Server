@@ -9,9 +9,6 @@
   assignees: [
     '@davinkevin',
   ],
-  ignorePaths: [
-    'frontend-angularjs/package.json',
-  ],
   kubernetes: {
     managerFilePatterns: [
       '/distribution/kubernetes/.+\\.yaml$/',

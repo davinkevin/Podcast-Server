@@ -29,7 +29,6 @@ build:
           fi
         dependencies:
           paths:
-            - frontend-angularjs/target/dist
             - frontend-angular/dist
             - ui
 manifests:

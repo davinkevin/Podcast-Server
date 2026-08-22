@@ -62,7 +62,7 @@ tasks:
   release:
     env:
       CURRENT_VERSION:
-        sh: jq .version -r frontend-angularjs/package.json
+        sh: jq .version -r frontend-angular/package.json
       NEW_VERSION: "{{.CLI_ARGS}}"
     cmds:
       - sd $CURRENT_VERSION $NEW_VERSION 
@@ -73,9 +73,7 @@ tasks:
            build-logic/build-plugin-docker-images/build.gradle.kts
            frontend-angular/build.gradle.kts
            frontend-angular/package.json
-           frontend-angularjs/build.gradle.kts
-           frontend-angularjs/npm-shrinkwrap.json
-           frontend-angularjs/package.json
+           frontend-angular/package-lock.json
       - git cliff -t $NEW_VERSION > CHANGELOG.md
       - git add .
       - 'git ci -m "chore(release): release version $NEW_VERSION"'
