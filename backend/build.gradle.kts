@@ -1,5 +1,6 @@
 import com.gitlab.davinkevin.podcastserver.database.DatabaseConfiguration
 import com.gitlab.davinkevin.podcastserver.dockerimages.DockerImagesConfiguration
+import com.gitlab.davinkevin.podcastserver.dockerimages.ImageRegistry
 import org.gradle.api.tasks.testing.logging.TestExceptionFormat
 import org.gradle.internal.deprecation.DeprecatableConfiguration
 import org.jetbrains.kotlin.gradle.dsl.JvmTarget
@@ -137,6 +138,12 @@ kover {
 			}
 		}
 	}
+}
+
+imageCleanup {
+	registry = ImageRegistry.DOCKER_HUB
+	namespace = "podcastserver"
+	images = listOf("backend", "backend-base-image", "init-db", "storage", "ui")
 }
 
 jib {

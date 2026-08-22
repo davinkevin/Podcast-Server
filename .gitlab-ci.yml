@@ -2,6 +2,7 @@ include:
   - local: .gitlab/ci/container-analysis.yaml
   - local: .gitlab/ci/gradle-build-tool.yaml
   - local: .gitlab/ci/documentation.yaml
+  - local: .gitlab/ci/maintenance.yaml
 
 default:
   interruptible: true
@@ -32,6 +33,7 @@ stages:
   - 🧪 test
   - 🔎 Security Analysis
   - 🚀 deploy
+  - 🧹 maintenance
 
 ⬇ backend:
   stage: ⬇ download
@@ -272,26 +274,6 @@ stages:
         - .gradle
         - .gradle_home/caches
         - backend/build
-  environment:
-    name: backend/$CI_COMMIT_REF_SLUG
-    url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/backend/tags
-    on_stop: 🗑 backend
-
-🗑 backend:
-  stage: 🐳 packaging
-  extends: [ .delete-docker-image ]
-  variables:
-    GIT_STRATEGY: none
-  script:
-    - delete_docker_hub_image backend
-    - delete_docker_hub_image backend-base-image
-  rules:
-    - !reference [ .not-on-default-branch ]
-    - !reference [ .manual_run_if_changes_on_backend_files ]
-  environment:
-    name: backend/$CI_COMMIT_REF_SLUG
-    action: stop
-
 🐳 init-db:
   stage: 🐳 packaging
   extends: [ .only-on-backend-changes ]
@@ -306,24 +288,6 @@ stages:
     - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend-lib-database/src/main/docker/Dockerfile --destination podcastserver/init-db:$CI_COMMIT_REF_SLUG
     - if [ -n "$CI_COMMIT_TAG" ]; then /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend-lib-database/src/main/docker/Dockerfile --destination podcastserver/init-db:${CI_COMMIT_TAG} ; fi
     - if [ "$CI_COMMIT_REF_SLUG" == "$CI_DEFAULT_BRANCH" ]; then /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend-lib-database/src/main/docker/Dockerfile --destination podcastserver/init-db:latest ; fi
-  environment:
-    name: init-db/$CI_COMMIT_REF_SLUG
-    url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/init-db/tags
-    on_stop: 🗑 init-db
-
-🗑 init-db:
-  stage: 🐳 packaging
-  extends: [ .delete-docker-image ]
-  variables:
-    GIT_STRATEGY: none
-    COMPONENT: init-db
-  rules:
-    - !reference [ .not-on-default-branch ]
-    - !reference [ .manual_run_if_changes_on_backend_files ]
-  environment:
-    name: init-db/$CI_COMMIT_REF_SLUG
-    action: stop
-
 🧪 init-db:
   stage: 🧪 test
   extends: [ .only-on-backend-changes ]
@@ -368,24 +332,6 @@ stages:
     - export PROJECT_DIR=$CI_PROJECT_DIR/storage
     - /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/storage:${VERSION}
     - if [ "$VERSION" == "$CI_DEFAULT_BRANCH" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/storage:latest ; fi
-  environment:
-    name: storage/$CI_COMMIT_REF_SLUG
-    url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/storage/tags
-    on_stop: 🗑 storage
-
-🗑 storage:
-  stage: 🐳 packaging
-  extends: [ .delete-docker-image ]
-  variables:
-    GIT_STRATEGY: none
-    COMPONENT: storage
-  rules:
-    - !reference [ .not-on-default-branch ]
-    - !reference [ .manual_run_if_changes_on_storage_files ]
-  environment:
-    name: storage/$CI_COMMIT_REF_SLUG
-    action: stop
-
 🐳 ui:
   stage: 🐳 packaging
   extends: [ .only-on-frontend-changes ]
@@ -402,19 +348,3 @@ stages:
     - export PROJECT_DIR=$CI_PROJECT_DIR/ui/target/docker/
     - /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/ui:${VERSION}
     - if [ "$VERSION" == "$CI_DEFAULT_BRANCH" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/ui:latest ; fi
-  environment:
-    name: ui/$CI_COMMIT_REF_SLUG
-    url: https://cloud.docker.com/u/podcastserver/repository/docker/podcastserver/ui/tags
-    on_stop: 🗑 ui
-
-🗑 ui:
-  stage: 🐳 packaging
-  extends: [ .delete-docker-image ]
-  variables:
-    COMPONENT: ui
-  rules:
-    - !reference [ .not-on-default-branch ]
-    - !reference [ .manual_run_if_changes_on_frontend_files ]
-  environment:
-    name: ui/$CI_COMMIT_REF_SLUG
-    action: stop

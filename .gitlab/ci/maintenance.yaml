@@ -1,0 +1,35 @@
+include:
+  - local: .gitlab/ci/utils.yaml
+
+# No `changes:` rule covered build-logic before, so the tag policy shipped untested.
+🧪 build-logic:
+  stage: 🧪 test
+  needs: []
+  image: gradle:jdk21
+  rules:
+    - changes:
+        - build-logic/**/*
+  script:
+    - ./gradlew $GRADLE_OPTS :build-plugin-docker-images:check :build-plugin-database:check
+  artifacts:
+    reports:
+      junit: build-logic/*/build/test-results/test/TEST-*.xml
+  cache:
+    - !reference [ .using-build-tool ]
+
+# Reconciles the image registry with the repository, replacing the per-branch `on_stop`
+# hook that only fired 42% of the time. Idempotent, so a missed run costs nothing.
+🧹 image-tags:
+  stage: 🧹 maintenance
+  needs: []
+  interruptible: false
+  image: gradle:jdk21
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "schedule"'
+    - if: '$CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual
+      allow_failure: true
+  script:
+    - ./gradlew $GRADLE_OPTS :backend:cleanupImageTags
+  cache:
+    - !reference [ .using-build-tool ]
