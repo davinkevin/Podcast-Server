@@ -2,11 +2,8 @@
 
 host = "::"
 port = 8080
-# `root` and `page-fallback` are intentionally omitted: they're set via the
-# `SERVER_ROOT` / `SERVER_FALLBACK_PAGE` environment variables in the
-# Dockerfile (default: V3) and overridable by Kubernetes for the V1
-# fallback. SWS config-file values take precedence over env vars — keeping
-# them out of this file is what lets env defaults stick.
+root = "/podcast-server"
+page-fallback = "/podcast-server/index.html"
 log-level = "error"
 
 cache-control-headers = true
