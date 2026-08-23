@@ -9,6 +9,7 @@ include:
   rules:
     - changes:
         - build-logic/**/*
+        - .gitlab/ci/maintenance.yaml
   script:
     - ./gradlew $GRADLE_OPTS :build-plugin-docker-images:check :build-plugin-database:check
   artifacts:
