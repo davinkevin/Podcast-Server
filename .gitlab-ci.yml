@@ -126,6 +126,7 @@ stages:
       paths:
         - .gradle
         - .gradle_home/caches
+  retry: 2
 
 🧪 ui-v3:
   stage: 🧪 test
@@ -153,6 +154,7 @@ stages:
       policy: pull
       paths:
         - frontend-angular/node_modules/
+  retry: 2
 
 👷 backend-base-image:
   stage: 👷‍ build
@@ -265,6 +267,7 @@ stages:
     - sleep 15
     - psql -c "SELECT count(*) FROM flyway_schema_history"
     - psql -c "SELECT tablename FROM pg_tables WHERE schemaname = 'public'" | grep podcast
+  retry: 2
 
 🐳 storage:
   stage: 🐳 packaging

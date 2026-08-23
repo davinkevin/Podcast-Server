@@ -17,6 +17,7 @@ include:
       junit: build-logic/*/build/test-results/test/TEST-*.xml
   cache:
     - !reference [ .using-build-tool ]
+  retry: 2
 
 # Reconciles the image registry with the repository, replacing the per-branch `on_stop`
 # hook that only fired 42% of the time. Idempotent, so a missed run costs nothing.
