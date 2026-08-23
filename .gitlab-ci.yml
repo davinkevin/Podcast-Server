@@ -264,9 +264,14 @@ stages:
     PGPASSWORD: pg-password
     PGDATABASE: podcast-server-db
   script:
-    - sleep 15
+    # `sleep 15` guessed at two things at once: Postgres accepting connections,
+    # and the flyway service having finished migrating. Wait for what the two
+    # assertions below actually need; `timeout` is what bounds the wait.
+    - until pg_isready -q; do sleep 1; done
+    - until psql -tAc "SELECT 1 FROM pg_tables WHERE schemaname = 'public' AND tablename = 'podcast'" 2>/dev/null | grep -q 1; do sleep 1; done
     - psql -c "SELECT count(*) FROM flyway_schema_history"
     - psql -c "SELECT tablename FROM pg_tables WHERE schemaname = 'public'" | grep podcast
+  timeout: 10m
   retry: 2
 
 🐳 storage:
