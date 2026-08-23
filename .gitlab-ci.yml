@@ -231,9 +231,12 @@ stages:
     - !reference [ .cicd_utils ]
     - kaniko_auth_docker_hub
   script:
-    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend-lib-database/src/main/docker/Dockerfile --destination podcastserver/init-db:$CI_COMMIT_REF_SLUG
-    - if [ -n "$CI_COMMIT_TAG" ]; then /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend-lib-database/src/main/docker/Dockerfile --destination podcastserver/init-db:${CI_COMMIT_TAG} ; fi
-    - if [ "$CI_COMMIT_REF_SLUG" == "$CI_DEFAULT_BRANCH" ]; then /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend-lib-database/src/main/docker/Dockerfile --destination podcastserver/init-db:latest ; fi
+    # kaniko pushes every --destination out of a single build, so the tags cannot
+    # drift apart and the layers are only computed once.
+    - DESTINATIONS="--destination podcastserver/init-db:$CI_COMMIT_REF_SLUG"
+    - if [ -n "$CI_COMMIT_TAG" ]; then DESTINATIONS="$DESTINATIONS --destination podcastserver/init-db:${CI_COMMIT_TAG}" ; fi
+    - if [ "$CI_COMMIT_REF_SLUG" == "$CI_DEFAULT_BRANCH" ]; then DESTINATIONS="$DESTINATIONS --destination podcastserver/init-db:latest" ; fi
+    - /kaniko/executor --context $CI_PROJECT_DIR --dockerfile $CI_PROJECT_DIR/backend-lib-database/src/main/docker/Dockerfile $DESTINATIONS
 🧪 init-db:
   stage: 🧪 test
   extends: [ .only-on-backend-changes ]
@@ -276,8 +279,9 @@ stages:
   script:
     - export VERSION="${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}"
     - export PROJECT_DIR=$CI_PROJECT_DIR/storage
-    - /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/storage:${VERSION}
-    - if [ "$VERSION" == "$CI_DEFAULT_BRANCH" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/storage:latest ; fi
+    - DESTINATIONS="--destination podcastserver/storage:${VERSION}"
+    - if [ "$VERSION" == "$CI_DEFAULT_BRANCH" ]; then DESTINATIONS="$DESTINATIONS --destination podcastserver/storage:latest" ; fi
+    - /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile $DESTINATIONS
 🐳 ui:
   stage: 🐳 packaging
   extends: [ .only-on-frontend-changes ]
@@ -292,5 +296,6 @@ stages:
     - sh ./ui/compile.sh
     - export VERSION="${CI_COMMIT_TAG:-$CI_COMMIT_REF_SLUG}"
     - export PROJECT_DIR=$CI_PROJECT_DIR/ui/target/docker/
-    - /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/ui:${VERSION}
-    - if [ "$VERSION" == "$CI_DEFAULT_BRANCH" ]; then /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile --destination podcastserver/ui:latest ; fi
+    - DESTINATIONS="--destination podcastserver/ui:${VERSION}"
+    - if [ "$VERSION" == "$CI_DEFAULT_BRANCH" ]; then DESTINATIONS="$DESTINATIONS --destination podcastserver/ui:latest" ; fi
+    - /kaniko/executor --context $PROJECT_DIR --dockerfile $PROJECT_DIR/Dockerfile $DESTINATIONS
