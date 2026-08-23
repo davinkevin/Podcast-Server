@@ -16,8 +16,8 @@ This page describes the **developer setup**: the cluster is k3d, images are buil
 ## Steps
 
 ```bash
-git clone https://gitlab.com/davinkevin/Podcast-Server.git
-cd Podcast-Server
+git clone https://gitlab.com/davinkevin.fr/podcast-server.git
+cd podcast-server
 
 # 1. Generate the TLS certs for podcast.k8s.local (one-off)
 task certificates:generate

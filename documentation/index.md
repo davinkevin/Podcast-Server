@@ -15,7 +15,7 @@ hero:
       link: /install/production
     - theme: alt
       text: View on GitLab
-      link: https://gitlab.com/davinkevin/Podcast-Server
+      link: https://gitlab.com/davinkevin.fr/podcast-server
 
 features:
   - icon: 📡

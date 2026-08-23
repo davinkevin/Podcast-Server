@@ -42,7 +42,7 @@ develocity {
                 tag(refName)
                 value("Pipeline", System.getenv("CI_PIPELINE_ID").orEmpty())
                 value("Job Image", System.getenv("CI_JOB_IMAGE").orEmpty())
-                link("Source", "https://gitlab.com/davinkevin/Podcast-Server/tree/$refName")
+                link("Source", "https://gitlab.com/davinkevin.fr/podcast-server/tree/$refName")
             }
         }
     }

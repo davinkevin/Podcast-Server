@@ -109,6 +109,6 @@ tasks:
     cmds:
       - |
         cd $GITLAB_DIRECTORY
-        git clone --bare git@gitlab.com:davinkevin/Podcast-Server.git
-        cd Podcast-Server.git
+        git clone --bare git@gitlab.com:davinkevin.fr/podcast-server.git
+        cd podcast-server.git
         git push --mirror --repo git@github.com:davinkevin/Podcast-Server.git

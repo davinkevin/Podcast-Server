@@ -6,7 +6,7 @@ Podcast-Server
 Application designed to be your Podcast local proxy in your LAN network. This projects is able to transform many source 
 into an RSS feed which can be consumed from the web UI or from your favorite podcast app.
 
-It also works on many sources like YouTube, RSS, France•tv, MyTF1, Gulli, Dailymotion… Check out the **[project website](https://davinkevin.gitlab.io/Podcast-Server/)** for screenshots, install instructions and more.
+It also works on many sources like YouTube, RSS, France•tv, MyTF1, Gulli, Dailymotion… Check out the **[project website](https://podcast-server.davinkevin.fr/)** for screenshots, install instructions and more.
 
 The application is available in [docker images](https://hub.docker.com/r/podcastserver/), see docker links above.
 
@@ -26,8 +26,8 @@ The application is available in [docker images](https://hub.docker.com/r/podcast
 
 The full install guide lives on the project website:
 
-* **[Deploy to production](https://davinkevin.gitlab.io/Podcast-Server/install/production)** — wrap the `standalone` kustomize overlay from your own kustomization, with BYO PostgreSQL/S3 supported out of the box.
-* **[Local dev setup](https://davinkevin.gitlab.io/Podcast-Server/install/local)** — try the app on k3d with `task skaffold:dev`.
+* **[Deploy to production](https://podcast-server.davinkevin.fr/install/production)** — wrap the `standalone` kustomize overlay from your own kustomization, with BYO PostgreSQL/S3 supported out of the box.
+* **[Local dev setup](https://podcast-server.davinkevin.fr/install/local)** — try the app on k3d with `task skaffold:dev`.
 
 ## Support
 

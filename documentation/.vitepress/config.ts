@@ -20,7 +20,7 @@ export default defineConfig({
 
     nav: [
       { text: 'Get started', link: '/install/production' },
-      { text: 'GitLab', link: 'https://gitlab.com/davinkevin/Podcast-Server' },
+      { text: 'GitLab', link: 'https://gitlab.com/davinkevin.fr/podcast-server' },
     ],
 
     sidebar: [

@@ -1,6 +1,6 @@
 # GitHub Pages redirect
 
-The canonical site lives on GitLab Pages: <https://davinkevin.gitlab.io/Podcast-Server/>.
+The canonical site lives on GitLab Pages: <https://podcast-server.davinkevin.fr/>.
 
 This folder holds a one-page `index.html` that redirects visitors who land on the legacy URL <https://davinkevin.github.io/Podcast-Server/> to the new site.
 

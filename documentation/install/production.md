@@ -41,7 +41,7 @@ namespace: podcast-server
 
 resources:
   # Pin a specific release. See the GitLab tags page for available versions.
-  - https://gitlab.com/davinkevin/Podcast-Server.git/distribution/kubernetes/overlays/standalone?ref=v6.x.y
+  - https://gitlab.com/davinkevin.fr/podcast-server.git/distribution/kubernetes/overlays/standalone?ref=v6.x.y
 
 configMapGenerator:
   - name: installation-parameters

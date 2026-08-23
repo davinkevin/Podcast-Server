@@ -25,7 +25,7 @@ include:
       - documentation/.vitepress/dist/
 
 # Publish to GitLab Pages on the default branch only.
-# Serves the site at https://davinkevin.gitlab.io/Podcast-Server/
+# Serves the site at https://podcast-server.davinkevin.fr/
 pages:
   stage: 🚀 deploy
   interruptible: false
