@@ -62,7 +62,7 @@ dependencies {
 	implementation("io.projectreactor.kotlin:reactor-kotlin-extensions")
 	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.jdom:jdom2:2.0.6.1")
-	implementation("org.jsoup:jsoup:1.23.1")
+	implementation("org.jsoup:jsoup:1.23.2")
 
 	implementation(project(":backend-lib-youtubedl"))
 
