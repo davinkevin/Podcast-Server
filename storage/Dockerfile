@@ -1,1 +1,1 @@
-FROM pgsty/silo:RELEASE.2026-08-06T00-00-00Z-distroless
+FROM pgsty/silo:RELEASE.2026-09-03T13-18-01Z-distroless
