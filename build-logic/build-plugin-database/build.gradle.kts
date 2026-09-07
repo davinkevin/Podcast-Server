@@ -1,6 +1,6 @@
 plugins {
     `java-gradle-plugin`
-    kotlin("jvm") version "2.4.10"
+    kotlin("jvm") version "2.4.20"
 }
 
 group = "com.gitlab.davinkevin.podcastserver.database"
