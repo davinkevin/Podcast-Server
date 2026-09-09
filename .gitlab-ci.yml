@@ -57,7 +57,7 @@ stages:
   stage: ⬇ download
   extends: [ .only-on-frontend-changes ]
   needs: []
-  image: node:24.20.0
+  image: node:24.21.0
   script:
     - cd frontend-angular
     - npm ci
@@ -131,7 +131,7 @@ stages:
 🧪 ui-v3:
   stage: 🧪 test
   extends: [ .only-on-frontend-changes ]
-  image: node:24.20.0
+  image: node:24.21.0
   needs: [⬇ ui-v3]
   variables:
     # Publish a Build Scan for the native npm test run through the Develocity
@@ -172,7 +172,7 @@ stages:
 👷 ui-v3:
   stage: 👷‍ build
   extends: [ .only-on-frontend-changes ]
-  image: node:24.20.0
+  image: node:24.21.0
   needs: [⬇ ui-v3]
   variables:
     # Publish a Build Scan for the native npm build through the Develocity npm
