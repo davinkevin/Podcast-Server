@@ -16,6 +16,13 @@
   - &changes_documentation_files
     changes:
       - documentation/**/*
+.gradle_root_files:
+  - &changes_gradle_root_files
+    changes:
+      - settings.gradle.kts
+      - gradle.properties
+      - gradlew
+      - gradle/wrapper/*
 # A change to the CI definition matches no source directory, so on its own it
 # creates none of the jobs it edits: it ships untested, and since a merge
 # request with no pipeline cannot be merged, it does not ship at all. Every
@@ -30,14 +37,17 @@
   rules:
     - *changes_backend_files
     - *changes_ci_files
+    - *changes_gradle_root_files
 .only-on-storage-changes:
   rules:
     - *changes_storage_files
     - *changes_ci_files
+    - *changes_gradle_root_files
 .only-on-frontend-changes:
   rules:
     - *changes_frontend_files
     - *changes_ci_files
+    - *changes_gradle_root_files
 .only-on-documentation-changes:
   rules:
     - *changes_documentation_files
@@ -48,6 +58,7 @@
     - *changes_storage_files
     - *changes_backend_files
     - *changes_ci_files
+    - *changes_gradle_root_files
 
 .cicd_utils: &cicd_utils |
   function kaniko_auth_docker_hub() {

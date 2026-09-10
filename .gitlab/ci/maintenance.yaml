@@ -10,6 +10,10 @@ include:
     - changes:
         - build-logic/**/*
         - .gitlab/ci/maintenance.yaml
+        - settings.gradle.kts
+        - gradle.properties
+        - gradlew
+        - gradle/wrapper/*
   script:
     - ./gradlew $GRADLE_OPTS :build-plugin-docker-images:check :build-plugin-database:check
   artifacts:
