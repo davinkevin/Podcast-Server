@@ -1,0 +1,41 @@
+{
+  "data": [
+    {
+      "id": "1000000001",
+      "user_id": "141981764",
+      "title": "live right now",
+      "description": "",
+      "created_at": "2026-09-17T08:00:00Z",
+      "published_at": "2026-09-17T08:00:00Z",
+      "url": "https://www.twitch.tv/videos/1000000001",
+      "thumbnail_url": "https://vod-secure.twitch.tv/_404/404_processing_%{width}x%{height}.png",
+      "type": "archive",
+      "duration": "2h1m3s"
+    },
+    {
+      "id": "1000000002",
+      "user_id": "141981764",
+      "title": "thumbnail not generated yet",
+      "description": "",
+      "created_at": "2026-09-17T07:00:00Z",
+      "published_at": "2026-09-17T07:00:00Z",
+      "url": "https://www.twitch.tv/videos/1000000002",
+      "thumbnail_url": "",
+      "type": "archive",
+      "duration": "1h1m1s"
+    },
+    {
+      "id": "335921245",
+      "user_id": "141981764",
+      "title": "Twitch Developers 101",
+      "description": "Welcome to Twitch development!",
+      "created_at": "2018-11-14T20:00:00Z",
+      "published_at": "2018-11-14T22:04:30Z",
+      "url": "https://www.twitch.tv/videos/335921245",
+      "thumbnail_url": "https://static-cdn.jtvnw.net/cf_vods/d2nvs31859zcd8/twitchdev/335921245/thumb-%{width}x%{height}.jpg",
+      "type": "upload",
+      "duration": "3m21s"
+    }
+  ],
+  "pagination": {}
+}

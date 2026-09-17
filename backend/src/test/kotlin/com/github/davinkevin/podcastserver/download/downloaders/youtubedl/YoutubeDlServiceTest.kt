@@ -47,7 +47,8 @@ class YoutubeDlServiceTest(
             "https://www.tf1.fr/file.mp3",
             "https://www.france.tv/file.mp3",
             "https://replay.gulli.fr/file.mp3",
-            "https://dailymotion.com/file.mp3"
+            "https://dailymotion.com/file.mp3",
+            "https://www.twitch.tv/videos/335921245"
         ])
         fun `with default hosts`(url: String) {
             assertThat(youtube.isFromVideoPlatform(url)).isTrue()
@@ -240,7 +241,8 @@ class YoutubeDlServiceTest(
             "https://www.tf1.fr/file.mp3",
             "https://www.france.tv/file.mp3",
             "https://replay.gulli.fr/file.mp3",
-            "https://dailymotion.com/file.mp3"
+            "https://dailymotion.com/file.mp3",
+            "https://www.twitch.tv/videos/335921245"
         ])
         fun `from video platform with`(videoPlatformUrl: String) {
             /* Given */
@@ -250,7 +252,7 @@ class YoutubeDlServiceTest(
                         it.option["retries"] == "10" &&
                         it.option["output"] == "foo.mp3" &&
                         it.option["merge-output-format"] == "mp4" &&
-                        it.option["format"] == "bv+ba" &&
+                        it.option["format"] == "bv*+ba/b" &&
                         !it.option.containsKey("impersonate")
             }
             whenever(youtubeDl.execute(requestForDownload, any(), anyOrNull())).thenReturn(response)
@@ -334,7 +336,7 @@ class YoutubeDlServiceTest(
                   it.option["retries"] == "10" &&
                   it.option["output"] == "foo.mp3" &&
                   it.option["merge-output-format"] == "mp4" &&
-                  it.option["format"] == "bv+ba"
+                  it.option["format"] == "bv*+ba/b"
                   it.option["foo"] == "bar"
             }
             whenever(youtubeDl.execute(requestForDownload, any(), anyOrNull())).thenReturn(response)

@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.update.updaters.francetv.FranceTvUpda
 import com.github.davinkevin.podcastserver.update.updaters.gulli.GulliUpdater
 import com.github.davinkevin.podcastserver.update.updaters.mytf1.MyTf1Updater
 import com.github.davinkevin.podcastserver.update.updaters.rss.RSSUpdater
+import com.github.davinkevin.podcastserver.update.updaters.twitch.TwitchUpdater
 import com.github.davinkevin.podcastserver.update.updaters.upload.UploadUpdater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByApiUpdater
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeByXmlUpdater
@@ -36,6 +37,7 @@ class UpdaterSelectorTest {
     @Mock lateinit var gulliUpdater: GulliUpdater
     @Mock lateinit var rssUpdater: RSSUpdater
     @Mock lateinit var myTf1Updater: MyTf1Updater
+    @Mock lateinit var twitchUpdater: TwitchUpdater
     @Mock lateinit var uploadUpdater: UploadUpdater
     @Mock lateinit var youtubeByXmlUpdater: YoutubeByXmlUpdater
     @Mock lateinit var youtubeByApiUpdater: YoutubeByApiUpdater
@@ -49,6 +51,7 @@ class UpdaterSelectorTest {
                 gulliUpdater,
                 rssUpdater,
                 myTf1Updater,
+                twitchUpdater,
                 uploadUpdater, 
                 youtubeByXmlUpdater,
                 youtubeByApiUpdater
@@ -81,6 +84,7 @@ class UpdaterSelectorTest {
                 gulliUpdater,
                 rssUpdater,
                 myTf1Updater,
+                twitchUpdater,
                 youtubeByXmlUpdater,
                 youtubeByApiUpdater
         )
@@ -93,7 +97,7 @@ class UpdaterSelectorTest {
         /* Then */
         assertThat(types)
                 .containsAll(uTypes)
-                .hasSize(7)
+                .hasSize(8)
     }
 
     companion object {
@@ -105,6 +109,7 @@ class UpdaterSelectorTest {
                         Arguments.of("http://replay.gulli.fr/showname", "Gulli"),
                         Arguments.of("http://www.link.to.rss/feeds", "RSS"),
                         Arguments.of("http://www.tf1.fr/title", "MyTF1"),
+                        Arguments.of("https://www.twitch.tv/twitchdev", "Twitch"),
                         Arguments.of("http://www.youtube.com/user/fakeUser", "Youtube")
                 )
     }

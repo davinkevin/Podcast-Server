@@ -1,0 +1,37 @@
+{
+  "data": [
+    {
+      "id": "335921245",
+      "stream_id": null,
+      "user_id": "141981764",
+      "user_login": "twitchdev",
+      "user_name": "TwitchDev",
+      "title": "Twitch Developers 101",
+      "description": "Welcome to Twitch development!",
+      "created_at": "2018-11-14T20:00:00Z",
+      "published_at": "2018-11-14T22:04:30Z",
+      "url": "https://www.twitch.tv/videos/335921245",
+      "thumbnail_url": "https://static-cdn.jtvnw.net/cf_vods/d2nvs31859zcd8/twitchdev/335921245/thumb-%{width}x%{height}.jpg",
+      "viewable": "public",
+      "view_count": 1863062,
+      "language": "en",
+      "type": "upload",
+      "duration": "3m21s"
+    },
+    {
+      "id": "335921246",
+      "user_id": "141981764",
+      "user_login": "twitchdev",
+      "user_name": "TwitchDev",
+      "title": "Extensions Monthly",
+      "description": "",
+      "created_at": "2019-01-10T18:00:00Z",
+      "published_at": "2019-01-10T19:30:00Z",
+      "url": "https://www.twitch.tv/videos/335921246",
+      "thumbnail_url": "https://static-cdn.jtvnw.net/cf_vods/d2nvs31859zcd8/twitchdev/335921246/thumb-%{width}x%{height}.jpg",
+      "type": "highlight",
+      "duration": "1h2m3s"
+    }
+  ],
+  "pagination": {}
+}

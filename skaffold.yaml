@@ -20,16 +20,44 @@ build:
       context: storage/
     - image: podcastserver/ui
       custom:
+        # `ui/compile.sh` only assembles the docker context: it copies
+        # frontend-angular/dist, it does not produce it. CI gets that directory
+        # from the `ui-v3` job artifact, so locally the build has to make it
+        # itself — otherwise a fresh clone fails before the first build.
+        #
+        # It runs npm through mise when available, rather than whatever node the
+        # shell exposes: a shell opened before mise.toml pinned node still has
+        # the previous one on its PATH, and the angular cli refuses to run on a
+        # version it does not support.
         buildCommand: |
           set -euo pipefail
+          if command -v mise > /dev/null 2>&1; then
+            NPM="mise exec -- npm"
+          else
+            NPM="npm"
+          fi
+          (
+            cd frontend-angular
+            [ -d node_modules ] || $NPM ci
+            $NPM run build
+          )
           sh ui/compile.sh
           docker build -f ui/target/docker/Dockerfile ui/target/docker/ -t $IMAGE
           if $PUSH_IMAGE; then
               docker push $IMAGE
           fi
+        # The angular sources, not the dist they compile to: skaffold watches
+        # these to decide when to rebuild, and a generated directory would only
+        # ever change after the rebuild it was supposed to trigger.
         dependencies:
           paths:
-            - frontend-angular/dist
+            - frontend-angular/src
+            - frontend-angular/public
+            - frontend-angular/angular.json
+            - frontend-angular/package.json
+            - frontend-angular/package-lock.json
+            - frontend-angular/tsconfig.json
+            - frontend-angular/tsconfig.app.json
             - ui
 manifests:
   kustomize:

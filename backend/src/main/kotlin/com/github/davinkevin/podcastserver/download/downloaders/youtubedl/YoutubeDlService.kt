@@ -19,7 +19,16 @@ class YoutubeDlService(
     private val videoPlatforms: List<String> = YTDlpParameters.DEFAULT_VIDEO_PLATFORMS,
 ) {
 
-    private val DEFAULT_FORMAT = "bv+ba"
+    /**
+     * Best video plus best audio, falling back to the best pre-muxed stream.
+     *
+     * `bv` alone only matches video-only streams, which some platforms simply do
+     * not publish: twitch serves HLS renditions that already carry their audio,
+     * so `bv+ba` matches nothing there and yt-dlp fails before downloading
+     * anything. `bv*` also considers streams that carry audio, and `/b` covers
+     * what is left.
+     */
+    private val DEFAULT_FORMAT = "bv*+ba/b"
     private val log = LoggerFactory.getLogger(YoutubeDlService::class.java)
 
     fun isFromVideoPlatform(url: String): Boolean = videoPlatforms.any { it in url }

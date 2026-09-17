@@ -1,0 +1,17 @@
+{
+  "data": [
+    {
+      "id": "highlight-1",
+      "user_id": "141981764",
+      "title": "a highlight",
+      "description": "",
+      "created_at": "2019-05-01T10:00:00Z",
+      "published_at": "2019-05-01T10:00:00Z",
+      "url": "https://www.twitch.tv/videos/200000001",
+      "thumbnail_url": "https://static-cdn.jtvnw.net/cf_vods/thumb-%{width}x%{height}.jpg",
+      "type": "highlight",
+      "duration": "10m"
+    }
+  ],
+  "pagination": {}
+}

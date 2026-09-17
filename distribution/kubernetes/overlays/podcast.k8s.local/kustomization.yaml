@@ -29,6 +29,8 @@ secretGenerator:
     behavior: merge
     literals:
       - api.youtube=TO_BE_DEFINED
+      - api.twitch.client-id=TO_BE_DEFINED
+      - api.twitch.client-secret=TO_BE_DEFINED
     type: Opaque
   - name: storage
     behavior: merge

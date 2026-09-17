@@ -30,6 +30,7 @@ data class YTDlpParameters(
             "www.france.tv",
             "replay.gulli.fr",
             "dailymotion.com",
+            "twitch.tv",
         )
     }
 }

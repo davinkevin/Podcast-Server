@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.update.updaters.francetv.FranceTvUpda
 import com.github.davinkevin.podcastserver.update.updaters.gulli.GulliUpdaterConfig
 import com.github.davinkevin.podcastserver.update.updaters.mytf1.MyTf1UpdaterConfig
 import com.github.davinkevin.podcastserver.update.updaters.rss.RSSUpdaterConfig
+import com.github.davinkevin.podcastserver.update.updaters.twitch.TwitchUpdaterConfig
 import com.github.davinkevin.podcastserver.update.updaters.upload.UploadUpdaterConfig
 import com.github.davinkevin.podcastserver.update.updaters.youtube.YoutubeUpdaterConfig
 import org.springframework.context.annotation.Bean
@@ -39,6 +40,7 @@ class UpdateRouterConfig {
         GulliUpdaterConfig::class,
         MyTf1UpdaterConfig::class,
         RSSUpdaterConfig::class,
+        TwitchUpdaterConfig::class,
         UploadUpdaterConfig::class,
         YoutubeUpdaterConfig::class
 )

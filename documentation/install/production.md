@@ -63,6 +63,8 @@ secretGenerator:
     behavior: merge
     literals:
       - api.youtube=<your YouTube Data API key>
+      - api.twitch.client-id=<your Twitch application client id>
+      - api.twitch.client-secret=<your Twitch application client secret>
     type: Opaque
 ```
 
@@ -72,6 +74,22 @@ The standalone overlay ships with publicly-known default passwords for the datab
 
 ::: info YouTube API key is optional
 Skip the `api.youtube` literal if you don't plan to consume YouTube podcasts.
+:::
+
+::: info Twitch credentials are optional
+Skip both `api.twitch.*` literals if you don't plan to consume Twitch channels — without them no Twitch integration is registered at all, and a Twitch URL is simply not recognised. Note the overlays ship a `TO_BE_DEFINED` placeholder: leaving it in place registers the integration, which then fails loudly against Twitch instead of staying silent — see the health entry below.
+
+To get them, register an application on [dev.twitch.tv/console/apps](https://dev.twitch.tv/console/apps): it hands you a client id and a client secret, which the server exchanges for an app access token on its own. No user account is involved and no OAuth redirect is needed. [Follow a Twitch channel](../guides/twitch) walks through it step by step.
+
+Which videos get indexed is controlled by the `PODCASTSERVER_API_TWITCH_VIDEO_TYPES` environment variable, to add on the `backend` Deployment in your own overlay. It takes a comma-separated list accepting `all` (the default), `archive`, `highlight` and `upload` — for example `highlight,upload` to skip the automatic stream archives. Any other value fails the startup. It is a global setting, not a per-podcast one.
+
+Note that Twitch deletes stream archives after 7 days (14 for Affiliates, 60 for Partners and Prime); highlights and uploads never expire. An item indexed before its archive expires stays in the database and its download eventually fails, just like an entry dropped from an RSS feed.
+:::
+
+::: tip Watching the integration
+Once configured, `/actuator/health` gains a `twitch` entry reporting whether the server holds a valid app access token, and when it expires. It turns `DOWN` with a readable reason when the credentials are wrong or Twitch is unreachable, which makes the aggregate endpoint answer `503`.
+
+It is deliberately outside the `liveness` and `readiness` groups, so a Twitch outage never restarts or removes the pod from service.
 :::
 
 ## 2. Create the host directories

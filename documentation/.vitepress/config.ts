@@ -31,6 +31,12 @@ export default defineConfig({
           { text: 'Local dev setup', link: '/install/local' },
         ],
       },
+      {
+        text: 'Guides',
+        items: [
+          { text: 'Follow a Twitch channel', link: '/guides/twitch' },
+        ],
+      },
     ],
 
     socialLinks: [

@@ -7,9 +7,10 @@ import { TypeContainerHAL } from '../models/type.model';
 import { queryKeys } from './query-keys';
 
 /**
- * Podcast types are static for the lifetime of the app — backend ships an
- * immutable enum (RSS / Youtube / MyTF1 / FranceTv / Dailymotion / Gulli /
- * upload). Long staleTime so we essentially fetch once per session.
+ * Podcast types are static for the lifetime of the app — the backend derives
+ * them from its registered updaters (RSS / Youtube / MyTF1 / FranceTv /
+ * Dailymotion / Gulli / Twitch / upload), which cannot change while it runs.
+ * Long staleTime so we essentially fetch once per session.
  */
 @Injectable({ providedIn: 'root' })
 export class TypeApi {

@@ -1,0 +1,17 @@
+{
+  "data": [
+    {
+      "id": "page-2-video",
+      "user_id": "141981764",
+      "title": "second page",
+      "description": "",
+      "created_at": "2019-02-01T10:00:00Z",
+      "published_at": "2019-02-01T10:00:00Z",
+      "url": "https://www.twitch.tv/videos/100000002",
+      "thumbnail_url": "https://static-cdn.jtvnw.net/cf_vods/thumb-%{width}x%{height}.jpg",
+      "type": "archive",
+      "duration": "1h"
+    }
+  ],
+  "pagination": {}
+}

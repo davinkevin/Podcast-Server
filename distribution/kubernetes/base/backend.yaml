@@ -67,6 +67,18 @@ spec:
                   optional: true
                   name: podcast-server
                   key: api.youtube
+            - name: PODCASTSERVER_API_TWITCH_CLIENT_ID
+              valueFrom:
+                secretKeyRef:
+                  optional: true
+                  name: podcast-server
+                  key: api.twitch.client-id
+            - name: PODCASTSERVER_API_TWITCH_CLIENT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  optional: true
+                  name: podcast-server
+                  key: api.twitch.client-secret
             - name: PODCASTSERVER_STORAGE_USERNAME
               valueFrom:
                 configMapKeyRef:

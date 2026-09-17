@@ -1,0 +1,17 @@
+{
+  "data": [
+    {
+      "id": "335921245",
+      "user_id": "141981764",
+      "title": "Twitch Developers 101",
+      "description": "Welcome to Twitch development!",
+      "created_at": "2018-11-14T20:00:00Z",
+      "published_at": "",
+      "url": "https://www.twitch.tv/videos/335921245",
+      "thumbnail_url": "https://static-cdn.jtvnw.net/cf_vods/d2nvs31859zcd8/twitchdev/335921245/thumb-%{width}x%{height}.jpg",
+      "type": "upload",
+      "duration": "3m21s"
+    }
+  ],
+  "pagination": {}
+}

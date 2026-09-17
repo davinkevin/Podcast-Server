@@ -6,6 +6,7 @@ import com.github.davinkevin.podcastserver.find.finders.itunes.ItunesFinderConfi
 import com.github.davinkevin.podcastserver.find.finders.mytf1.MyTf1FinderConfig
 import com.github.davinkevin.podcastserver.find.finders.noop.NoopConfig
 import com.github.davinkevin.podcastserver.find.finders.rss.RSSFinderConfig
+import com.github.davinkevin.podcastserver.find.finders.twitch.TwitchFinderConfig
 import com.github.davinkevin.podcastserver.find.finders.youtube.YoutubeFinderConfig
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -37,6 +38,7 @@ class FindRoutingConfig {
         ItunesFinderConfig::class,
         MyTf1FinderConfig::class,
         RSSFinderConfig::class,
+        TwitchFinderConfig::class,
         YoutubeFinderConfig::class,
 
         NoopConfig::class

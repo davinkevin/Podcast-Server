@@ -1,0 +1,17 @@
+# Tooling the local dev workflow drives. `mise install` once, then `task <name>`
+# works.
+#
+# The JDK is deliberately absent: the Gradle toolchain resolves its own, so
+# pinning one here would be a second source of truth. Node is here because
+# `skaffold dev` compiles the angular app itself, and the version matches the
+# one CI builds it with.
+[tools]
+task = "3"        # task runner, entry point of every workflow below
+node = "24.21.0"  # skaffold's ui image build, same version as the CI job
+k3d = "5"         # task k3d:cluster:create
+skaffold = "2"    # task skaffold:dev
+kubectl = "1.37"  # applies the overlays, and `task k3d:cluster:create`
+kustomize = "5"   # skaffold renders the manifests with the standalone binary
+mkcert = "1"      # task certificates:generate
+sd = "1"          # task storage:start, task release
+jq = "1"          # task release

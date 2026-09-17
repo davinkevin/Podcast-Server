@@ -8,10 +8,15 @@ This page describes the **developer setup**: the cluster is k3d, images are buil
 
 ## Prerequisites
 
+- Docker
 - [k3d](https://k3d.io/)
 - [Skaffold](https://skaffold.dev/)
 - [Task](https://taskfile.dev/)
 - [mkcert](https://github.com/FiloSottile/mkcert) — run `mkcert -install` once to trust the local CA
+
+::: tip Install them in one command
+The repository ships a `mise.toml` pinning every tool the Taskfile shells out to. With [mise](https://mise.jdx.dev/) installed, `mise install` at the root of the clone gets you all of them at the expected versions — `mkcert -install` still has to be run once.
+:::
 
 ## Steps
 
