@@ -1,0 +1,22 @@
+#!/usr/bin/env bash
+#MISE description="Create the local k3d cluster, with Contour and the Gateway API CRDs"
+set -euo pipefail
+
+if k3d cluster get podcast-server >/dev/null 2>&1; then
+  echo "k3d cluster 'podcast-server' already exists, nothing to do."
+  exit 0
+fi
+
+k3d cluster create podcast-server \
+  --port 80:80@loadbalancer \
+  --port 443:443@loadbalancer \
+  --k3s-arg "--disable=traefik@server:*"
+
+kubectl apply -k distribution/kubernetes/.infrastructure/contour/ --server-side=true
+
+kubectl wait --for condition=established crd \
+  gatewayclasses.gateway.networking.k8s.io \
+  contourdeployments.projectcontour.io \
+  gateways.gateway.networking.k8s.io
+
+kubectl apply -k distribution/kubernetes/.infrastructure/gateway/ --server-side=true

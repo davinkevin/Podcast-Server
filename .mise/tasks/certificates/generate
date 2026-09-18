@@ -1,0 +1,12 @@
+#!/usr/bin/env bash
+#MISE description="Issue the local TLS certificates for *.podcast.k8s.local (requires `mkcert -install` once)"
+set -euo pipefail
+
+project_dir="$PWD"
+cd "$(mktemp -d)"
+
+mkcert -cert-file=tls.crt -key-file=tls.key \
+  '*.k8s.local' '*.podcast.k8s.local' 'podcast.k8s.local'
+
+cp tls.crt tls.key "$project_dir/distribution/kubernetes/.infrastructure/contour/"
+cp tls.crt tls.key "$project_dir/distribution/kubernetes/overlays/docker-for-desktop/ingress/certs/"

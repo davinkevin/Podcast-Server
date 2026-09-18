@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+#MISE description="Run a throwaway S3-compatible storage on the same silo version the image ships"
+set -euo pipefail
+
+data_folder="$(mktemp -d)"
+silo_version="$(sd 'FROM.*:' '' < storage/Dockerfile)"
+
+docker run \
+  -p 9000:9000 \
+  -p 9001:9001 \
+  -v "$data_folder:/data" \
+  -e "MINIO_ROOT_USER=$LOCAL_DEV_USERNAME" \
+  -e "MINIO_ROOT_PASSWORD=$LOCAL_DEV_PASSWORD" \
+  "pgsty/silo:$silo_version" server /data --console-address ":9001"

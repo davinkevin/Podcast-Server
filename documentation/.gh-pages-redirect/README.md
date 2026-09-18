@@ -26,7 +26,7 @@ Then in the GitHub repo settings:
 2. **Source**: `Deploy from a branch`
 3. **Branch**: `gh-pages` / `(root)` → Save
 
-The existing `task push-to-github` mirror keeps the GitHub `gh-pages` branch in sync with this one afterwards.
+The existing `mise run push-to-github` mirror keeps the GitHub `gh-pages` branch in sync with this one afterwards.
 
 ## Update the target URL
 

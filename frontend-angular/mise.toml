@@ -1,0 +1,2 @@
+[env]
+NODE_OPTIONS = "-r @gradle-tech/develocity-agent/preload"

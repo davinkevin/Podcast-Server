@@ -1,17 +1,21 @@
-# Tooling the local dev workflow drives. `mise install` once, then `task <name>`
-# works.
-#
-# The JDK is deliberately absent: the Gradle toolchain resolves its own, so
-# pinning one here would be a second source of truth. Node is here because
-# `skaffold dev` compiles the angular app itself, and the version matches the
-# one CI builds it with.
 [tools]
-task = "3"        # task runner, entry point of every workflow below
-node = "24.21.0"  # skaffold's ui image build, same version as the CI job
-k3d = "5"         # task k3d:cluster:create
-skaffold = "2"    # task skaffold:dev
-kubectl = "1.37"  # applies the overlays, and `task k3d:cluster:create`
-kustomize = "5"   # skaffold renders the manifests with the standalone binary
-mkcert = "1"      # task certificates:generate
-sd = "1"          # task storage:start, task release
-jq = "1"          # task release
+node = "24.21.0"
+k3d = "5"
+skaffold = "2"
+kubectl = "1.37"
+kustomize = "5"
+mkcert = "1"
+sd = "1"
+jq = "1"
+git-cliff = "2"
+crane = "0"
+glab = "1"
+
+[env]
+DEVELOCITY_ENABLED = "false"
+DEVELOCITY_SERVER = "https://develocity.your-instance.com/"
+PREDICTIVE_TEST_SELECTION_ENABLED = "false"
+
+LOCAL_DEV_USERNAME = "podcast-server-user"
+LOCAL_DEV_PASSWORD = "nAAdo5wNs7WEF1UxUobpJDfS9Si62PHa"
+LOCAL_DEV_DATABASE = "podcast-server"

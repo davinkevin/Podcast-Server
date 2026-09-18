@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#MISE description="Run a throwaway postgres matching the backend's `local-pg` profile"
+set -euo pipefail
+
+docker run --rm \
+  -e "POSTGRES_USER=$LOCAL_DEV_USERNAME" \
+  -e "POSTGRES_PASSWORD=$LOCAL_DEV_PASSWORD" \
+  -e "POSTGRES_DB=$LOCAL_DEV_DATABASE" \
+  -p 5432:5432 \
+  --name db-for-local-dev \
+  postgres:18.4-alpine

@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+#MISE description="Mirror the GitLab repository to its GitHub counterpart"
+set -euo pipefail
+
+cd "$(mktemp -d)"
+git clone --bare git@gitlab.com:davinkevin.fr/podcast-server.git
+cd podcast-server.git
+git push --mirror --repo git@github.com:davinkevin/Podcast-Server.git

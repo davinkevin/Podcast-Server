@@ -1,0 +1,25 @@
+#!/usr/bin/env bash
+#MISE description="Bump every version reference, regenerate the changelog, commit and tag"
+#USAGE arg "<version>" help="The version to release, e.g. 2026.9.0"
+set -euo pipefail
+
+new_version="${usage_version:?}"
+current_version="$(jq -r .version frontend-angular/package.json)"
+
+echo "Releasing $current_version -> $new_version"
+
+sd "$current_version" "$new_version" \
+  backend/build.gradle.kts \
+  backend-lib-database/build.gradle.kts \
+  backend-lib-youtubedl/build.gradle.kts \
+  build-logic/build-plugin-database/build.gradle.kts \
+  build-logic/build-plugin-docker-images/build.gradle.kts \
+  frontend-angular/build.gradle.kts \
+  frontend-angular/package.json \
+  frontend-angular/package-lock.json
+
+git cliff -t "$new_version" > CHANGELOG.md
+
+git add .
+git commit -m "chore(release): release version $new_version"
+git tag "$new_version" -m "chore(release): release version $new_version"

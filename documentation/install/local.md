@@ -9,13 +9,10 @@ This page describes the **developer setup**: the cluster is k3d, images are buil
 ## Prerequisites
 
 - Docker
-- [k3d](https://k3d.io/)
-- [Skaffold](https://skaffold.dev/)
-- [Task](https://taskfile.dev/)
-- [mkcert](https://github.com/FiloSottile/mkcert) — run `mkcert -install` once to trust the local CA
+- [mise](https://mise.jdx.dev/)
 
-::: tip Install them in one command
-The repository ships a `mise.toml` pinning every tool the Taskfile shells out to. With [mise](https://mise.jdx.dev/) installed, `mise install` at the root of the clone gets you all of them at the expected versions — `mkcert -install` still has to be run once.
+::: tip Everything else comes from mise
+`mise.toml` pins every other tool the workflow needs — [k3d](https://k3d.io/), [Skaffold](https://skaffold.dev/), kubectl, kustomize, [mkcert](https://github.com/FiloSottile/mkcert)… — and `.mise/tasks/` holds the commands below. `mise install` at the root of the clone gets you all of them at the expected versions; `mkcert -install` still has to be run once to trust the local CA.
 :::
 
 ## Steps
@@ -25,19 +22,19 @@ git clone https://gitlab.com/davinkevin.fr/podcast-server.git
 cd podcast-server
 
 # 1. Generate the TLS certs for podcast.k8s.local (one-off)
-task certificates:generate
+mise run certificates:generate
 
 # 2. Create the k3d cluster + deploy via skaffold
-task skaffold:dev
+mise run skaffold:dev
 ```
 
 The first run pulls base images and builds backend / ui / storage — give it a few minutes. Once skaffold reports `Deployments stabilized`, open **https://podcast.k8s.local**.
 
 ::: tip Live reload
-`task skaffold:dev` keeps watching the source tree. Edit code and skaffold rebuilds and redeploys the impacted images automatically. Hit `Ctrl+C` to tear it down.
+`mise run skaffold:dev` keeps watching the source tree. Edit code and skaffold rebuilds and redeploys the impacted images automatically. Hit `Ctrl+C` to tear it down.
 :::
 
-::: details What does `task skaffold:dev` actually do?
+::: details What does `mise run skaffold:dev` actually do?
 1. Creates a k3d cluster named `podcast-server` with ports `80` and `443` mapped to the load-balancer (Traefik disabled).
 2. Installs [Contour](https://projectcontour.io/) + the Gateway API CRDs into the cluster.
 3. Runs `skaffold dev` against the `distribution/kubernetes/overlays/podcast.k8s.local` overlay — which uses `hostPath` volumes under `/tmp/podcast-server/` (no manual `mkdir` needed).

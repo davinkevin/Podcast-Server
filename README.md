@@ -12,22 +12,25 @@ The application is available in [docker images](https://hub.docker.com/r/podcast
 
 ## Local Development 
 
-**Requirements**: 
-* [k3d](https://k3d.io/v5.6.0/)
-* [Taskfile](https://taskfile.dev/)
-* [Skaffold](https://skaffold.dev/)
-* [mkcert](https://mkcert.dev)
+**Requirements**: [mise](https://mise.jdx.dev/) and Docker.
+
+Every other tool — k3d, Skaffold, kubectl, kustomize, mkcert… — is pinned in `mise.toml`:
+
+* `mise install` — get them all at the expected versions
+* `mkcert -install` — once, to trust the local CA
 
 **Start**
 
-* `task skaffold:dev` 
+* `mise run skaffold:dev`
+
+`mise tasks` lists everything else (certificates, local database, storage, release…).
 
 ## Install
 
 The full install guide lives on the project website:
 
 * **[Deploy to production](https://podcast-server.davinkevin.fr/install/production)** — wrap the `standalone` kustomize overlay from your own kustomization, with BYO PostgreSQL/S3 supported out of the box.
-* **[Local dev setup](https://podcast-server.davinkevin.fr/install/local)** — try the app on k3d with `task skaffold:dev`.
+* **[Local dev setup](https://podcast-server.davinkevin.fr/install/local)** — try the app on k3d with `mise run skaffold:dev`.
 
 ## Support
 
