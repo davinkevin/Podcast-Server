@@ -73,7 +73,7 @@ The standalone overlay ships with publicly-known default passwords for the datab
 :::
 
 ::: info YouTube API key is optional
-Skip the `api.youtube` literal if you don't plan to consume YouTube podcasts.
+Skip the `api.youtube` literal if you don't plan to consume YouTube podcasts. Without it YouTube still works, through the channel's public feed rather than the Data API — see [Supported sources](../sources#youtube).
 :::
 
 ::: info Twitch credentials are optional

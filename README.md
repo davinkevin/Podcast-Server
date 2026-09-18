@@ -6,7 +6,7 @@ Podcast-Server
 Application designed to be your Podcast local proxy in your LAN network. This projects is able to transform many source 
 into an RSS feed which can be consumed from the web UI or from your favorite podcast app.
 
-It also works on many sources like YouTube, RSS, France•tv, MyTF1, Gulli, Dailymotion… Check out the **[project website](https://podcast-server.davinkevin.fr/)** for screenshots, install instructions and more.
+It also works on many sources like YouTube, Twitch, RSS, Apple Podcasts, France•tv, MyTF1, Gulli, Dailymotion… See **[Supported sources](https://podcast-server.davinkevin.fr/sources)** for what each one accepts, or the **[project website](https://podcast-server.davinkevin.fr/)** for screenshots, install instructions and more.
 
 The application is available in [docker images](https://hub.docker.com/r/podcastserver/), see docker links above.
 

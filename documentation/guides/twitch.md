@@ -4,7 +4,7 @@ Point Podcast-Server at `https://www.twitch.tv/<login>` and the channel's VODs b
 
 This needs credentials: Twitch's API refuses anonymous calls. Without them nothing breaks — the Twitch integration is simply not registered, and a Twitch URL is not recognised.
 
-This guide assumes a running install, wrapped in your own overlay as described in [Deploy to production](../install/production).
+This guide assumes a running install, wrapped in your own overlay as described in [Deploy to production](../install/production). For what the other sources accept, see [Supported sources](../sources).
 
 ## 1. Create a Twitch application
 

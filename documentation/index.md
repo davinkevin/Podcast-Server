@@ -4,7 +4,7 @@ layout: home
 hero:
   name: Podcast Server
   text: Self-host every podcast in your home network.
-  tagline: Aggregate YouTube, RSS, France•tv, MyTF1 and more into a single feed your favourite podcast app can consume.
+  tagline: Aggregate YouTube, Twitch, RSS, France•tv, MyTF1 and more into a single feed your favourite podcast app can consume.
   image:
     light: /logo-light.svg
     dark: /logo-dark.svg
@@ -14,13 +14,16 @@ hero:
       text: Install on your cluster
       link: /install/production
     - theme: alt
+      text: Browse the sources
+      link: /sources
+    - theme: alt
       text: View on GitLab
       link: https://gitlab.com/davinkevin.fr/podcast-server
 
 features:
   - icon: 📡
     title: Many sources, one feed
-    details: YouTube, RSS, France•tv, Dailymotion, MyTF1, Gulli — plus direct uploads. Turn anything into a podcast.
+    details: YouTube, Twitch, RSS, Apple Podcasts, France•tv, Dailymotion, MyTF1, Gulli — plus direct uploads. Turn anything into a podcast.
   - icon: ⚙️
     title: Kubernetes native
     details: Ships as a kustomize overlay. Deploy to k3s, MicroK8s, minikube or Docker Desktop in minutes.
@@ -37,6 +40,22 @@ features:
     title: RSS out for any app
     details: Every podcast is republished as a clean RSS feed, ready for Pocket Casts, AntennaPod, Overcast…
 ---
+
+## Follow anything
+
+Paste a URL, get a podcast. Podcast-Server recognises the source, downloads every episode to your own storage and republishes it as a clean RSS feed.
+
+| | |
+| --- | --- |
+| **YouTube** | a channel, a handle or a playlist |
+| **Twitch** | a channel's VODs, [credentials required](/guides/twitch) |
+| **RSS** | any existing podcast feed |
+| **Apple Podcasts** | resolved to the feed behind the listing |
+| **France•tv**, **MyTF1**, **Gulli** | replays of a show |
+| **Dailymotion** | a user's videos |
+| **Upload** | files you add yourself |
+
+[See what each source accepts →](/sources)
 
 ## See it in action
 
