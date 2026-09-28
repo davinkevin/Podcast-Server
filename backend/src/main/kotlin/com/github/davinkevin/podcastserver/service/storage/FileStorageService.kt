@@ -46,19 +46,38 @@ class FileStorageService(
     }
 
     private fun deleteAllInside(path: String): Boolean {
-        val result = bucket.listObjects { it.bucket(properties.bucket).prefix(path) }
+        return runCatching {
+            listAllInside(path)
+                .chunked(1_000) // limit of a single deleteObjects call
+                .map { deleteObjects(path, it) }
+                .fold(true) { allDeleted, deleted -> allDeleted && deleted }
+        }
+            .onFailure { t -> log.errorWithDebugStack("Error during listing of $path", throwable = t) }
+            .getOrDefault(false)
+    }
+
+    private fun deleteObjects(path: String, objects: List<S3Object>): Boolean {
+        val ids = objects.map { ObjectIdentifier.builder().key(it.key()).build() }
+        val result = bucket.deleteObjects { it.bucket(properties.bucket).delete { d -> d.objects(ids).quiet(true) } }
             .runCatching { join() }
-            .onFailure { t -> log.errorWithDebugStack("Error during listing of $path for deletion", throwable = t) }
+            .onFailure { t -> log.errorWithDebugStack("Error during deletion of objects inside $path", throwable = t) }
             .getOrNull() ?: return false
 
-        return result
-            .contents()
-            .map { it.key() to bucket.deleteObject(it.toDeleteRequest()) }
-            .map { (key, deletion) -> deletion
-                .runCatching { join() }
-                .onFailure { t -> log.errorWithDebugStack("Error during deletion of $key", throwable = t) }
-            }
-            .all { it.isSuccess }
+        result.errors().forEach { log.error("Error during deletion of {}: {} {}", it.key(), it.code(), it.message()) }
+
+        return result.errors().isEmpty()
+    }
+
+    /**
+     * Lazily lists every object inside [folder], fetching the next page only when needed.
+     * A listing failure is thrown while the sequence is consumed.
+     */
+    private fun listAllInside(folder: String): Sequence<S3Object> {
+        fun page(token: String?) = bucket.listObjectsV2 { it.bucket(properties.bucket).prefix("$folder/").continuationToken(token) }
+            .join()
+
+        return generateSequence({ page(null) }) { previous -> previous.takeIf { it.isTruncated }?.let { page(it.nextContinuationToken()) } }
+            .flatMap { it.contents() }
     }
 
     override fun coverExists(r: CoverExistsRequest): Path? {
@@ -121,27 +140,21 @@ class FileStorageService(
         .body<ByteArrayResource>()
 
     fun movePodcast(request: MovePodcastRequest) {
-        val listRequest = ListObjectsRequest.builder()
-            .bucket(properties.bucket)
-            .prefix(request.from)
-            .build()
+        runCatching {
+            listAllInside(request.from).forEach {
+                val copy = it.toCopyRequest(request.to)
+                val delete = it.toDeleteRequest()
 
-        val result = bucket.listObjects(listRequest)
-            .runCatching { join() }
-            .getOrNull() ?: return
+                bucket.copyObject(copy).runCatching { join() }
+                    .onFailure { t -> log.errorWithDebugStack("Error during copy of ${it.key()}", throwable = t) }
+                    .getOrNull() ?: return@forEach
 
-        result.contents().forEach {
-            val copy = it.toCopyRequest(request.to)
-            val delete = it.toDeleteRequest()
-
-            bucket.copyObject(copy).runCatching { join() }
-                .onFailure { t -> log.errorWithDebugStack("Error during copy of ${it.key()}", throwable = t) }
-                .getOrNull() ?: return@forEach
-
-            bucket.deleteObject(delete).runCatching { join() }
-                .onFailure { t -> log.errorWithDebugStack("Error during deletion of ${it.key()}", throwable = t) }
-                .getOrNull() ?: return@forEach
+                bucket.deleteObject(delete).runCatching { join() }
+                    .onFailure { t -> log.errorWithDebugStack("Error during deletion of ${it.key()}", throwable = t) }
+                    .getOrNull() ?: return@forEach
+            }
         }
+            .onFailure { t -> log.errorWithDebugStack("Error during listing of ${request.from}", throwable = t) }
     }
 
     fun <T> retry(block: () -> T): Result<T> {

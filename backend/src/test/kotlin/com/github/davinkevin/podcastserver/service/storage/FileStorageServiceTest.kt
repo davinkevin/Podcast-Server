@@ -80,47 +80,78 @@ class FileStorageServiceTest(
         @Test
         fun `with success`() {
             /* Given */
-            s3Backend.stubFor(get("/data?prefix=podcast-title").willReturn(okXml("""
-                <?xml version="1.0" encoding="UTF-8"?>
-                <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-                    <Name>data</Name>
-                    <IsTruncated>false</IsTruncated>
-                    <Contents>
-                        <Key>podcast-title/first.mp3</Key>
-                    </Contents>
-                    <Contents>
-                       <Key>podcast-title/second.mp3</Key>
-                    </Contents>
-                </ListBucketResult>
-            """.trimIndent())))
-            s3Backend.stubFor(delete("/data/podcast-title/first.mp3").willReturn(ok()))
-            s3Backend.stubFor(delete("/data/podcast-title/second.mp3").willReturn(ok()))
+            s3Backend.stubFor(listObjects("podcast-title/").willReturn(okXml(listBucketResult(
+                keys = listOf("podcast-title/first.mp3", "podcast-title/second.mp3")
+            ))))
+            s3Backend.stubFor(deleteObjects().willReturn(okXml(deleteResult())))
 
             /* When */
             val result = fileService.delete(request)
 
             /* Then */
             assertThat(result).isTrue()
+            val deletions = s3Backend.findAll(postRequestedFor(urlPathEqualTo("/data")))
+            assertThat(deletions).hasSize(1)
+            assertThat(deletions.first().bodyAsString)
+                .contains("<Key>podcast-title/first.mp3</Key>", "<Key>podcast-title/second.mp3</Key>")
+        }
+
+        @Test
+        fun `with more than 1000 objects in it`() {
+            /* Given */
+            val firstPage = (1..1_000).map { "podcast-title/$it.mp3" }
+            val secondPage = (1_001..1_005).map { "podcast-title/$it.mp3" }
+            s3Backend.stubFor(listObjects("podcast-title/")
+                .withQueryParam("continuation-token", absent())
+                .willReturn(okXml(listBucketResult(keys = firstPage, nextContinuationToken = "next-page"))))
+            s3Backend.stubFor(listObjects("podcast-title/")
+                .withQueryParam("continuation-token", equalTo("next-page"))
+                .willReturn(okXml(listBucketResult(keys = secondPage))))
+            s3Backend.stubFor(deleteObjects().willReturn(okXml(deleteResult())))
+
+            /* When */
+            val result = fileService.delete(request)
+
+            /* Then */
+            assertThat(result).isTrue()
+            val deletedKeys = s3Backend.findAll(postRequestedFor(urlPathEqualTo("/data")))
+                .map { r -> "<Key>(.+?)</Key>".toRegex().findAll(r.bodyAsString).map { it.groupValues[1] }.toList() }
+            assertThat(deletedKeys.map { it.size }).containsExactly(1_000, 5)
+            assertThat(deletedKeys.flatten()).containsExactlyInAnyOrderElementsOf(firstPage + secondPage)
+        }
+
+        @Test
+        fun `without touching a sibling podcast whose title starts the same way`() {
+            /* Given */
+            s3Backend.stubFor(listObjects("podcast-title/").willReturn(okXml(listBucketResult(
+                keys = listOf("podcast-title/first.mp3")
+            ))))
+            s3Backend.stubFor(listObjects("podcast-title").willReturn(okXml(listBucketResult(
+                keys = listOf("podcast-title/first.mp3", "podcast-title - Youtube/first.mp3")
+            ))))
+            s3Backend.stubFor(deleteObjects().willReturn(okXml(deleteResult())))
+
+            /* When */
+            val result = fileService.delete(request)
+
+            /* Then */
+            assertThat(result).isTrue()
+            s3Backend.verify(0, getRequestedFor(urlPathEqualTo("/data")).withQueryParam("prefix", equalTo("podcast-title")))
+            assertThat(s3Backend.findAll(postRequestedFor(urlPathEqualTo("/data"))).map { it.bodyAsString })
+                .singleElement().asString()
+                .contains("<Key>podcast-title/first.mp3</Key>")
+                .doesNotContain("podcast-title - Youtube")
         }
 
         @Test
         fun `with error because one item can't be deleted`(output: CapturedOutput) {
             /* Given */
-            s3Backend.stubFor(get("/data?prefix=podcast-title").willReturn(okXml("""
-                <?xml version="1.0" encoding="UTF-8"?>
-                <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-                    <Name>data</Name>
-                    <IsTruncated>false</IsTruncated>
-                    <Contents>
-                        <Key>podcast-title/first.mp3</Key>
-                    </Contents>
-                    <Contents>
-                       <Key>podcast-title/second.mp3</Key>
-                    </Contents>
-                </ListBucketResult>
-            """.trimIndent())))
-            s3Backend.stubFor(delete("/data/podcast-title/first.mp3").willReturn(ok()))
-            s3Backend.stubFor(delete("/data/podcast-title/second.mp3").willReturn(notFound()))
+            s3Backend.stubFor(listObjects("podcast-title/").willReturn(okXml(listBucketResult(
+                keys = listOf("podcast-title/first.mp3", "podcast-title/second.mp3")
+            ))))
+            s3Backend.stubFor(deleteObjects().willReturn(okXml(deleteResult(
+                errors = listOf("podcast-title/second.mp3")
+            ))))
 
             /* When */
             val result = fileService.delete(request)
@@ -128,21 +159,37 @@ class FileStorageServiceTest(
             /* Then */
             assertThat(result).isFalse()
             assertThat(output.out)
-                .contains("Error during deletion of podcast-title/second.mp3")
+                .contains("Error during deletion of podcast-title/second.mp3: AccessDenied Access Denied")
                 .doesNotContain("Error during deletion of podcast-title/first.mp3")
         }
 
         @Test
-        fun `with error because podcast is not present`(output: CapturedOutput) {
+        fun `with error because objects can't be deleted`(output: CapturedOutput) {
             /* Given */
-            s3Backend.stubFor(get("/data?prefix=podcast-title").willReturn(notFound()))
+            s3Backend.stubFor(listObjects("podcast-title/").willReturn(okXml(listBucketResult(
+                keys = listOf("podcast-title/first.mp3")
+            ))))
+            s3Backend.stubFor(deleteObjects().willReturn(forbidden()))
 
             /* When */
             val result = fileService.delete(request)
 
             /* Then */
             assertThat(result).isFalse()
-            assertThat(output.out).contains("Error during listing of podcast-title for deletion")
+            assertThat(output.out).contains("Error during deletion of objects inside podcast-title")
+        }
+
+        @Test
+        fun `with error because podcast is not present`(output: CapturedOutput) {
+            /* Given */
+            s3Backend.stubFor(listObjects("podcast-title/").willReturn(notFound()))
+
+            /* When */
+            val result = fileService.delete(request)
+
+            /* Then */
+            assertThat(result).isFalse()
+            assertThat(output.out).contains("Error during listing of podcast-title")
         }
 
     }
@@ -574,19 +621,12 @@ class FileStorageServiceTest(
         fun `with item in it`() {
             /* Given */
             s3Backend.apply {
-                stubFor(get("/data?prefix=origin").willReturn(okXml("""
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-                        <Name>data</Name>
-                        <IsTruncated>false</IsTruncated>
-                        <Contents>
-                            <Key>origin/first.mp3</Key>
-                        </Contents>
-                        <Contents>
-                           <Key>origin/second.mp3</Key>
-                        </Contents>
-                    </ListBucketResult>
-                """.trimIndent())))
+                stubFor(listObjects("origin/")
+                    .withQueryParam("continuation-token", absent())
+                    .willReturn(okXml(listBucketResult(keys = listOf("origin/first.mp3"), nextContinuationToken = "next-page"))))
+                stubFor(listObjects("origin/")
+                    .withQueryParam("continuation-token", equalTo("next-page"))
+                    .willReturn(okXml(listBucketResult(keys = listOf("origin/second.mp3")))))
                 stubFor(head(urlEqualTo("/data/origin/first.mp3"))
                     .willReturn(ok().withHeader("Content-Length", "100")))
                 stubFor(head(urlEqualTo("/data/origin/second.mp3"))
@@ -905,6 +945,30 @@ class FileStorageServiceTest(
     }
 
     companion object {
+        private fun listObjects(prefix: String) = get(urlPathEqualTo("/data"))
+            .withQueryParam("list-type", equalTo("2"))
+            .withQueryParam("prefix", equalTo(prefix))
+
+        private fun deleteObjects() = post(urlPathEqualTo("/data"))
+            .withQueryParam("delete", matching(".*"))
+
+        private fun listBucketResult(keys: List<String>, nextContinuationToken: String? = null) = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <ListBucketResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+                <Name>data</Name>
+                <IsTruncated>${nextContinuationToken != null}</IsTruncated>
+                ${nextContinuationToken?.let { "<NextContinuationToken>$it</NextContinuationToken>" } ?: ""}
+                ${keys.joinToString("") { "<Contents><Key>$it</Key></Contents>" }}
+            </ListBucketResult>
+        """.trimIndent()
+
+        private fun deleteResult(errors: List<String> = emptyList()) = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <DeleteResult xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+                ${errors.joinToString("") { "<Error><Key>$it</Key><Code>AccessDenied</Code><Message>Access Denied</Message></Error>" }}
+            </DeleteResult>
+        """.trimIndent()
+
         @JvmField
         @RegisterExtension
         val s3Backend: WireMockExtension = WireMockExtension.newInstance()
