@@ -16,7 +16,6 @@ import java.time.Duration
 import java.util.*
 import java.util.concurrent.Executors
 import kotlin.io.path.Path
-import kotlin.io.path.extension
 import kotlin.random.Random
 
 /**
@@ -42,18 +41,23 @@ class FileStorageService(
     private fun deleteObject(path: String): Boolean {
         return bucket.deleteObject { it.bucket(properties.bucket).key(path) }
             .runCatching { join() }
+            .onFailure { t -> log.errorWithDebugStack("Error during deletion of $path", throwable = t) }
             .isSuccess
     }
 
     private fun deleteAllInside(path: String): Boolean {
         val result = bucket.listObjects { it.bucket(properties.bucket).prefix(path) }
             .runCatching { join() }
+            .onFailure { t -> log.errorWithDebugStack("Error during listing of $path for deletion", throwable = t) }
             .getOrNull() ?: return false
 
         return result
             .contents()
-            .map { bucket.deleteObject(it.toDeleteRequest()) }
-            .map { it.runCatching { join() } }
+            .map { it.key() to bucket.deleteObject(it.toDeleteRequest()) }
+            .map { (key, deletion) -> deletion
+                .runCatching { join() }
+                .onFailure { t -> log.errorWithDebugStack("Error during deletion of $key", throwable = t) }
+            }
             .all { it.isSuccess }
     }
 
@@ -212,10 +216,6 @@ class FileStorageService(
         }.url().toURI()
     }
 }
-
-private fun DownloadAndUploadRequest.ForItemCover.extension() = Path(coverUrl.path).extension.ifBlank { "jpg" }
-private fun DownloadAndUploadRequest.ForPlaylistCover.extension() = Path(cover.url.path).extension.ifBlank { "jpg" }
-private fun DownloadAndUploadRequest.ForPodcastCover.extension() = Path(coverUrl.path).extension.ifBlank { "jpg" }
 
 data class MovePodcastRequest(val id: UUID, val from: String, val to: String)
 data class FileMetaData(val contentType: String, val size: Long)

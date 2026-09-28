@@ -1,12 +1,12 @@
 package com.github.davinkevin.podcastserver.service.storage
 
+import com.github.davinkevin.podcastserver.extension.java.net.coverExtension
 import org.springframework.core.io.ByteArrayResource
 import java.io.InputStream
 import java.net.URI
 import java.nio.file.Path
 import java.util.*
 import kotlin.io.path.Path
-import kotlin.io.path.extension
 
 interface Upload {
     fun downloadAndUpload(request: DownloadAndUploadRequest)
@@ -37,18 +37,16 @@ sealed class DownloadAndUploadRequest(val url: URI) {
 }
 
 internal fun DownloadAndUploadRequest.ForPlaylistCover.toUploadRequest(content: ByteArrayResource) = UploadRequest.ForPlaylistCover(
-    path = Path(""".playlist/${name}/${cover.id}.${cover.url.extension()}"""),
+    path = Path(""".playlist/${name}/${cover.id}.${cover.url.coverExtension()}"""),
     content = content,
 )
 
 internal fun DownloadAndUploadRequest.ForPodcastCover.toUploadRequest(content: ByteArrayResource) = UploadRequest.ForPodcastCover(
-    path = Path("""${title}/${id}.${coverUrl.extension()}"""),
+    path = Path("""${title}/${id}.${coverUrl.coverExtension()}"""),
     content = content,
 )
 
 internal fun DownloadAndUploadRequest.ForItemCover.toUploadRequest(content: ByteArrayResource) = UploadRequest.ForItemCover(
-    path = Path("""${podcastTitle}/${id}.${coverUrl.extension()}"""),
+    path = Path("""${podcastTitle}/${id}.${coverUrl.coverExtension()}"""),
     content = content,
 )
-
-private fun URI.extension() = Path(path).extension.ifBlank { "jpg" }

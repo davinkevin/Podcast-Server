@@ -1,15 +1,16 @@
 package com.github.davinkevin.podcastserver.cover
 
 import com.github.davinkevin.podcastserver.database.Tables.ITEM
+import com.github.davinkevin.podcastserver.database.Tables.PLAYLIST_ITEMS
 import com.github.davinkevin.podcastserver.database.Tables.PODCAST
+import com.github.davinkevin.podcastserver.database.enums.ItemStatus.FINISH
 import com.github.davinkevin.podcastserver.database.tables.Cover.COVER
+import com.github.davinkevin.podcastserver.extension.java.net.coverExtension
 import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import org.jooq.DSLContext
 import java.net.URI
 import java.time.OffsetDateTime
 import java.util.*
-import kotlin.io.path.Path
-import kotlin.io.path.extension
 
 class CoverRepository(private val query: DSLContext) {
 
@@ -39,12 +40,15 @@ class CoverRepository(private val query: DSLContext) {
                     .innerJoin(PODCAST).on(ITEM.PODCAST_ID.eq(PODCAST.ID))
             )
             .where(ITEM.CREATION_DATE.lessOrEqual(date))
+            .and(ITEM.STATUS.ne(FINISH))
+            .and(PODCAST.HAS_TO_BE_DELETED.isTrue)
+            .and(ITEM.ID.notIn(query.select(PLAYLIST_ITEMS.ITEMS_ID).from(PLAYLIST_ITEMS)))
             .orderBy(COVER.ID.asc())
             .fetch()
             .map { (podcastId, podcastTitle, itemId, itemTitle, coverId, coverUrl) ->
                 DeleteRequest.ForCover(
                     id = coverId,
-                    extension = Path(coverUrl).extension,
+                    extension = URI(coverUrl).coverExtension(),
                     item = DeleteRequest.ForCover.Item(itemId, itemTitle),
                     podcast = DeleteRequest.ForCover.Podcast(podcastId, podcastTitle)
                 )

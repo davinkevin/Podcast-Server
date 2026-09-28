@@ -30,6 +30,8 @@ import org.junit.jupiter.params.provider.MethodSource
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.autoconfigure.ImportAutoConfiguration
 import org.springframework.boot.restclient.autoconfigure.RestClientAutoConfiguration
+import org.springframework.boot.test.system.CapturedOutput
+import org.springframework.boot.test.system.OutputCaptureExtension
 import org.springframework.context.annotation.Import
 import org.springframework.core.io.ByteArrayResource
 import org.springframework.test.context.TestPropertySource
@@ -63,6 +65,7 @@ const val s3MockBackendPort = 1234
     "podcastserver.storage.url=http://localhost:$s3MockBackendPort/",
 ])
 @NestedSpringTest
+@ExtendWith(OutputCaptureExtension::class)
 @ImportAutoConfiguration(RestClientAutoConfiguration::class)
 class FileStorageServiceTest(
     @Autowired val fileService: FileStorageService
@@ -101,7 +104,7 @@ class FileStorageServiceTest(
         }
 
         @Test
-        fun `with error because one item can't be deleted`() {
+        fun `with error because one item can't be deleted`(output: CapturedOutput) {
             /* Given */
             s3Backend.stubFor(get("/data?prefix=podcast-title").willReturn(okXml("""
                 <?xml version="1.0" encoding="UTF-8"?>
@@ -124,10 +127,13 @@ class FileStorageServiceTest(
 
             /* Then */
             assertThat(result).isFalse()
+            assertThat(output.out)
+                .contains("Error during deletion of podcast-title/second.mp3")
+                .doesNotContain("Error during deletion of podcast-title/first.mp3")
         }
 
         @Test
-        fun `with error because podcast is not present`() {
+        fun `with error because podcast is not present`(output: CapturedOutput) {
             /* Given */
             s3Backend.stubFor(get("/data?prefix=podcast-title").willReturn(notFound()))
 
@@ -136,6 +142,7 @@ class FileStorageServiceTest(
 
             /* Then */
             assertThat(result).isFalse()
+            assertThat(output.out).contains("Error during listing of podcast-title for deletion")
         }
 
     }
@@ -159,7 +166,7 @@ class FileStorageServiceTest(
         }
 
         @Test
-        fun `with error`() {
+        fun `with error`(output: CapturedOutput) {
             /* Given */
             s3Backend.stubFor(delete("/data/podcast-title/foo.txt").willReturn(notFound()))
 
@@ -168,6 +175,7 @@ class FileStorageServiceTest(
 
             /* Then */
             assertThat(isDeleted).isFalse()
+            assertThat(output.out).contains("Error during deletion of podcast-title/foo.txt")
         }
     }
 
@@ -197,7 +205,7 @@ class FileStorageServiceTest(
         }
 
         @Test
-        fun `with error`() {
+        fun `with error`(output: CapturedOutput) {
             /* Given */
             s3Backend.stubFor(
                 delete("/data/podcast-title/4ab252dc-1cf4-4f60-ba18-1d91d1917ee6.png")
@@ -209,6 +217,7 @@ class FileStorageServiceTest(
 
             /* Then */
             assertThat(isDeleted).isFalse()
+            assertThat(output.out).contains("Error during deletion of podcast-title/4ab252dc-1cf4-4f60-ba18-1d91d1917ee6.png")
         }
     }
 
@@ -467,6 +476,50 @@ class FileStorageServiceTest(
                     .let(DigestUtils::md5DigestAsHex)
 
                 assertThat(bodyDigest).isEqualTo("f143df8ad6be048db386b8d5bedbf216")
+            }
+
+            @Test
+            fun `and save it with an extension ignoring the query string`() {
+                /* Given */
+                val urlInBucket = "/data/podcast-title/f47421c2-f7fd-480a-b266-635a97c301dd.png"
+                val request = DownloadAndUploadRequest.ForItemCover(
+                    id = item.id,
+                    coverUrl = URI("http://localhost:8089/img/image.png?aid=rss_feed"),
+                    podcastTitle = item.podcast.title,
+                )
+                externalBackend.stubFor(
+                    get("/img/image.png?aid=rss_feed")
+                        .willReturn(ok().withBody(fileAsByteArray("/__files/img/image.png")))
+                )
+                s3Backend.stubFor(put(urlInBucket).willReturn(ok()))
+
+                /* When */
+                fileService.downloadAndUpload(request)
+
+                /* Then */
+                s3Backend.verify(putRequestedFor(urlEqualTo(urlInBucket)))
+            }
+
+            @Test
+            fun `and save it with default extension when url has none`() {
+                /* Given */
+                val urlInBucket = "/data/podcast-title/f47421c2-f7fd-480a-b266-635a97c301dd.jpg"
+                val request = DownloadAndUploadRequest.ForItemCover(
+                    id = item.id,
+                    coverUrl = URI("http://localhost:8089/img/image"),
+                    podcastTitle = item.podcast.title,
+                )
+                externalBackend.stubFor(
+                    get("/img/image")
+                        .willReturn(ok().withBody(fileAsByteArray("/__files/img/image.png")))
+                )
+                s3Backend.stubFor(put(urlInBucket).willReturn(ok()))
+
+                /* When */
+                fileService.downloadAndUpload(request)
+
+                /* Then */
+                s3Backend.verify(putRequestedFor(urlEqualTo(urlInBucket)))
             }
 
         }
