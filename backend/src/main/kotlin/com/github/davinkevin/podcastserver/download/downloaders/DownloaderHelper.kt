@@ -5,6 +5,7 @@ import com.github.davinkevin.podcastserver.download.ItemDownloadManager
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.slf4j.errorWithDebugStack
 import com.github.davinkevin.podcastserver.messaging.MessagingTemplate
+import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.service.storage.FileStorageService
 import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import org.slf4j.LoggerFactory
@@ -81,10 +82,19 @@ class DownloaderHelper(
         Thread.ofVirtual().start(::finishDownloadSync)
     }
 
-    private fun finishDownloadSync() = runCatching {
+    private fun finishDownloadSync() {
         log.info("Uploading downloaded file to storage for ${info.item.url}")
-        file.upload(UploadRequest.ForItemFromPath(info.item.podcast.title, target))
+        val upload = runCatching { file.upload(UploadRequest.ForItemFromPath(info.item.podcast.title, target)) }
+        if (upload.isFailure) {
+            log.errorWithDebugStack("Error during upload of ${info.item.url}", throwable = upload.exceptionOrNull())
+            failDownload()
+            return
+        }
 
+        saveUploadedFile()
+    }
+
+    private fun saveUploadedFile() = runCatching {
         val (mimeType, size) = file.metadata(info.item.podcast.title, target)
             ?: error("metadata not found after upload for ${info.item.url}")
 
@@ -103,6 +113,7 @@ class DownloaderHelper(
         }
         .onFailure {
             log.errorWithDebugStack("Error during download of ${info.item.url}", throwable = it)
+            file.delete(DeleteRequest.ForItem(info.item.id, target.fileName, info.item.podcast.title))
             failDownload()
         }
 

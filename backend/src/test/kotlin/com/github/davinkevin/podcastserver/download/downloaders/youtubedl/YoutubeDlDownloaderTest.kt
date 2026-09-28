@@ -7,6 +7,7 @@ import com.github.davinkevin.podcastserver.download.downloaders.DownloadingInfor
 import com.github.davinkevin.podcastserver.download.downloaders.DownloadingItem
 import com.github.davinkevin.podcastserver.entity.Status
 import com.github.davinkevin.podcastserver.extension.spring.NestedSpringTest
+import com.github.davinkevin.podcastserver.service.storage.DeleteRequest
 import com.github.davinkevin.podcastserver.service.storage.FileMetaData
 import com.github.davinkevin.podcastserver.service.storage.UploadRequest
 import com.gitlab.davinkevin.podcastserver.youtubedl.DownloadProgressCallback
@@ -217,6 +218,49 @@ class YoutubeDlDownloaderTest(
                     assertThatThrownBy { downloader.download() }
                             /* Then */
                             .hasMessage("No file found after download with youtube-dl...")
+                }
+
+                @Test
+                fun `should delete the uploaded file if the download can't be saved`() {
+                    /* Given */
+                    Mockito.reset(helper.file)
+                    var finalFile: Path = Files.createTempFile("not-used-for-now", ".mp3")
+                    whenever(youtube.download(eq(url.toASCIIString()), any(), any(), any())).then {
+                        finalFile = Files.createFile(it.getArgument(1))
+                        mock<YoutubeDLResponse>()
+                    }
+                    whenever(helper.file.metadata(eq(dItem.item.podcast.title), any())).thenReturn(null)
+                    whenever(helper.file.delete(any())).thenReturn(true)
+
+                    /* When */
+                    downloader.download()
+
+                    /* Then */
+                    await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                        verify(helper.file).delete(DeleteRequest.ForItem(dItem.item.id, finalFile.fileName, dItem.item.podcast.title))
+                        assertThat(helper.info.item.status).isEqualTo(Status.FAILED)
+                    }
+                }
+
+                @Test
+                fun `should not delete anything if the upload fails`() {
+                    /* Given */
+                    Mockito.reset(helper.file)
+                    whenever(youtube.download(eq(url.toASCIIString()), any(), any(), any())).then {
+                        Files.createFile(it.getArgument(1))
+                        mock<YoutubeDLResponse>()
+                    }
+                    doThrow(RuntimeException("fake upload error")).whenever(helper.file).upload(any())
+
+                    /* When */
+                    downloader.download()
+
+                    /* Then */
+                    await().atMost(5, TimeUnit.SECONDS).untilAsserted {
+                        assertThat(helper.info.item.status).isEqualTo(Status.FAILED)
+                    }
+                    verify(helper.file, never()).metadata(any(), any())
+                    verify(helper.file, never()).delete(any())
                 }
 
             }

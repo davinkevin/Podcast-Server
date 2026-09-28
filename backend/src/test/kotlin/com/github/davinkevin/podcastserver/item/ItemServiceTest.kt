@@ -100,6 +100,42 @@ class ItemServiceTest(
     }
 
     @Test
+    fun `should not mark as deleted items whose file deletion failed`() {
+        /* Given */
+        val limit = OffsetDateTime.now().minusDays(30)
+        val deleted = DeleteRequest.ForItem(UUID.fromString("2e7d6cc7-c3ed-47d1-866f-7f797624124d"), Path("foo"), "bar")
+        val failed = DeleteRequest.ForItem(UUID.fromString("dca41d0b-a59c-43fa-8d2d-2129fb637546"), Path("num1"), "num2")
+        whenever(repository.findAllToDelete(limit)).thenReturn(listOf(deleted, failed))
+        whenever(fileService.delete(deleted)).thenReturn(true)
+        whenever(fileService.delete(failed)).thenReturn(false)
+        doNothing().whenever(repository).updateAsDeleted(any())
+
+        /* When */
+        itemService.deleteItemOlderThan(limit)
+
+        /* Then */
+        verify(fileService).delete(deleted)
+        verify(fileService).delete(failed)
+        verify(repository).updateAsDeleted(listOf(deleted.id))
+    }
+
+    @Test
+    fun `should not mark anything as deleted if every file deletion failed`() {
+        /* Given */
+        val limit = OffsetDateTime.now().minusDays(30)
+        val item = DeleteRequest.ForItem(UUID.fromString("2e7d6cc7-c3ed-47d1-866f-7f797624124d"), Path("foo"), "bar")
+        whenever(repository.findAllToDelete(limit)).thenReturn(listOf(item))
+        whenever(fileService.delete(item)).thenReturn(false)
+
+        /* When */
+        itemService.deleteItemOlderThan(limit)
+
+        /* Then */
+        verify(fileService).delete(item)
+        verify(repository, never()).updateAsDeleted(any())
+    }
+
+    @Test
     fun `should find by id`() {
         /* Given */
         whenever(repository.findById(any<UUID>())).thenReturn(item)

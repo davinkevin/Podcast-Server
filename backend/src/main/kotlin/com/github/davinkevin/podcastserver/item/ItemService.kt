@@ -37,9 +37,15 @@ class ItemService(
         log.info("Deletion of items older than {}", date)
         val items = repository.findAllToDelete(date)
 
-        items.forEach { file.delete(it) }
+        val (deleted, failed) = items.partition { file.delete(it) }
 
-        repository.updateAsDeleted(items.map { it.id })
+        if (deleted.isNotEmpty()) {
+            repository.updateAsDeleted(deleted.map { it.id })
+        }
+
+        val message = "Items older than {}: {} candidates, {} deleted, {} failed"
+        if (failed.isEmpty()) log.info(message, date, items.size, deleted.size, failed.size)
+        else log.warn(message, date, items.size, deleted.size, failed.size)
     }
 
     fun findById(id: UUID): Item? = repository.findById(id)
