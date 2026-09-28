@@ -47,7 +47,12 @@
               [attr.aria-label]="'Open ' + item.title"
               (click)="onOpen(item)"
             >
-              <img class="spotlight-card__bg" [src]="coverUrl(item)" alt="" />
+              <img
+                class="spotlight-card__bg"
+                [src]="coverUrl(item)"
+                [psPodcastCoverFallback]="item.podcast.id"
+                alt=""
+              />
               <span class="spotlight-card__scrim"></span>
               <span class="spotlight-card__body">
                 @if (isNew(item)) {
@@ -101,6 +106,7 @@
               [title]="entry.item.title"
               [subtitle]="entry.item.podcast.title"
               [coverUrl]="coverUrl(entry.item)"
+              [fallbackPodcastId]="entry.item.podcast.id"
               [parentCoverUrl]="entry.podcastCoverUrl"
               [parentTitle]="entry.item.podcast.title"
               [playable]="entry.item.isDownloaded"
@@ -136,6 +142,7 @@
                   <ps-cover-card
                     [title]="item.title"
                     [coverUrl]="coverUrl(item)"
+                    [fallbackPodcastId]="item.podcast.id"
                     [playable]="item.isDownloaded"
                     [downloadable]="!item.isDownloaded && !isInProgress(item)"
                     [playing]="player.currentItem()?.id === item.id"

@@ -20,6 +20,7 @@ import {
 import { DownloadStreamService } from '../../core/downloads/download-stream.service';
 import { DownloadApi } from '../../core/api/download.api';
 import { DownloadingItemHAL } from '../../core/models/downloading-item.model';
+import { PodcastCoverFallbackDirective } from '../../shared/podcast-cover-fallback/podcast-cover-fallback.directive';
 
 @Component({
   selector: 'ps-downloads-popover',
@@ -30,6 +31,7 @@ import { DownloadingItemHAL } from '../../core/models/downloading-item.model';
     MatProgressBarModule,
     MatTooltipModule,
     DragDropModule,
+    PodcastCoverFallbackDirective,
   ],
   templateUrl: './downloads-popover.component.html',
   styleUrl: './downloads-popover.component.scss',

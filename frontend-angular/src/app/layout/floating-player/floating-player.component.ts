@@ -6,6 +6,7 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { PlayerService } from '../../core/player/player.service';
 import { VlcService } from '../../core/vlc/vlc.service';
 import { PlayerQueueButtonComponent } from '../../shared/player-queue-button/player-queue-button.component';
+import { PodcastCoverFallbackDirective } from '../../shared/podcast-cover-fallback/podcast-cover-fallback.directive';
 
 @Component({
   selector: 'ps-floating-player',
@@ -15,6 +16,7 @@ import { PlayerQueueButtonComponent } from '../../shared/player-queue-button/pla
     MatButtonModule,
     MatTooltipModule,
     PlayerQueueButtonComponent,
+    PodcastCoverFallbackDirective,
   ],
   templateUrl: './floating-player.component.html',
   styleUrl: './floating-player.component.scss',

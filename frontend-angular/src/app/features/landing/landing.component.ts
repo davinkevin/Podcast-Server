@@ -25,6 +25,7 @@ import { ItemApi } from '../../core/api/item.api';
 import { ItemHAL } from '../../core/models/item.model';
 import { PlayerService } from '../../core/player/player.service';
 import { CoverColorService } from '../../core/cover-color/cover-color.service';
+import { PodcastCoverFallbackDirective } from '../../shared/podcast-cover-fallback/podcast-cover-fallback.directive';
 
 /** The mixed grid's cell sizing — mirrored from the SCSS so the JS column
  *  count matches CSS `auto-fill` exactly (needed to drop the expansion panel
@@ -73,6 +74,7 @@ type Entry = ShowEntry | EpisodeEntry;
     MatButtonToggleModule,
     MatProgressSpinnerModule,
     CoverCardComponent,
+    PodcastCoverFallbackDirective,
     ContentRowComponent,
     EmptyStateComponent,
   ],

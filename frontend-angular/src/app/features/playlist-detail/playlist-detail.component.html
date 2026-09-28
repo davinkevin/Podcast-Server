@@ -115,6 +115,7 @@
             [title]="item.title"
             [subtitle]="item.podcast.title"
             [coverUrl]="itemCoverUrl(item)"
+            [fallbackPodcastId]="item.podcast.id"
             [aspectRatio]="item.cover.width + ' / ' + item.cover.height"
             [playable]="item.isDownloaded"
             [downloadable]="!item.isDownloaded && !isInProgress(item)"

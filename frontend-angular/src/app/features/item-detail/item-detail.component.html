@@ -29,6 +29,7 @@
         #coverEl
         class="detail__cover"
         [src]="coverSrc()"
+        [psPodcastCoverFallback]="coverFallbackPodcastId()"
         [alt]="item?.title ?? ''"
         [style.view-transition-name]="heroTransitionName()"
       />

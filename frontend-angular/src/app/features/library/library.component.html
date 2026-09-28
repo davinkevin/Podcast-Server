@@ -193,6 +193,7 @@
             [title]="item.title"
             [subtitle]="item.podcast.title"
             [coverUrl]="coverUrl(item)"
+            [fallbackPodcastId]="item.podcast.id"
             [playable]="item.isDownloaded"
             [downloadable]="!item.isDownloaded && !isInProgress(item)"
             [playing]="player.currentItem()?.id === item.id"

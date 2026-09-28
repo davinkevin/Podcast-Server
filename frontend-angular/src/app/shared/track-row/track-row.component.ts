@@ -11,6 +11,7 @@ import {
   CoverCardDivider,
   CoverCardMenuEntry,
 } from '../cover-card/cover-card.component';
+import { PodcastCoverFallbackDirective } from '../podcast-cover-fallback/podcast-cover-fallback.directive';
 
 /**
  * Spotify / Apple Music style horizontal row for an item. Built as a
@@ -30,6 +31,7 @@ import {
     MatDividerModule,
     MatMenuModule,
     MatRippleModule,
+    PodcastCoverFallbackDirective,
   ],
   templateUrl: './track-row.component.html',
   styleUrl: './track-row.component.scss',
@@ -42,6 +44,9 @@ export class TrackRowComponent {
   readonly title = input.required<string>();
   readonly subtitle = input<string | undefined>(undefined);
   readonly coverUrl = input.required<string>();
+  /** Podcast of the item shown, whose cover replaces the item cover when
+   *  that one can't be loaded. Leave unset for podcast or playlist covers. */
+  readonly fallbackPodcastId = input<string | undefined>(undefined);
   /** CSS `aspect-ratio` value, e.g. `'16 / 9'` or `'1 / 1'`. When set, the
    *  thumb keeps the row's fixed height but its width follows the natural
    *  ratio of the artwork (capped by SCSS so panoramic covers don't push

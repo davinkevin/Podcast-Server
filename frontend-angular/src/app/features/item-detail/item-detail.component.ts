@@ -41,6 +41,10 @@ import {
 } from '../../shared/status-badge/status-badge.component';
 import { EmptyStateComponent } from '../../shared/empty-state/empty-state.component';
 import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialog.component';
+import {
+  PodcastCoverFallbackDirective,
+  podcastCoverUrl,
+} from '../../shared/podcast-cover-fallback/podcast-cover-fallback.directive';
 
 @Component({
   selector: 'ps-item-detail',
@@ -54,6 +58,7 @@ import { AddToPlaylistDialogComponent } from '../playlists/add-to-playlist-dialo
     MatMenuModule,
     MatProgressSpinnerModule,
     StatusBadgeComponent,
+    PodcastCoverFallbackDirective,
     EmptyStateComponent,
   ],
   templateUrl: './item-detail.component.html',
@@ -175,6 +180,15 @@ export default class ItemDetailComponent {
     return '';
   });
 
+  // Podcast whose cover stands in when the item cover can't be loaded,
+  // resolved from the same sources as `coverSrc`.
+  protected readonly coverFallbackPodcastId = computed<string | undefined>(
+    () =>
+      this.itemQuery.data()?.podcast.id ??
+      this.playlistItem()?.podcast.id ??
+      this.podcastId(),
+  );
+
   // Cover of the playlist itself, shown as a small overlay on the hero when
   // the user arrived via /playlists/:idPlaylist/items/:id — signature
   // visual cue that we're inside a playlist context.
@@ -233,7 +247,10 @@ export default class ItemDetailComponent {
     effect(() => {
       const item = this.itemQuery.data();
       if (!item) return;
-      this.coverColor.extract(item.cover.proxyURL).then((p) => this.palette.set(p));
+      this.coverColor
+        .extract(item.cover.proxyURL)
+        .then((p) => p ?? this.coverColor.extract(podcastCoverUrl(item.podcast.id)))
+        .then((p) => this.palette.set(p));
     });
 
     // Claim the tint for the URL we are rendered at. PageTintService only

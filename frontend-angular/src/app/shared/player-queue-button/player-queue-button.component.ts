@@ -5,6 +5,7 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatTooltipModule } from '@angular/material/tooltip';
 
 import { PlayerService } from '../../core/player/player.service';
+import { PodcastCoverFallbackDirective } from '../podcast-cover-fallback/podcast-cover-fallback.directive';
 
 /**
  * Inline button revealing the current player queue in a popover. Mounted
@@ -19,7 +20,13 @@ import { PlayerService } from '../../core/player/player.service';
 @Component({
   selector: 'ps-player-queue-button',
   standalone: true,
-  imports: [MatIconModule, MatButtonModule, MatMenuModule, MatTooltipModule],
+  imports: [
+    MatIconModule,
+    MatButtonModule,
+    MatMenuModule,
+    MatTooltipModule,
+    PodcastCoverFallbackDirective,
+  ],
   template: `
     <button
       mat-icon-button
@@ -53,7 +60,12 @@ import { PlayerService } from '../../core/player/player.service';
             @if (active) {
               <mat-icon class="queue__leader-icon">play_arrow</mat-icon>
             } @else {
-              <img class="queue__cover" [src]="item.cover.proxyURL" alt="" />
+              <img
+                class="queue__cover"
+                [src]="item.cover.proxyURL"
+                [psPodcastCoverFallback]="item.podcast.id"
+                alt=""
+              />
             }
           </div>
           <div class="queue__meta">

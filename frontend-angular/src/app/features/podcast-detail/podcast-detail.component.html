@@ -366,6 +366,7 @@
               [title]="item.title"
               [subtitle]="subtitleFor(item)"
               [coverUrl]="item.cover.proxyURL"
+              [fallbackPodcastId]="item.podcast.id"
               [aspectRatio]="item.cover.width + ' / ' + item.cover.height"
               [playable]="item.isDownloaded"
               [downloadable]="!item.isDownloaded && !isInProgress(item)"

@@ -2,6 +2,7 @@
   <img
     class="cover__image"
     [src]="coverUrl()"
+    [psPodcastCoverFallback]="fallbackPodcastId()"
     [alt]="title()"
     loading="lazy"
     [style.view-transition-name]="viewTransitionName()"

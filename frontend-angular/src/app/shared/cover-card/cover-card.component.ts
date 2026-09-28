@@ -4,6 +4,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatRippleModule } from '@angular/material/core';
+import { PodcastCoverFallbackDirective } from '../podcast-cover-fallback/podcast-cover-fallback.directive';
 
 export interface CoverCardAction {
   /** Optional stable identifier for action matching by callers. */
@@ -74,6 +75,7 @@ export type CoverCardMenuEntry =
     MatDividerModule,
     MatMenuModule,
     MatRippleModule,
+    PodcastCoverFallbackDirective,
   ],
   templateUrl: './cover-card.component.html',
   styleUrl: './cover-card.component.scss',
@@ -86,6 +88,9 @@ export class CoverCardComponent {
   readonly title = input.required<string>();
   readonly subtitle = input<string | undefined>(undefined);
   readonly coverUrl = input.required<string>();
+  /** Podcast of the item shown, whose cover replaces the item cover when
+   *  that one can't be loaded. Leave unset for podcast or playlist covers. */
+  readonly fallbackPodcastId = input<string | undefined>(undefined);
   readonly actions = input<readonly CoverCardMenuEntry[]>([]);
   readonly playable = input<boolean>(true);
   readonly downloadable = input<boolean>(false);
