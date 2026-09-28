@@ -15,7 +15,7 @@ plugins {
 
 	id("com.gorylenko.gradle-git-properties") version "4.0.1"
 	id("com.google.cloud.tools.jib") version "3.5.4"
-	id("org.jetbrains.kotlinx.kover") version "0.9.9"
+	id("org.jetbrains.kotlinx.kover") version "0.9.10"
 
 	id("build-plugin-database")
 	id("build-plugin-docker-images")
