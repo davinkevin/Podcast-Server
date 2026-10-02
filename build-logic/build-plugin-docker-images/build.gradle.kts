@@ -5,7 +5,7 @@ plugins {
 }
 
 group = "com.gitlab.davinkevin.podcastserver.dockerimages"
-version = "2026.1.0"
+version = "2026.10.0"
 
 assignment {
     annotation("org.gradle.api.SupportsKotlinAssignmentOverloading")
